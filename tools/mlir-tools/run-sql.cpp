@@ -17,6 +17,8 @@ int main(int argc, char** argv) {
    std::string directory = std::string(argv[2]);
    std::cout << "Loading Database from: " << directory << '\n';
    auto session = runtime::Session::createSession(directory,false);
+   auto nice = session->getCatalog()->findRelation("hoeren")->getArrowSchema();
+
 
    support::eval::init();
    execution::ExecutionMode runMode = execution::getExecutionMode();
