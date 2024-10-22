@@ -20,6 +20,7 @@ int main(int argc, char** argv) {
    auto nice = session->getCatalog()->findRelation("hoeren")->getArrowSchema();
 
 
+
    support::eval::init();
    execution::ExecutionMode runMode = execution::getExecutionMode();
    auto queryExecutionConfig = execution::createQueryExecutionConfig(runMode, true);

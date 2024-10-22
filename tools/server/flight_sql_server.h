@@ -29,6 +29,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetStatement(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::StatementQueryTicket &command) override;
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSqlInfo(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::GetSqlInfo &command, const arrow::flight::FlightDescriptor &descriptor) override;
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoPreparedStatement(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::PreparedStatementQuery &command, const arrow::flight::FlightDescriptor &descriptor) override;
+   arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> CreatePreparedStatement(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::ActionCreatePreparedStatementRequest &request) override;
 
    /*arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSubstraitPlan(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::StatementSubstraitPlan &command, const arrow::flight::FlightDescriptor &descriptor) override;
    arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetStatement(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::StatementQueryTicket &command) override;
@@ -65,8 +66,15 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    arrow::Result<arrow::flight::sql::ActionBeginTransactionResult> BeginTransaction(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::ActionBeginTransactionRequest &request) override;
    arrow::Result<arrow::flight::GetSessionOptionsResult> GetSessionOptions(const arrow::flight::ServerCallContext &context, const arrow::flight::GetSessionOptionsRequest &request) override;*/
 
+   arrow::Status ClosePreparedStatement(const arrow::flight::ServerCallContext &context, const arrow::flight::sql::ActionClosePreparedStatementRequest &request) override;
 
 
+
+};
+
+class CustomAuthHandler : public arrow::flight::ServerAuthHandler {
+   arrow::Status Authenticate(const arrow::flight::ServerCallContext &context, arrow::flight::ServerAuthSender *outgoing, arrow::flight::ServerAuthReader *incoming) override;
+   arrow::Status IsValid(const arrow::flight::ServerCallContext &context, const std::string &token, std::string *peer_identity) override;
 };
 
 } // namespace server
