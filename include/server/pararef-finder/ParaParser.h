@@ -20,12 +20,12 @@ class ParaParser {
    ParaParser() = delete;
    ParaParser(const std::shared_ptr<runtime::Session>& session);
    void parseTestA(std::string sqlUrl);
-   bool findParasInSelectStatement(SelectStmt* selectStatement, std::vector<std::shared_ptr<arrow::Field>>& value1);
-   std::vector<std::shared_ptr<arrow::Field>> getParas(std::string sql);
+   std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>>  findParasInSelectStatement(SelectStmt* selectStatement);
+   std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>>  getParas(std::string sql);
 
    private:
    std::shared_ptr<runtime::Session> session;
-   std::vector<std::shared_ptr<arrow::Field>> findParas(Node* currentNode);
+  std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>>  findParas(Node* currentNode);
    std::string fieldsToString(List* fields);
    std::shared_ptr<arrow::Field> getFieldOfColumn(std::string columnName);
 };
