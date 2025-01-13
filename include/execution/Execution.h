@@ -121,6 +121,7 @@ class QueryExecuter {
    QueryExecutionConfig& getConfig() { return *queryExecutionConfig; }
    static std::unique_ptr<QueryExecuter> createDefaultExecuter(std::unique_ptr<QueryExecutionConfig> queryExecutionConfig, runtime::Session& session);
    virtual ~QueryExecuter() {}
+   [[nodiscard]] std::unique_ptr<runtime::ExecutionContext>& get_execution_context()  { return executionContext; }
 };
 
 } // namespace execution
