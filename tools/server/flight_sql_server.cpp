@@ -41,7 +41,7 @@ arrow::Status startServer(std::string sqlUrl) {
    std::cout << "Loading: " << sqlUrl << std::endl;
    auto session = runtime::Session::createSession(sqlUrl, true);
 
-   auto executionContext = session->createExecutionContext();
+  /* auto executionContext = session->createExecutionContext();
    auto queryExecutionConfig = execution::createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
    ParaParser parser{session};
@@ -54,7 +54,7 @@ arrow::Status startServer(std::string sqlUrl) {
    } catch (const std::runtime_error& error) {
       std::cerr << "Error" << std::endl;
       return arrow::Status::Invalid(error.what());
-   }
+   }*/
 
    arrow::flight::Location server_location;
    ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
