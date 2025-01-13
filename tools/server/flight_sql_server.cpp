@@ -113,8 +113,6 @@ FlightSqlServerTestImpl::GetFlightInfoStatement(const arrow::flight::ServerCallC
    return arrow::Status::NotImplemented("FlightSqlServerTestImpl::GetFlightInfoStatement");
 }
 
-
-
 arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
 FlightSqlServerTestImpl::GetFlightInfoSqlInfo(const arrow::flight::ServerCallContext& context,
                                               const arrow::flight::sql::GetSqlInfo& command,
@@ -128,10 +126,8 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
    CHECK_FOR_VALID_SERVER_SESSION()
    std::cout << "GetFlightInfoPreparedStatement " << std::endl;
 
-
-
    // The schema can be built from a vector of fields, and we do so here.
-    std::shared_ptr<arrow::Schema> schema = sessions->at(0)->getCatalog()->findRelation("hoeren")->getArrowSchema();
+   std::shared_ptr<arrow::Schema> schema = sessions->at(0)->getCatalog()->findRelation("hoeren")->getArrowSchema();
 
    ARROW_ASSIGN_OR_RAISE(auto ticket_string,
                          arrow::flight::sql::CreateStatementQueryTicket(command.prepared_statement_handle));
@@ -141,8 +137,7 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
    // TODO: Set true only when "ORDER BY" is used in a main "SELECT"
    // in the given query.
    const bool ordered = false;
-   ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*schema, descriptor,
-                                                               endpoints, -1, -1, ordered));
+   ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*schema, descriptor, endpoints, -1, -1, ordered));
 
    return std::make_unique<arrow::flight::FlightInfo>(result);
 }

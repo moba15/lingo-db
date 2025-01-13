@@ -74,7 +74,7 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       return childPid;
    }
 }
-arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>StatementHandler::waitAndGetStatementResult(std::string handle) {
+arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler::waitAndGetStatementResult(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
    CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
 
