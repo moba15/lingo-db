@@ -39,7 +39,7 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
       CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
-      executer->fromData("select * from hoeren");
+      executer->fromData(sqlStatement);
       try {
          executer->execute();
       } catch (const std::runtime_error& e) {

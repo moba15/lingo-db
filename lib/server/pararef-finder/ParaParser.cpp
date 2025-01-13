@@ -27,20 +27,19 @@ void ParaParser::parseTestA(std::string sqlUrl) {
    auto t = translator.translate(builder);
 }
 
-bool ParaParser::findParasInSelectStatement(SelectStmt* selectStatement, std::vector<std::shared_ptr<arrow::Field>>& value1) {
-
+std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::findParasInSelectStatement(SelectStmt* selectStatement) {
    if (selectStatement->op_ != SETOP_NONE) {
       throw std::runtime_error("ParaParser::getParas(): invalid node op_ type");
    }
 
    if (selectStatement->where_clause_) {
       Node* current = selectStatement->where_clause_;
-      value1 = findParas(selectStatement->where_clause_);
-      return true;
+      auto result = findParas(selectStatement->where_clause_);
+      return std::move(result);
    }
-   return false;
+   return std::make_unique<std::vector<std::shared_ptr<arrow::Field>>>();
 }
-std::vector<std::shared_ptr<arrow::Field>> ParaParser::getParas(std::string sql) {
+std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::getParas(std::string sql) {
    mlir::MLIRContext context;
    execution::initializeContext(context);
    mlir::OpBuilder builder(&context);
@@ -49,13 +48,11 @@ std::vector<std::shared_ptr<arrow::Field>> ParaParser::getParas(std::string sql)
    frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
    auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
    if (statement->type != T_SelectStmt) { throw std::runtime_error("ParaParser::getParas(): invalid node type"); }
-   std::vector<std::shared_ptr<arrow::Field>> value1;
-   if (findParasInSelectStatement(reinterpret_cast<SelectStmt*>(statement), value1)) return value1;
-   return {};
+   return std::move(findParasInSelectStatement(reinterpret_cast<SelectStmt*>(statement)));
 }
 
-std::vector<std::shared_ptr<arrow::Field>> ParaParser::findParas(Node* currentNode) {
-   std::vector<std::shared_ptr<arrow::Field>> fieldsVector{};
+std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::findParas(Node* currentNode) {
+   auto fieldsVector = std::make_unique<std::vector<std::shared_ptr<arrow::Field>>>();
    if (currentNode->type == T_A_Expr) {
       auto* expr = reinterpret_cast<A_Expr*>(currentNode);
       if (expr->kind_ == AEXPR_OP) {
@@ -69,15 +66,13 @@ std::vector<std::shared_ptr<arrow::Field>> ParaParser::findParas(Node* currentNo
                auto name = fieldsToString(fields);
                std::cout << fieldsToString(fields) << std::endl;
                auto field = getFieldOfColumn(name);
-               fieldsVector.push_back(field);
+               fieldsVector->push_back(field);
             }
          } else if (right->type == T_SubLink) {
             auto* subLink = reinterpret_cast<SubLink*>(right);
             std::vector<std::shared_ptr<arrow::Field>> value1;
-            auto f = findParasInSelectStatement(reinterpret_cast<SelectStmt*>(subLink->subselect_),value1);
-            for (auto fcurrent : value1) { fieldsVector.push_back(fcurrent); }
-
-
+            auto f = findParasInSelectStatement(reinterpret_cast<SelectStmt*>(subLink->subselect_));
+            for (auto fcurrent : value1) { fieldsVector->push_back(fcurrent); }
          }
 
          //Left should include column
@@ -89,10 +84,10 @@ std::vector<std::shared_ptr<arrow::Field>> ParaParser::findParas(Node* currentNo
       for (auto* cell = boolExpr->args_->head; cell != nullptr; cell = cell->next) {
          auto* node = reinterpret_cast<Node*>(cell->data.ptr_value);
          auto f = findParas(node);
-         for (auto fcurrent : f) { fieldsVector.push_back(fcurrent); }
+         for (auto fcurrent : *f) { fieldsVector->push_back(fcurrent); }
       }
    }
-   return fieldsVector;
+   return std::move(fieldsVector);
 }
 
 std::string ParaParser::fieldsToString(List* fields) {
@@ -116,9 +111,12 @@ std::string ParaParser::fieldsToString(List* fields) {
    return tableName.empty() ? colName : tableName + "." + colName;
 }
 std::shared_ptr<arrow::Field> ParaParser::getFieldOfColumn(std::string columnName) {
-   auto fields = this->session->getCatalog()->findRelation("hoeren")->getTable()->schema()->fields();
-   for (auto field : fields) {
-      if (field->name() == columnName) { return field; }
+   std::vector<std::shared_ptr<runtime::Relation>> relations{session->getCatalog()->findRelation("hoeren"), session->getCatalog()->findRelation("vorlesungen")};
+   for (auto& relation : relations) {
+      auto fields = relation->getArrowSchema()->fields();
+      for (auto field : fields) {
+         if (field->name() == columnName) { return field; }
+      }
    }
 
    throw std::runtime_error("could not find field " + columnName);

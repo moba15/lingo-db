@@ -44,11 +44,12 @@ arrow::Status startServer(std::string sqlUrl) {
    auto executionContext = session->createExecutionContext();
    auto queryExecutionConfig = execution::createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
-   /* ParaParser parser{session};
-   auto paras = parser.getParas("select * from hoeren where matrnr=(select matrnr from hoeren where vorlnr=? and matrnr=? and vorlnr=(select * from vorlesungen where sws=? ))");
-   for (auto para : paras) { std::cout << "Found: " << para->name() << std::endl; }*/
-   executer->fromData("select * from hoeren");
+   ParaParser parser{session};
+   auto paras = parser.getParas("select * from hoeren where matrnr=(select matrnr from hoeren where vorlnr=? and matrnr=? and vorlnr=(select * from vorlesungen where sws LIKE ?))");
+   for (auto para : *paras) { std::cout << "Found: " << para->name() << std::endl; }
+   executer->fromData("insert into hoeren (matrnr,vorlnr) VALUES (1,2)");
    try {
+
       executer->execute();
    } catch (const std::runtime_error& error) {
       std::cerr << "Error" << std::endl;
