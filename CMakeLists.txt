@@ -137,6 +137,8 @@ add_subdirectory(lib/Conversion/DSAToStd)
 add_subdirectory(lib/Conversion/RelAlgToSubOp)
 add_subdirectory(lib/Conversion/SubOpToControlFlow)
 
+add_subdirectory(lib/server)
+
 add_subdirectory(lib/Conversion/UtilToLLVM)
 
 get_property(dialect_libs GLOBAL PROPERTY MLIR_DIALECT_LIBS)
