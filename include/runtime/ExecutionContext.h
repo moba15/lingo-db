@@ -29,14 +29,14 @@ class ExecutionContext {
    }
    template <class T>
    std::optional<T*> getResultOfType(uint32_t id) {
-      if (results.contains(id)) {
+      if (results.find(id) != results.end()) {
          return (T*) results[id];
       } else {
          return {};
       }
    }
    std::optional<int64_t> getTupleCount(uint32_t id) {
-      if (tupleCounts.contains(id)) {
+      if (results.find(id) != results.end()) {
          return tupleCounts[id];
       } else {
          return {};

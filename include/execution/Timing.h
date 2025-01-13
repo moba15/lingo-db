@@ -44,7 +44,7 @@ class TimingPrinter : public TimingProcessor {
       std::cout << std::endl;
       std::cout << std::setw(10) << queryName;
       for (auto n : printOrder) {
-         if (timing.contains(n)) {
+         if (timing.find(n) != timing.end()) {
             std::cout << std::setw(15) << timing[n];
          } else {
             std::cout << std::setw(15) << "";
