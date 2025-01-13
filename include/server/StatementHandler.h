@@ -10,6 +10,7 @@
 #include <mutex>
 #include <shared_mutex>
 #include <string>
+#include <arrow/flight/server.h>
 #include <arrow/result.h>
 #include <arrow/util/launder.h>
 #include <runtime/ArrowTable.h>
@@ -27,7 +28,7 @@ class StatementHandler {
 
    arrow::Result<std::string> addStatementToQueue(std::string sqlStatement);
    arrow::Result<pid_t> executeStatement(std::string handle, std::shared_ptr<runtime::Session> session);
-   arrow::Result<std::shared_ptr<arrow::Buffer>> waitAndGetStatementResult(std::string handle);
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> waitAndGetStatementResult(std::string handle);
    arrow::Status closeStatement(std::string handle);
 
    private:

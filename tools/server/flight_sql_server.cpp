@@ -41,20 +41,19 @@ arrow::Status startServer(std::string sqlUrl) {
    std::cout << "Loading: " << sqlUrl << std::endl;
    auto session = runtime::Session::createSession(sqlUrl, true);
 
-  /* auto executionContext = session->createExecutionContext();
+   auto executionContext = session->createExecutionContext();
    auto queryExecutionConfig = execution::createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
-   ParaParser parser{session};
+  /* ParaParser parser{session};
    auto paras = parser.getParas("select * from hoeren where matrnr=(select matrnr from hoeren where vorlnr=? and matrnr=? and vorlnr=(select * from vorlesungen where sws=? ))");
-   for (auto para : paras) { std::cout << "Found: " << para->name() << std::endl; }
-   executer->fromData("select p.matrnr from (select * from hoeren where vorlnr in (select vorlnr from vorlesungen "
-                      "where sws=4)) as p");
+   for (auto para : paras) { std::cout << "Found: " << para->name() << std::endl; }*/
+   executer->fromData("select * from hoeren");
    try {
-      //executer->execute();
+      executer->execute();
    } catch (const std::runtime_error& error) {
       std::cerr << "Error" << std::endl;
       return arrow::Status::Invalid(error.what());
-   }*/
+   }
 
    arrow::flight::Location server_location;
    ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
@@ -64,10 +63,10 @@ arrow::Status startServer(std::string sqlUrl) {
    auto statementExecution = std::make_unique<server::StatementExecution>();
    auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 32);
    auto sessions = std::make_unique<std::vector<std::shared_ptr<runtime::Session>>>();
-   sessions->emplace_back(std::move(session));
-   std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
-      new server::FlightSqlServerTestImpl(std::move(root), std::move(sessions), std::move(statementHandler)));
 
+   std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
+      new server::FlightSqlServerTestImpl(std::move(root), session, std::move(statementHandler)));
+   session->getCatalog()->findRelation("hoeren");
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;
    return server->Serve();
@@ -129,18 +128,19 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
 FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::ServerCallContext& context,
                                                         const arrow::flight::sql::PreparedStatementQuery& command,
                                                         const arrow::flight::FlightDescriptor& descriptor) {
-   std::cout << "GetFlightInfoPreparedStatement " << descriptor.cmd << std::endl;
+   std::cout << "GetFlightInfoPreparedStatement "  << std::endl;
+   CHECK_FOR_VALID_SERVER_SESSION()
    std::shared_ptr<arrow::Schema> schema;
 
    // The schema can be built from a vector of fields, and we do so here.
-   schema = sessions->at(0)->getCatalog()->findRelation("hoeren")->getArrowSchema();
+   schema = session->getCatalog()->findRelation("hoeren")->getArrowSchema();
 
    ARROW_ASSIGN_OR_RAISE(auto ticket_string,
                          arrow::flight::sql::CreateStatementQueryTicket(command.prepared_statement_handle));
    arrow::flight::Ticket ticket{std::move(ticket_string)};
-
+   arrow::flight::Ticket ticket2(descriptor.cmd);
    std::vector<arrow::flight::FlightEndpoint> endpoints{
-      arrow::flight::FlightEndpoint{arrow::flight::Ticket(descriptor.cmd), {}, std::nullopt, descriptor.cmd}};
+      arrow::flight::FlightEndpoint{ticket, {}, std::nullopt, descriptor.cmd}};
    // TODO: Set true only when "ORDER BY" is used in a main "SELECT"
    // in the given query.
    const bool ordered = false;
@@ -153,8 +153,7 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
 FlightSqlServerTestImpl::DoGetPreparedStatement(const arrow::flight::ServerCallContext& context,
                                                 const arrow::flight::sql::PreparedStatementQuery& command) {
-   ARROW_ASSIGN_OR_RAISE(auto buffer, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
-   ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
+   ARROW_ASSIGN_OR_RAISE(auto stream, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
 
    return stream;
 }
@@ -174,10 +173,13 @@ arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSql
    const arrow::flight::ServerCallContext& context,
    const arrow::flight::sql::ActionCreatePreparedStatementRequest& request) {
    std::cout << "CreatePreparedStatement" << std::endl;
-   ARROW_ASSIGN_OR_RAISE(auto const handle, statementHandler->addStatementToQueue(request.query));
-   ARROW_RETURN_NOT_OK(statementHandler->executeStatement(handle, sessions->at(0)));
+   CHECK_FOR_VALID_SERVER_SESSION()
 
-   return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
+   ARROW_ASSIGN_OR_RAISE(auto const handle, statementHandler->addStatementToQueue(request.query));
+   ARROW_RETURN_NOT_OK(statementHandler->executeStatement(handle, session));
+   auto r = this->session->getCatalog()->findRelation("hoeren")->getArrowSchema();
+
+   return arrow::flight::sql::ActionCreatePreparedStatementResult{std::move(r), nullptr, handle};
 }
 
 arrow::Status
@@ -214,7 +216,8 @@ FlightSqlServerTestImpl::GetFlightInfoTableTypes(const arrow::flight::ServerCall
 arrow::Status FlightSqlServerTestImpl::ClosePreparedStatement(
    const arrow::flight::ServerCallContext& context,
    const arrow::flight::sql::ActionClosePreparedStatementRequest& request) {
-   return statementHandler->closeStatement(request.prepared_statement_handle);
+
+   return arrow::Status::OK();
 }
 arrow::Result<int64_t>
 FlightSqlServerTestImpl::DoPutPreparedStatementUpdate(const arrow::flight::ServerCallContext& context,

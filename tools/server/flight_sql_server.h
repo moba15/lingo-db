@@ -22,6 +22,9 @@
 #include <sys/types.h>
 #define SharedmemSize 100
 
+#define CHECK_FOR_VALID_SERVER_SESSION() \
+  if(session == nullptr) {return arrow::Status::Invalid("Session is null");}
+
 namespace server {
 
 class FlightSqlServer {};
@@ -34,9 +37,9 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    public:
    //TODO check if session is given correctly
    explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
-                                    std::unique_ptr<std::vector<std::shared_ptr<runtime::Session>>> sessions,
+                                    std::shared_ptr<runtime::Session> session,
                                     std::unique_ptr<StatementHandler> statementHandler)
-      : sessions{std::move(sessions)}, statementHandler(std::move(statementHandler)) {}
+      : session{std::move(session)}, statementHandler(std::move(statementHandler)) {}
 
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
    GetFlightInfoStatement(const arrow::flight::ServerCallContext& context,
@@ -101,8 +104,8 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
 
       return randomString;
    }
-
-   std::unique_ptr<std::vector<std::shared_ptr<runtime::Session>>> sessions;
+    std::shared_ptr<runtime::Session> session;
+   //std::unique_ptr<std::vector<std::shared_ptr<runtime::Session>>> sessions;
    std::unique_ptr<StatementHandler> statementHandler;
 };
 

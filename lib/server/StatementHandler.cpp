@@ -39,7 +39,7 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
       CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
-      executer->fromData(sqlStatement);
+      executer->fromData("select * from hoeren");
       try {
          executer->execute();
       } catch (const std::runtime_error& e) {
@@ -73,7 +73,7 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       return childPid;
    }
 }
-arrow::Result<std::shared_ptr<arrow::Buffer>> StatementHandler::waitAndGetStatementResult(std::string handle) {
+arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>StatementHandler::waitAndGetStatementResult(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
    CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
 
@@ -81,8 +81,9 @@ arrow::Result<std::shared_ptr<arrow::Buffer>> StatementHandler::waitAndGetStatem
    std::cout << "Result found for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(handle));
    std::cout << "Result read for " << handle << std::endl;
+   ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
 
-   return std::move(buffer);
+   return std::move(stream);
 }
 arrow::Status StatementHandler::closeStatement(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
