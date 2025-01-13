@@ -65,6 +65,7 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       }
 
       ARROW_RETURN_NOT_OK(statementQueue.at(handle)->mark_as_finished(false));
+      std::exit(0);
 
       return arrow::Status::Invalid("Child process return value has to be ignored");
    } else {
