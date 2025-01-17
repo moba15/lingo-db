@@ -9,15 +9,20 @@
 #include <arrow/result.h>
 #include <arrow/table.h>
 #include <arrow/util/launder.h>
-namespace  server {
-
+#include <runtime/Relation.h>
+namespace server {
 
 enum class StatementType {
-   AD_HOC,
+   AD_HOC_QUERY,
    PreparedStatement,
+   AD_HOC_UPDATE,
+
 };
 
-enum StatementStatus { IDLE, EXECUTING, DONE, ERROR };
+enum StatementStatus { IDLE,
+                       EXECUTING,
+                       DONE,
+                       ERROR };
 class Statement {
    public:
    Statement(std::string handle, std::string sqlStatement, StatementType type,

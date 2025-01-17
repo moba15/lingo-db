@@ -24,11 +24,11 @@ namespace server {
 
 class StatementHandler {
    public:
-   explicit StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize = 1024);
+   StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<runtime::Session> session);
 
    arrow::Result<std::string> addStatementToQueue(std::string sqlStatement);
-   arrow::Result<pid_t> executeStatement(std::string handle, std::shared_ptr<runtime::Session> session);
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> waitAndGetStatementResult(std::string handle);
+   arrow::Result<pid_t> executeQeueryStatement(std::string handle, bool onlyIfQuery);
+   arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>> waitAndGetStatementResult(std::string handle);
    arrow::Status closeStatement(std::string handle);
 
    private:
@@ -36,6 +36,7 @@ class StatementHandler {
    std::unique_ptr<StatementExecution> statementExecution;
    std::map<std::string, std::unique_ptr<Statement>> statementQueue;
    std::timed_mutex statementQueueMutex;
+   std::shared_ptr<runtime::Session> session;
    static std::string randomString(int length) {
       // Characters to use for generating the string
       const std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

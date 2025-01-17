@@ -7,10 +7,11 @@
 #include <mutex>
 #include <execution/Execution.h>
 #include <server/ipc/IPCHelper.h>
+#include <server/pararef-finder/ParaParser.h>
 using namespace std::chrono_literals;
 namespace server {
-StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, const size_t handleSize)
-   : handleSize(handleSize), statementExecution(std::move(statementExecution)) {}
+StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<runtime::Session> session)
+   : handleSize(handleSize), statementExecution(std::move(statementExecution)), session(session) {}
 
 arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sqlStatement) {
    if (sqlStatement.find("?") != std::string::npos) { return arrow::Status::Invalid("Invalid SQL statement"); }
@@ -19,17 +20,27 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    std::string handle = randomString(handleSize);
    while (statementQueue.find(handle) != statementQueue.end()) { handle = randomString(handleSize); }
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
+   ParaParser para_parser{session};
+   auto type = para_parser.getStatementType(sqlStatement);
+
+
 
    auto statement =
-      std::make_unique<Statement>(handle, sqlStatement, StatementType::AD_HOC, std::move(sharedSemaphore));
+      std::make_unique<Statement>(handle, sqlStatement, type, std::move(sharedSemaphore));
    statementQueue.emplace(handle, std::move(statement));
 
    return arrow::Result<std::string>(handle);
 }
-arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std::shared_ptr<runtime::Session> session) {
+arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle, bool onlyIfQuery) {
    {
       UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-         CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)} pid_t childPid = fork();
+         CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)}
+   if (onlyIfQuery && statementQueue.at(handle)->get_type() != StatementType::AD_HOC_QUERY) {
+      //Only execute Query statements
+      return -1;
+   }
+   pid_t childPid = fork();
+
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
       //Child
@@ -41,7 +52,9 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
       executer->fromData(sqlStatement);
       try {
+         std::cout << "Executing " << sqlStatement << std::endl;
          executer->execute();
+         std::cout << "Executed " << sqlStatement << std::endl;
       } catch (const std::runtime_error& e) {
          std::cerr << e.what() << std::endl;
 
@@ -53,10 +66,14 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
          }
          return arrow::Status::Invalid(e.what());
       }
-      auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
-      auto table = resultTable.value()->get();
-      ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
-      ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(handle, buffer));
+      if (statementQueue.at(handle)->get_type() == StatementType::AD_HOC_QUERY) {
+         auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
+         auto table = resultTable.value()->get();
+         ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
+         ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(handle, buffer));
+
+      }
+
       std::cout << "Execution finished: " << handle << std::endl;
 
       if (statementQueue.find(handle) == statementQueue.end()) {
@@ -74,11 +91,14 @@ arrow::Result<pid_t> StatementHandler::executeStatement(std::string handle, std:
       return childPid;
    }
 }
-arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler::waitAndGetStatementResult(std::string handle) {
+arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>> StatementHandler::waitAndGetStatementResult(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
    CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
 
    ARROW_RETURN_NOT_OK(statementQueue.at(handle)->waitForResult());
+   if (statementQueue.at(handle)->get_type() == StatementType::AD_HOC_UPDATE) {
+      return 0;
+   }
    std::cout << "Result found for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(handle));
    std::cout << "Result read for " << handle << std::endl;

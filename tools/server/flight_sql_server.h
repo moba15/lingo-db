@@ -37,7 +37,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    public:
    //TODO check if session is given correctly
    explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
-                                    std::unique_ptr<std::vector<std::shared_ptr<runtime::Session>>>
+                                    std::unique_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>
                                        sessions,
                                     std::unique_ptr<StatementHandler>
                                        statementHandler)
@@ -87,25 +87,20 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    GetFlightInfoTableTypes(const arrow::flight::ServerCallContext& context,
                            const arrow::flight::FlightDescriptor& descriptor) override;
 
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetCatalogs(const arrow::flight::ServerCallContext& context) override;
+
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetDbSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command) override;
+
    arrow::Status start(const arrow::flight::FlightServerOptions& options);
 
    private:
-   std::string randomString(int length) {
-      // Characters to use for generating the string
-      const std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-      std::string randomString;
-
-      // Seed the random number generator with current time
-      std::srand(std::time(nullptr));
-
-      // Generate the random string
-      for (int i = 0; i < length; ++i) { randomString += characters[std::rand() % characters.size()]; }
-
-      return randomString;
-   }
-   std::unique_ptr<std::vector<std::shared_ptr<runtime::Session>>> sessions;
+   std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>>  getAllPossibleRelations();
+   std::unique_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
    std::unique_ptr<StatementHandler> statementHandler;
 };
+
+
 
 class CustomAuthHandler : public arrow::flight::ServerAuthHandler {
    arrow::Status Authenticate(const arrow::flight::ServerCallContext& context,
