@@ -324,7 +324,13 @@ arrow::Result<int64_t>
 FlightSqlServerTestImpl::DoPutPreparedStatementUpdate(const arrow::flight::ServerCallContext& context,
                                                       const arrow::flight::sql::PreparedStatementUpdate& command,
                                                       arrow::flight::FlightMessageReader* reader) {
-   return arrow::Status::NotImplemented("FlightSqlServerTestImpl::DoPutPreparedStatementUpdate");
+   std::cout << "DoPutPreparedStatementUpdate" << std::endl;
+   ARROW_RETURN_NOT_OK(statementHandler->executeQeueryStatement(command.prepared_statement_handle, false));
+   ARROW_ASSIGN_OR_RAISE(auto result, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
+   if (!std::holds_alternative<int>(result)) {
+      return arrow::Status::Invalid("FlightSqlServerTestImpl::DoPutPreparedStatementUpdated");
+   }
+   return std::get<int>(result);
 }
 
 arrow::Status FlightSqlServerTestImpl::start(const arrow::flight::FlightServerOptions& options) {
