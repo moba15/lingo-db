@@ -211,9 +211,9 @@ FlightSqlServerTestImpl::DoGetTables(const arrow::flight::ServerCallContext& con
    }
 
    auto relations = getAllPossibleRelations();
-   std::vector<std::string>  catalog_names_raw{};
+   std::vector<std::string> catalog_names_raw{};
    std::vector<std::string> db_schema_names_raw;
-   std::vector<std::string> table_names_raw ;
+   std::vector<std::string> table_names_raw;
    std::vector<std::string> table_types_raw;
 
    for (auto& relation : *relations) {
@@ -235,9 +235,8 @@ FlightSqlServerTestImpl::DoGetTables(const arrow::flight::ServerCallContext& con
    ARROW_RETURN_NOT_OK(builder.AppendValues(std::move(table_types_raw)));
    ARROW_ASSIGN_OR_RAISE(auto table_types, builder.Finish());
 
-
    std::shared_ptr<arrow::RecordBatch> batch =
-         arrow::RecordBatch::Make(schema, relations->size() , {std::move(catalog_names), std::move(db_schema_names), std::move(table_names), std::move(table_types)});
+      arrow::RecordBatch::Make(schema, relations->size(), {std::move(catalog_names), std::move(db_schema_names), std::move(table_names), std::move(table_types)});
    ARROW_ASSIGN_OR_RAISE(auto reader, arrow::RecordBatchReader::Make({batch}));
    return std::make_unique<arrow::flight::RecordBatchStream>(reader);
 }
@@ -357,15 +356,12 @@ std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Rela
          //TODO
       } else if (typeid(*catalog.get()) == typeid(runtime::DBCatalog)) {
          std::cout << "Is type DB" << std::endl;
-         auto dbCatalog =  std::static_pointer_cast<runtime::DBCatalog>(catalog);
-         for (auto relation : dbCatalog->relations ) {
+         auto dbCatalog = std::static_pointer_cast<runtime::DBCatalog>(catalog);
+         for (auto relation : dbCatalog->relations) {
             result->emplace_back(std::make_pair(catalog_name, relation.second));
          }
-
       }
-
    }
    return result;
-
 }
 } // namespace server

@@ -23,8 +23,6 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    ParaParser para_parser{session};
    auto type = para_parser.getStatementType(sqlStatement);
 
-
-
    auto statement =
       std::make_unique<Statement>(handle, sqlStatement, type, std::move(sharedSemaphore));
    statementQueue.emplace(handle, std::move(statement));
@@ -34,7 +32,8 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
 arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle, bool onlyIfQuery) {
    {
       UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-         CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)}
+      CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+   }
    if (onlyIfQuery && statementQueue.at(handle)->get_type() != StatementType::AD_HOC_QUERY) {
       //Only execute Query statements
       return -1;
@@ -71,7 +70,6 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          auto table = resultTable.value()->get();
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
          ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(handle, buffer));
-
       }
 
       std::cout << "Execution finished: " << handle << std::endl;

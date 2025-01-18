@@ -75,7 +75,7 @@ std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::get
       switch (node->type) {
          case T_RangeVar: {
             auto* range = reinterpret_cast<RangeVar*>(node);
-            auto *relName = range->relname_;
+            auto* relName = range->relname_;
 
             result->emplace_back(this->session->getCatalog()->findRelation(relName));
 
@@ -83,7 +83,7 @@ std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::get
          }
          case T_RangeSubselect: {
             auto* range = reinterpret_cast<RangeSubselect*>(node);
-           auto r = getRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(range->subquery_));
+            auto r = getRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(range->subquery_));
             for (auto relation : *r) {
                result->emplace_back(relation);
             }
@@ -101,7 +101,7 @@ std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::get
    }
    return result;
 }
-std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>>  ParaParser::getRelations(std::string sql) {
+std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::getRelations(std::string sql) {
    mlir::MLIRContext context;
    execution::initializeContext(context);
    mlir::OpBuilder builder(&context);
