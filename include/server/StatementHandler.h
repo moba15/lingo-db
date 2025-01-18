@@ -14,6 +14,7 @@
 #include <arrow/result.h>
 #include <arrow/util/launder.h>
 #include <runtime/ArrowTable.h>
+#include <runtime/ExecutionContext.h>
 #include <runtime/Session.h>
 #define CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(queue, handle) \
    if (queue.find(handle) == queue.end()) { return arrow::Status::Invalid("Handle not found in queue"); }
@@ -25,7 +26,7 @@ namespace server {
 class StatementHandler {
    public:
    StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<runtime::Session> session);
-
+   arrow::Result<std::shared_ptr<StatementInformation>> getStatement(std::string handle);
    arrow::Result<std::string> addStatementToQueue(std::string sqlStatement);
    arrow::Result<pid_t> executeQeueryStatement(std::string handle, bool onlyIfQuery);
    arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>> waitAndGetStatementResult(std::string handle);

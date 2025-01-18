@@ -1,9 +1,7 @@
-add_subdirectory(shm)
-add_subdirectory(ipc)
-add_subdirectory(pararef-finder)
-add_library(serverLib OBJECT
+
+add_library(serverLib STATIC
         StatementHandler.cpp
         StatementExecution.cpp
-        Statement.cpp)
-target_link_libraries(serverLib PRIVATE syncHelper PRIVATE ipcHelper)
+        Statement.cpp ipc/IPCHelper.cpp shm/SyncHelper.cpp parser/ParaParser.cpp)
+
 set_target_properties(serverLib PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)

@@ -7,11 +7,19 @@
 #include <mutex>
 #include <execution/Execution.h>
 #include <server/ipc/IPCHelper.h>
-#include <server/pararef-finder/ParaParser.h>
+#include <server/parser/ParaParser.h>
 using namespace std::chrono_literals;
 namespace server {
 StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<runtime::Session> session)
    : handleSize(handleSize), statementExecution(std::move(statementExecution)), session(session) {}
+//TODO is this good practice?
+arrow::Result<std::shared_ptr<StatementInformation>> StatementHandler::getStatement(std::string handle) {
+   if (statementQueue.find(handle) == statementQueue.end()) {
+      return arrow::Status::Invalid("Unknown handle '" + handle + "'");
+
+   }
+   return statementQueue.at(handle)->get_information();
+}
 
 arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sqlStatement) {
    if (sqlStatement.find("?") != std::string::npos) { return arrow::Status::Invalid("Invalid SQL statement"); }
@@ -21,10 +29,11 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    while (statementQueue.find(handle) != statementQueue.end()) { handle = randomString(handleSize); }
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
    ParaParser para_parser{session};
-   auto type = para_parser.getStatementType(sqlStatement);
+   auto information = para_parser.getStatementInformation(sqlStatement);
+
 
    auto statement =
-      std::make_unique<Statement>(handle, sqlStatement, type, std::move(sharedSemaphore));
+      std::make_unique<Statement>(handle, sqlStatement, information, std::move(sharedSemaphore));
    statementQueue.emplace(handle, std::move(statement));
 
    return arrow::Result<std::string>(handle);
@@ -34,7 +43,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
       CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
    }
-   if (onlyIfQuery && statementQueue.at(handle)->get_type() != StatementType::AD_HOC_QUERY) {
+   if (onlyIfQuery && statementQueue.at(handle)->get_information()->type != StatementType::AD_HOC_QUERY) {
       //Only execute Query statements
       return -1;
    }
@@ -65,7 +74,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          }
          return arrow::Status::Invalid(e.what());
       }
-      if (statementQueue.at(handle)->get_type() == StatementType::AD_HOC_QUERY) {
+      if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_QUERY) {
          auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
@@ -94,7 +103,7 @@ arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int
    CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
 
    ARROW_RETURN_NOT_OK(statementQueue.at(handle)->waitForResult());
-   if (statementQueue.at(handle)->get_type() == StatementType::AD_HOC_UPDATE) {
+   if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
       return 0;
    }
    std::cout << "Result found for " << handle << std::endl;

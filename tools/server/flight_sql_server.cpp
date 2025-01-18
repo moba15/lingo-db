@@ -1,10 +1,10 @@
 #include "flight_sql_server.h"
 
 #include "runtime/Session.h"
-#include "server/pararef-finder/ParaParser.h"
+#include "server/parser/ParaParser.h"
 
 #include <runtime/ArrowTable.h>
-#include <server/pararef-finder/ParaParser.h>
+#include <server/parser//ParaParser.h>
 #include <unistd.h>
 arrow::Status startServer(std::string sqlUrl);
 
@@ -126,10 +126,10 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
                                                         const arrow::flight::sql::PreparedStatementQuery& command,
                                                         const arrow::flight::FlightDescriptor& descriptor) {
    CHECK_FOR_VALID_SERVER_SESSION()
-   std::cout << "GetFlightInfoPreparedStatement " << std::endl;
+   std::cout << "GetFlightInfoPreparedStatement: " << descriptor.cmd << std::endl;
 
    // The schema can be built from a vector of fields, and we do so here.
-   std::shared_ptr<arrow::Schema> schema = sessions->at(0)->getCatalog()->findRelation("orders")->getArrowSchema();
+   std::shared_ptr<arrow::Schema> schema = sessions->at("tpch")->getCatalog()->findRelation("orders")->getArrowSchema();
 
    ARROW_ASSIGN_OR_RAISE(auto ticket_string,
                          arrow::flight::sql::CreateStatementQueryTicket(command.prepared_statement_handle));
@@ -178,7 +178,10 @@ arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSql
 
    ARROW_ASSIGN_OR_RAISE(auto const handle, statementHandler->addStatementToQueue(request.query));
    ARROW_RETURN_NOT_OK(statementHandler->executeQeueryStatement(handle, true));
-
+   ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
+   if (statementInformation->type == StatementType::AD_HOC_QUERY && statementInformation->relations != nullptr) {
+      return arrow::flight::sql::ActionCreatePreparedStatementResult{statementInformation->relations->at(0)->getArrowSchema(), nullptr, handle};
+   }
    return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
 }
 

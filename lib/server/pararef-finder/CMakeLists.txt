@@ -1,2 +1,0 @@
-add_library(paraRefFinder OBJECT ParaParser.cpp)
-set_target_properties(paraRefFinder PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)

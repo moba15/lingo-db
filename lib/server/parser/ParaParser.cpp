@@ -2,7 +2,7 @@
 // Created by mor on 06.01.25.
 //
 
-#include "server/pararef-finder/ParaParser.h"
+#include "server/parser/ParaParser.h"
 #include "execution/Frontend.h"
 #include "mlir/Dialect/Async/IR/Async.h"
 #include "mlir/Dialect/RelAlg/Passes.h"
@@ -10,21 +10,32 @@
 #include "mlir/InitAllExtensions.h"
 #include <llvm/Support/SourceMgr.h>
 #include <runtime/ExecutionContext.h>
-
 #include <arrow/table.h>
+namespace server {
+
 ParaParser::ParaParser(const std::shared_ptr<runtime::Session>& session) : session(session) {}
 
-void ParaParser::parseTestA(std::string sqlUrl) {
-   std::string sql = "select * from hoeren where matrnr=12";
 
-   auto catalog = session->getCatalog();
+std::shared_ptr<StatementInformation> ParaParser::getStatementInformation(std::string sql) {
    mlir::MLIRContext context;
    execution::initializeContext(context);
    mlir::OpBuilder builder(&context);
-   mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-   frontend::sql::Parser translator(sql, *catalog, moduleOp);
 
-   auto t = translator.translate(builder);
+   mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
+   frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
+   auto type = getStatementType(translator);
+   auto statementInformation = std::make_shared<StatementInformation>(type);
+   if (type == StatementType::AD_HOC_QUERY) {
+      //Get used relations
+      auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
+      auto relations = getUsedRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(statement));
+      statementInformation->relations = std::move(relations);
+
+
+
+   }
+
+   return std::move(statementInformation);
 }
 
 std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::findParasInSelectStatement(SelectStmt* selectStatement) {
@@ -50,24 +61,18 @@ std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::getParas
    if (statement->type != T_SelectStmt) { return {}; }
    return std::move(findParasInSelectStatement(reinterpret_cast<SelectStmt*>(statement)));
 }
-server::StatementType ParaParser::getStatementType(std::string sql) {
-   mlir::MLIRContext context;
-   execution::initializeContext(context);
-   mlir::OpBuilder builder(&context);
-
-   mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-   frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
+server::StatementType ParaParser::getStatementType(frontend::sql::Parser& translator) {
    auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
-   if (statement->type == T_SelectStmt) { return server::StatementType::AD_HOC_QUERY; }
+   if (statement->type == T_SelectStmt) { return StatementType::AD_HOC_QUERY; }
    if (statement->type == T_UpdateStmt) {
-      return server::StatementType::AD_HOC_UPDATE;
+      return StatementType::AD_HOC_UPDATE;
    }
    if (statement->type == T_InsertStmt) {
-      return server::StatementType::AD_HOC_UPDATE;
+      return StatementType::AD_HOC_UPDATE;
    }
    throw std::runtime_error("ParaParser::getParas(): invalid node type");
 }
-std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::getRelationsFromSelectStatement(SelectStmt* selectStatement) {
+std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::getUsedRelationsFromSelectStatement(SelectStmt* selectStatement) {
    auto result = std::make_unique<std::vector<std::shared_ptr<runtime::Relation>>>();
    auto fromClause = selectStatement->from_clause_;
    for (auto* cell = fromClause->head; cell != nullptr; cell = cell->next) {
@@ -83,7 +88,7 @@ std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::get
          }
          case T_RangeSubselect: {
             auto* range = reinterpret_cast<RangeSubselect*>(node);
-            auto r = getRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(range->subquery_));
+            auto r = getUsedRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(range->subquery_));
             for (auto relation : *r) {
                result->emplace_back(relation);
             }
@@ -100,18 +105,6 @@ std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::get
       }
    }
    return result;
-}
-std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::getRelations(std::string sql) {
-   mlir::MLIRContext context;
-   execution::initializeContext(context);
-   mlir::OpBuilder builder(&context);
-
-   mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-   frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
-   auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
-   if (statement->type != T_SelectStmt) { throw std::runtime_error("ParaParser::getParas(): invalid node type"); }
-   auto selectStatement = reinterpret_cast<SelectStmt*>(statement);
-   return getRelationsFromSelectStatement(selectStatement);
 }
 
 std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::findParas(Node* currentNode) {
@@ -183,4 +176,5 @@ std::shared_ptr<arrow::Field> ParaParser::getFieldOfColumn(std::string columnNam
    }
 
    throw std::runtime_error("could not find field " + columnName);
+}
 }
