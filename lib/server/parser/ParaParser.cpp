@@ -9,12 +9,11 @@
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/InitAllExtensions.h"
 #include <llvm/Support/SourceMgr.h>
-#include <runtime/ExecutionContext.h>
 #include <arrow/table.h>
+#include <runtime/ExecutionContext.h>
 namespace server {
 
 ParaParser::ParaParser(const std::shared_ptr<runtime::Session>& session) : session(session) {}
-
 
 std::shared_ptr<StatementInformation> ParaParser::getStatementInformation(std::string sql) {
    mlir::MLIRContext context;
@@ -30,9 +29,6 @@ std::shared_ptr<StatementInformation> ParaParser::getStatementInformation(std::s
       auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
       auto relations = getUsedRelationsFromSelectStatement(reinterpret_cast<SelectStmt*>(statement));
       statementInformation->relations = std::move(relations);
-
-
-
    }
 
    return std::move(statementInformation);

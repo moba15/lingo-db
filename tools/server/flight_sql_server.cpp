@@ -4,7 +4,7 @@
 #include "server/parser/ParaParser.h"
 
 #include <runtime/ArrowTable.h>
-#include <server/parser//ParaParser.h>
+#include <server/parser //ParaParser.h>
 #include <unistd.h>
 arrow::Status startServer(std::string sqlUrl);
 

@@ -10,8 +10,8 @@
 
 #include "frontend/SQL/Parser.h"
 
-#include <server/Statement.h>
 #include <runtime/Session.h>
+#include <server/Statement.h>
 
 namespace server {
 class ParaParser {

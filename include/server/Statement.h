@@ -32,7 +32,7 @@ enum StatementStatus { IDLE,
                        ERROR };
 class Statement {
    public:
-   Statement(std::string handle, std::string sqlStatement,  std::shared_ptr<StatementInformation> information,
+   Statement(std::string handle, std::string sqlStatement, std::shared_ptr<StatementInformation> information,
              std::unique_ptr<util::SharedSemaphore> shared_semaphore);
    [[nodiscard]] std::string get_handle() const { return handle; }
    [[nodiscard]] std::string get_sql_statement() const { return sqlStatement; }
@@ -46,7 +46,7 @@ class Statement {
    protected:
    std::string handle;
    std::string sqlStatement;
-    std::shared_ptr<StatementInformation> information;
+   std::shared_ptr<StatementInformation> information;
    StatementStatus status = IDLE;
    std::unique_ptr<util::SharedMemoryWrapper> result;
    std::unique_ptr<util::SharedSemaphore> sharedSemaphore;

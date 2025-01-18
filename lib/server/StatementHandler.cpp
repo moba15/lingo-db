@@ -16,7 +16,6 @@ StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statement
 arrow::Result<std::shared_ptr<StatementInformation>> StatementHandler::getStatement(std::string handle) {
    if (statementQueue.find(handle) == statementQueue.end()) {
       return arrow::Status::Invalid("Unknown handle '" + handle + "'");
-
    }
    return statementQueue.at(handle)->get_information();
 }
@@ -30,7 +29,6 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
    ParaParser para_parser{session};
    auto information = para_parser.getStatementInformation(sqlStatement);
-
 
    auto statement =
       std::make_unique<Statement>(handle, sqlStatement, information, std::move(sharedSemaphore));

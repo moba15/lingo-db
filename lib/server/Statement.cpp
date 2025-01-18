@@ -5,7 +5,7 @@
 #include "server/Statement.h"
 namespace server {
 
-Statement::Statement(std::string handle, std::string sqlStatement,  std::shared_ptr<StatementInformation> information,
+Statement::Statement(std::string handle, std::string sqlStatement, std::shared_ptr<StatementInformation> information,
                      std::unique_ptr<util::SharedSemaphore> sharedSemaphore)
    : handle(handle), sqlStatement(sqlStatement), information(information), sharedSemaphore(std::move(sharedSemaphore)) {}
 arrow::Result<std::shared_ptr<arrow::Table>> Statement::get_result() const {
