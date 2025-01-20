@@ -1,5 +1,5 @@
 #include "server/shm/SyncHelper.h"
-namespace  server {
+namespace server {
 namespace util {
 
 arrow::Status SharedSemaphore::post() const {
@@ -14,28 +14,31 @@ arrow::Status SharedSemaphore::wait() const {
    if (sem_wait(sem) == -1) { return arrow::Status::IOError("Failed to wait for semaphore"); }
    return arrow::Status::OK();
 }
-SharedMemoryWrapper::SharedMemoryWrapper(void* data, const std::string_view handle, bool freed)
-   : data(data), handle(handle), freed(freed) {}
+SharedMemoryWrapper::SharedMemoryWrapper(const std::string handle, int shmFd, bool freed)
+   : freed(freed), handle(handle), shmFd(shmFd) {}
 SharedMemoryWrapper::~SharedMemoryWrapper() {
+   std::cout << "Shared memory is beeing freed (" << getpid() << ") freed: " << freed << std::endl;
    if (!freed) {
-
       freed = true;
+      close(shmFd);
+      shm_unlink(handle.c_str());
    }
 }
 SharedMemoryWrapper::SharedMemoryWrapper(SharedMemoryWrapper&& other) noexcept
-   : data(other.data), freed(other.freed), handle(other.handle) {
+   : freed(other.freed), handle(other.handle) {
    other.freed = true;
-   other.data = nullptr;
+   //
+   // other.data = nullptr;
 }
 SharedMemoryWrapper& SharedMemoryWrapper::operator=(SharedMemoryWrapper&& other) noexcept {
    freed = other.freed;
    other.freed = true;
-   data = other.data, other.data = nullptr;
+   //data = other.data, other.data = nullptr;
    handle = other.handle;
    return *this;
 }
 
-arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(const std::string_view handle) {
+arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(const std::string handle) {
    const auto semName = "SEMA" + std::string(handle);
    auto* sharedSem = sem_open(semName.c_str(), O_CREAT, 0, 0);
    if (sharedSem == SEM_FAILED) { return arrow::Status::IOError("Failed to open semaphore2"); }
@@ -43,21 +46,25 @@ arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(const s
    return arrow::Result(std::move(std::make_unique<SharedSemaphore>(sharedSem, semName)));
 }
 
-arrow::Result<std::unique_ptr<SharedMemoryWrapper>>
-createAndCopySharedResultMemory(std::string_view handle, const std::shared_ptr<arrow::ResizableBuffer> buffer) {
-   auto shmFd = shm_open(handle.cbegin(), O_CREAT | O_EXCL | O_RDWR, 0666);
+arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::string handle) {
+   auto shmFd = shm_open(handle.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
    if (shmFd < 0) { return arrow::Status::IOError("Failed to open shm"); }
+
+   return std::make_unique<SharedMemoryWrapper>(handle, shmFd, false);
+}
+
+arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper, const std::shared_ptr<arrow::ResizableBuffer> buffer) {
+   auto shmFd = sharedMemoryWrapper.getShmFd();
    ftruncate(shmFd, buffer->size());
    auto* sharedMemory = mmap(nullptr, buffer->size(), PROT_WRITE, MAP_SHARED, shmFd, 0);
    if (sharedMemory == MAP_FAILED) { return arrow::Status::IOError("mmap failed"); }
    std::memcpy(sharedMemory, buffer->data(), buffer->size());
-   auto wrapper = std::make_unique<SharedMemoryWrapper>(sharedMemory, handle, false);
-   return std::move(wrapper);
+
+   return sharedMemory;
 }
 
-arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(const std::string_view handle) {
-   auto shmFd = shm_open(handle.cbegin(), O_RDONLY, 0666);
-   if (shmFd < 0) { return arrow::Status::IOError("Failed to open shm"); }
+arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(SharedMemoryWrapper& sharedMemoryWrapper) {
+   auto shmFd = sharedMemoryWrapper.getShmFd();
 
    struct stat shmStat;
    if (fstat(shmFd, &shmStat) == -1) { return arrow::Status::IOError("Failed to get shared memory stats"); }

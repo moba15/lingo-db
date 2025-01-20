@@ -33,12 +33,13 @@ enum StatementStatus { IDLE,
 class Statement {
    public:
    Statement(std::string handle, std::string sqlStatement, std::shared_ptr<StatementInformation> information,
-             std::unique_ptr<util::SharedSemaphore> shared_semaphore);
+             std::unique_ptr<util::SharedSemaphore> shared_semaphore, std::unique_ptr<util::SharedMemoryWrapper> shareMemoryWrapper);
    [[nodiscard]] std::string get_handle() const { return handle; }
    [[nodiscard]] std::string get_sql_statement() const { return sqlStatement; }
    [[nodiscard]] StatementStatus get_status() const { return status; }
    [[nodiscard]] std::shared_ptr<StatementInformation> get_information() const { return information; }
    [[nodiscard]] arrow::Result<std::shared_ptr<arrow::Table>> get_result() const;
+   [[nodiscard]] util::SharedMemoryWrapper& get_share_memory_wrapper() const { return *shareMemoryWrapper; }
    [[deprecated]] void set_result(std::unique_ptr<util::SharedMemoryWrapper> result) {}
    arrow::Status mark_as_finished(bool error);
    arrow::Status waitForResult();
@@ -50,5 +51,6 @@ class Statement {
    StatementStatus status = IDLE;
    std::unique_ptr<util::SharedMemoryWrapper> result;
    std::unique_ptr<util::SharedSemaphore> sharedSemaphore;
+   std::unique_ptr<util::SharedMemoryWrapper> shareMemoryWrapper;
 };
 }

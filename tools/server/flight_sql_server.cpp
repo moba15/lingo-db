@@ -191,7 +191,9 @@ FlightSqlServerTestImpl::DoGetPreparedStatement(const arrow::flight::ServerCallC
 arrow::Status FlightSqlServerTestImpl::ClosePreparedStatement(
    const arrow::flight::ServerCallContext& context,
    const arrow::flight::sql::ActionClosePreparedStatementRequest& request) {
-   return arrow::Status::OK();
+   std::cout << "ClosePreparedStatement " << std::endl;
+   CHECK_FOR_VALID_SERVER_SESSION()
+   return this->statementHandler->closeStatement(request.prepared_statement_handle);
 }
 /***
  * ---------------------------------------------------

@@ -26,6 +26,7 @@ struct SharedSemaphore {
    ~SharedSemaphore() {
       std::cout << "Semaphore destroyed" << std::endl;
       sem_unlink(name.c_str());
+      sem_close(sem);
    }
    arrow::Status post() const;
    arrow::Status wait() const;
@@ -37,25 +38,28 @@ struct SharedSemaphore {
 };
 struct SharedMemoryWrapper {
    public:
-   SharedMemoryWrapper(void* data, std::string_view handle, bool freed = false);
+   SharedMemoryWrapper(std::string handle, int shmFd, bool freed = false);
    ~SharedMemoryWrapper();
-   SharedMemoryWrapper(SharedMemoryWrapper&) = delete;
-   SharedMemoryWrapper& operator=(SharedMemoryWrapper&) = delete;
    SharedMemoryWrapper(const SharedMemoryWrapper&) = delete;
    SharedMemoryWrapper& operator=(const SharedMemoryWrapper&) = delete;
+   SharedMemoryWrapper(SharedMemoryWrapper&) = delete;
+   SharedMemoryWrapper& operator=(SharedMemoryWrapper&) = delete;
+
    SharedMemoryWrapper(SharedMemoryWrapper&&) noexcept;
    SharedMemoryWrapper& operator=(SharedMemoryWrapper&&) noexcept;
 
+   int getShmFd() const { return shmFd; }
+
    private:
-   void* data;
    bool freed;
-   std::string_view handle;
+   std::string handle;
+   int shmFd;
 };
 
-arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(std::string_view handle);
-arrow::Result<std::unique_ptr<SharedMemoryWrapper>>
-createAndCopySharedResultMemory(std::string_view handle, const std::shared_ptr<arrow::ResizableBuffer> buffer);
-arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(std::string_view handle);
+arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::string handle);
+arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(std::string handle);
+arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper, const std::shared_ptr<arrow::ResizableBuffer> buffer);
+arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(SharedMemoryWrapper& sharedMemoryWrapper);
 
 } //namespace util
 };

@@ -29,9 +29,10 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
    ParaParser para_parser{session};
    auto information = para_parser.getStatementInformation(sqlStatement);
+   ARROW_ASSIGN_OR_RAISE(auto sharedMemoryWrapper, util::createSharedMemory(handle))
 
    auto statement =
-      std::make_unique<Statement>(handle, sqlStatement, information, std::move(sharedSemaphore));
+      std::make_unique<Statement>(handle, sqlStatement, information, std::move(sharedSemaphore), std::move(sharedMemoryWrapper));
    statementQueue.emplace(handle, std::move(statement));
 
    return arrow::Result<std::string>(handle);
@@ -45,11 +46,14 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       //Only execute Query statements
       return -1;
    }
+
+   std::cout << "Forking (pid: " << getpid() << ")" << std::endl;
    pid_t childPid = fork();
 
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
-      //Child
+      std::cout << "Child: Forked (pid: " << getpid() << ")" << std::endl;
+      //Childsp
       //std::this_thread::sleep_for(2s);
       auto executionContext = session->createExecutionContext();
       auto queryExecutionConfig = createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
@@ -76,7 +80,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
-         ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(handle, buffer));
+         ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), buffer));
       }
 
       std::cout << "Execution finished: " << handle << std::endl;
@@ -92,7 +96,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       return arrow::Status::Invalid("Child process return value has to be ignored");
    } else {
       //Parent
-
+      std::cout << "Parent: Forked child " << childPid << " (pid: " << getpid() << ")" << std::endl;
       return childPid;
    }
 }
@@ -105,7 +109,7 @@ arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int
       return 0;
    }
    std::cout << "Result found for " << handle << std::endl;
-   ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(handle));
+   ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(statementQueue.at(handle)->get_share_memory_wrapper()));
    std::cout << "Result read for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
 
