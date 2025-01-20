@@ -43,56 +43,45 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
                                        statementHandler)
       : sessions{std::move(sessions)}, statementHandler(std::move(statementHandler)) {}
 
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoStatement(const arrow::flight::ServerCallContext& context,
-                          const arrow::flight::sql::StatementQuery& command,
-                          const arrow::flight::FlightDescriptor& descriptor) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
-   DoGetSqlInfo(const arrow::flight::ServerCallContext& context,
-                const arrow::flight::sql::GetSqlInfo& command) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoSqlInfo(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetSqlInfo& command,
-                        const arrow::flight::FlightDescriptor& descriptor) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoPreparedStatement(const arrow::flight::ServerCallContext& context,
-                                  const arrow::flight::sql::PreparedStatementQuery& command,
-                                  const arrow::flight::FlightDescriptor& descriptor) override;
-   arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult>
-   CreatePreparedStatement(const arrow::flight::ServerCallContext& context,
-                           const arrow::flight::sql::ActionCreatePreparedStatementRequest& request) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
-   DoGetPreparedStatement(const arrow::flight::ServerCallContext& context,
-                          const arrow::flight::sql::PreparedStatementQuery& command) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoCatalogs(const arrow::flight::ServerCallContext& context,
-                         const arrow::flight::FlightDescriptor& descriptor) override;
-   arrow::Status DoPutPreparedStatementQuery(const arrow::flight::ServerCallContext& context,
-                                             const arrow::flight::sql::PreparedStatementQuery& command,
-                                             arrow::flight::FlightMessageReader* reader,
-                                             arrow::flight::FlightMetadataWriter* writer) override;
-   arrow::Status
-   ClosePreparedStatement(const arrow::flight::ServerCallContext& context,
-                          const arrow::flight::sql::ActionClosePreparedStatementRequest& request) override;
-   arrow::Result<int64_t> DoPutPreparedStatementUpdate(const arrow::flight::ServerCallContext& context,
-                                                       const arrow::flight::sql::PreparedStatementUpdate& command,
-                                                       arrow::flight::FlightMessageReader* reader) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoTables(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetTables& command,
-                       const arrow::flight::FlightDescriptor& descriptor) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
-   DoGetTables(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetTables& command) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
-   DoGetTableTypes(const arrow::flight::ServerCallContext& context) override;
-   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
-   GetFlightInfoTableTypes(const arrow::flight::ServerCallContext& context,
-                           const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::StatementQuery& command, const arrow::flight::FlightDescriptor& descriptor) override;
 
-   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetCatalogs(const arrow::flight::ServerCallContext& context) override;
+   /***
+    * ---------------------------------------------------
+    * Prepared statement
+    * ---------------------------------------------------
+    */
+   arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> CreatePreparedStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::ActionCreatePreparedStatementRequest& request) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoPreparedStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::PreparedStatementQuery& command, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<int64_t> DoPutPreparedStatementUpdate(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::PreparedStatementUpdate& command, arrow::flight::FlightMessageReader* reader) override;
+   arrow::Status DoPutPreparedStatementQuery(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::PreparedStatementQuery& command, arrow::flight::FlightMessageReader* reader, arrow::flight::FlightMetadataWriter* writer) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetPreparedStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::PreparedStatementQuery& command) override;
+   arrow::Status ClosePreparedStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::ActionClosePreparedStatementRequest& request) override;
+
+   /***
+    * ---------------------------------------------------
+    * Metadata
+    * ---------------------------------------------------
+    */
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSqlInfo(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetSqlInfo& command, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetSqlInfo(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetSqlInfo& command) override;
+
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoTables(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetTables& command, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetTables(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetTables& command) override;
+
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoTableTypes(const arrow::flight::ServerCallContext& context, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetTableTypes(const arrow::flight::ServerCallContext& context) override;
 
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command, const arrow::flight::FlightDescriptor& descriptor) override;
    arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetDbSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command) override;
 
+   arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoCatalogs(const arrow::flight::ServerCallContext& context, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetCatalogs(const arrow::flight::ServerCallContext& context) override;
 
+   /***
+    *---------------------------------------------------
+    * Utility
+    *---------------------------------------------------
+    */
    arrow::Status start(const arrow::flight::FlightServerOptions& options);
 
    private:
