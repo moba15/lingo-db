@@ -3,6 +3,7 @@
 #include "runtime/Session.h"
 #include "server/parser/ParaParser.h"
 
+#include <libpg_query/src/postgres/include/c.h>
 #include <runtime/ArrowTable.h>
 arrow::Status startServer(std::string sqlUrl);
 
@@ -67,7 +68,7 @@ arrow::Status startServer(std::string sqlUrl) {
 
    std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
       new server::FlightSqlServerTestImpl(std::move(root), std::move(sessions), std::move(statementHandler)));
-
+   server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, true);
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;
    return server->Serve();
@@ -117,7 +118,13 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
 FlightSqlServerTestImpl::GetFlightInfoSqlInfo(const arrow::flight::ServerCallContext& context,
                                               const arrow::flight::sql::GetSqlInfo& command,
                                               const arrow::flight::FlightDescriptor& descriptor) {
-   return arrow::Status::NotImplemented("FlightSqlServerTestImpl::GetFlightInfoSqlInfo");
+   CHECK_FOR_VALID_SERVER_SESSION()
+   std::string info(command.info.begin(), command.info.end());
+   std::cout << "GetFlightInfoSqlInfo: " << info << std::endl;
+   std::vector endpoints{
+      arrow::flight::FlightEndpoint{{descriptor.cmd}, {}, std::nullopt, ""}};
+   ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*arrow::flight::sql::SqlSchema::GetSqlInfoSchema(), descriptor, endpoints, -1, -1, false));
+   return std::make_unique<arrow::flight::FlightInfo>(result);
 }
 arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
 FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::ServerCallContext& context,
@@ -166,7 +173,44 @@ FlightSqlServerTestImpl::GetFlightInfoCatalogs(const arrow::flight::ServerCallCo
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
 FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& context,
                                       const arrow::flight::sql::GetSqlInfo& command) {
-   return arrow::Status::NotImplemented("FlightSqlServerTestImpl::DoGetSqlInfo");
+   CHECK_FOR_VALID_SERVER_SESSION()
+   std::string info(command.info.begin(), command.info.end());
+   std::cout << "DoGetSqlInfo: " << info << std::endl;
+   auto schema = arrow::flight::sql::SqlSchema::GetSqlInfoSchema();
+   auto fields = schema->fields();
+   for (auto field : fields) {
+      std::cout << field->ToString() << std::endl;
+   }
+   std::vector<int32> info_names_raw{{arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY}};
+   arrow::Int32Builder builder{};
+   ARROW_RETURN_NOT_OK(builder.AppendValues(info_names_raw));
+   ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
+
+   std::vector<arrow::flight::sql::SqlInfoResult> values_raw{{true}};
+   std::vector<std::shared_ptr<arrow::Field>> child_fields = {
+      arrow::field("bigint_value", arrow::int64()),
+      arrow::field("bool_value", arrow::boolean())};
+   auto union_type = arrow::dense_union(arrow::flight::sql::SqlSchema::GetSqlInfoSchema()->fields(), {0, 1, 2, 3, 4, 5});
+
+   auto stringBuilder = std::make_shared<arrow::StringBuilder>();
+   auto booleanBuilder = std::make_shared<arrow::BooleanBuilder>();
+   auto bigintBuilder = std::make_shared<arrow::Int64Builder>();
+   auto int32_bitmaskBuilder = std::make_shared<arrow::Int32Builder>();
+   auto stringListBuilder = std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::StringBuilder>());
+   auto int32_to_int32_list_mapBuilder = std::make_shared<arrow::MapBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::Int32Builder>(), std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::Int32Builder>()));
+   const std::vector<std::shared_ptr<arrow::ArrayBuilder>>& children{{stringBuilder, booleanBuilder, bigintBuilder, int32_bitmaskBuilder, stringListBuilder, int32_to_int32_list_mapBuilder}};
+   auto f = union_type->fields();
+   arrow::DenseUnionBuilder unionBuilder{arrow::default_memory_pool()};
+
+   ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
+   std::vector<std::string> fieldNames{"string_value", "bool_value", "bigint_value", "int32_bitmask", "string_list", "int32_to_int32_list_map"};
+   for (size_t i = 0; i < children.size(); i++) {
+      unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
+   }
+   std::shared_ptr<arrow::RecordBatch> batch =
+      arrow::RecordBatch::Make(schema, 1, {std::move(info_names), std::move(values)});
+   ARROW_ASSIGN_OR_RAISE(auto reader, arrow::RecordBatchReader::Make({batch}));
+   return std::make_unique<arrow::flight::RecordBatchStream>(reader);
 }
 arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSqlServerTestImpl::CreatePreparedStatement(
    const arrow::flight::ServerCallContext& context,
@@ -224,16 +268,16 @@ FlightSqlServerTestImpl::DoGetTables(const arrow::flight::ServerCallContext& con
       table_types_raw.push_back("TABLE");
    }
    arrow::StringBuilder builder{};
-   ARROW_RETURN_NOT_OK(builder.AppendValues(std::move(catalog_names_raw)));
+   ARROW_RETURN_NOT_OK(builder.AppendValues(catalog_names_raw));
    ARROW_ASSIGN_OR_RAISE(auto catalog_names, builder.Finish());
 
-   ARROW_RETURN_NOT_OK(builder.AppendValues(std::move(db_schema_names_raw)));
+   ARROW_RETURN_NOT_OK(builder.AppendValues(db_schema_names_raw));
    ARROW_ASSIGN_OR_RAISE(auto db_schema_names, builder.Finish());
 
-   ARROW_RETURN_NOT_OK(builder.AppendValues(std::move(table_names_raw)));
+   ARROW_RETURN_NOT_OK(builder.AppendValues(table_names_raw));
    ARROW_ASSIGN_OR_RAISE(auto table_names, builder.Finish());
 
-   ARROW_RETURN_NOT_OK(builder.AppendValues(std::move(table_types_raw)));
+   ARROW_RETURN_NOT_OK(builder.AppendValues(table_types_raw));
    ARROW_ASSIGN_OR_RAISE(auto table_types, builder.Finish());
 
    std::shared_ptr<arrow::RecordBatch> batch =

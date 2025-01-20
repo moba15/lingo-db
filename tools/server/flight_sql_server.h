@@ -92,6 +92,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command, const arrow::flight::FlightDescriptor& descriptor) override;
    arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetDbSchemas(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::GetDbSchemas& command) override;
 
+
    arrow::Status start(const arrow::flight::FlightServerOptions& options);
 
    private:
