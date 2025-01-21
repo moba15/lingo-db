@@ -58,7 +58,7 @@ struct SharedMemoryWrapper {
 
 arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::string handle);
 arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(std::string handle);
-arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper, const std::shared_ptr<arrow::ResizableBuffer> buffer);
+arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper,  std::shared_ptr<arrow::ResizableBuffer> buffer);
 arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(SharedMemoryWrapper& sharedMemoryWrapper);
 
 } //namespace util

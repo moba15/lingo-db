@@ -53,13 +53,15 @@ arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::stri
    return std::make_unique<SharedMemoryWrapper>(handle, shmFd, false);
 }
 
-arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper, const std::shared_ptr<arrow::ResizableBuffer> buffer) {
+arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper,  std::shared_ptr<arrow::ResizableBuffer> buffer) {
    auto shmFd = sharedMemoryWrapper.getShmFd();
    ftruncate(shmFd, buffer->size());
    auto* sharedMemory = mmap(nullptr, buffer->size(), PROT_WRITE, MAP_SHARED, shmFd, 0);
    if (sharedMemory == MAP_FAILED) { return arrow::Status::IOError("mmap failed"); }
    std::memcpy(sharedMemory, buffer->data(), buffer->size());
-
+   ARROW_RETURN_NOT_OK(buffer->Resize(0));
+   std::cout << "New buffer size: " << buffer->size() << std::endl;
+   buffer.reset();
    return sharedMemory;
 }
 

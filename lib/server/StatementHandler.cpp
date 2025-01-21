@@ -77,10 +77,20 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          return arrow::Status::Invalid(e.what());
       }
       if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_QUERY) {
+         std::cout << "Getting result of" << handle << std::endl;
          auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
+         std::cout << "Got table of" << handle << std::endl;
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
+         std::cout << "Serialized table of" << handle << std::endl;
          ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), buffer));
+         buffer.~shared_ptr();
+         close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
+         shm_unlink(handle.c_str());
+
+
+
+
       }
 
       std::cout << "Execution finished: " << handle << std::endl;
@@ -91,9 +101,8 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       }
 
       ARROW_RETURN_NOT_OK(statementQueue.at(handle)->mark_as_finished(false));
-      std::exit(0);
 
-      return arrow::Status::Invalid("Child process return value has to be ignored");
+      return 0;
    } else {
       //Parent
       std::cout << "Parent: Forked child " << childPid << " (pid: " << getpid() << ")" << std::endl;

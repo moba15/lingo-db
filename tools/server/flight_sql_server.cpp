@@ -68,7 +68,7 @@ arrow::Status startServer(std::string sqlUrl) {
 
    std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
       new server::FlightSqlServerTestImpl(std::move(root), std::move(sessions), std::move(statementHandler)));
-   server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, true);
+   server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, false);
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;
    return server->Serve();
@@ -125,12 +125,19 @@ arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSql
    CHECK_FOR_VALID_SERVER_SESSION()
 
    ARROW_ASSIGN_OR_RAISE(auto const handle, statementHandler->addStatementToQueue(request.query));
-   ARROW_RETURN_NOT_OK(statementHandler->executeQeueryStatement(handle, true));
-   ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
-   if (statementInformation->type == StatementType::AD_HOC_QUERY && statementInformation->relations != nullptr) {
-      return arrow::flight::sql::ActionCreatePreparedStatementResult{statementInformation->relations->at(0)->getArrowSchema(), nullptr, handle};
+   ARROW_ASSIGN_OR_RAISE(auto pid, statementHandler->executeQeueryStatement(handle, true));
+   if (pid == 0) {
+      this->statementHandler.~unique_ptr();
+      std::exit(0);
+
+      return arrow::Status::Cancelled("");
+   } else {
+      ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
+      if (statementInformation->type == StatementType::AD_HOC_QUERY && statementInformation->relations != nullptr) {
+         return arrow::flight::sql::ActionCreatePreparedStatementResult{statementInformation->relations->at(0)->getArrowSchema(), nullptr, handle};
+      }
+      return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
    }
-   return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
 }
 
 arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
@@ -224,16 +231,11 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
    for (auto field : fields) {
       std::cout << field->ToString() << std::endl;
    }
-   std::vector<int32> info_names_raw{{arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY}};
-   arrow::Int32Builder builder{};
-   ARROW_RETURN_NOT_OK(builder.AppendValues(info_names_raw));
-   ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
 
-   std::vector<arrow::flight::sql::SqlInfoResult> values_raw{{true}};
-   std::vector<std::shared_ptr<arrow::Field>> child_fields = {
-      arrow::field("bigint_value", arrow::int64()),
-      arrow::field("bool_value", arrow::boolean())};
-   auto union_type = arrow::dense_union(arrow::flight::sql::SqlSchema::GetSqlInfoSchema()->fields(), {0, 1, 2, 3, 4, 5});
+   arrow::Int32Builder builder{};
+
+
+
 
    auto stringBuilder = std::make_shared<arrow::StringBuilder>();
    auto booleanBuilder = std::make_shared<arrow::BooleanBuilder>();
@@ -242,14 +244,40 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
    auto stringListBuilder = std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::StringBuilder>());
    auto int32_to_int32_list_mapBuilder = std::make_shared<arrow::MapBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::Int32Builder>(), std::make_shared<arrow::ListBuilder>(arrow::default_memory_pool(), std::make_shared<arrow::Int32Builder>()));
    const std::vector<std::shared_ptr<arrow::ArrayBuilder>>& children{{stringBuilder, booleanBuilder, bigintBuilder, int32_bitmaskBuilder, stringListBuilder, int32_to_int32_list_mapBuilder}};
-   auto f = union_type->fields();
    arrow::DenseUnionBuilder unionBuilder{arrow::default_memory_pool()};
 
-   ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
+
    std::vector<std::string> fieldNames{"string_value", "bool_value", "bigint_value", "int32_bitmask", "string_list", "int32_to_int32_list_map"};
    for (size_t i = 0; i < children.size(); i++) {
       unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
    }
+   ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
+   for (size_t i = 0; i<1000; i++) {
+      auto arrowResult = getSqlInfoResult(i);
+      if (arrowResult.ok()) {
+         ARROW_ASSIGN_OR_RAISE(auto result, arrowResult);
+        if (std::holds_alternative<std::string>(result)) {
+
+
+           ARROW_RETURN_NOT_OK(stringBuilder->Append(std::get<std::string>(result)));
+
+           ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
+           ARROW_RETURN_NOT_OK(builder.Append(i));
+        } else if (std::holds_alternative<bool>(result)) {
+           // ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
+
+           ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
+
+           ARROW_RETURN_NOT_OK(unionBuilder.Append(1));
+           ARROW_RETURN_NOT_OK(builder.Append(i));
+
+        }
+      }
+
+   }
+   ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
+   ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
+
    std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(schema, 1, {std::move(info_names), std::move(values)});
    ARROW_ASSIGN_OR_RAISE(auto reader, arrow::RecordBatchReader::Make({batch}));
@@ -401,6 +429,102 @@ arrow::Status CustomAuthHandler::IsValid(const arrow::flight::ServerCallContext&
                                          const std::string& token,
                                          std::string* peer_identity) {
    return arrow::Status::OK();
+}
+arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSqlInfoResult(size_t type) {
+   switch (type) {
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_NAME: return "Flight SQL Server Name";
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_VERSION: return "Flight SQL Server Version";
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_ARROW_VERSION: return "Arrow Version";
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SQL: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT_MIN_VERSION: return "";
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT_MAX_VERSION: return "";
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_TRANSACTION: return arrow::flight::sql::SqlInfoOptions::SqlSupportedTransaction::SQL_SUPPORTED_TRANSACTION_NONE;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_CANCEL: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_BULK_INGESTION: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_INGEST_TRANSACTIONS_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_STATEMENT_TIMEOUT: return 0;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_TRANSACTION_TIMEOUT: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DDL_CATALOG: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DDL_SCHEMA: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DDL_TABLE: return false; //asd
+      case arrow::flight::sql::SqlInfoOptions::SQL_IDENTIFIER_CASE: return arrow::flight::sql::SqlInfoOptions::SqlSupportedCaseSensitivity::SQL_CASE_SENSITIVITY_UNKNOWN;
+      case arrow::flight::sql::SqlInfoOptions::SQL_IDENTIFIER_QUOTE_CHAR: return "Identifier Quote";
+      case arrow::flight::sql::SqlInfoOptions::SQL_QUOTED_IDENTIFIER_CASE: return arrow::flight::sql::SqlInfoOptions::SqlSupportedCaseSensitivity::SQL_CASE_SENSITIVITY_UNKNOWN;
+      case arrow::flight::sql::SqlInfoOptions::SQL_ALL_TABLES_ARE_SELECTABLE: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_NULL_ORDERING: return arrow::flight::sql::SqlInfoOptions::SqlNullOrdering::SQL_NULLS_SORTED_AT_END;
+      case arrow::flight::sql::SqlInfoOptions::SQL_KEYWORDS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_NUMERIC_FUNCTIONS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_STRING_FUNCTIONS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_SYSTEM_FUNCTIONS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_DATETIME_FUNCTIONS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_SEARCH_STRING_ESCAPE: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_EXTRA_NAME_CHARACTERS: return {"asd"};
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_COLUMN_ALIASING: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_NULL_PLUS_NULL_IS_NULL: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_CONVERT: return std::unordered_map<int32_t, std::vector<int32_t>>{{1,{2,3}}};
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_TABLE_CORRELATION_NAMES: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_DIFFERENT_TABLE_CORRELATION_NAMES: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_EXPRESSIONS_IN_ORDER_BY: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_ORDER_BY_UNRELATED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_GROUP_BY: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_LIKE_ESCAPE_CLAUSE: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_NON_NULLABLE_COLUMNS: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_GRAMMAR: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_ANSI92_SUPPORTED_LEVEL: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_INTEGRITY_ENHANCEMENT_FACILITY: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_OUTER_JOINS_SUPPORT_LEVEL: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SCHEMA_TERM: return "";
+      case arrow::flight::sql::SqlInfoOptions::SQL_PROCEDURE_TERM: return "";
+      case arrow::flight::sql::SqlInfoOptions::SQL_CATALOG_TERM: return "";
+      case arrow::flight::sql::SqlInfoOptions::SQL_CATALOG_AT_START: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SCHEMAS_SUPPORTED_ACTIONS: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_CATALOGS_SUPPORTED_ACTIONS: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_POSITIONED_COMMANDS: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SELECT_FOR_UPDATE_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_STORED_PROCEDURES_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_SUBQUERIES: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_CORRELATED_SUBQUERIES_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_UNIONS: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_BINARY_LITERAL_LENGTH: return (int64)static_cast<int64_t>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CHAR_LITERAL_LENGTH: return (int64) static_cast<int64_t>(10);
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMN_NAME_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_GROUP_BY: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_INDEX: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_ORDER_BY: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_SELECT: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_TABLE: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CONNECTIONS: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CURSOR_NAME_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_INDEX_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SCHEMA_NAME_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_PROCEDURE_NAME_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CATALOG_NAME_LENGTH: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_ROW_SIZE: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_ROW_SIZE_INCLUDES_BLOBS: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENT_LENGTH: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENTS: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLE_NAME_LENGTH: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLES_IN_SELECT: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_USERNAME_LENGTH: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DEFAULT_TRANSACTION_ISOLATION: return 0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_TRANSACTIONS_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_TRANSACTIONS_ISOLATION_LEVELS: return  0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DATA_DEFINITION_CAUSES_TRANSACTION_COMMIT: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_DATA_DEFINITIONS_IN_TRANSACTIONS_IGNORED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_RESULT_SET_TYPES: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_UNSPECIFIED: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_FORWARD_ONLY: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_SCROLL_SENSITIVE: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_CONCURRENCIES_FOR_RESULT_SET_SCROLL_INSENSITIVE: return 0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_BATCH_UPDATES_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SAVEPOINTS_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_NAMED_PARAMETERS_SUPPORTED: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_LOCATORS_UPDATE_COPY: return false;
+      case arrow::flight::sql::SqlInfoOptions::SQL_STORED_FUNCTIONS_USING_CALL_SYNTAX_SUPPORTED: return false;
+   }
+   return arrow::Status::Invalid("");
 }
 arrow::Status CustomAuthHandler::Authenticate(const arrow::flight::ServerCallContext& context,
                                               arrow::flight::ServerAuthSender* outgoing,
