@@ -53,7 +53,7 @@ arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::stri
    return std::make_unique<SharedMemoryWrapper>(handle, shmFd, false);
 }
 
-arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper,  std::shared_ptr<arrow::ResizableBuffer> buffer) {
+arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& sharedMemoryWrapper, std::shared_ptr<arrow::ResizableBuffer> buffer) {
    auto shmFd = sharedMemoryWrapper.getShmFd();
    ftruncate(shmFd, buffer->size());
    auto* sharedMemory = mmap(nullptr, buffer->size(), PROT_WRITE, MAP_SHARED, shmFd, 0);

@@ -88,9 +88,8 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>> getAllPossibleRelations();
    std::unique_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
    std::unique_ptr<StatementHandler> statementHandler;
-  arrow::Result<arrow::flight::sql::SqlInfoResult> getSqlInfoResult(size_t type);
+   arrow::Result<arrow::flight::sql::SqlInfoResult> getSqlInfoResult(size_t type);
 };
-
 
 class CustomAuthHandler : public arrow::flight::ServerAuthHandler {
    arrow::Status Authenticate(const arrow::flight::ServerCallContext& context,

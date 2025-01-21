@@ -234,9 +234,6 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
 
    arrow::Int32Builder builder{};
 
-
-
-
    auto stringBuilder = std::make_shared<arrow::StringBuilder>();
    auto booleanBuilder = std::make_shared<arrow::BooleanBuilder>();
    auto bigintBuilder = std::make_shared<arrow::Int64Builder>();
@@ -246,34 +243,29 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
    const std::vector<std::shared_ptr<arrow::ArrayBuilder>>& children{{stringBuilder, booleanBuilder, bigintBuilder, int32_bitmaskBuilder, stringListBuilder, int32_to_int32_list_mapBuilder}};
    arrow::DenseUnionBuilder unionBuilder{arrow::default_memory_pool()};
 
-
    std::vector<std::string> fieldNames{"string_value", "bool_value", "bigint_value", "int32_bitmask", "string_list", "int32_to_int32_list_map"};
    for (size_t i = 0; i < children.size(); i++) {
       unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
    }
    ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
-   for (size_t i = 0; i<1000; i++) {
+   for (size_t i = 0; i < 1000; i++) {
       auto arrowResult = getSqlInfoResult(i);
       if (arrowResult.ok()) {
          ARROW_ASSIGN_OR_RAISE(auto result, arrowResult);
-        if (std::holds_alternative<std::string>(result)) {
+         if (std::holds_alternative<std::string>(result)) {
+            ARROW_RETURN_NOT_OK(stringBuilder->Append(std::get<std::string>(result)));
 
+            ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
+            ARROW_RETURN_NOT_OK(builder.Append(i));
+         } else if (std::holds_alternative<bool>(result)) {
+            // ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
 
-           ARROW_RETURN_NOT_OK(stringBuilder->Append(std::get<std::string>(result)));
+            ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
 
-           ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
-           ARROW_RETURN_NOT_OK(builder.Append(i));
-        } else if (std::holds_alternative<bool>(result)) {
-           // ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
-
-           ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
-
-           ARROW_RETURN_NOT_OK(unionBuilder.Append(1));
-           ARROW_RETURN_NOT_OK(builder.Append(i));
-
-        }
+            ARROW_RETURN_NOT_OK(unionBuilder.Append(1));
+            ARROW_RETURN_NOT_OK(builder.Append(i));
+         }
       }
-
    }
    ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
    ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
@@ -463,7 +455,7 @@ arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSql
       case arrow::flight::sql::SqlInfoOptions::SQL_EXTRA_NAME_CHARACTERS: return {"asd"};
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_COLUMN_ALIASING: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_NULL_PLUS_NULL_IS_NULL: return false;
-      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_CONVERT: return std::unordered_map<int32_t, std::vector<int32_t>>{{1,{2,3}}};
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_CONVERT: return std::unordered_map<int32_t, std::vector<int32_t>>{{1, {2, 3}}};
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_TABLE_CORRELATION_NAMES: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_DIFFERENT_TABLE_CORRELATION_NAMES: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTS_EXPRESSIONS_IN_ORDER_BY: return false;
@@ -487,30 +479,30 @@ arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSql
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_SUBQUERIES: return 0b0;
       case arrow::flight::sql::SqlInfoOptions::SQL_CORRELATED_SUBQUERIES_SUPPORTED: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_UNIONS: return 0b0;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_BINARY_LITERAL_LENGTH: return (int64)static_cast<int64_t>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_BINARY_LITERAL_LENGTH: return (int64) static_cast<int64_t>(10); ;
       case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CHAR_LITERAL_LENGTH: return (int64) static_cast<int64_t>(10);
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMN_NAME_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_GROUP_BY: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_INDEX: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_ORDER_BY: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_SELECT: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_TABLE: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CONNECTIONS: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CURSOR_NAME_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_INDEX_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_SCHEMA_NAME_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_PROCEDURE_NAME_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CATALOG_NAME_LENGTH: return (int64) static_cast<int64>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_ROW_SIZE: return (int64) static_cast<int64>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMN_NAME_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_GROUP_BY: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_INDEX: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_ORDER_BY: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_SELECT: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_COLUMNS_IN_TABLE: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CONNECTIONS: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CURSOR_NAME_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_INDEX_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SCHEMA_NAME_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_PROCEDURE_NAME_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_CATALOG_NAME_LENGTH: return (int64) static_cast<int64>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_ROW_SIZE: return (int64) static_cast<int64>(10); ;
       case arrow::flight::sql::SqlInfoOptions::SQL_MAX_ROW_SIZE_INCLUDES_BLOBS: return false;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENT_LENGTH: return (int32) static_cast<int32>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENTS: return (int32) static_cast<int32>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLE_NAME_LENGTH: return (int32) static_cast<int32>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLES_IN_SELECT: return (int32) static_cast<int32>(10);;
-      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_USERNAME_LENGTH: return (int32) static_cast<int32>(10);;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENT_LENGTH: return (int32) static_cast<int32>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_STATEMENTS: return (int32) static_cast<int32>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLE_NAME_LENGTH: return (int32) static_cast<int32>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_TABLES_IN_SELECT: return (int32) static_cast<int32>(10); ;
+      case arrow::flight::sql::SqlInfoOptions::SQL_MAX_USERNAME_LENGTH: return (int32) static_cast<int32>(10); ;
       case arrow::flight::sql::SqlInfoOptions::SQL_DEFAULT_TRANSACTION_ISOLATION: return 0;
       case arrow::flight::sql::SqlInfoOptions::SQL_TRANSACTIONS_SUPPORTED: return false;
-      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_TRANSACTIONS_ISOLATION_LEVELS: return  0b0;
+      case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_TRANSACTIONS_ISOLATION_LEVELS: return 0b0;
       case arrow::flight::sql::SqlInfoOptions::SQL_DATA_DEFINITION_CAUSES_TRANSACTION_COMMIT: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_DATA_DEFINITIONS_IN_TRANSACTIONS_IGNORED: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_SUPPORTED_RESULT_SET_TYPES: return 0b0;

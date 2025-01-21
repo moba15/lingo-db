@@ -87,10 +87,6 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          buffer.~shared_ptr();
          close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
          shm_unlink(handle.c_str());
-
-
-
-
       }
 
       std::cout << "Execution finished: " << handle << std::endl;
