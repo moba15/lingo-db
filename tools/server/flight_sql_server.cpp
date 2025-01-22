@@ -227,11 +227,6 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
    std::string info(command.info.begin(), command.info.end());
    std::cout << "DoGetSqlInfo: " << info << std::endl;
    auto schema = arrow::flight::sql::SqlSchema::GetSqlInfoSchema();
-   auto fields = schema->fields();
-   for (auto field : fields) {
-      std::cout << field->ToString() << std::endl;
-   }
-
    arrow::Int32Builder builder{};
 
    auto stringBuilder = std::make_shared<arrow::StringBuilder>();
@@ -245,33 +240,35 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
 
    std::vector<std::string> fieldNames{"string_value", "bool_value", "bigint_value", "int32_bitmask", "string_list", "int32_to_int32_list_map"};
    for (size_t i = 0; i < children.size(); i++) {
-      unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
+      auto  result = unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
+      std::cout << fieldNames.at(i) << ": " << std::to_string(result) << std::endl;
    }
-   ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
-   for (size_t i = 0; i < 1000; i++) {
-      auto arrowResult = getSqlInfoResult(i);
+   for (size_t info_name_id = 0; info_name_id < 1000; info_name_id++) {
+      auto arrowResult = getSqlInfoResult(info_name_id);
       if (arrowResult.ok()) {
          ARROW_ASSIGN_OR_RAISE(auto result, arrowResult);
          if (std::holds_alternative<std::string>(result)) {
-            ARROW_RETURN_NOT_OK(stringBuilder->Append(std::get<std::string>(result)));
-
             ARROW_RETURN_NOT_OK(unionBuilder.Append(0));
-            ARROW_RETURN_NOT_OK(builder.Append(i));
+            ARROW_RETURN_NOT_OK(stringBuilder->Append(std::get<std::string>(result)));
+            ARROW_RETURN_NOT_OK(builder.Append(info_name_id));
          } else if (std::holds_alternative<bool>(result)) {
-            // ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
-
-            ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
-
             ARROW_RETURN_NOT_OK(unionBuilder.Append(1));
-            ARROW_RETURN_NOT_OK(builder.Append(i));
+            ARROW_RETURN_NOT_OK(booleanBuilder->Append(std::get<bool>(result)));
+            ARROW_RETURN_NOT_OK(builder.Append(info_name_id));
+         } else if (std::holds_alternative<int32>(result)) {
+            ARROW_RETURN_NOT_OK(unionBuilder.Append(1));
+            ARROW_RETURN_NOT_OK(int32_bitmaskBuilder->Append(std::get<int32>(result)));
+            ARROW_RETURN_NOT_OK(builder.Append(info_name_id));
          }
       }
    }
    ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
    ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
 
+
    std::shared_ptr<arrow::RecordBatch> batch =
-      arrow::RecordBatch::Make(schema, 1, {std::move(info_names), std::move(values)});
+      arrow::RecordBatch::Make(schema, 4, {std::move(info_names), std::move(values)});
+   std::cout << batch->ToString() << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto reader, arrow::RecordBatchReader::Make({batch}));
    return std::make_unique<arrow::flight::RecordBatchStream>(reader);
 }
@@ -428,7 +425,7 @@ arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSql
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_VERSION: return "Flight SQL Server Version";
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_ARROW_VERSION: return "Arrow Version";
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY: return false;
-      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SQL: return false;
+      case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SQL: return true;
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT: return false;
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT_MIN_VERSION: return "";
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_SUBSTRAIT_MAX_VERSION: return "";
@@ -440,7 +437,7 @@ arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSql
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_TRANSACTION_TIMEOUT: return 0;
       case arrow::flight::sql::SqlInfoOptions::SQL_DDL_CATALOG: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_DDL_SCHEMA: return false;
-      case arrow::flight::sql::SqlInfoOptions::SQL_DDL_TABLE: return false; //asd
+      case arrow::flight::sql::SqlInfoOptions::SQL_DDL_TABLE: return false;
       case arrow::flight::sql::SqlInfoOptions::SQL_IDENTIFIER_CASE: return arrow::flight::sql::SqlInfoOptions::SqlSupportedCaseSensitivity::SQL_CASE_SENSITIVITY_UNKNOWN;
       case arrow::flight::sql::SqlInfoOptions::SQL_IDENTIFIER_QUOTE_CHAR: return "Identifier Quote";
       case arrow::flight::sql::SqlInfoOptions::SQL_QUOTED_IDENTIFIER_CASE: return arrow::flight::sql::SqlInfoOptions::SqlSupportedCaseSensitivity::SQL_CASE_SENSITIVITY_UNKNOWN;
