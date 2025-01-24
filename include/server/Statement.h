@@ -6,6 +6,7 @@
 #include "shm/SyncHelper.h"
 
 #include <string>
+#include <arrow/flight/server.h>
 #include <arrow/result.h>
 #include <arrow/table.h>
 #include <arrow/util/launder.h>
@@ -43,13 +44,13 @@ class Statement {
    [[deprecated]] void set_result(std::unique_ptr<util::SharedMemoryWrapper> result) {}
    arrow::Status mark_as_finished(bool error);
    arrow::Status waitForResult();
+   std::shared_ptr<std::optional<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>>> result;
 
    protected:
    std::string handle;
    std::string sqlStatement;
    std::shared_ptr<StatementInformation> information;
    StatementStatus status = IDLE;
-   std::unique_ptr<util::SharedMemoryWrapper> result;
    std::unique_ptr<util::SharedSemaphore> sharedSemaphore;
    std::unique_ptr<util::SharedMemoryWrapper> shareMemoryWrapper;
 };

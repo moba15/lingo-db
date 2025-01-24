@@ -80,11 +80,14 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          std::cout << "Getting result of" << handle << std::endl;
          auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
+
          std::cout << "Got table of" << handle << std::endl;
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
+         resultTable.reset();
+         table.reset();
+         std::cout << "Use count " << table.use_count() << std::endl;
          std::cout << "Serialized table of" << handle << std::endl;
-         ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), buffer));
-         buffer.~shared_ptr();
+         ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), std::move(buffer)));
          close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
          shm_unlink(handle.c_str());
       }

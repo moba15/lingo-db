@@ -5,8 +5,9 @@
 #include "server/ipc/IPCHelper.h"
 namespace server {
 namespace util {
-arrow::Result<std::shared_ptr<arrow::ResizableBuffer>> serializeTable(const std::shared_ptr<arrow::Table>& table) {
-   ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::ResizableBuffer> buffer, arrow::AllocateResizableBuffer(10240 * 10240));
+arrow::Result<std::shared_ptr<arrow::ResizableBuffer>> serializeTable( const std::shared_ptr<arrow::Table>& table) {
+
+   ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::ResizableBuffer> buffer, arrow::AllocateResizableBuffer(1024 * 1024));
 
    auto stream = std::make_shared<arrow::io::FixedSizeBufferWriter>(buffer);
 
@@ -15,6 +16,7 @@ arrow::Result<std::shared_ptr<arrow::ResizableBuffer>> serializeTable(const std:
       std::cerr << "Failed to write table to buffer" << std::endl;
       return arrow::Status::Invalid("Failed to write table to buffer");
    }
+
    ARROW_RETURN_NOT_OK(stream->Close());
    return arrow::Result<std::shared_ptr<arrow::ResizableBuffer>>(std::move(buffer));
 }
@@ -25,8 +27,10 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> deserializeTable
    auto reader = std::make_shared<arrow::io::BufferReader>(buffer);
    ARROW_ASSIGN_OR_RAISE(auto recordBatchReader, arrow::ipc::RecordBatchStreamReader::Open(reader))
 
+
    auto stream = std::unique_ptr<arrow::flight::FlightDataStream>(
       std::make_unique<arrow::flight::RecordBatchStream>(recordBatchReader));
+
 
    return arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>(std::move(stream));
 }

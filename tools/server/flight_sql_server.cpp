@@ -129,7 +129,6 @@ arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSql
    if (pid == 0) {
       this->statementHandler.~unique_ptr();
       std::exit(0);
-
       return arrow::Status::Cancelled("");
    } else {
       ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
@@ -240,7 +239,7 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
 
    std::vector<std::string> fieldNames{"string_value", "bool_value", "bigint_value", "int32_bitmask", "string_list", "int32_to_int32_list_map"};
    for (size_t i = 0; i < children.size(); i++) {
-      auto  result = unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
+      auto result = unionBuilder.AppendChild(children.at(i), fieldNames.at(i));
       std::cout << fieldNames.at(i) << ": " << std::to_string(result) << std::endl;
    }
    for (size_t info_name_id = 0; info_name_id < 1000; info_name_id++) {
@@ -264,7 +263,6 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
    }
    ARROW_ASSIGN_OR_RAISE(auto info_names, builder.Finish());
    ARROW_ASSIGN_OR_RAISE(auto values, unionBuilder.Finish());
-
 
    std::shared_ptr<arrow::RecordBatch> batch =
       arrow::RecordBatch::Make(schema, 4, {std::move(info_names), std::move(values)});
