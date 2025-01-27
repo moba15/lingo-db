@@ -108,20 +108,48 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       return childPid;
    }
 }
-arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>> StatementHandler::waitAndGetStatementResult(std::string handle) {
+arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
    CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
 
    ARROW_RETURN_NOT_OK(statementQueue.at(handle)->waitForResult());
+
    if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
-      return 0;
+      statementQueue.at(handle)->result = 0;
    }
    std::cout << "Result found for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(statementQueue.at(handle)->get_share_memory_wrapper()));
    std::cout << "Result read for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
+   statementQueue.at(handle)->result = std::move(stream);
+   return arrow::Status::OK();
+}
 
-   return std::move(stream);
+arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler::getResultStream(std::string handle) {
+   UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+
+   if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
+      return arrow::Status::Invalid("");
+   }
+   if (std::holds_alternative<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result)) {
+      std::cout << "Found" << std::endl;
+      return std::move(std::get<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result));
+   }
+   return arrow::Status::Invalid("No result found");
+}
+
+arrow::Result<std::shared_ptr<arrow::Schema>> StatementHandler::getSchemaOfStatement(std::string handle) {
+   UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+
+   if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
+      return arrow::Status::Invalid("");
+   }
+   if (std::holds_alternative<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result)) {
+      return std::get<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result)->schema();
+   }
+   return arrow::Status::Invalid("No result found");
 }
 arrow::Status StatementHandler::closeStatement(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)

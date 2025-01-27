@@ -20,8 +20,8 @@ SharedMemoryWrapper::~SharedMemoryWrapper() {
    std::cout << "Shared memory is beeing freed (" << getpid() << ") freed: " << freed << std::endl;
    if (!freed) {
       freed = true;
-      close(shmFd);
-      shm_unlink(handle.c_str());
+      /*  close(shmFd);
+      shm_unlink(handle.c_str()); */
    }
 }
 SharedMemoryWrapper::SharedMemoryWrapper(SharedMemoryWrapper&& other) noexcept
@@ -48,6 +48,7 @@ arrow::Result<std::unique_ptr<SharedSemaphore>> createAndLockSharedMutex(const s
 
 arrow::Result<std::unique_ptr<SharedMemoryWrapper>> createSharedMemory(std::string handle) {
    auto shmFd = shm_open(handle.c_str(), O_CREAT | O_EXCL | O_RDWR, 0666);
+   std::cout << "Created shared memory: " << std::to_string(shmFd) << std::endl;
    if (shmFd < 0) { return arrow::Status::IOError("Failed to open shm"); }
 
    return std::make_unique<SharedMemoryWrapper>(handle, shmFd, false);
@@ -62,21 +63,22 @@ arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& shared
    if (sharedMemory == MAP_FAILED) { return arrow::Status::IOError("mmap failed"); }
    std::memcpy(sharedMemory, buffer->data(), buffer->size());
    std::cout << "memcpy" << std::endl;
-   munmap(sharedMemory, buffer->size());
-   ARROW_RETURN_NOT_OK(buffer->Resize(0));
+   // munmap(sharedMemory, buffer->size());
+   //ARROW_RETURN_NOT_OK(buffer->Resize(0));
    std::cout << "New buffer size: " << buffer->size() << std::endl;
-   buffer.reset();
+   // buffer.reset();
    std::cout << "Buffer count " << buffer.use_count() << std::endl;
    return sharedMemory;
 }
 
 arrow::Result<std::shared_ptr<arrow::Buffer>> readResultSharedMemory(SharedMemoryWrapper& sharedMemoryWrapper) {
    auto shmFd = sharedMemoryWrapper.getShmFd();
+   std::cout << "   read: " + std::to_string(shmFd) << std::endl;
 
    struct stat shmStat;
    if (fstat(shmFd, &shmStat) == -1) { return arrow::Status::IOError("Failed to get shared memory stats"); }
    auto* sharedMemory = mmap(nullptr, shmStat.st_size, PROT_READ, MAP_SHARED, shmFd, 0);
-   if (sharedMemory == nullptr || sharedMemory == MAP_FAILED) { return arrow::Status::IOError("Map failed"); }
+   if (sharedMemory == nullptr || sharedMemory == MAP_FAILED) { return arrow::Status::IOError("Map failed " + std::to_string(reinterpret_cast<unsigned long long>(sharedMemory)) + ":" + std::to_string(reinterpret_cast<unsigned long long>(MAP_FAILED))); }
    auto buffer = std::make_shared<arrow::Buffer>(static_cast<uint8_t*>(sharedMemory), shmStat.st_size);
    return arrow::Result(std::move(buffer));
 }

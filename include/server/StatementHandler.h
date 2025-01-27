@@ -29,8 +29,10 @@ class StatementHandler {
    arrow::Result<std::shared_ptr<StatementInformation>> getStatement(std::string handle);
    arrow::Result<std::string> addStatementToQueue(std::string sqlStatement);
    arrow::Result<pid_t> executeQeueryStatement(std::string handle, bool onlyIfQuery);
-   arrow::Result<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>> waitAndGetStatementResult(std::string handle);
+   arrow::Status waitAndLoadResult(std::string handle);
    arrow::Status closeStatement(std::string handle);
+   arrow::Result<std::shared_ptr<arrow::Schema>> getSchemaOfStatement(std::string handle);
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> getResultStream(std::string handle);
 
    private:
    size_t handleSize;

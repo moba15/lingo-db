@@ -44,7 +44,7 @@ class Statement {
    [[deprecated]] void set_result(std::unique_ptr<util::SharedMemoryWrapper> result) {}
    arrow::Status mark_as_finished(bool error);
    arrow::Status waitForResult();
-   std::shared_ptr<std::optional<std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int>>> result;
+   std::variant<std::unique_ptr<arrow::flight::FlightDataStream>, int> result;
 
    protected:
    std::string handle;
