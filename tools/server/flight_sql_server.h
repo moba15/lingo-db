@@ -21,9 +21,12 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #define SharedmemSize 100
-
+#define debug false
 #define CHECK_FOR_VALID_SERVER_SESSION() \
    if (sessions == nullptr || sessions->size() == 0) { return arrow::Status::Invalid("Session is null"); }
+
+#define PrintIfDebug(msg) \
+   if (debug) std::cout << msg << std::endl;
 
 namespace server {
 

@@ -144,10 +144,11 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
                                                         const arrow::flight::sql::PreparedStatementQuery& command,
                                                         const arrow::flight::FlightDescriptor& descriptor) {
    CHECK_FOR_VALID_SERVER_SESSION()
-   std::cout << "GetFlightInfoPreparedStatement: " << descriptor.cmd << std::endl;
+   PrintIfDebug("GetFlightInfoPreparedStatement" << descriptor.cmd)
 
-   // The schema can be built from a vector of fields, and we do so here.
-   std::shared_ptr<arrow::Schema> schema = sessions->at("tpch")->getCatalog()->findRelation("orders")->getArrowSchema();
+      // The schema can be built from a vector of fields, and we do so here.
+      std::shared_ptr<arrow::Schema>
+         schema = sessions->at("tpch")->getCatalog()->findRelation("orders")->getArrowSchema();
 
    ARROW_ASSIGN_OR_RAISE(auto ticket_string,
                          arrow::flight::sql::CreateStatementQueryTicket(command.prepared_statement_handle));
@@ -165,8 +166,8 @@ arrow::Result<int64_t>
 FlightSqlServerTestImpl::DoPutPreparedStatementUpdate(const arrow::flight::ServerCallContext& context,
                                                       const arrow::flight::sql::PreparedStatementUpdate& command,
                                                       arrow::flight::FlightMessageReader* reader) {
-   std::cout << "DoPutPreparedStatementUpdate" << std::endl;
-   ARROW_RETURN_NOT_OK(statementHandler->executeQeueryStatement(command.prepared_statement_handle, false));
+   PrintIfDebug("DoPutPreparedStatementUpdate")
+      ARROW_RETURN_NOT_OK(statementHandler->executeQeueryStatement(command.prepared_statement_handle, false));
    ARROW_ASSIGN_OR_RAISE(auto result, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
    if (!std::holds_alternative<int>(result)) {
       return arrow::Status::Invalid("FlightSqlServerTestImpl::DoPutPreparedStatementUpdated");
@@ -185,9 +186,9 @@ FlightSqlServerTestImpl::DoPutPreparedStatementQuery(const arrow::flight::Server
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
 FlightSqlServerTestImpl::DoGetPreparedStatement(const arrow::flight::ServerCallContext& context,
                                                 const arrow::flight::sql::PreparedStatementQuery& command) {
-   std::cout << "DoGetPreparedStatement " << std::endl;
-   CHECK_FOR_VALID_SERVER_SESSION()
-   ARROW_ASSIGN_OR_RAISE(auto result, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
+   PrintIfDebug("DoGetPreparedStatement")
+      CHECK_FOR_VALID_SERVER_SESSION()
+         ARROW_ASSIGN_OR_RAISE(auto result, statementHandler->waitAndGetStatementResult(command.prepared_statement_handle));
    if (!std::holds_alternative<std::unique_ptr<arrow::flight::FlightDataStream>>(result)) {
       return arrow::Status::Invalid("FlightSqlServerTestImpl::DoGetPreparedStatementd");
    }
@@ -197,9 +198,8 @@ FlightSqlServerTestImpl::DoGetPreparedStatement(const arrow::flight::ServerCallC
 arrow::Status FlightSqlServerTestImpl::ClosePreparedStatement(
    const arrow::flight::ServerCallContext& context,
    const arrow::flight::sql::ActionClosePreparedStatementRequest& request) {
-   std::cout << "ClosePreparedStatement " << std::endl;
-   CHECK_FOR_VALID_SERVER_SESSION()
-   return this->statementHandler->closeStatement(request.prepared_statement_handle);
+   PrintIfDebug("ClosePreparedStatement")
+      CHECK_FOR_VALID_SERVER_SESSION() return this->statementHandler->closeStatement(request.prepared_statement_handle);
 }
 /***
  * ---------------------------------------------------
@@ -213,9 +213,9 @@ FlightSqlServerTestImpl::GetFlightInfoSqlInfo(const arrow::flight::ServerCallCon
                                               const arrow::flight::FlightDescriptor& descriptor) {
    CHECK_FOR_VALID_SERVER_SESSION()
    std::string info(command.info.begin(), command.info.end());
-   std::cout << "GetFlightInfoSqlInfo: " << info << std::endl;
-   std::vector endpoints{
-      arrow::flight::FlightEndpoint{{descriptor.cmd}, {}, std::nullopt, ""}};
+   PrintIfDebug("GetFlightInfoSqlInfo")
+      std::vector endpoints{
+         arrow::flight::FlightEndpoint{{descriptor.cmd}, {}, std::nullopt, ""}};
    ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*arrow::flight::sql::SqlSchema::GetSqlInfoSchema(), descriptor, endpoints, -1, -1, false));
    return std::make_unique<arrow::flight::FlightInfo>(result);
 }
@@ -224,8 +224,7 @@ FlightSqlServerTestImpl::DoGetSqlInfo(const arrow::flight::ServerCallContext& co
                                       const arrow::flight::sql::GetSqlInfo& command) {
    CHECK_FOR_VALID_SERVER_SESSION()
    std::string info(command.info.begin(), command.info.end());
-   std::cout << "DoGetSqlInfo: " << info << std::endl;
-   auto schema = arrow::flight::sql::SqlSchema::GetSqlInfoSchema();
+   PrintIfDebug("DoGetSqlInfo") auto schema = arrow::flight::sql::SqlSchema::GetSqlInfoSchema();
    arrow::Int32Builder builder{};
 
    auto stringBuilder = std::make_shared<arrow::StringBuilder>();
@@ -332,8 +331,7 @@ FlightSqlServerTestImpl::GetFlightInfoTableTypes(const arrow::flight::ServerCall
 }
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>>
 FlightSqlServerTestImpl::DoGetTableTypes(const arrow::flight::ServerCallContext& context) {
-   std::cout << "DoGetTableTypes" << std::endl;
-   auto schema = arrow::flight::sql::SqlSchema::GetTableTypesSchema();
+   PrintIfDebug("DoGetTableTypes") auto schema = arrow::flight::sql::SqlSchema::GetTableTypesSchema();
    arrow::StringBuilder builder{};
    ARROW_RETURN_NOT_OK(builder.Append("TABLE"));
    ARROW_ASSIGN_OR_RAISE(auto tableTypes, builder.Finish());
@@ -388,9 +386,9 @@ FlightSqlServerTestImpl::GetFlightInfoCatalogs(const arrow::flight::ServerCallCo
    return std::make_unique<arrow::flight::FlightInfo>(result);
 }
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> FlightSqlServerTestImpl::DoGetCatalogs(const arrow::flight::ServerCallContext& context) {
-   std::cout << "DoGetCatalogs" << std::endl;
-   const std::shared_ptr<arrow::Schema>& schema =
-      arrow::flight::sql::SqlSchema::GetCatalogsSchema();
+   PrintIfDebug("DoGetCatalogs")
+      const std::shared_ptr<arrow::Schema>& schema =
+         arrow::flight::sql::SqlSchema::GetCatalogsSchema();
    arrow::StringBuilder catalog_name_builder;
 
    for (auto session : *sessions) {
@@ -525,11 +523,10 @@ std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Rela
       auto db_schema_name = session.first;
       auto catalog = session.second->getCatalog();
       if (typeid(*catalog.get()) == typeid(runtime::LocalCatalog)) {
-         std::cout << "Is type LOCAL" << std::endl;
+         PrintIfDebug("Is type LOCAL")
          //TODO
       } else if (typeid(*catalog.get()) == typeid(runtime::DBCatalog)) {
-         std::cout << "Is type DB" << std::endl;
-         auto dbCatalog = std::static_pointer_cast<runtime::DBCatalog>(catalog);
+         PrintIfDebug("Is type DB") auto dbCatalog = std::static_pointer_cast<runtime::DBCatalog>(catalog);
          for (auto relation : dbCatalog->relations) {
             result->emplace_back(std::make_pair(catalog_name, relation.second));
          }
