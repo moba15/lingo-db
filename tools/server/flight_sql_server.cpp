@@ -5,22 +5,46 @@
 
 #include <libpg_query/src/postgres/include/c.h>
 #include <runtime/ArrowTable.h>
-arrow::Status startServer(std::string sqlUrl);
+arrow::Status startServer(std::unordered_map<std::string, std::string>& urls);
 
 arrow::Status connectClient(int port);
 
 int main(int argc, char** argv) {
-   if (argc != 3) { std::cout << "usage: " << argv[0] << " <port>" << std::endl; }
+   if (argc < 3) {
+      std::cout << "usage: " << argv[0] << " <port> <...dbName:PathToDb>" << std::endl;
+      return 1;
+   }
+   if (argc > 3) {
+      std::cout << "Currently only one database at a time is supported " << std::endl;
+      return 1;
+   }
    auto build_info = arrow::GetBuildInfo();
    std::cout << "Apache Arrow version: " << build_info.version_string << std::endl;
    arrow::Status st;
-   if (*argv[2] == 'c') {
-      std::cout << "Start client" << std::endl;
-      st = connectClient(8082);
-   } else {
-      std::cout << "Start server..." << std::endl;
-      st = startServer(std::string(argv[2]));
+   std::cout << "Start server..." << std::endl;
+   std::unordered_map<std::string, std::string> urls{};
+   for (int i = 2; i < argc; i++) {
+      std::string arg = argv[i];
+      std::stringstream ss(arg);
+      std::string splitted;
+      int place = 0;
+      std::string name;
+      std::string url;
+      while (getline(ss, splitted, ':')) {
+         if (place == 0) {
+            name = splitted;
+         } else if (place == 1) {
+            url = splitted;
+         }
+         place++;
+      }
+      if (place != 2) {
+         std::cout << "Please use: dbName:PathToDb" << std::endl;
+         return 1;
+      }
+      urls.insert({name, url});
    }
+   st = startServer(urls);
 
    if (!st.ok()) {
       std::cerr << st << std::endl;
@@ -35,24 +59,8 @@ int main(int argc, char** argv) {
 
    return 0;
 }
-arrow::Status startServer(std::string sqlUrl) {
+arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    //  auto reuslt = arrow::flight::Location::Parse("127.0.0.1");
-   std::cout << "Loading: " << sqlUrl << std::endl;
-   auto session = runtime::Session::createSession(sqlUrl, true);
-
-   auto executionContext = session->createExecutionContext();
-   auto queryExecutionConfig = execution::createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
-   auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
-   /* ParaParser parser{session};
-   auto paras = parser.getParas("select * from hoeren where matrnr=(select matrnr from hoeren where vorlnr=? and matrnr=? and vorlnr=(select * from vorlesungen where sws LIKE ?))");
-   for (auto para : *paras) { std::cout << "Found: " << para->name() << std::endl; }*/
-   executer->fromData("Select * from region");
-   try {
-      executer->execute();
-   } catch (const std::runtime_error& error) {
-      std::cerr << "Error" << std::endl;
-      return arrow::Status::Invalid(error.what());
-   }
 
    arrow::flight::Location server_location;
    ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
@@ -60,14 +68,18 @@ arrow::Status startServer(std::string sqlUrl) {
    auto root = std::make_shared<arrow::fs::SubTreeFileSystem>("./flight_datasets/", fs);
    arrow::flight::FlightServerOptions options(server_location);
    auto statementExecution = std::make_unique<server::StatementExecution>();
-   auto sessions = std::make_unique<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>();
+   auto sessions = std::make_shared<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>();
 
-   auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 32, session);
+   auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 32, sessions);
 
-   sessions->emplace("tpch", session);
+   for (auto url : urls) {
+      std::cout << "Loading: " << url.first << ":" << url.second << std::endl;
+      auto session = runtime::Session::createSession(url.second, true);
+      sessions->emplace("tpch", session);
+   }
 
    std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
-      new server::FlightSqlServerTestImpl(std::move(root), std::move(sessions), std::move(statementHandler)));
+      new server::FlightSqlServerTestImpl(std::move(root), sessions, std::move(statementHandler)));
    server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, false);
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;

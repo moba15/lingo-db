@@ -10,8 +10,8 @@
 #include <server/parser/ParaParser.h>
 using namespace std::chrono_literals;
 namespace server {
-StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<runtime::Session> session)
-   : handleSize(handleSize), statementExecution(std::move(statementExecution)), session(session) {}
+StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions)
+   : handleSize(handleSize), statementExecution(std::move(statementExecution)), sessions(std::move(sessions)) {}
 //TODO is this good practice?
 arrow::Result<std::shared_ptr<StatementInformation>> StatementHandler::getStatement(std::string handle) {
    if (statementQueue.find(handle) == statementQueue.end()) {
@@ -27,7 +27,7 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    std::string handle = randomString(handleSize);
    while (statementQueue.find(handle) != statementQueue.end()) { handle = randomString(handleSize); }
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
-   ParaParser para_parser{session};
+   ParaParser para_parser{sessions->at("tpch")};
    auto information = para_parser.getStatementInformation(sqlStatement);
    ARROW_ASSIGN_OR_RAISE(auto sharedMemoryWrapper, util::createSharedMemory(handle))
 
@@ -55,9 +55,9 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       std::cout << "Child: Forked (pid: " << getpid() << ")" << std::endl;
       //Childsp
       //std::this_thread::sleep_for(2s);
-      auto executionContext = session->createExecutionContext();
+      auto executionContext = sessions->at("tpch")->createExecutionContext();
       auto queryExecutionConfig = createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
-      auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
+      auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *sessions->at("tpch"));
       CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
       executer->fromData(sqlStatement);

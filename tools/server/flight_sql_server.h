@@ -40,7 +40,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    public:
    //TODO check if session is given correctly
    explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
-                                    std::unique_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>
+                                    std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>
                                        sessions,
                                     std::unique_ptr<StatementHandler>
                                        statementHandler)
@@ -89,7 +89,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
 
    private:
    std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>> getAllPossibleRelations();
-   std::unique_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
+   std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
    std::unique_ptr<StatementHandler> statementHandler;
    arrow::Result<arrow::flight::sql::SqlInfoResult> getSqlInfoResult(size_t type);
 };
