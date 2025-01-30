@@ -16,8 +16,16 @@
 #include <runtime/ArrowTable.h>
 #include <runtime/ExecutionContext.h>
 #include <runtime/Session.h>
-#define CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(queue, handle) \
-   if (queue.find(handle) == queue.end()) { return arrow::Status::Invalid("Handle not found in queue"); }
+#define CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(queue, handle, method) \
+   std::string errorMsg{"Handle not found in queue: "};             \
+   errorMsg.append(handle);                                         \
+   errorMsg.append(" Method: ");                                    \
+   errorMsg.append(method);                                         \
+   if (queue.find(handle) == queue.end()) { return arrow::Status::Invalid(errorMsg); }
+#define debug true
+#define PrintIfDebugHandler(msg) \
+   if (debug) std::cout << "[Handler]" << msg << std::endl;
+
 #define UNIQUE_LOCK_AND_RETURN_NOT_ABLE(mutex, timout) \
    const std::unique_lock lock{mutex, timout};         \
    if (!lock.owns_lock()) { return arrow::Status::Invalid("Not able to lock"); }

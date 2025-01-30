@@ -34,37 +34,35 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    auto statement =
       std::make_unique<Statement>(handle, sqlStatement, information, std::move(sharedSemaphore), std::move(sharedMemoryWrapper));
    statementQueue.emplace(handle, std::move(statement));
+   PrintIfDebugHandler(handle << " was added to que")
 
-   return arrow::Result<std::string>(handle);
+      return arrow::Result<std::string>(handle);
 }
 arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle, bool onlyIfQuery) {
    {
       UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-      CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+      CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "executeQeueryStatement")
    }
    if (onlyIfQuery && statementQueue.at(handle)->get_information()->type != StatementType::AD_HOC_QUERY) {
       //Only execute Query statements
       return -1;
    }
 
-   std::cout << "Forking (pid: " << getpid() << ")" << std::endl;
    pid_t childPid = fork();
 
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
-      std::cout << "Child: Forked (pid: " << getpid() << ")" << std::endl;
       //Childsp
       //std::this_thread::sleep_for(2s);
       auto executionContext = sessions->at("tpch")->createExecutionContext();
       auto queryExecutionConfig = createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
       auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *sessions->at("tpch"));
-      CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+      CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "executeQeueryStatement2")
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
       executer->fromData(sqlStatement);
       try {
-         std::cout << "Executing " << sqlStatement << std::endl;
          executer->execute();
-         std::cout << "Executed " << sqlStatement << std::endl;
+
       } catch (const std::runtime_error& e) {
          std::cerr << e.what() << std::endl;
 
@@ -110,7 +108,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
 }
 arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "waitAndLoadResult")
 
    ARROW_RETURN_NOT_OK(statementQueue.at(handle)->waitForResult());
 
@@ -127,7 +125,7 @@ arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
 
 arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler::getResultStream(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "getResultStream")
 
    if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
       return arrow::Status::Invalid("");
@@ -141,7 +139,7 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler
 
 arrow::Result<std::shared_ptr<arrow::Schema>> StatementHandler::getSchemaOfStatement(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "getSchemaOfStatement")
 
    if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
       return arrow::Status::Invalid("");
@@ -153,9 +151,11 @@ arrow::Result<std::shared_ptr<arrow::Schema>> StatementHandler::getSchemaOfState
 }
 arrow::Status StatementHandler::closeStatement(std::string handle) {
    UNIQUE_LOCK_AND_RETURN_NOT_ABLE(statementQueueMutex, 10s)
-   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle)
+   CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "closeStatement")
+   PrintIfDebugHandler("Closed statement for " << handle);
+
    auto it = statementQueue.find(handle);
-   statementQueue.erase(it, statementQueue.end());
+   statementQueue.erase(it);
 
    return arrow::Status::OK();
 }
