@@ -24,9 +24,11 @@ struct SharedSemaphore {
    SharedSemaphore(const SharedSemaphore&&) = delete;
    SharedSemaphore& operator=(const SharedSemaphore&&) = delete;
    ~SharedSemaphore() {
-      std::cout << "Semaphore destroyed" << std::endl;
+
       sem_unlink(name.c_str());
       sem_close(sem);
+      sem_destroy(sem);
+      std::cout << "SEMA: (-)" << name << std::endl;
    }
    arrow::Status post() const;
    arrow::Status wait() const;
@@ -49,6 +51,8 @@ struct SharedMemoryWrapper {
    SharedMemoryWrapper& operator=(SharedMemoryWrapper&&) noexcept;
 
    int getShmFd() const { return shmFd; }
+   void* address;
+   size_t size;
 
    private:
    bool freed;

@@ -52,7 +52,10 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
 
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
+
+
       //Childsp
+
       //std::this_thread::sleep_for(2s);
       auto executionContext = sessions->at("tpch")->createExecutionContext();
       auto queryExecutionConfig = createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
@@ -83,11 +86,15 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
          resultTable.reset();
          table.reset();
+
          std::cout << "Use count " << table.use_count() << std::endl;
          std::cout << "Serialized table of" << handle << std::endl;
+         auto bufferSize = buffer->size();
          ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), std::move(buffer)));
+         munmap(sharedMemmory, bufferSize);
          close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
          shm_unlink(handle.c_str());
+         unlink(handle.c_str());
       }
 
       std::cout << "Execution finished: " << handle << std::endl;
@@ -98,7 +105,6 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       }
 
       ARROW_RETURN_NOT_OK(statementQueue.at(handle)->mark_as_finished(false));
-
       return 0;
    } else {
       //Parent
@@ -117,9 +123,14 @@ arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
    }
    std::cout << "Result found for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(statementQueue.at(handle)->get_share_memory_wrapper()));
+   auto bufferSize = buffer->size();
    std::cout << "Result read for " << handle << std::endl;
    ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
    statementQueue.at(handle)->result = std::move(stream);
+
+   shm_unlink(handle.c_str());
+   close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
+
    return arrow::Status::OK();
 }
 
@@ -155,7 +166,9 @@ arrow::Status StatementHandler::closeStatement(std::string handle) {
    PrintIfDebugHandler("Closed statement for " << handle);
 
    auto it = statementQueue.find(handle);
+   munmap(statementQueue.at(handle)->get_share_memory_wrapper().address, statementQueue.at(handle)->get_share_memory_wrapper().size);
    statementQueue.erase(it);
+
 
    return arrow::Status::OK();
 }

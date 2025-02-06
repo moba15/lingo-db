@@ -70,7 +70,7 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    auto statementExecution = std::make_unique<server::StatementExecution>();
    auto sessions = std::make_shared<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>();
 
-   auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 32, sessions);
+   auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 16, sessions);
 
    for (auto url : urls) {
       std::cout << "Loading: " << url.first << ":" << url.second << std::endl;
@@ -83,7 +83,21 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, false);
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;
-   return server->Serve();
+   std::thread server_thread([&server]() {
+      if (server->Serve().ok()) {
+      } else {
+         std::cerr << "Server Server error" << std::endl;
+      }
+   });
+   for (std::string line; std::getline(std::cin, line);) {
+      if (line == "stop") {
+         ARROW_RETURN_NOT_OK(server->Shutdown());
+         server_thread.join();
+         return arrow::Status::OK();
+      }
+   }
+
+   return arrow::Status::OK();
 }
 
 arrow::Status connectClient(int port) {
@@ -140,6 +154,7 @@ arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSql
    ARROW_ASSIGN_OR_RAISE(auto pid, statementHandler->executeQeueryStatement(handle, true));
    if (pid == 0) {
       this->statementHandler.~unique_ptr();
+
       std::exit(0);
       return arrow::Status::Cancelled("");
    } else {
