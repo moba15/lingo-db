@@ -67,6 +67,7 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    auto fs = std::make_shared<arrow::fs::LocalFileSystem>();
    auto root = std::make_shared<arrow::fs::SubTreeFileSystem>("./flight_datasets/", fs);
    arrow::flight::FlightServerOptions options(server_location);
+   options.auth_handler = std::make_shared<server::CustomAuthHandler>();
    auto statementExecution = std::make_unique<server::StatementExecution>();
    auto sessions = std::make_shared<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>();
 
@@ -147,23 +148,16 @@ FlightSqlServerTestImpl::GetFlightInfoStatement(const arrow::flight::ServerCallC
 arrow::Result<arrow::flight::sql::ActionCreatePreparedStatementResult> FlightSqlServerTestImpl::CreatePreparedStatement(
    const arrow::flight::ServerCallContext& context,
    const arrow::flight::sql::ActionCreatePreparedStatementRequest& request) {
-   std::cout << "CreatePreparedStatement" << std::endl;
+   PrintIfDebug("CreatePreparedStatement");
    CHECK_FOR_VALID_SERVER_SESSION()
 
    ARROW_ASSIGN_OR_RAISE(auto const handle, statementHandler->addStatementToQueue(request.query));
-   ARROW_ASSIGN_OR_RAISE(auto pid, statementHandler->executeQeueryStatement(handle, true));
-   if (pid == 0) {
-      this->statementHandler.~unique_ptr();
 
-      std::exit(0);
-      return arrow::Status::Cancelled("");
-   } else {
-      ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
-      if (statementInformation->type == StatementType::AD_HOC_QUERY && statementInformation->relations != nullptr) {
-         return arrow::flight::sql::ActionCreatePreparedStatementResult{statementInformation->relations->at(0)->getArrowSchema(), nullptr, handle};
-      }
-      return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
+   ARROW_ASSIGN_OR_RAISE(auto statementInformation, statementHandler->getStatement(handle));
+   if (statementInformation->type == StatementType::AD_HOC_QUERY && statementInformation->relations != nullptr) {
+      return arrow::flight::sql::ActionCreatePreparedStatementResult{statementInformation->relations->at(0)->getArrowSchema(), nullptr, handle};
    }
+   return arrow::flight::sql::ActionCreatePreparedStatementResult{nullptr, nullptr, handle};
 }
 
 arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>>
@@ -171,10 +165,18 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
                                                         const arrow::flight::sql::PreparedStatementQuery& command,
                                                         const arrow::flight::FlightDescriptor& descriptor) {
    CHECK_FOR_VALID_SERVER_SESSION()
-   PrintIfDebug("GetFlightInfoPreparedStatement" << descriptor.cmd)
+   PrintIfDebug("GetFlightInfoPreparedStatement" << descriptor.cmd);
 
-      // The schema can be built from a vector of fields, and we do so here.
-      ARROW_RETURN_NOT_OK(statementHandler->waitAndLoadResult(command.prepared_statement_handle));
+   // The schema can be built from a vector of fields, and we do so here.
+
+   ARROW_ASSIGN_OR_RAISE(auto pid, statementHandler->executeQeueryStatement(command.prepared_statement_handle, true));
+   if (pid == 0) {
+      this->statementHandler.~unique_ptr();
+
+      std::exit(0);
+      return arrow::Status::Cancelled("");
+   }
+   ARROW_RETURN_NOT_OK(statementHandler->waitAndLoadResult(command.prepared_statement_handle));
    ARROW_ASSIGN_OR_RAISE(auto schema, statementHandler->getSchemaOfStatement(command.prepared_statement_handle));
 
    ARROW_ASSIGN_OR_RAISE(auto ticket_string,
@@ -435,11 +437,7 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> FlightSqlServerT
 arrow::Status FlightSqlServerTestImpl::start(const arrow::flight::FlightServerOptions& options) {
    return Init(options);
 }
-arrow::Status CustomAuthHandler::IsValid(const arrow::flight::ServerCallContext& context,
-                                         const std::string& token,
-                                         std::string* peer_identity) {
-   return arrow::Status::OK();
-}
+
 arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSqlInfoResult(size_t type) {
    switch (type) {
       case arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_NAME: return "Flight SQL Server Name";
@@ -539,6 +537,13 @@ arrow::Result<arrow::flight::sql::SqlInfoResult> FlightSqlServerTestImpl::getSql
 arrow::Status CustomAuthHandler::Authenticate(const arrow::flight::ServerCallContext& context,
                                               arrow::flight::ServerAuthSender* outgoing,
                                               arrow::flight::ServerAuthReader* incoming) {
+   PrintIfDebug("Authenticate");
+   return arrow::Status::OK();
+}
+arrow::Status CustomAuthHandler::IsValid(const arrow::flight::ServerCallContext& context,
+                                         const std::string& token,
+                                         std::string* peer_identity) {
+   PrintIfDebug("IsValid: token:" << token << "peer identity:" << peer_identity);
    return arrow::Status::OK();
 }
 std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>> FlightSqlServerTestImpl::getAllPossibleRelations() {

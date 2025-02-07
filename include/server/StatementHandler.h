@@ -22,7 +22,7 @@
    errorMsg.append(" Method: ");                                    \
    errorMsg.append(method);                                         \
    if (queue.find(handle) == queue.end()) { return arrow::Status::Invalid(errorMsg); }
-#define debug true
+#define debug false
 #define PrintIfDebugHandler(msg) \
    if (debug) std::cout << "[Handler]" << msg << std::endl;
 

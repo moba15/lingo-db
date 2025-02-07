@@ -52,8 +52,6 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
 
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
-
-
       //Childsp
 
       //std::this_thread::sleep_for(2s);
@@ -167,7 +165,6 @@ arrow::Status StatementHandler::closeStatement(std::string handle) {
    auto it = statementQueue.find(handle);
    munmap(statementQueue.at(handle)->get_share_memory_wrapper().address, statementQueue.at(handle)->get_share_memory_wrapper().size);
    statementQueue.erase(it);
-
 
    return arrow::Status::OK();
 }

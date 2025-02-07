@@ -14,6 +14,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#define debug false
+#define PrintIfDebugSyncHelper(msg) \
+   if (debug) std::cout << "[SyncHelper]" << msg << std::endl;
 namespace server {
 namespace util {
 struct SharedSemaphore {
@@ -28,7 +31,7 @@ struct SharedSemaphore {
       sem_unlink(name.c_str());
       sem_close(sem);
       sem_destroy(sem);
-      std::cout << "SEMA: (-)" << name << std::endl;
+      PrintIfDebugSyncHelper("SEMA: (-)" << name);
    }
    arrow::Status post() const;
    arrow::Status wait() const;

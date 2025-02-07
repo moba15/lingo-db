@@ -13,7 +13,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> Statement::get_result() const {
 }
 arrow::Status Statement::mark_as_finished(const bool error) {
    ARROW_RETURN_NOT_OK(sharedSemaphore->post());
-   std::cout << "Posted" << std::endl;
+
    if (error) {
       status = ERROR;
       return arrow::Status::OK();
