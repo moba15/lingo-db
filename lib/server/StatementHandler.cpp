@@ -70,7 +70,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          std::cerr << e.what() << std::endl;
 
          if (statementQueue.find(handle) == statementQueue.end()) {
-            std::cerr << "Statement with handle " << handle << " was removed during execution" << std::endl;
+            PrintIfDebugHandler("Statement with handle " << handle << " was removed during execution")
 
          } else {
             ARROW_RETURN_NOT_OK(statementQueue.at(handle)->mark_as_finished(false));
@@ -78,18 +78,18 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          return arrow::Status::Invalid(e.what());
       }
       if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_QUERY) {
-         std::cout << "Getting result of" << handle << std::endl;
-         auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
+         PrintIfDebugHandler("Getting result of" << handle) auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
 
-         std::cout << "Got table of" << handle << std::endl;
-         ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
+         PrintIfDebugHandler("Got table of" << handle)
+            ARROW_ASSIGN_OR_RAISE(const auto buffer, server::util::serializeTable(table));
          resultTable.reset();
          table.reset();
 
-         std::cout << "Use count " << table.use_count() << std::endl;
-         std::cout << "Serialized table of" << handle << std::endl;
-         auto bufferSize = buffer->size();
+         PrintIfDebugHandler("Use count " << table.use_count())
+            PrintIfDebugHandler("Serialized table of" << handle)
+
+               auto bufferSize = buffer->size();
          ARROW_ASSIGN_OR_RAISE(auto sharedMemmory, server::util::createAndCopySharedResultMemory(statementQueue.at(handle)->get_share_memory_wrapper(), std::move(buffer)));
          munmap(sharedMemmory, bufferSize);
          close(statementQueue.at(handle)->get_share_memory_wrapper().getShmFd());
@@ -97,9 +97,9 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          unlink(handle.c_str());
       }
 
-      std::cout << "Execution finished: " << handle << std::endl;
+      PrintIfDebugHandler("Execution finished: " << handle)
 
-      if (statementQueue.find(handle) == statementQueue.end()) {
+         if (statementQueue.find(handle) == statementQueue.end()) {
          std::cerr << "Statement with handle " << handle << " was removed during execution" << std::endl;
          return arrow::Status::Invalid("Statement with handle " + handle + " was removed during execution");
       }
@@ -108,8 +108,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
       return 0;
    } else {
       //Parent
-      std::cout << "Parent: Forked child " << childPid << " (pid: " << getpid() << ")" << std::endl;
-      return childPid;
+      PrintIfDebugHandler("Parent: Forked child " << childPid << " (pid: " << getpid() << ")") return childPid;
    }
 }
 arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
@@ -121,11 +120,12 @@ arrow::Status StatementHandler::waitAndLoadResult(std::string handle) {
    if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_UPDATE) {
       statementQueue.at(handle)->result = 0;
    }
-   std::cout << "Result found for " << handle << std::endl;
-   ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(statementQueue.at(handle)->get_share_memory_wrapper()));
+   PrintIfDebugHandler("Result found for " << handle)
+      ARROW_ASSIGN_OR_RAISE(auto buffer, util::readResultSharedMemory(statementQueue.at(handle)->get_share_memory_wrapper()));
    auto bufferSize = buffer->size();
-   std::cout << "Result read for " << handle << std::endl;
-   ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
+   PrintIfDebugHandler("Result read for " << handle)
+
+      ARROW_ASSIGN_OR_RAISE(auto stream, util::deserializeTableFromBufferToStream(buffer));
    statementQueue.at(handle)->result = std::move(stream);
 
    shm_unlink(handle.c_str());
@@ -142,8 +142,7 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> StatementHandler
       return arrow::Status::Invalid("");
    }
    if (std::holds_alternative<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result)) {
-      std::cout << "Found" << std::endl;
-      return std::move(std::get<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result));
+      PrintIfDebugHandler("Found") return std::move(std::get<std::unique_ptr<arrow::flight::FlightDataStream>>(statementQueue.at(handle)->result));
    }
    return arrow::Status::Invalid("No result found");
 }

@@ -6,6 +6,9 @@
 #include <arrow/flight/api.h>
 #include <arrow/io/api.h>
 #include <arrow/ipc/api.h>
+#define debug false
+#define PrintIfDebugIPCHelper(msg) \
+if (debug) std::cout << "[IPCHelper]" << msg << std::endl;
 namespace server {
 namespace util {
 arrow::Result<std::shared_ptr<arrow::Buffer>> serializeTable(const std::shared_ptr<arrow::Table>& table);
