@@ -1,7 +1,3 @@
-//
-// Created by mor on 20.11.24.
-//
-
 #include "server/ipc/IPCHelper.h"
 namespace server {
 namespace util {

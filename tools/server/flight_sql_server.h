@@ -1,7 +1,3 @@
-//
-// Created by mor on 17.10.24.
-//
-
 #pragma once
 
 #include "execution/Execution.h"

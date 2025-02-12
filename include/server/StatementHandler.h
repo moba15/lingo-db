@@ -1,7 +1,3 @@
-//
-// Created by mor on 10.01.25.
-//
-
 #pragma once
 #include "Statement.h"
 #include "server/StatementExecution.h"
