@@ -17,7 +17,7 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #define SharedmemSize 100
-#define debug false
+#define debug true
 #define CHECK_FOR_VALID_SERVER_SESSION() \
    if (sessions == nullptr || sessions->size() == 0) { return arrow::Status::Invalid("Session is null"); }
 
@@ -43,6 +43,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
       : sessions{std::move(sessions)}, statementHandler(std::move(statementHandler)) {}
 
    arrow::Result<std::unique_ptr<arrow::flight::FlightInfo>> GetFlightInfoStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::StatementQuery& command, const arrow::flight::FlightDescriptor& descriptor) override;
+   arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> DoGetStatement(const arrow::flight::ServerCallContext& context, const arrow::flight::sql::StatementQueryTicket& command) override;
 
    /***
     * ---------------------------------------------------
