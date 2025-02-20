@@ -1,6 +1,2 @@
-add_subdirectory(python/bridge)
-add_subdirectory(mlir-tools)
-add_subdirectory(sourcemap)
-add_subdirectory(sql)
-add_subdirectory(sqlite-tester)
-add_subdirectory(server)
+add_subdirectory(python/bridgelib)
+add_subdirectory(ct)

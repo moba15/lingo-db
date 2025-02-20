@@ -6,50 +6,42 @@ project(lingodb LANGUAGES CXX C)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard to conform to")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DTRACER")
+
+
+
+# Define ASAN build type if not already set
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+endif()
+
+# Add custom ASAN build type
+set(CMAKE_CXX_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer -g -O1 -DASAN_ACTIVE")
+set(CMAKE_C_FLAGS_ASAN "-fsanitize=address -fno-omit-frame-pointer -g -O1 -DASAN_ACTIVE")
+set(CMAKE_EXE_LINKER_FLAGS_ASAN "-fsanitize=address")
+# Apply the flags if the build type is ASAN
+if(CMAKE_BUILD_TYPE STREQUAL "ASAN")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_ASAN}")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_ASAN}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS_ASAN}")
+endif()
+
 include(FindZLIB)
 message("Using ZLIB: ${ZLIB_INCLUDE_DIRS}")
 message("Using Python3: ${Python3_EXECUTABLE}")
-execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import lingodbllvm; print(lingodbllvm.get_mlir_dir())"
-        OUTPUT_VARIABLE MLIR_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import pyarrow as pa; print(pa.get_include())"
-        OUTPUT_VARIABLE ARROW_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import pyarrow as pa; print(pa.get_library_dirs()[0])"
-        OUTPUT_VARIABLE ARROW_LIB_PATH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import pkg_resources; print(pkg_resources.get_distribution('tbb').location+'/../../')"
-        OUTPUT_VARIABLE TBB_LIB_PATH
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-execute_process(
-        COMMAND ${Python3_EXECUTABLE} -c "import pkg_resources; print(pkg_resources.get_distribution('tbb-devel').location+'/../../../include')"
-        OUTPUT_VARIABLE TBB_INCLUDE_DIR
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-set(LLVM_BINARY_DIR "${MLIR_DIR}/../../../")
-message("arrow: ${ARROW_INCLUDE_DIR} ${ARROW_LIB_PATH}")
-message("tbb: ${TBB_LIB_PATH} ${TBB_INCLUDE_DIR} ")
-include_directories(${ARROW_INCLUDE_DIR})
-include_directories(${TBB_INCLUDE_DIR})
 
-link_directories(${ARROW_LIB_PATH})
-link_directories(${TBB_LIB_PATH})
+find_package(Arrow 19 REQUIRED)
+
 option(ENABLE_GPU_BACKEND "enable GPU backend" OFF)
 
 
-set (Clang_DIR "${MLIR_DIR}/../clang")
-message(STATUS "Using ClangConfig.cmake in: ${Clang_DIR}")
+find_package(Clang 20.1 REQUIRED)
+find_package(LLVM 20.1 REQUIRED)
+message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+set (MLIR_DIR "${LLVM_DIR}/../mlir")
+find_package(MLIR 20.1 REQUIRED)
 
-find_package(Clang REQUIRED CONFIG)
-find_package(MLIR REQUIRED CONFIG)
+set(LLVM_BUILD_STATIC ON)
+
 
 message(STATUS "Using MLIRConfig.cmake in: ${MLIR_DIR}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
@@ -85,7 +77,7 @@ set(LLVM_LINK_COMPONENTS
         nativecodegen
         OrcJIT
         X86
-        )
+)
 
 
 add_custom_target(build_includes)
@@ -121,25 +113,24 @@ string (REPLACE " " ";" runtime_funcs_ptr_libs "${runtime_funcs_ptr_libs}")
 
 add_library(runtime_funcs_ptr ${runtime_funcs_ptr_libs})
 add_dependencies(runtime_funcs_ptr build_includes)
-add_subdirectory(lib/mlir-support)
+add_subdirectory(src/compiler/mlir-support)
 
-add_subdirectory(lib/RelAlg)
-add_subdirectory(lib/TupleStream)
-add_subdirectory(lib/SubOperator)
+add_subdirectory(src/compiler/Dialect/RelAlg)
+add_subdirectory(src/compiler/Dialect/TupleStream)
+add_subdirectory(src/compiler/Dialect/SubOperator)
 
-add_subdirectory(lib/DB)
-add_subdirectory(lib/DSA)
-add_subdirectory(lib/util)
-add_subdirectory(lib/utility)
+add_subdirectory(src/compiler/Dialect/DB)
+add_subdirectory(src/compiler/Dialect/DSA)
+add_subdirectory(src/compiler/Dialect/util)
+add_subdirectory(src/utility)
+add_subdirectory(src/scheduler)
 
-add_subdirectory(lib/Conversion/DBToStd)
-add_subdirectory(lib/Conversion/DSAToStd)
-add_subdirectory(lib/Conversion/RelAlgToSubOp)
-add_subdirectory(lib/Conversion/SubOpToControlFlow)
+add_subdirectory(src/compiler/Conversion/DBToStd)
+add_subdirectory(src/compiler/Conversion/DSAToStd)
+add_subdirectory(src/compiler/Conversion/RelAlgToSubOp)
+add_subdirectory(src/compiler/Conversion/SubOpToControlFlow)
 
-add_subdirectory(lib/server)
-
-add_subdirectory(lib/Conversion/UtilToLLVM)
+add_subdirectory(src/compiler/Conversion/UtilToLLVM)
 
 get_property(dialect_libs GLOBAL PROPERTY MLIR_DIALECT_LIBS)
 get_property(conversion_libs GLOBAL PROPERTY MLIR_CONVERSION_LIBS)
@@ -161,7 +152,6 @@ set(LIBS
         MLIRParser
         MLIRPass
         MLIRSupport
-        MLIRExecutionEngine
         MLIRLLVMToLLVMIRTranslation
         MLIRTargetLLVMIRExport
         MLIRSupport
@@ -170,11 +160,13 @@ set(LIBS
         MLIRSideEffectInterfaces
         MLIRTransforms
         MLIRMathTransforms
-        )
+        MLIRExecutionEngine
+)
 set(PRECOMPILED_CC_PATH "${CMAKE_CURRENT_BINARY_DIR}/precompiled_bitcode.cc")
-add_subdirectory(lib/runtime)
-add_subdirectory(lib/execution)
-add_subdirectory(lib/frontend/SQL)
+add_subdirectory(src/runtime)
+add_subdirectory(src/execution)
+add_subdirectory(src/compiler/frontend/SQL)
+add_subdirectory(src/tools)
 add_subdirectory(tools)
 add_subdirectory(test)
 
