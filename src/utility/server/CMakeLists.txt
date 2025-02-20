@@ -4,4 +4,4 @@ add_library(serverLib STATIC
         StatementExecution.cpp
         Statement.cpp ipc/IPCHelper.cpp shm/SyncHelper.cpp parser/ParaParser.cpp)
 
-set_target_properties(serverLib PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
+set_target_properties(serverLib PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
