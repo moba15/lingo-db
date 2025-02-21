@@ -26,13 +26,9 @@
 
 namespace server {
 
-class FlightSqlServer {};
 
-struct Test {
-   ~Test() { std::cout << "delete test" << std::endl; }
-};
 
-class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sql::FlightSqlServerBase {
+class FlightSqlServerTestImpl : public arrow::flight::sql::FlightSqlServerBase {
    public:
    //TODO check if session is given correctly
    explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
