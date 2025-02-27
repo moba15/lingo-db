@@ -1,4 +1,4 @@
-#include "server/shm/SyncHelper.h"
+#include "lingodb/server/shm/SyncHelper.h"
 namespace server {
 namespace util {
 

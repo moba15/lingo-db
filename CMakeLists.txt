@@ -6,8 +6,9 @@ project(lingodb LANGUAGES CXX C)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard to conform to")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DTRACER")
-
-
+set(CMAKE_PREFIX_PATH "/home/mor/projects/_tmp/llvm-project/build")
+set(CMAKE_C_COMPILER /usr/bin/gcc)
+set(CMAKE_CXX_COMPILER /usr/bin/g++)
 
 # Define ASAN build type if not already set
 if(NOT CMAKE_BUILD_TYPE)
@@ -28,17 +29,16 @@ endif()
 include(FindZLIB)
 message("Using ZLIB: ${ZLIB_INCLUDE_DIRS}")
 message("Using Python3: ${Python3_EXECUTABLE}")
-
 find_package(Arrow 19 REQUIRED)
 
 option(ENABLE_GPU_BACKEND "enable GPU backend" OFF)
 
 
-find_package(Clang 20.1 REQUIRED)
-find_package(LLVM 20.1 REQUIRED)
+find_package(Clang 20.1.0 REQUIRED)
+find_package(LLVM 20.1.0 REQUIRED)
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
 set (MLIR_DIR "${LLVM_DIR}/../mlir")
-find_package(MLIR 20.1 REQUIRED)
+find_package(MLIR 20.1.0 REQUIRED)
 
 set(LLVM_BUILD_STATIC ON)
 

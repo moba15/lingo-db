@@ -2,15 +2,15 @@
 // Created by mor on 10.01.25.
 //
 
-#include "server/StatementHandler.h"
+#include "lingodb/server/StatementHandler.h"
 
 #include <mutex>
-#include <execution/Execution.h>
-#include <server/ipc/IPCHelper.h>
-#include <server/parser/ParaParser.h>
+#include <lingodb/execution/Execution.h>
+#include <lingodb/server/ipc/IPCHelper.h>
+#include <lingodb/server/parser/ParaParser.h>
 using namespace std::chrono_literals;
 namespace server {
-StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions)
+StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>> sessions)
    : handleSize(handleSize), statementExecution(std::move(statementExecution)), sessions(std::move(sessions)) {}
 //TODO is this good practice?
 arrow::Result<std::shared_ptr<StatementInformation>> StatementHandler::getStatement(std::string handle) {
@@ -56,8 +56,8 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
 
       //std::this_thread::sleep_for(2s);
       auto executionContext = sessions->at("tpch")->createExecutionContext();
-      auto queryExecutionConfig = createQueryExecutionConfig(execution::ExecutionMode::DEFAULT, true);
-      auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *sessions->at("tpch"));
+      auto queryExecutionConfig = createQueryExecutionConfig(lingodb::execution::ExecutionMode::DEFAULT, true);
+      auto executer = lingodb::execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *sessions->at("tpch"));
       CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(statementQueue, handle, "executeQeueryStatement2")
       auto sqlStatement = statementQueue.at(handle)->get_sql_statement();
       executer->fromData(sqlStatement);
@@ -76,7 +76,7 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
          return arrow::Status::Invalid(e.what());
       }
       if (statementQueue.at(handle)->get_information()->type == StatementType::AD_HOC_QUERY) {
-         PrintIfDebugHandler("Getting result of" << handle) auto resultTable = executer->get_execution_context()->getResultOfType<runtime::ArrowTable>(0);
+         PrintIfDebugHandler("Getting result of" << handle) auto resultTable = executer->get_execution_context()->getResultOfType<lingodb::runtime::ArrowTable>(0);
          auto table = resultTable.value()->get();
 
          PrintIfDebugHandler("Got table of" << handle)

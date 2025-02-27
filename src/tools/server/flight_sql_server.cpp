@@ -1,10 +1,10 @@
 #include "flight_sql_server.h"
 
-#include "runtime/Session.h"
-#include "server/parser/ParaParser.h"
+#include "lingodb/runtime/Session.h"
+#include "lingodb/server/parser/ParaParser.h"
 
 #include <libpg_query/src/postgres/include/c.h>
-#include <runtime/ArrowTable.h>
+#include <lingodb/runtime/ArrowTable.h>
 arrow::Status startServer(std::unordered_map<std::string, std::string>& urls);
 
 arrow::Status connectClient(int port);
@@ -69,13 +69,13 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    arrow::flight::FlightServerOptions options(server_location);
    options.auth_handler = std::make_shared<server::CustomAuthHandler>();
    auto statementExecution = std::make_unique<server::StatementExecution>();
-   auto sessions = std::make_shared<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>();
+   auto sessions = std::make_shared<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>>();
 
    auto statementHandler = std::make_unique<server::StatementHandler>(std::move(statementExecution), 16, sessions);
 
    for (auto url : urls) {
       std::cout << "Loading: " << url.first << ":" << url.second << std::endl;
-      auto session = runtime::Session::createSession(url.second, true);
+      auto session = lingodb::runtime::Session::createSession(url.second, true);
       sessions->emplace("tpch", session);
    }
 
@@ -566,17 +566,17 @@ arrow::Status CustomAuthHandler::IsValid(const arrow::flight::ServerCallContext&
    PrintIfDebug("IsValid: token:" << token << "peer identity:" << peer_identity);
    return arrow::Status::OK();
 }
-std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>> FlightSqlServerTestImpl::getAllPossibleRelations() {
-   auto result = std::make_unique<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>>();
+std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<lingodb::runtime::Relation>>>> FlightSqlServerTestImpl::getAllPossibleRelations() {
+   auto result = std::make_unique<std::vector<std::pair<std::string, std::shared_ptr<lingodb::runtime::Relation>>>>();
    for (auto session : *sessions) {
       auto catalog_name = session.first;
       auto db_schema_name = session.first;
       auto catalog = session.second->getCatalog();
-      if (typeid(*catalog.get()) == typeid(runtime::LocalCatalog)) {
+      if (typeid(*catalog.get()) == typeid(lingodb::runtime::DBCatalog)) {
          PrintIfDebug("Is type LOCAL")
          //TODO
-      } else if (typeid(*catalog.get()) == typeid(runtime::DBCatalog)) {
-         PrintIfDebug("Is type DB") auto dbCatalog = std::static_pointer_cast<runtime::DBCatalog>(catalog);
+      } else if (typeid(*catalog.get()) == typeid(lingodb::runtime::DBCatalog)) {
+         PrintIfDebug("Is type DB") auto dbCatalog = std::static_pointer_cast<lingodb::runtime::DBCatalog>(catalog);
          for (auto relation : dbCatalog->relations) {
             result->emplace_back(std::make_pair(catalog_name, relation.second));
          }

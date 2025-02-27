@@ -52,7 +52,7 @@ build/lingodb-debug/.buildstamp: build/lingodb-debug/.stamp
 
 build/lingodb-release/.buildstamp: build/lingodb-release/.stamp
 	cmake --build $(dir $@) -- -j${NPROCS}
-	touch $@
+
 
 build/lingodb-release/.stamp: build
 	cmake -G Ninja . -B $(dir $@) $(LDB_ARGS) -DCMAKE_BUILD_TYPE=Release

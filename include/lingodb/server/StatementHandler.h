@@ -1,6 +1,6 @@
 #pragma once
 #include "Statement.h"
-#include "server/StatementExecution.h"
+#include "lingodb/server/StatementExecution.h"
 
 #include <map>
 #include <mutex>
@@ -9,9 +9,9 @@
 #include <arrow/flight/server.h>
 #include <arrow/result.h>
 #include <arrow/util/launder.h>
-#include <runtime/ArrowTable.h>
-#include <runtime/ExecutionContext.h>
-#include <runtime/Session.h>
+#include <lingodb/runtime/ArrowTable.h>
+#include <lingodb/runtime/ExecutionContext.h>
+#include <lingodb/runtime/Session.h>
 #define CHECK_FOR_HANDLE_IN_QUEUE_AND_RETURN(queue, handle, method) \
    std::string errorMsg{"Handle not found in queue: "};             \
    errorMsg.append(handle);                                         \
@@ -29,7 +29,7 @@ namespace server {
 
 class StatementHandler {
    public:
-   StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions);
+   StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>> sessions);
    arrow::Result<std::shared_ptr<StatementInformation>> getStatement(std::string handle);
    arrow::Result<std::string> addStatementToQueue(std::string sqlStatement);
    arrow::Result<pid_t> executeQeueryStatement(std::string handle, bool onlyIfQuery);
@@ -43,7 +43,7 @@ class StatementHandler {
    std::unique_ptr<StatementExecution> statementExecution;
    std::map<std::string, std::unique_ptr<Statement>> statementQueue;
    std::timed_mutex statementQueueMutex;
-   std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
+   std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>> sessions;
    static std::string randomString(int length) {
       // Characters to use for generating the string
       const std::string characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

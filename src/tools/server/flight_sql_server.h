@@ -1,9 +1,9 @@
 #pragma once
 
-#include "execution/Execution.h"
-#include "runtime/Session.h"
-#include "server/ipc/IPCHelper.h"
-#include "server/shm/SyncHelper.h"
+#include "lingodb/execution/Execution.h"
+#include "lingodb/runtime/Session.h"
+#include "lingodb/server/ipc/IPCHelper.h"
+#include "lingodb/server/shm/SyncHelper.h"
 #include <iostream>
 #include <thread>
 #include <arrow/csv/api.h>
@@ -13,7 +13,7 @@
 #include <arrow/flight/sql/server.h>
 #include <arrow/ipc/api.h>
 #include <fcntl.h>
-#include <server/StatementHandler.h>
+#include <lingodb/server/StatementHandler.h>
 #include <sys/shm.h>
 #include <sys/types.h>
 #define SharedmemSize 100
@@ -36,7 +36,7 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    public:
    //TODO check if session is given correctly
    explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
-                                    std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>>
+                                    std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>>
                                        sessions,
                                     std::unique_ptr<StatementHandler>
                                        statementHandler)
@@ -85,8 +85,8 @@ class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sq
    arrow::Status start(const arrow::flight::FlightServerOptions& options);
 
    private:
-   std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<runtime::Relation>>>> getAllPossibleRelations();
-   std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<runtime::Session>>> sessions;
+   std::unique_ptr<std::vector<std::pair<std::string, std::shared_ptr<lingodb::runtime::Relation>>>> getAllPossibleRelations();
+   std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>> sessions;
    std::unique_ptr<StatementHandler> statementHandler;
    arrow::Result<arrow::flight::sql::SqlInfoResult> getSqlInfoResult(size_t type);
 };

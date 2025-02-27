@@ -2,26 +2,25 @@
 // Created by mor on 06.01.25.
 //
 
-#include "server/parser/ParaParser.h"
-#include "execution/Frontend.h"
+#include "lingodb/server/parser/ParaParser.h"
+#include "lingodb/execution/Frontend.h"
 #include "mlir/Dialect/Async/IR/Async.h"
-#include "mlir/Dialect/RelAlg/Passes.h"
 #include "mlir/IR/MLIRContext.h"
 #include "mlir/InitAllExtensions.h"
 #include <llvm/Support/SourceMgr.h>
 #include <arrow/table.h>
-#include <runtime/ExecutionContext.h>
+#include <lingodb/runtime/ExecutionContext.h>
 namespace server {
 
-ParaParser::ParaParser(const std::shared_ptr<runtime::Session>& session) : session(session) {}
+ParaParser::ParaParser(const std::shared_ptr<lingodb::runtime::Session>& session) : session(session) {}
 
 std::shared_ptr<StatementInformation> ParaParser::getStatementInformation(std::string sql) {
    mlir::MLIRContext context;
-   execution::initializeContext(context);
+   lingodb::execution::initializeContext(context);
    mlir::OpBuilder builder(&context);
 
    mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-   frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
+   lingodb::compiler::frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
    auto type = getStatementType(translator);
    auto statementInformation = std::make_shared<StatementInformation>(type);
    if (type == StatementType::AD_HOC_QUERY) {
@@ -48,16 +47,16 @@ std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::findPara
 }
 std::unique_ptr<std::vector<std::shared_ptr<arrow::Field>>> ParaParser::getParas(std::string sql) {
    mlir::MLIRContext context;
-   execution::initializeContext(context);
+   lingodb::execution::initializeContext(context);
    mlir::OpBuilder builder(&context);
 
    mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-   frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
+   lingodb::compiler::frontend::sql::Parser translator(sql, *session->getCatalog(), moduleOp);
    auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
    if (statement->type != T_SelectStmt) { return {}; }
    return std::move(findParasInSelectStatement(reinterpret_cast<SelectStmt*>(statement)));
 }
-server::StatementType ParaParser::getStatementType(frontend::sql::Parser& translator) {
+server::StatementType ParaParser::getStatementType(lingodb::compiler::frontend::sql::Parser& translator) {
    auto* statement = static_cast<Node*>(translator.result.tree->head->data.ptr_value);
    if (statement->type == T_SelectStmt) { return StatementType::AD_HOC_QUERY; }
    if (statement->type == T_UpdateStmt) {
@@ -68,8 +67,8 @@ server::StatementType ParaParser::getStatementType(frontend::sql::Parser& transl
    }
    throw std::runtime_error("ParaParser::getParas(): invalid node type");
 }
-std::unique_ptr<std::vector<std::shared_ptr<runtime::Relation>>> ParaParser::getUsedRelationsFromSelectStatement(SelectStmt* selectStatement) {
-   auto result = std::make_unique<std::vector<std::shared_ptr<runtime::Relation>>>();
+std::unique_ptr<std::vector<std::shared_ptr<lingodb::runtime::Relation>>> ParaParser::getUsedRelationsFromSelectStatement(SelectStmt* selectStatement) {
+   auto result = std::make_unique<std::vector<std::shared_ptr<lingodb::runtime::Relation>>>();
    auto fromClause = selectStatement->from_clause_;
    for (auto* cell = fromClause->head; cell != nullptr; cell = cell->next) {
       auto* node = reinterpret_cast<Node*>(cell->data.ptr_value);
@@ -163,7 +162,7 @@ std::string ParaParser::fieldsToString(List* fields) {
    return tableName.empty() ? colName : tableName + "." + colName;
 }
 std::shared_ptr<arrow::Field> ParaParser::getFieldOfColumn(std::string columnName) {
-   std::vector<std::shared_ptr<runtime::Relation>> relations{session->getCatalog()->findRelation("hoeren"), session->getCatalog()->findRelation("vorlesungen")};
+   std::vector<std::shared_ptr<lingodb::runtime::Relation>> relations{session->getCatalog()->findRelation("hoeren"), session->getCatalog()->findRelation("vorlesungen")};
    for (auto& relation : relations) {
       auto fields = relation->getArrowSchema()->fields();
       for (auto field : fields) {

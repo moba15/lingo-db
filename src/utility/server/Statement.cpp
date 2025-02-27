@@ -2,7 +2,7 @@
 // Created by mor on 10.01.25.
 //
 
-#include "server/Statement.h"
+#include "lingodb/server/Statement.h"
 namespace server {
 
 Statement::Statement(std::string handle, std::string sqlStatement, std::shared_ptr<StatementInformation> information,
