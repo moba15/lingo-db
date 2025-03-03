@@ -17,7 +17,7 @@
 #include <sys/shm.h>
 #include <sys/types.h>
 #define SharedmemSize 100
-#define debug true
+#define debug false
 #define CHECK_FOR_VALID_SERVER_SESSION() \
    if (sessions == nullptr || sessions->size() == 0) { return arrow::Status::Invalid("Session is null"); }
 
