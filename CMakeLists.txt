@@ -7,8 +7,7 @@ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_STANDARD 20 CACHE STRING "C++ standard to conform to")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g -DTRACER")
 set(CMAKE_PREFIX_PATH "/home/mor/projects/_tmp/llvm-project/build")
-set(CMAKE_C_COMPILER /usr/bin/gcc)
-set(CMAKE_CXX_COMPILER /usr/bin/g++)
+
 
 # Define ASAN build type if not already set
 if(NOT CMAKE_BUILD_TYPE)

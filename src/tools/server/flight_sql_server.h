@@ -35,7 +35,7 @@ struct Test {
 class FlightSqlServerTestImpl : public FlightSqlServer, public arrow::flight::sql::FlightSqlServerBase {
    public:
    //TODO check if session is given correctly
-   explicit FlightSqlServerTestImpl(std::shared_ptr<arrow::fs::FileSystem> root,
+   explicit FlightSqlServerTestImpl(
                                     std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>>
                                        sessions,
                                     std::unique_ptr<StatementHandler>

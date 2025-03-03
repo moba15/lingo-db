@@ -2,7 +2,7 @@
 
 #include "lingodb/runtime/Session.h"
 #include "lingodb/server/parser/ParaParser.h"
-
+#include "lingodb/compiler/mlir-support/eval.h"
 #include <libpg_query/src/postgres/include/c.h>
 #include <lingodb/runtime/ArrowTable.h>
 arrow::Status startServer(std::unordered_map<std::string, std::string>& urls);
@@ -65,7 +65,6 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    arrow::flight::Location server_location;
    ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
    auto fs = std::make_shared<arrow::fs::LocalFileSystem>();
-   auto root = std::make_shared<arrow::fs::SubTreeFileSystem>("./flight_datasets/", fs);
    arrow::flight::FlightServerOptions options(server_location);
    options.auth_handler = std::make_shared<server::CustomAuthHandler>();
    auto statementExecution = std::make_unique<server::StatementExecution>();
@@ -80,8 +79,10 @@ arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
    }
 
    std::unique_ptr<server::FlightSqlServerTestImpl> server = std::unique_ptr<server::FlightSqlServerTestImpl>(
-      new server::FlightSqlServerTestImpl(std::move(root), sessions, std::move(statementHandler)));
+      new server::FlightSqlServerTestImpl( sessions, std::move(statementHandler)));
    server->RegisterSqlInfo(arrow::flight::sql::SqlInfoOptions::FLIGHT_SQL_SERVER_READ_ONLY, false);
+   lingodb::compiler::support::eval::init();
+   auto scheduler = lingodb::scheduler::startScheduler(1);
    ARROW_RETURN_NOT_OK(server->start(options));
    std::cout << "Listening on port " << server->port() << std::endl;
    std::thread server_thread([&server]() {
@@ -455,6 +456,7 @@ arrow::Result<std::unique_ptr<arrow::flight::FlightDataStream>> FlightSqlServerT
  *---------------------------------------------------
  */
 arrow::Status FlightSqlServerTestImpl::start(const arrow::flight::FlightServerOptions& options) {
+
    return Init(options);
 }
 
