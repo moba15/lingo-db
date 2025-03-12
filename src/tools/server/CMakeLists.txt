@@ -1,4 +1,5 @@
 # sql-to-mlir
+find_package(ArrowFlight REQUIRED )
 find_package(ArrowFlightSql REQUIRED )
 
 add_executable(server flight_sql_server.cpp)
