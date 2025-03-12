@@ -8,4 +8,4 @@ RUN pip3 install --break-system-packages lit
 RUN apt install -y -V libarrow-flight-dev
 RUN apt install -y -V libarrow-flight-sql-dev
 RUN git clone https://github.com/moba15/lingo-db.git /lingo-db && cd lingo-db && git checkout 17889e5
-RUN cd lingo-db && mkdir build && cd build && cmake .. && cmake --build . --target server -j6
+RUN cd lingo-db && make build-release
