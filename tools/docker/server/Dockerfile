@@ -9,3 +9,7 @@ RUN apt install -y -V libarrow-flight-dev=19.*
 RUN apt install -y -V libarrow-flight-sql-dev=19.*
 RUN git clone https://github.com/moba15/lingo-db.git /lingo-db && cd lingo-db && git checkout 17889e5
 RUN cd lingo-db && make build-release
+RUN mkdir /database
+EXPOSE 8083
+VOLUME /database
+ENTRYPOINT ["/bin/sh", "-c", "./lingo-db/build/lingodb-release/server 8083 tpch:/database"]
