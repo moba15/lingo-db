@@ -5,7 +5,7 @@
 #include "lingodb/compiler/mlir-support/eval.h"
 #include <libpg_query/src/postgres/include/c.h>
 #include <lingodb/runtime/ArrowTable.h>
-arrow::Status startServer(std::unordered_map<std::string, std::string>& urls);
+arrow::Status startServer(size_t port, std::unordered_map<std::string, std::string>& urls);
 
 arrow::Status connectClient(int port);
 
@@ -21,7 +21,15 @@ int main(int argc, char** argv) {
    auto build_info = arrow::GetBuildInfo();
    std::cout << "Apache Arrow version: " << build_info.version_string << std::endl;
    arrow::Status st;
-   std::cout << "Start server..." << std::endl;
+   std::string portString = argv[1];
+   std::stringstream portStringStream(portString);
+   size_t port;
+   portStringStream >> port;
+   if (port == 0) {
+      std::cout << "Please use a valid port!" << std::endl;
+      return 1;
+   }
+   std::cout << "Starting server with port: " << port << std::endl;
    std::unordered_map<std::string, std::string> urls{};
    for (int i = 2; i < argc; i++) {
       std::string arg = argv[i];
@@ -44,7 +52,8 @@ int main(int argc, char** argv) {
       }
       urls.insert({name, url});
    }
-   st = startServer(urls);
+
+   st = startServer(port, urls);
 
    if (!st.ok()) {
       std::cerr << st << std::endl;
@@ -59,11 +68,11 @@ int main(int argc, char** argv) {
 
    return 0;
 }
-arrow::Status startServer(std::unordered_map<std::string, std::string>& urls) {
+arrow::Status startServer(size_t port, std::unordered_map<std::string, std::string>& urls) {
    //  auto reuslt = arrow::flight::Location::Parse("127.0.0.1");
 
    arrow::flight::Location server_location;
-   ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
+   ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", port));
    auto fs = std::make_shared<arrow::fs::LocalFileSystem>();
    arrow::flight::FlightServerOptions options(server_location);
    options.auth_handler = std::make_shared<server::CustomAuthHandler>();
@@ -113,7 +122,7 @@ arrow::Status connectClient(int port) {
    ARROW_ASSIGN_OR_RAISE(auto info, sql_client->Execute(call_options, "select nice from test;"));
 
    const auto endpoints = info->endpoints();
-   for (auto i = 0; i < endpoints.size(); i++) {
+   for (size_t i = 0; i < endpoints.size(); i++) {
       auto& ticket = endpoints[i].ticket;
       //TODO Move outside an make unique
 
