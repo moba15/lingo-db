@@ -7,8 +7,6 @@
 #include <lingodb/runtime/ArrowTable.h>
 arrow::Status startServer(size_t port, std::unordered_map<std::string, std::string>& urls);
 
-arrow::Status connectClient(int port);
-
 int main(int argc, char** argv) {
    if (argc < 3) {
       std::cout << "usage: " << argv[0] << " <port> <...dbName:PathToDb>" << std::endl;
@@ -59,7 +57,6 @@ int main(int argc, char** argv) {
       std::cerr << st << std::endl;
       return 1;
    }
-   //st = connectClient();
    if (!st.ok()) {
       std::cerr << st << std::endl;
 
@@ -105,37 +102,6 @@ arrow::Status startServer(size_t port, std::unordered_map<std::string, std::stri
          ARROW_RETURN_NOT_OK(server->Shutdown());
          server_thread.join();
          return arrow::Status::OK();
-      }
-   }
-
-   return arrow::Status::OK();
-}
-
-arrow::Status connectClient(int port) {
-   ARROW_ASSIGN_OR_RAISE(auto location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", port))
-   ARROW_ASSIGN_OR_RAISE(auto client, arrow::flight::FlightClient::Connect(location))
-
-   auto sql_client = std::make_unique<arrow::flight::sql::FlightSqlClient>(std::move(client));
-
-   arrow::flight::FlightCallOptions call_options{};
-
-   ARROW_ASSIGN_OR_RAISE(auto info, sql_client->Execute(call_options, "select nice from test;"));
-
-   const auto endpoints = info->endpoints();
-   for (size_t i = 0; i < endpoints.size(); i++) {
-      auto& ticket = endpoints[i].ticket;
-      //TODO Move outside an make unique
-
-      ARROW_ASSIGN_OR_RAISE(auto stream, sql_client->DoGet(call_options, ticket));
-
-      auto schema = stream->GetSchema();
-      ARROW_RETURN_NOT_OK(schema);
-
-      std::cout << "Schema:" << schema->get()->ToString() << std::endl;
-      while (true) {
-         ARROW_ASSIGN_OR_RAISE(arrow::flight::FlightStreamChunk chunk, stream->Next());
-         if (chunk.data == nullptr) { break; }
-         std::cout << chunk.data->ToString();
       }
    }
 
