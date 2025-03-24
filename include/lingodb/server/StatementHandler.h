@@ -24,7 +24,7 @@
 
 #define UNIQUE_LOCK_AND_RETURN_NOT_ABLE(mutex, timout) \
    const std::unique_lock lock{mutex, timout};         \
-   if (!lock.owns_lock()) { return arrow::Status::Invalid("Not able to lock"); }
+   if (!lock.owns_lock()) { return arrow::Status::Invalid("Not able to lock (timed out)"); }
 namespace server {
 
 class StatementHandler {
