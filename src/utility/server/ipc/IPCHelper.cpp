@@ -12,19 +12,6 @@ arrow::Result<std::shared_ptr<arrow::Buffer>> serializeTable(const std::shared_p
    }
    ARROW_RETURN_NOT_OK(writer2->Close());
    ARROW_ASSIGN_OR_RAISE(auto buffer2, buffer_stream->Finish())
-
-   /*ARROW_ASSIGN_OR_RAISE(std::shared_ptr<arrow::ResizableBuffer> buffer, arrow::AllocateResizableBuffer(1024*1024));
-
-
-   auto stream = std::make_shared<arrow::io::FixedSizeBufferWriter>(buffer);
-
-   ARROW_ASSIGN_OR_RAISE(auto writer, arrow::ipc::MakeStreamWriter(stream, table->schema()));
-   if (!writer->WriteTable(*table).ok() || !writer->Close().ok()) {
-      std::cerr << "Failed to write table to buffer" << std::endl;
-      return arrow::Status::Invalid("Failed to write table to buffer");
-   }
-   ARROW_RETURN_NOT_OK(writer->Close());
-   ARROW_RETURN_NOT_OK(stream->Close());*/
    return std::move(buffer2);
 }
 

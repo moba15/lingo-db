@@ -21,20 +21,15 @@ SharedMemoryWrapper::~SharedMemoryWrapper() {
    close(shmFd);
    if (!freed) {
       freed = true;
-      /*  close(shmFd);
-      shm_unlink(handle.c_str()); */
    }
 }
 SharedMemoryWrapper::SharedMemoryWrapper(SharedMemoryWrapper&& other) noexcept
    : freed(other.freed), handle(other.handle) {
    other.freed = true;
-   //
-   // other.data = nullptr;
 }
 SharedMemoryWrapper& SharedMemoryWrapper::operator=(SharedMemoryWrapper&& other) noexcept {
    freed = other.freed;
    other.freed = true;
-   //data = other.data, other.data = nullptr;
    handle = other.handle;
    return *this;
 }
@@ -71,7 +66,6 @@ arrow::Result<void*> createAndCopySharedResultMemory(SharedMemoryWrapper& shared
    std::memcpy(sharedMemory, buffer->data(), buffer->size());
    PrintIfDebugSyncHelper("memcpy");
    // munmap(sharedMemory, buffer->size());
-   //ARROW_RETURN_NOT_OK(buffer->Resize(0));
    PrintIfDebugSyncHelper("New buffer size: " << buffer->size());
    // buffer.reset();
    PrintIfDebugSyncHelper("Buffer count " << buffer.use_count());

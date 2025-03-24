@@ -12,7 +12,6 @@ using namespace std::chrono_literals;
 namespace server {
 StatementHandler::StatementHandler(std::unique_ptr<StatementExecution> statementExecution, size_t handleSize, std::shared_ptr<std::unordered_map<std::string, std::shared_ptr<lingodb::runtime::Session>>> sessions)
    : handleSize(handleSize), statementExecution(std::move(statementExecution)), sessions(std::move(sessions)) {}
-//TODO is this good practice?
 arrow::Result<std::shared_ptr<StatementInformation>> StatementHandler::getStatement(std::string handle) {
    if (statementQueue.find(handle) == statementQueue.end()) {
       return arrow::Status::Invalid("Unknown handle '" + handle + "'");
@@ -52,9 +51,8 @@ arrow::Result<pid_t> StatementHandler::executeQeueryStatement(std::string handle
 
    if (childPid == -1) { return arrow::Status::Invalid("Fork failed"); }
    if (childPid == 0) {
-      //Childsp
+      //Child
 
-      //std::this_thread::sleep_for(2s);
       auto executionContext = sessions->at("tpch")->createExecutionContext();
       auto queryExecutionConfig = createQueryExecutionConfig(lingodb::execution::ExecutionMode::DEFAULT, true);
       auto executer = lingodb::execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *sessions->at("tpch"));

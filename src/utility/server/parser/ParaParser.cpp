@@ -151,7 +151,6 @@ std::string ParaParser::fieldsToString(List* fields) {
    } else {
       auto* nextNode = reinterpret_cast<Node*>(fields->head->next->data.ptr_value);
       if (nextNode->type == T_A_Star) {
-         //all_columns = true;
          throw std::runtime_error("unexpected *");
       } else {
          colName = reinterpret_cast<value*>(nextNode)->val_.str_;

@@ -128,8 +128,7 @@ FlightSqlServerTestImpl::GetFlightInfoStatement(const arrow::flight::ServerCallC
    ARROW_ASSIGN_OR_RAISE(server_location, arrow::flight::Location::ForGrpcTcp("0.0.0.0", 8083));
    std::vector endpoints{
       arrow::flight::FlightEndpoint{{ticket}, {server_location}, std::nullopt, ""}};
-   // TODO: Set true only when "ORDER BY" is used in a main "SELECT"
-   // in the given query.
+   // TODO: Set true only when "ORDER BY" is used in a main "SELECT" in the given query
    const bool ordered = false;
    ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*schema, descriptor, endpoints, -1, -1, ordered));
    return std::make_unique<arrow::flight::FlightInfo>(result);
@@ -167,8 +166,6 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
    CHECK_FOR_VALID_SERVER_SESSION()
    PrintIfDebug("GetFlightInfoPreparedStatement" << descriptor.cmd);
 
-   // The schema can be built from a vector of fields, and we do so here.
-
    ARROW_ASSIGN_OR_RAISE(auto pid, statementHandler->executeQeueryStatement(command.prepared_statement_handle, true));
    if (pid == 0) {
       this->statementHandler.~unique_ptr();
@@ -180,8 +177,7 @@ FlightSqlServerTestImpl::GetFlightInfoPreparedStatement(const arrow::flight::Ser
    ARROW_ASSIGN_OR_RAISE(auto schema, statementHandler->getSchemaOfStatement(command.prepared_statement_handle));
    std::vector endpoints{
       arrow::flight::FlightEndpoint{{descriptor.cmd}, {}, std::nullopt, ""}};
-   // TODO: Set true only when "ORDER BY" is used in a main "SELECT"
-   // in the given query.
+   // TODO: Set true only when "ORDER BY" is used in a main "SELECT" in the given query
    const bool ordered = false;
    ARROW_ASSIGN_OR_RAISE(auto result, arrow::flight::FlightInfo::Make(*schema, descriptor, endpoints, -1, -1, ordered));
    return std::make_unique<arrow::flight::FlightInfo>(result);
