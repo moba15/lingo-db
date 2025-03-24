@@ -26,6 +26,7 @@ arrow::Result<std::string> StatementHandler::addStatementToQueue(std::string sql
    std::string handle = randomString(handleSize);
    while (statementQueue.find(handle) != statementQueue.end()) { handle = randomString(handleSize); }
    ARROW_ASSIGN_OR_RAISE(auto sharedSemaphore, util::createAndLockSharedMutex(handle))
+   //TODO: Hardcoded
    ParaParser para_parser{sessions->at("tpch")};
    auto information = para_parser.getStatementInformation(sqlStatement);
    ARROW_ASSIGN_OR_RAISE(auto sharedMemoryWrapper, util::createSharedMemory(handle))
