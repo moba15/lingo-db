@@ -36,7 +36,7 @@ docker run -it  \
   lingodbserver
 
 ```
-## Building 
+## Building (Localy)
 ### Dependencies 
 To use the Flight SQL server you specific need Apache **Arrow 19.x, Arrow Flight 19.x and Arrow Flight SQL 19.x**
 How to install them, you can find out here: https://arrow.apache.org/install/ 
