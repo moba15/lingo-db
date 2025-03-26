@@ -29,7 +29,12 @@ docker build tools/docker/server -t lingodbserver:latest
 Run docker container 
 
 ```bash
-docker build tools/docker/server -t lingodbserver:latest
+docker run -it  \      
+  --name lingodbServer \
+  -v <localPathToDatabase>:/database \
+  -p 8083:8083 \
+  lingodbserver
+
 ```
 ## Building 
 ### Dependencies 
