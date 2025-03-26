@@ -7,8 +7,8 @@ RUN apt-get update && apt-get -y install python3 python3-venv python3-pip git g+
 RUN pip3 install --break-system-packages lit
 RUN apt install -y -V libarrow-flight-dev=19.*
 RUN apt install -y -V libarrow-flight-sql-dev=19.*
-RUN git clone https://github.com/moba15/lingo-db.git /lingo-db && cd lingo-db && git checkout 17889e5
-RUN cd lingo-db && make build-release
+RUN git clone https://github.com/moba15/lingo-db.git /lingo-db && cd lingo-db && git checkout 9e76ac9
+RUN cd lingo-db && make build-release 
 RUN mkdir /database
 EXPOSE 8083
 VOLUME /database
