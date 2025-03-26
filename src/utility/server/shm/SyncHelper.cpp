@@ -1,4 +1,6 @@
 #include "lingodb/server/shm/SyncHelper.h"
+
+#include <thread>
 namespace server {
 namespace util {
 
@@ -10,7 +12,13 @@ arrow::Status SharedSemaphore::post() const {
 }
 
 arrow::Status SharedSemaphore::wait() const {
-   if (sem_wait(sem) == -1) { return arrow::Status::IOError("Failed to wait for semaphore"); }
+   struct timespec ts;
+   if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+      perror("clock_gettime");
+      return arrow::Status::IOError("Failed to get realtime time for sem_timedwait");
+   }
+   ts.tv_sec += 10;
+   if (sem_timedwait(sem, &ts) == -1) { return arrow::Status::IOError("Failed to wait for semaphore"); }
    return arrow::Status::OK();
 }
 SharedMemoryWrapper::SharedMemoryWrapper(const std::string handle, int shmFd, bool freed)
