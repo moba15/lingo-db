@@ -16,7 +16,9 @@ std::string JoinRef::toAsciiAST(uint32_t depth){
     }
 
    if (std::holds_alternative<std::shared_ptr<ParsedExpression>>(condition)) {
-      ast.append(std::get<std::shared_ptr<ParsedExpression>>(condition)->toAsciiAST(depth + 1));
+      auto cond = std::get<std::shared_ptr<ParsedExpression>>(condition);
+      if (cond)
+         ast.append(cond->toAsciiAST(depth + 1));
    } else if (std::holds_alternative<std::vector<std::shared_ptr<ColumnRefExpression>>>(condition)) {
       auto columnRefs = std::get<std::vector<std::shared_ptr<ColumnRefExpression>>>(condition);
       for (auto& columnRef : columnRefs) {
