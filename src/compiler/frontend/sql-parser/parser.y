@@ -411,7 +411,13 @@ simple_select:
 
 from_list: 
     table_ref { $$=$1;}
-    | from_list COMMA table_ref
+    | from_list[list] COMMA table_ref 
+    {
+        auto join = mkNode<lingodb::ast::JoinRef>(@$, lingodb::ast::JoinType::OUTER, lingodb::ast::JoinCondType::CROSS);
+        join->left = $list;
+        join->right = $table_ref;
+        $$ = join;
+    }
     ;
 
 
@@ -740,7 +746,7 @@ c_expr:
     //TODO | implicit_row
     //TODO | GROUPING LP expr_list RP
     ;
-
+//TODO Alias -> opt_alias_clause
 func_application:
     func_name LP RP 
     {
@@ -772,6 +778,19 @@ func_application:
     | func_name LP func_arg_list COMMA VARIADIC func_arg_expr opt_sort_clause RP
     | func_name LP ALL func_arg_list opt_sort_clause RP
     | func_name LP DISTINCT func_arg_list opt_alias_clause RP
+    {
+        std::string catalog("");
+        std::string schema("");
+        std::string functionName = $func_name;
+        bool isOperator = false;
+        bool distinct = true;
+        bool exportState = false;
+        auto funcExpr = mkNode<lingodb::ast::FunctionExpression>(@$, catalog, schema, functionName, isOperator, distinct, exportState);
+
+        funcExpr->arguments = $func_arg_list;
+
+        $$ = funcExpr;
+    }
     | func_name LP STAR RP
 
 /*
