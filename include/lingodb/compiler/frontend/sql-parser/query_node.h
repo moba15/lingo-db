@@ -1,4 +1,6 @@
 #pragma once
+#include "ast_node.h"
+
 #include <cstdint>
 #include <string>
 #define toAsciiASTPrefix std::string ast{}; \
@@ -16,7 +18,7 @@ enum class QueryNodeType : uint8_t {
   RECURSIVE_CTE_NODE = 4,
   CTE_NODE = 5
 };
-class QueryNode {
+class QueryNode : public AstNode {
 public:
    virtual ~QueryNode() ;
   explicit  QueryNode(QueryNodeType type) : type(type) {};
