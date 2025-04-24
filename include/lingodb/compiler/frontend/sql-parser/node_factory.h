@@ -8,7 +8,7 @@ public:
   template<class T, class... Args>
   std::shared_ptr<T> node(lingodb::location loc, Args... args) {
     auto node = std::make_shared<T>(std::forward<Args>(args)...);
-    //TODO node->set_location(loc);
+     node->loc = loc;
     return std::move(node);
   }
    template<class T, class... Args>
