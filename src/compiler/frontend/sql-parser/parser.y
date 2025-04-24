@@ -79,6 +79,25 @@
 %token          HAT         "^"
 %token 			QUOTE		"'"
 %token 			CONCAT		"||"
+
+
+
+/*
+ * Non-keyword token types.  These are hard-wired into the "flex" lexer.
+ * They must be listed first so that their numeric codes do not depend on
+ * the set of keywords.  PL/pgSQL depends on this so that it can share the
+ * same lexer.  If you add/change tokens here, fix PL/pgSQL to match!
+ *
+ * UIDENT and USCONST are reduced to IDENT and SCONST in parser.c, so that
+ * they need no productions here; but we must assign token codes to them.
+ *
+ * DOT_DOT is unused in the core SQL grammar, and so will always provoke
+ * parse errors.  It is needed by PL/pgSQL.
+ */
+%token <std::string>	        UIDENT FCONST SCONST USCONST BCONST XCONST Op
+%token 	        PARAM
+%token			TYPECAST DOT_DOT COLON_EQUALS
+
 /* 
  * Taken directly from postgres grammatic 
  * TODO LINK
@@ -182,13 +201,28 @@
 	ZONE
 
 
+/*
+ * The grammar thinks these are keywords, but they are not in the kwlist.h
+ * list and so can never be entered directly.  The filter in parser.c
+ * creates these tokens when required (based on looking one token ahead).
+ *
+ * NOT_LA exists so that productions such as NOT LIKE can be given the same
+ * precedence as LIKE; otherwise they'd effectively have the same precedence
+ * as NOT, at least with respect to their left-hand subexpression.
+ * FORMAT_LA, NULLS_LA, WITH_LA, and WITHOUT_LA are needed to make the grammar
+ * LALR(1).
+ */
+%token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
+
+
 %type <std::shared_ptr<lingodb::ast::QueryNode>> stmtmulti select_no_parens select_clause toplevel_stmt stmt simple_select SelectStmt select_with_parens
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> opt_target_list target_list
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> opt_target_list target_list group_by_list func_arg_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>> target_el a_expr c_expr where_clause
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr func_expr where_clause group_by_item 
+                                                        func_application func_arg_expr 
 
-%type<lingodb::ast::    jointCondOrUsingCols> join_qual
+%type<lingodb::ast::jointCondOrUsingCols> join_qual
 
 %type<std::shared_ptr<lingodb::ast::ColumnRefExpression>> columnref
 
@@ -196,11 +230,13 @@
 
 %type<std::string>  ColId ColLabel indirection attr_name indirection_el 
                     qualified_name relation_expr alias_clause opt_alias_clause 
-                    name
+                    name type_function_name func_name
 
 %type<std::vector<std::string>> name_list
 
 %type<std::shared_ptr<lingodb::ast::ConstantExpression>> Iconst AexprConst 
+
+%type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -224,7 +260,7 @@
 %left		AND
 %right		NOT
 %nonassoc	IS ISNULL NOTNULL	/* IS sets precedence for IS NULL, etc */
-%nonassoc	GREATER LESS EQUAL LESS_EQUALS GREATER_EQUALS NOT_EQUALS
+%nonassoc	GREATER LESS EQUAL LESS_EQUAL GREATER_EQUAL NOT_EQUAL
 %nonassoc	BETWEEN IN_P LIKE ILIKE SIMILAR NOT_LA
 %nonassoc	ESCAPE			/* ESCAPE must be just above LIKE/ILIKE/SIMILAR */
 
@@ -342,12 +378,14 @@ simple_select:
     SELECT opt_all_clause opt_target_list 
     //TODO into_clause 
     from_clause where_clause
-    //TODO group_clause having_clause window_clause
+    group_clause having_clause //TODO window_clause
     {
         auto t = mkNode<lingodb::ast::SelectNode>(@$);
         t->select_list = $opt_target_list;
         t->where_clause = $where_clause;
         t->from_clause = $from_clause;
+        t->groups = $group_clause;
+        t->having = $having_clause;
         $$ = t;
     }
     //TODO | SELECT distinct_clause target_list into_clause from_clause where_clause group_clause having_clause window_clause
@@ -399,7 +437,74 @@ table_ref:
 
 
     ;
-/*
+
+set_quantifier: 
+    ALL
+    | DISTINCT
+    | %empty
+    ;
+
+/* Postgres
+ * This syntax for group_clause tries to follow the spec quite closely.
+ * However, the spec allows only column references, not expressions,
+ * which introduces an ambiguity between implicit row constructors
+ * (a,b) and lists of column references.
+ *
+ * We handle this by using the a_expr production for what the spec calls
+ * <ordinary grouping set>, which in the spec represents either one column
+ * reference or a parenthesized list of column references. Then, we check the
+ * top node of the a_expr to see if it's an implicit RowExpr, and if so, just
+ * grab and use the list, discarding the node. (this is done in parse analysis,
+ * not here)
+ *
+ * (we abuse the row_format field of RowExpr to distinguish implicit and
+ * explicit row constructors; it's debatable if anyone sanely wants to use them
+ * in a group clause, but if they have a reason to, we make it possible.)
+ *
+ * Each item in the group_clause list is either an expression tree or a
+ * GroupingSet node of some type.
+ */
+group_clause: 
+    GROUP_P BY set_quantifier group_by_list 
+    {
+        auto node = mkNode<lingodb::ast::GroupByNode>(@$);
+        node->group_expressions = $group_by_list;
+        $$ = node;
+        //TODO Support set_quantifier
+    }
+    | %empty
+    ;
+
+group_by_list:
+    group_by_item 
+    {
+        auto list = mkListShared<lingodb::ast::ParsedExpression>();
+        list.emplace_back($group_by_item);
+        $$ = list;
+    }
+    | group_by_list[list] COMMA group_by_item 
+    {
+        $list.emplace_back($group_by_item);
+        $$ = $list;
+    }
+    ;
+//TODO Add missing rules
+group_by_item:
+    a_expr {$$ = $1;}
+    | empty_grouping_set {}
+    /*| cube_clause
+    | rollup_clause
+    | grouping_sets_clause*/
+    ;
+empty_grouping_set:
+    LP RP
+    ;
+
+having_clause:
+    HAVING a_expr {$$=$a_expr;}
+    | %empty
+    ;
+/* Postgres
  * It may seem silly to separate joined_table from table_ref, but there is
  * method in SQL's madness: if you don't do it this way you get reduce-
  * reduce conflicts, because it's not clear to the parser generator whether
@@ -441,6 +546,10 @@ alias_clause:
 
 
 
+opt_nulls_order: NULLS_LA FIRST_P
+    | NULLS_LA LAST_P
+    | %empty
+
 opt_alias_clause: 
     alias_clause {$$ = $alias_clause;}
     | %empty
@@ -451,6 +560,10 @@ opt_alias_clause_for_join_using:
     | %empty
     ;
 
+opt_asc_desc:
+    ASC
+    | DESC
+    | %empty
 
 join_type: 
     FULL opt_outer
@@ -505,7 +618,21 @@ opt_all_clause:
     ALL
     | %empty
     ;
-
+opt_sort_clause:
+    sort_clause
+    | %empty
+    ;
+sort_clause:
+    ORDER BY sortby_list
+    ;
+sortby_list:
+    sortby
+    | sortby_list COMMA sortby
+    ;
+sortby: 
+    a_expr USING qual_all_Op opt_nulls_order
+    | a_expr opt_asc_desc opt_nulls_order
+    ;
 /*****************************************************************************
  *
  *	expression grammar
@@ -603,7 +730,7 @@ c_expr:
     //TODO
     | LP a_expr RP {$$=$2;}//opt_indirection
     //TODO | case_expr
-    //TODO | func_expr
+    | func_expr {$$=$1;}
     //TODO | select_with_parens
     //TODO | select_with_parens indirection 
     //TODO | EXISTS select_with_parens
@@ -614,6 +741,82 @@ c_expr:
     //TODO | GROUPING LP expr_list RP
     ;
 
+func_application:
+    func_name LP RP 
+    {
+        std::string catalog("");
+        std::string schema("");
+        std::string functionName = $func_name;
+        bool isOperator = false;
+        bool distinct = false;
+        bool exportState = false;
+        auto funcExpr = mkNode<lingodb::ast::FunctionExpression>(@$, catalog, schema, functionName, isOperator, distinct, exportState);
+
+        $$ = funcExpr;
+    }
+    | func_name LP func_arg_list opt_sort_clause RP
+    {
+        std::string catalog("");
+        std::string schema("");
+        std::string functionName = $func_name;
+        bool isOperator = false;
+        bool distinct = false;
+        bool exportState = false;
+        auto funcExpr = mkNode<lingodb::ast::FunctionExpression>(@$, catalog, schema, functionName, isOperator, distinct, exportState);
+
+        funcExpr->arguments = $func_arg_list;
+
+        $$ = funcExpr;
+    }
+    | func_name LP VARIADIC func_arg_expr opt_sort_clause RP
+    | func_name LP func_arg_list COMMA VARIADIC func_arg_expr opt_sort_clause RP
+    | func_name LP ALL func_arg_list opt_sort_clause RP
+    | func_name LP DISTINCT func_arg_list opt_alias_clause RP
+    | func_name LP STAR RP
+
+/*
+ * func_expr and its cousin func_expr_windowless are split out from c_expr just
+ * so that we have classifications for "everything that is a function call or
+ * looks like one".  This isn't very important, but it saves us having to
+ * document which variants are legal in places like "FROM function()" or the
+ * backwards-compatible functional-index syntax for CREATE INDEX.
+ * (Note that many of the special SQL functions wouldn't actually make any
+ * sense as functional index entries, but we ignore that consideration here.)
+ */
+ //TODO add missing rules
+ func_expr:
+    func_application //within_group_clause filter_clause over_clause
+    {
+        //TODO within_group_clause filter_clause over_clause
+        $$ = $func_application;
+    }
+    //| func_expr_common_subexpr
+    ;
+
+/* function arguments can have names */    
+func_arg_list:
+    func_arg_expr 
+    {
+        auto list = mkListShared<lingodb::ast::ParsedExpression>();
+        list.emplace_back($func_arg_expr);
+        $$ = list;
+    }
+    | func_arg_list[list] COMMA func_arg_expr
+    {
+        $list.emplace_back($func_arg_expr);
+        $$= $list;
+    }
+    ;
+expr_list: 
+    a_expr {}
+    | expr_list COMMA a_expr
+    ;
+//TODO Allow for param_name
+func_arg_expr: 
+    a_expr {$$=$1;}
+    | param_name COLON_EQUALS a_expr
+    | param_name GREATER_EQUAL a_expr
+    ;
 
 columnref: 
     ColId {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);}
@@ -627,7 +830,7 @@ indirection:
 indirection_el:
     DOT attr_name {$$=$attr_name;}
     | DOT STAR //TODO make star
-   //TODO | LB a_expr RB
+    | LB a_expr RB
    //TODO | LB opt_slice_bound ':' opt_slice_bound RB
 
 
@@ -653,6 +856,34 @@ target_el:
 
 
 
+any_operator:
+    all_Op
+    | ColId DOT any_operator
+    ;
+
+qual_all_Op:
+    all_Op
+    | OPERATOR LP any_operator RP
+    ;
+
+all_Op: 
+    Op
+    | MathOp
+    ;
+MathOp:
+    PLUS
+    | MINUS
+    | STAR
+    | SLASH
+    | PERCENT
+    | HAT
+    | LESS
+    | GREATER
+    | LESS_EQUAL
+    | GREATER_EQUAL
+    | NOT_EQUAL
+    ;
+
 /*
  * Name classification hierarchy.
  *
@@ -672,6 +903,40 @@ ColId:
    //TODO | unreserved_keyword
    //TODO | col_name_keyword
    ;
+
+/* Type/function identifier --- names that can be type or function names.*/
+type_function_name: 
+    IDENTIFIER {$$=$1;}
+    //TODO | unreserved_keyword
+    | type_func_name_keyword 
+
+type_func_name_keyword:
+			  AUTHORIZATION
+			| BINARY
+			| COLLATION
+			| CONCURRENTLY
+			| CROSS
+			| CURRENT_SCHEMA
+			| FREEZE
+			| FULL
+			| ILIKE
+			| INNER_P
+			| IS
+			| ISNULL
+			| JOIN
+			| LEFT
+			| LIKE
+			| NATURAL
+			| NOTNULL
+			| OUTER_P
+			| OVERLAPS
+			| RIGHT
+			| SIMILAR
+			| TABLESAMPLE
+			| VERBOSE
+            ;
+
+
 /* Column label --- allowed labels in "AS" clauses.
  * This presently includes *all* Postgres keywords.
  */
@@ -707,6 +972,13 @@ qualified_name_list:
     qualified_name 
     | qualified_name_list COMMA qualified_name
     ;
+
+
+
+
+
+    
+
 /*
  * Postgres
  * The production for a qualified relation name has to exactly match the
@@ -725,6 +997,23 @@ name_list:
     ;
 name: ColId {$$=$1;};
 attr_name: ColLabel {$$=$1;};
+
+/*
+ * The production for a qualified func_name has to exactly match the
+ * production for a qualified columnref, because we cannot tell which we
+ * are parsing until we see what comes after it ('(' or Sconst for a func_name,
+ * anything else for a columnref).  Therefore we allow 'indirection' which
+ * may contain subscripts, and reject that case in the C code.  (If we
+ * ever implement SQL99-like methods, such syntax may actually become legal!)
+ */
+func_name: 
+    type_function_name
+    | ColId indirection
+    ;
+
+param_name: type_function_name
+    ;
+
 
 /*
  * Constants
