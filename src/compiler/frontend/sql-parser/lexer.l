@@ -136,11 +136,18 @@ all             { return lingodb::parser::make_ALL(loc); }
 and             { return lingodb::parser::make_AND(loc);}
 as              { return lingodb::parser::make_AS(loc);}
 
+by              { return lingodb::parser::make_BY(loc);}
+
+
 from            { return lingodb::parser::make_FROM(loc); }
 full            { return lingodb::parser::make_FULL(loc); }
-inner            { return lingodb::parser::make_INNER_P(loc); }
-
 left             { return lingodb::parser::make_LEFT(loc); }
+
+group           { return lingodb::parser::make_GROUP_P(loc);}
+
+having          { return lingodb::parser::make_HAVING(loc);}
+
+inner            { return lingodb::parser::make_INNER_P(loc); }
 
 not             { return lingodb::parser::make_NOT(loc); }
 
