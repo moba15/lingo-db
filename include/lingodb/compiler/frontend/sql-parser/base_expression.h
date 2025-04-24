@@ -1,11 +1,13 @@
 #pragma once
+#include "ast_node.h"
+
 #include <cstdint>
 namespace lingodb::ast {
 enum class ExpressionType : uint8_t;
 enum class ExpressionClass : uint8_t;
 
 
-class BaseExpression {
+class BaseExpression : public AstNode {
   public:
   BaseExpression(ExpressionType type, ExpressionClass expression_class) : type(type) {}
 

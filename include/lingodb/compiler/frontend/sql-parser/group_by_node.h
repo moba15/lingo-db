@@ -6,7 +6,7 @@
 #include <vector>
 namespace lingodb::ast {
 using GroupingSet = std::set<int>;
-class GroupByNode {
+class GroupByNode : public AstNode {
    public:
    //! The total set of all group expressions
    std::vector<std::shared_ptr<ParsedExpression>> group_expressions;

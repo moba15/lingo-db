@@ -1,10 +1,12 @@
 #pragma once
+#include "ast_node.h"
+
 #include <cstdint>
 #include <string>
 namespace lingodb::ast {
 enum class TableReferenceType : uint8_t;
 
-class TableRef {
+class TableRef : public AstNode {
    public:
    explicit TableRef(TableReferenceType type) : type(type) {
    }
