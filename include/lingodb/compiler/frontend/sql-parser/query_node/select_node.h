@@ -1,4 +1,5 @@
 #pragma once
+#include "lingodb/compiler/frontend/sql-parser/group_by_node.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
@@ -17,6 +18,13 @@ public:
   std::shared_ptr<TableRef> from_clause;
   //! The WHERE clause
   std::shared_ptr<ParsedExpression> where_clause;
+
+   //! list of groups
+   std::shared_ptr<GroupByNode> groups;
+
+   //! HAVING clause
+   std::shared_ptr<ParsedExpression> having;
+
   //TODO add missing parameters
    std::string toString(uint32_t depth) override;
 
