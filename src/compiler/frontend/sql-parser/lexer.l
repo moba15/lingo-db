@@ -7,6 +7,8 @@
 # include "lingodb/compiler/frontend/sql-parser/driver.h"
 # include "parser.hpp"
 # include <algorithm>
+#include <location.hh>
+
 %}
 
 %{
@@ -132,36 +134,41 @@ identifier      {ident_start}{ident_cont}*
 ">"             { return lingodb::parser::make_GREATER(loc); }
 "||"            { return lingodb::parser::make_CONCAT(loc); }
 "#"             { return lingodb::parser::make_YYEOF(loc);}
-all             { return lingodb::parser::make_ALL(loc); }
-and             { return lingodb::parser::make_AND(loc);}
-as              { return lingodb::parser::make_AS(loc);}
+"|>"            { return lingodb::parser::make_PIPE(loc); }
+\n              { loc.lines();}
+[aA][lL][lL]                          { return lingodb::parser::make_ALL(loc); }
+[aA][gG][gG][rR][eE][gG][aA][tT][eE]  { return lingodb::parser::make_AGGREGATE(loc); }
+[aA][nN][dD]                          { return lingodb::parser::make_AND(loc);}
+[aA][sS]                              { return lingodb::parser::make_AS(loc);}
 
-by              { return lingodb::parser::make_BY(loc);}
+[bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
 
-from            { return lingodb::parser::make_FROM(loc); }
-full            { return lingodb::parser::make_FULL(loc); }
-left             { return lingodb::parser::make_LEFT(loc); }
+[fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
+[fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
+left                                  { return lingodb::parser::make_LEFT(loc); }
 
-group           { return lingodb::parser::make_GROUP_P(loc);}
+[gG][rR][oO][uU][pP]                  { return lingodb::parser::make_GROUP_P(loc);}
 
-having          { return lingodb::parser::make_HAVING(loc);}
+having                                { return lingodb::parser::make_HAVING(loc);}
 
-inner            { return lingodb::parser::make_INNER_P(loc); }
+inner                                 { return lingodb::parser::make_INNER_P(loc); }
 
-not             { return lingodb::parser::make_NOT(loc); }
+[nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
+not                                   { return lingodb::parser::make_NOT(loc); }
 
-where           { return lingodb::parser::make_WHERE(loc); }
+[wW][hH][eE][rR][eE]                  { return lingodb::parser::make_WHERE(loc); }
 
-join            { return lingodb::parser::make_JOIN(loc); }
+[jJ][oO][iI][nN]                      { return lingodb::parser::make_JOIN(loc); }
 
-right           { return lingodb::parser::make_RIGHT(loc); }
+right                                 { return lingodb::parser::make_RIGHT(loc); }
 
-on              { return lingodb::parser::make_ON(loc); }
-or              { return lingodb::parser::make_OR(loc); }
-outer           { return lingodb::parser::make_OUTER_P(loc); }
+on                                    { return lingodb::parser::make_ON(loc); }
+or                                    { return lingodb::parser::make_OR(loc); }
+outer                                 { return lingodb::parser::make_OUTER_P(loc); }
 
-select          { return lingodb::parser::make_SELECT(loc); }
+select                                { return lingodb::parser::make_SELECT(loc); }
+
 
 <<EOF>>    return lingodb::parser::make_YYEOF (loc);
 {identifier}    {

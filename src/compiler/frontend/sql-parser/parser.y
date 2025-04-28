@@ -79,6 +79,7 @@
 %token          HAT         "^"
 %token 			QUOTE		"'"
 %token 			CONCAT		"||"
+%token          PIPE        "|>"
 
 
 
@@ -200,7 +201,7 @@
 
 	ZONE
 
-
+%token AGGREGATE
 /*
  * The grammar thinks these are keywords, but they are not in the kwlist.h
  * list and so can never be entered directly.  The filter in parser.c
@@ -217,7 +218,9 @@
 
 %type <std::shared_ptr<lingodb::ast::QueryNode>> stmtmulti select_no_parens select_clause toplevel_stmt stmt simple_select SelectStmt select_with_parens
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> opt_target_list target_list group_by_list func_arg_list
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list
+
+%type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr func_expr where_clause group_by_item 
                                                         func_application func_arg_expr 
@@ -237,6 +240,10 @@
 %type<std::shared_ptr<lingodb::ast::ConstantExpression>> Iconst AexprConst 
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
+
+%type<std::shared_ptr<lingodb::ast::PipeOperator>> pipe_operator pipe_start
+
+%type<lingodb::ast::JoinType> join_type
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -339,6 +346,57 @@ select_no_parens:
     //TODO | with_clause select_clause sort_clause
     //TODO | with_clause select_clause opt_sort_clause for_locking_clause opt_select_limit
     //TODO | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
+    //PIPE:
+    | from_clause 
+     {
+        auto pipeNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
+        auto p = mkNode<lingodb::ast::PipeOperator>(@$, $from_clause);
+        pipeNode->startPipeOperator = p;
+        $$ = pipeNode;
+        
+     }
+     //TODO DOC
+    | select_no_parens[parens] PIPE pipe_operator 
+    {
+        auto pipeNode = $parens->type == lingodb::ast::QueryNodeType::SELECT_NODE 
+                            ? mkNode<lingodb::ast::PipeSelectNode>(@$)
+                            : std::static_pointer_cast<lingodb::ast::PipeSelectNode>($parens);
+        std::shared_ptr<lingodb::ast::PipeOperator> tmp;
+        if(pipeNode->startPipeOperator) {
+            tmp = pipeNode->startPipeOperator;
+        }
+            
+        if($pipe_operator->type == lingodb::ast::PipeOperatorType::TABLE_REF 
+            && $pipe_operator->tabelRef->type == lingodb::ast::TableReferenceType::JOIN) {
+            auto joinRef = std::static_pointer_cast<lingodb::ast::JoinRef>($pipe_operator->tabelRef);
+            std::cout << "Nice" << std::endl;
+            joinRef->left = pipeNode;
+            auto newNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
+            newNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+            $$ = newNode;
+           
+        } else {
+            if(pipeNode->endPipeOperator) {
+                pipeNode->endPipeOperator->next  = $pipe_operator;
+            } else {
+                pipeNode->startPipeOperator->next = $pipe_operator;
+            }
+            pipeNode->endPipeOperator = $pipe_operator;
+            $$ = pipeNode;
+        }
+    }
+    ;
+pipe_start:
+    | from_clause 
+     {
+      
+        
+     }
+     //TODO DOC
+    | select_no_parens[parens] PIPE pipe_operator 
+    {
+        
+    }
     ;
 select_clause: 
     simple_select {$$ = $1;}
@@ -440,6 +498,7 @@ table_ref:
     | joined_table { $$ = $1;}
     | LP joined_table RP alias_clause
     | joined_table opt_alias_clause
+    | select_with_parens opt_alias_clause
 
 
     ;
@@ -575,7 +634,10 @@ join_type:
     FULL opt_outer
     | LEFT opt_outer
     | RIGHT opt_outer 
-    | INNER_P
+    | INNER_P 
+    {
+        $$ = lingodb::ast::JoinType::INNER;
+    }
     ;
 
 opt_outer: 
@@ -859,7 +921,12 @@ indirection_el:
  *
  *****************************************************************************/
 opt_target_list:
-    target_list { $$=$target_list;}
+    target_list 
+    {
+        auto node = mkNode<lingodb::ast::TargetsExpression>(@$);
+        node->targets = std::move($target_list);
+        $$ = node;
+    }
     | %empty
     ;
 target_list:
@@ -1043,87 +1110,55 @@ AexprConst:
 ;
 Iconst:	
     ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->iVal=$1; $$=t;  };
-// ALLL
-// stmt:
-//     SelectStatement
-//     {
-//         drv.result = $SelectStatement;
-//     }
-//  ;
-// SelectStatement:
-//     select_no_parens
-//     {
-//         $$ = mkNode<nodes::SelectStatement>(@$, $select_no_parens);
-//     }
-//      ;
-// select_no_parens:
-//     simple_select
-//     {
-//         $$ = mkNode<nodes::Query>(@$, $simple_select);
-//     }
-// ;
-// simple_select:
-//     SELECT target_list from_clause
-//     {
-//         auto expr = mkNode<nodes::SelectExpr>(@$);
-//         expr->from_clause = $from_clause;
-//         expr->target_list = $target_list;
-//         $$ = expr;
-//     }
-// ;
 
-// target_list:
-//    target_element {$$ = mkNode<nodes::RowExpr>(@$, $target_element);}
-//  | target_list[list] COMMA target_element {}
-//  ;
-// target_element:
-//     qualified_name { $$ = $qualified_name;}
-//   | STAR {}
-//  ;
 
-// from_clause:
-//     FROM from_list { $$ = $from_list;}
 
-//   | %empty {}
-// ;
 
-// from_list:
-//     table_ref {$$ = mkList<nodes::RelExpression>(@$); $$.emplace_back($table_ref); }
-//    | from_list[list] COMMA table_ref {$list.emplace_back($table_ref); $$=$list;}
-//  ;
-// table_ref:
-//     qualified_name[table_name]
-//     {
-//         auto node = mkNode<nodes::TableName>(@$, $table_name);
-//         $$ = node;
-//     }
-// ;
-// qualified_name:
-//     qualifier_list[list]
-// 	{
-// 	    auto last = std::move($list.back());
-//         $list.pop_back();
-//         $$ = mkNode<nodes::QualifiedName>(@$, std::move(last));
-//         $$->qualifier = $list;
-// 	}
-//  ;
+/*
+* GOOLE PIPE syntax
+*/
+//TODO Add more operators
+pipe_operator: 
+    where_clause 
+    {
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $where_clause);
+        
+    }
+    | SELECT opt_target_list 
+    {
+       $$ = mkNode<lingodb::ast::PipeOperator>(@$, $opt_target_list);
+    }
+    | ORDER BY sortby_list 
+    | join_type JOIN table_ref join_qual
+    {
+        auto joinType = $join_type;
+        auto joinRef = mkNode<lingodb::ast::JoinRef>(@$, joinType, lingodb::ast::JoinCondType::REGULAR );
+        joinRef->right = $table_ref;
+        joinRef->condition = $join_qual;
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+    }
+    | JOIN table_ref join_qual
+    {
+        auto joinRef = mkNode<lingodb::ast::JoinRef>(@$, lingodb::ast::JoinType::INNER, lingodb::ast::JoinCondType::REGULAR );
+        joinRef->right = $table_ref;
+        joinRef->condition = $join_qual;
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+    }
+    //TODO check if this does not allow to much!
+    | AGGREGATE agg_expr
+    | alias_clause
+    //...
 
-//  qualifier_list:
-//      IDENTIFIER[name]						{  auto l = mkList<std::string>(@$); l.emplace_back($name); $$ = l;}
-//   |  qualifier_list[qn] DOT IDENTIFIER[name]			{ $qn.push_back($name); $$ = $qn;  }
-//   ;
+    ;
 
-// where_clause:
-//     WHERE bool_value_expr {}
-// ;
-// bool_value_expr:
-//     bool_predicand {}
-// ;
-// bool_predicand:
-//     common_value_expr {}
-// ;
-// common_value_expr:
-//     IDENTIFIER
+agg_expr: 
+    func_expr_list group_clause
+    ;
+func_expr_list: 
+    func_expr opt_alias_clause
+    | func_expr_list COMMA func_expr_list opt_alias_clause
+    ;
+
 
 %%
 void

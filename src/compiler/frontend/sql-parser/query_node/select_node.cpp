@@ -16,17 +16,14 @@ std::string SelectNode::toAsciiAST(uint32_t depth ) {
    ast.append("└──");
    ast.append("SelectNode");
    ast.append("\n");
-   ast.append(std::string(depth+1,'\t'));
-   ast.append("└── selectList\n");
-   for (auto select: select_list) {
-      if (!select) {
-         std::cerr << "Select List seems empty" << std::endl;
-         continue;
 
-      }
-
-      ast.append(select->toAsciiAST(depth+2));
+   if (select_list) {
+      ast.append(std::string(depth+1,'\t'));
+      ast.append("└── selectList\n");
+      select_list->toAsciiAST(depth+2);
    }
+
+
    if (where_clause) {
       ast.append(std::string(depth+1,'\t'));
       ast.append("└── whereClause\n");
