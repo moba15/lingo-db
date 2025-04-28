@@ -1,6 +1,7 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/group_by_node.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/parsed_expression/targets_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
@@ -13,7 +14,7 @@ public:
    ~SelectNode() override;
   static constexpr QueryNodeType TYPE = QueryNodeType::SELECT_NODE;
   //! The projection list
-  std::vector<std::shared_ptr<ParsedExpression>> select_list;
+  std::shared_ptr<TargetsExpression> select_list;
   //! The FROM clause
   std::shared_ptr<TableRef> from_clause;
   //! The WHERE clause
