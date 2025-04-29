@@ -9,7 +9,7 @@ enum class ExpressionClass : uint8_t;
 
 class BaseExpression : public AstNode {
   public:
-  BaseExpression(ExpressionType type, ExpressionClass expression_class) : AstNode(NodeType::Expression), type(type) {}
+  BaseExpression(ExpressionType type, ExpressionClass expression_class) : AstNode(NodeType::EXPRESSION), type(type) {}
 
   ExpressionType type;
    //! The alias of the expression,
