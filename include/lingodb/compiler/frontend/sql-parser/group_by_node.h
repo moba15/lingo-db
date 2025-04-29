@@ -8,6 +8,7 @@ namespace lingodb::ast {
 using GroupingSet = std::set<int>;
 class GroupByNode : public AstNode {
    public:
+   GroupByNode() : AstNode(NodeType::GroupBy) {};
    //! The total set of all group expressions
    std::vector<std::shared_ptr<ParsedExpression>> group_expressions;
 

@@ -366,10 +366,9 @@ select_no_parens:
             tmp = pipeNode->startPipeOperator;
         }
             
-        if($pipe_operator->type == lingodb::ast::PipeOperatorType::TABLE_REF 
-            && $pipe_operator->tabelRef->type == lingodb::ast::TableReferenceType::JOIN) {
-            auto joinRef = std::static_pointer_cast<lingodb::ast::JoinRef>($pipe_operator->tabelRef);
-            std::cout << "Nice" << std::endl;
+        if($pipe_operator->node->nodeType == lingodb::ast::NodeType::TABLE_REF 
+            && std::static_pointer_cast<lingodb::ast::TableRef>($pipe_operator->node)->type == lingodb::ast::TableReferenceType::JOIN) {
+            auto joinRef = std::static_pointer_cast<lingodb::ast::JoinRef>($pipe_operator->node);
             joinRef->left = pipeNode;
             auto newNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
             newNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);

@@ -8,7 +8,7 @@ enum class TableReferenceType : uint8_t;
 
 class TableRef : public AstNode {
    public:
-   explicit TableRef(TableReferenceType type) : type(type) {
+   explicit TableRef(TableReferenceType type) : AstNode(NodeType::TABLE_REF), type(type) {
    }
    TableReferenceType type;
    //TODO missing variables

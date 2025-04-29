@@ -1,7 +1,9 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
-#include "lingodb/compiler/frontend/sql-parser/tableref.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/columnref_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/pipe_operator.h"
+#include "lingodb/compiler/frontend/sql-parser/query_node/pipe_select_node.h"
+#include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
 #include <memory>
 #include <variant>
@@ -18,7 +20,8 @@ class JoinRef : public TableRef {
 
 
    //! The left hand side of the join
-   std::shared_ptr<TableRef> left;
+   //! QueryNode as variant is needed for pipe syntax. Example: FROM Test |> join ok on id1=id2
+   std::variant<std::shared_ptr<TableRef>, std::shared_ptr<QueryNode>> left;
    //! The right hand side of the join
    std::shared_ptr<TableRef> right;
    //TODO is this condition a good solution for on condiotion and using?
