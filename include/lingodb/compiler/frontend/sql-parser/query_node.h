@@ -6,7 +6,8 @@
 #define toAsciiASTPrefix std::string ast{}; \
    for (uint32_t i = 0; i < depth-1; ++i) { \
       ast.append("\t"); \
-      ast.append(""); \
+       \
+         ast.append(""); \
    } \
 ast.append("\t"); \
 ast.append("└──");
@@ -16,12 +17,14 @@ enum class QueryNodeType : uint8_t {
   SET_OPERATION_NODE = 2,
   BOUND_SUBQUERY_NODE = 3,
   RECURSIVE_CTE_NODE = 4,
-  CTE_NODE = 5
+  CTE_NODE = 5,
+  PIPE_NODE = 6
+
 };
 class QueryNode : public AstNode {
 public:
    virtual ~QueryNode() ;
-  explicit  QueryNode(QueryNodeType type) : type(type) {};
+  explicit QueryNode(QueryNodeType type) : AstNode(NodeType::QUERY_NODE), type(type) {};
 
   //! The type of the query node, either SetOperation or Select
   QueryNodeType type;

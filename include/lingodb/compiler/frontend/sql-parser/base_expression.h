@@ -9,9 +9,11 @@ enum class ExpressionClass : uint8_t;
 
 class BaseExpression : public AstNode {
   public:
-  BaseExpression(ExpressionType type, ExpressionClass expression_class) : type(type) {}
+  BaseExpression(ExpressionType type, ExpressionClass expression_class) : AstNode(NodeType::Expression), type(type) {}
 
-   ExpressionType type;
+  ExpressionType type;
+   //! The alias of the expression,
+   std::string alias;
 };
 //Extracted from PostgresSQL
 //===--------------------------------------------------------------------===//
@@ -151,7 +153,8 @@ enum class ExpressionType : uint8_t {
 	LAMBDA = 231,
 	POSITIONAL_REFERENCE = 232,
 	BOUND_LAMBDA_REF = 233,
-	BOUND_EXPANDED = 234
+	BOUND_EXPANDED = 234,
+        TARGETS=240,
 };
 
 enum class ExpressionClass : uint8_t {
@@ -203,7 +206,8 @@ enum class ExpressionClass : uint8_t {
   // Miscellaneous
   //===--------------------------------------------------------------------===//
   BOUND_EXPRESSION = 50,
-  BOUND_EXPANDED = 51
+  BOUND_EXPANDED = 51,
+  TARGETS=52
 };
 
 
