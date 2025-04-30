@@ -8,6 +8,7 @@ enum class NodeType : uint8_t {
    PIPE_OP = 4,
    GROUP_BY = 5,
    AGGREGATION = 6,
+   RESULT_MODIFIER = 7,
 };
 class AstNode {
    public:

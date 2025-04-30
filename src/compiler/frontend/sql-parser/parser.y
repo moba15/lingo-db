@@ -20,6 +20,7 @@
   #include "lingodb/compiler/frontend/sql-parser/query_node/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref.h"
   #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
+  #include "lingodb/compiler/frontend/sql-parser/result_modifier.h"
   #include "lingodb/compiler/frontend/sql-parser/parsed_expression/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref/list.h"
   #include "lingodb/compiler/frontend/sql-parser/common/binding_alias.h"
@@ -252,6 +253,16 @@
 
 %type<std::shared_ptr<lingodb::ast::AggregationNode>> agg_expr
 
+%type<std::shared_ptr<lingodb::ast::OrderByModifier>> sort_clause
+
+%type<std::vector<std::shared_ptr<lingodb::ast::OrderByElement>>> sortby_list
+
+%type<std::shared_ptr<lingodb::ast::OrderByElement>> sortby
+
+%type<lingodb::ast::OrderType> opt_asc_desc
+
+%type<lingodb::ast::OrderByNullType> opt_nulls_order
+
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
 %type <std::shared_ptr<nodes::SelectStatement>> SelectStatement
@@ -346,7 +357,11 @@ select_with_parens:
 
 select_no_parens: 
     simple_select {$$=$1;}
-    //TODO | select_clause sort_clause
+    | select_clause sort_clause 
+    {
+        $select_clause->modifiers.emplace_back($sort_clause);
+        $$ = $select_clause;
+    }
     //TODO | select_clause opt_sort_clause for_locking_clause opt_select_limit 
     //TODO | select_clause opt_sort_clause select_limit opt_for_locking_clause
     //TODO | with_clause select_clause
@@ -371,6 +386,9 @@ select_no_parens:
         std::shared_ptr<lingodb::ast::PipeOperator> tmp;
         if(pipeNode->startPipeOperator) {
             tmp = pipeNode->startPipeOperator;
+        }
+        if( $parens->type == lingodb::ast::QueryNodeType::SELECT_NODE) {
+            pipeNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$,$parens);
         }
             
         if($pipe_operator->node->nodeType == lingodb::ast::NodeType::TABLE_REF 
@@ -616,10 +634,14 @@ alias_clause:
     ;
 
 
-
-opt_nulls_order: NULLS_LA FIRST_P
+//TODO AST
+opt_nulls_order: 
+    NULLS_LA FIRST_P
     | NULLS_LA LAST_P
-    | %empty
+    | %empty  
+    {
+        $$ = lingodb::ast::OrderByNullType::ORDER_DEFAULT;
+    }
 
 opt_alias_clause: 
     alias_clause {$$ = $alias_clause;}
@@ -633,8 +655,16 @@ opt_alias_clause_for_join_using:
 
 opt_asc_desc:
     ASC
-    | DESC
-    | %empty
+    {
+        $$ = lingodb::ast::OrderType::ASCENDING;
+    }
+    | DESC 
+    {
+        $$ = lingodb::ast::OrderType::DESCENDING;
+    }
+    | %empty {
+        $$ = lingodb::ast::OrderType::ASCENDING;
+    }
 
 join_type: 
     FULL opt_outer
@@ -697,15 +727,35 @@ opt_sort_clause:
     | %empty
     ;
 sort_clause:
-    ORDER BY sortby_list
+    ORDER BY sortby_list 
+    {
+        auto n = mkNode<lingodb::ast::OrderByModifier>(@$);
+        n->orderByElements = std::move($sortby_list);
+        $$ = n;
+    }
     ;
 sortby_list:
-    sortby
-    | sortby_list COMMA sortby
+    sortby 
+    {
+        auto list = mkListShared<lingodb::ast::OrderByElement>();
+        list.emplace_back($sortby);
+        $$ = list;
+    }
+    | sortby_list[list] COMMA sortby 
+    {
+        $list.emplace_back($sortby);
+        $$ = $list;
+    }
     ;
 sortby: 
+    //TODO
     a_expr USING qual_all_Op opt_nulls_order
-    | a_expr opt_asc_desc opt_nulls_order
+    | a_expr opt_asc_desc opt_nulls_order 
+    {
+        auto orderByElement = mkNode<lingodb::ast::OrderByElement>(@$, $opt_asc_desc, $opt_nulls_order);
+        orderByElement->expression = $a_expr;
+        $$ = orderByElement;
+    }
     ;
 /*****************************************************************************
  *
@@ -825,7 +875,6 @@ func_application:
         bool distinct = false;
         bool exportState = false;
         auto funcExpr = mkNode<lingodb::ast::FunctionExpression>(@$, catalog, schema, functionName, isOperator, distinct, exportState);
-
         $$ = funcExpr;
     }
     | func_name LP func_arg_list opt_sort_clause RP
@@ -1134,7 +1183,10 @@ pipe_operator:
     {
        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $opt_target_list);
     }
-    | ORDER BY sortby_list 
+    | sort_clause 
+    {
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $sort_clause);
+    }
     | join_type JOIN table_ref join_qual
     {
         auto joinType = $join_type;
