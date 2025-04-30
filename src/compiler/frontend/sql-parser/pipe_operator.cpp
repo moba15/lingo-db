@@ -16,20 +16,15 @@ std::string PipeOperator::toAsciiAST(uint32_t depth) {
    return ast;
 }
 std::string PipeOperator::toDotGraph(uint32_t depth) {
-
    std::string dot{};
 
-
+   dot += "node" + std::to_string(reinterpret_cast<uintptr_t>(this)) +
+      " [label=\"Pipe Operator\"];\n";
 
    dot += "node" + std::to_string(reinterpret_cast<uintptr_t>(this)) +
-          " [label=\"Pipe Operator\"];\n";
-
-   dot += "node" + std::to_string(reinterpret_cast<uintptr_t>(this)) +
-          " -> node" + std::to_string(reinterpret_cast<uintptr_t>(node.get())) + ";\n";
+      " -> node" + std::to_string(reinterpret_cast<uintptr_t>(node.get())) + ";\n";
 
    dot += node->toDotGraph(depth + 1);
-
-
 
    return dot;
 }

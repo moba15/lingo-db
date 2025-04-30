@@ -20,9 +20,7 @@ class StarExpression : public ParsedExpression {
    //! Whether or not this is a COLUMNS expression
    bool columns = false;
 
-
-   std::string toAsciiAST(uint32_t depth ) override;
+   std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth) override;
-
 };
 } // namespace lingodb::ast

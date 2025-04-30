@@ -1,7 +1,7 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
-#include <vector>
 #include <memory>
+#include <vector>
 namespace lingodb::ast {
 //List of targets
 //Used for the select_list
@@ -12,7 +12,7 @@ class TargetsExpression : public ParsedExpression {
    TargetsExpression();
 
    std::vector<std::shared_ptr<ParsedExpression>> targets{};
-   std::string toAsciiAST(uint32_t depth ) override;
+   std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth) override;
 };
 } // namespace lingodb::ast

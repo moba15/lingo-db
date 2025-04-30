@@ -5,7 +5,7 @@
 #include <vector>
 
 namespace lingodb::ast {
-class ConjunctionExpression : public  ParsedExpression {
+class ConjunctionExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::CONJUNCTION;
    explicit ConjunctionExpression(ExpressionType type);
@@ -14,13 +14,10 @@ class ConjunctionExpression : public  ParsedExpression {
 
    std::vector<std::shared_ptr<ParsedExpression>> children;
 
-
-   std::string toAsciiAST(uint32_t depth ) override;
+   std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth) override;
 
    private:
    std::string typeToAscii(ExpressionType type) const;
-
-
 };
 } // namespace lingodb::ast

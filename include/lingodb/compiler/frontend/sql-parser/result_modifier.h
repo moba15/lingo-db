@@ -4,13 +4,13 @@
 #include <vector>
 namespace lingodb::ast {
 enum class OrderType : uint8_t {
-    ASCENDING = 1,
-    DESCENDING = 2
+   ASCENDING = 1,
+   DESCENDING = 2
 };
 enum class ResultModifierType : uint8_t {
-    ORDER_BY = 1,
-    LIMIT = 2,
-    OFFSET = 3,
+   ORDER_BY = 1,
+   LIMIT = 2,
+   OFFSET = 3,
 };
 enum class OrderByNullType : uint8_t {
    INVALID = 0,
@@ -20,9 +20,9 @@ enum class OrderByNullType : uint8_t {
 };
 
 class ResultModifier : public AstNode {
-public:
+   public:
    explicit ResultModifier(ResultModifierType type)
-        : AstNode(NodeType::RESULT_MODIFIER), modifierType(type) {}
+      : AstNode(NodeType::RESULT_MODIFIER), modifierType(type) {}
 
    virtual ~ResultModifier() = default;
 
@@ -31,7 +31,7 @@ public:
    virtual std::string toDotGraph(uint32_t depth);
 };
 
-class OrderByElement  {
+class OrderByElement {
    public:
    OrderByElement(OrderType type, OrderByNullType nullOrder) : type(type), nullOrder(nullOrder) {};
 
@@ -42,16 +42,11 @@ class OrderByElement  {
    /// The NULL sort order, NULLS_FIRST or NULLS_LAST
    OrderByNullType nullOrder;
 
-  location loc;
-
-
+   location loc;
 };
 
-
 class OrderByModifier : public ResultModifier {
-public:
-
-
+   public:
    OrderByModifier() : ResultModifier(ResultModifierType::ORDER_BY) {}
 
    std::vector<std::shared_ptr<OrderByElement>> orderByElements;
@@ -59,18 +54,17 @@ public:
    std::string toDotGraph(uint32_t depth) override;
 };
 
-
 class LimitModifier : public ResultModifier {
-public:
-    LimitModifier() : ResultModifier(ResultModifierType::LIMIT) {}
-    std::shared_ptr<ParsedExpression> limitExpression;
-    // ... implementation ...
+   public:
+   LimitModifier() : ResultModifier(ResultModifierType::LIMIT) {}
+   std::shared_ptr<ParsedExpression> limitExpression;
+   // ... implementation ...
 };
 
 class OffsetModifier : public ResultModifier {
-public:
-    OffsetModifier() : ResultModifier(ResultModifierType::OFFSET) {}
-    std::shared_ptr<ParsedExpression> offsetExpression;
+   public:
+   OffsetModifier() : ResultModifier(ResultModifierType::OFFSET) {}
+   std::shared_ptr<ParsedExpression> offsetExpression;
 };
 
 } // namespace lingodb::ast
