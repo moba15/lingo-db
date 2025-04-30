@@ -18,6 +18,7 @@ add_library(lingo-db-parser
         group_by_node.cpp
         ast_node.cpp
         pipe_operator.cpp
+        aggregation_node.cpp
 
         query_node/select_node.cpp
         query_node/pipe_select_node.cpp
@@ -30,6 +31,8 @@ add_library(lingo-db-parser
         parsed_expression/conjunction_expression.cpp
         parsed_expression/function_expression.cpp
         parsed_expression/targets_expression.cpp
+
+
 
         tableref/basetableref.cpp
         tableref/joinref.cpp
