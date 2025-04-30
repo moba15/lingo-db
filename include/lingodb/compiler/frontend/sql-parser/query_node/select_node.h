@@ -10,23 +10,22 @@
 #include <vector>
 namespace lingodb::ast {
 class SelectNode : public QueryNode {
-public:
-  SelectNode();
+   public:
+   SelectNode();
    ~SelectNode() override;
-  static constexpr QueryNodeType TYPE = QueryNodeType::SELECT_NODE;
-  //! The projection list
-  std::shared_ptr<TargetsExpression> select_list;
-  //! The FROM clause
-  std::shared_ptr<TableRef> from_clause;
-  //! The WHERE clause
-  std::shared_ptr<ParsedExpression> where_clause;
+   static constexpr QueryNodeType TYPE = QueryNodeType::SELECT_NODE;
+   //! The projection list
+   std::shared_ptr<TargetsExpression> select_list;
+   //! The FROM clause
+   std::shared_ptr<TableRef> from_clause;
+   //! The WHERE clause
+   std::shared_ptr<ParsedExpression> where_clause;
 
    //! list of groups
    std::shared_ptr<GroupByNode> groups;
 
    //! HAVING clause
    std::shared_ptr<ParsedExpression> having;
-
 
    ///For pipe operators
    std::shared_ptr<PipeOperator> startPipeOperator;

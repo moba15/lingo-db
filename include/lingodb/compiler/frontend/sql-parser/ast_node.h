@@ -12,7 +12,7 @@ enum class NodeType : uint8_t {
 };
 class AstNode {
    public:
-   explicit  AstNode(NodeType type) : nodeType(type) {}
+   explicit AstNode(NodeType type) : nodeType(type) {}
    virtual ~AstNode() = default;
 
    NodeType nodeType;

@@ -2,23 +2,21 @@
 
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 namespace lingodb::ast {
-ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpression(type, TYPE)  {
+ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpression(type, TYPE) {
 }
-ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right): ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
-
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
 }
 
-
-std::string ComparisonExpression::toAsciiAST(uint32_t depth ) {
+std::string ComparisonExpression::toAsciiAST(uint32_t depth) {
    toAsciiASTPrefix
 
-   ast.append("ComparisonExpression: $1 ");
+      ast.append("ComparisonExpression: $1 ");
    ast.append(typeToAscii(type));
    ast.append(" $2\n");
    if (left)
-      ast.append(left->toAsciiAST(depth+1));
+      ast.append(left->toAsciiAST(depth + 1));
    if (right)
-      ast.append(right->toAsciiAST(depth+1));
+      ast.append(right->toAsciiAST(depth + 1));
 
    return ast;
 }
@@ -35,46 +33,46 @@ std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
    }
 }
 std::string ComparisonExpression::toDotGraph(uint32_t depth) {
-    std::string dot{};
-    
-    // Create node identifier for the comparison expression
-    std::string nodeId;
-    nodeId.append("node");
-    nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
-    
-    // Create the node with operator label
-    dot.append(nodeId);
-    dot.append(" [label=\"");
-    dot.append(typeToAscii(type));
-    dot.append("\"];\n");
-    
-    // Handle left operand
-    if (left) {
-        std::string leftId;
-        leftId.append("node");
-        leftId.append(std::to_string(reinterpret_cast<uintptr_t>(left.get())));
-        
-        dot.append(nodeId);
-        dot.append(" -> ");
-        dot.append(leftId);
-        dot.append(" [label=\"left\"];\n");
-        dot.append(left->toDotGraph(depth + 1));
-    }
-    
-    // Handle right operand
-    if (right) {
-        std::string rightId;
-        rightId.append("node");
-        rightId.append(std::to_string(reinterpret_cast<uintptr_t>(right.get())));
-        
-        dot.append(nodeId);
-        dot.append(" -> ");
-        dot.append(rightId);
-        dot.append(" [label=\"right\"];\n");
-        dot.append(right->toDotGraph(depth + 1));
-    }
-    
-    return dot;
+   std::string dot{};
+
+   // Create node identifier for the comparison expression
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+
+   // Create the node with operator label
+   dot.append(nodeId);
+   dot.append(" [label=\"");
+   dot.append(typeToAscii(type));
+   dot.append("\"];\n");
+
+   // Handle left operand
+   if (left) {
+      std::string leftId;
+      leftId.append("node");
+      leftId.append(std::to_string(reinterpret_cast<uintptr_t>(left.get())));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(leftId);
+      dot.append(" [label=\"left\"];\n");
+      dot.append(left->toDotGraph(depth + 1));
+   }
+
+   // Handle right operand
+   if (right) {
+      std::string rightId;
+      rightId.append("node");
+      rightId.append(std::to_string(reinterpret_cast<uintptr_t>(right.get())));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(rightId);
+      dot.append(" [label=\"right\"];\n");
+      dot.append(right->toDotGraph(depth + 1));
+   }
+
+   return dot;
 }
 
 } // namespace lingodb::ast
