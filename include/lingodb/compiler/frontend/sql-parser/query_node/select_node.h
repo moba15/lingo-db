@@ -2,6 +2,7 @@
 #include "lingodb/compiler/frontend/sql-parser/group_by_node.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/targets_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/pipe_operator.h"
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
@@ -26,7 +27,12 @@ public:
    //! HAVING clause
    std::shared_ptr<ParsedExpression> having;
 
-  //TODO add missing parameters
+
+   ///For pipe operators
+   std::shared_ptr<PipeOperator> startPipeOperator;
+   std::shared_ptr<PipeOperator> endPipeOperator;
+
+   //TODO add missing parameters
    std::string toString(uint32_t depth) override;
 
    std::string toAsciiAST(uint32_t depth) override;
