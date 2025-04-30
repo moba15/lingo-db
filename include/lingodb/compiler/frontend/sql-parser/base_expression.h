@@ -9,9 +9,10 @@ enum class ExpressionClass : uint8_t;
 
 class BaseExpression : public AstNode {
   public:
-  BaseExpression(ExpressionType type, ExpressionClass expression_class) : AstNode(NodeType::EXPRESSION), type(type) {}
+  BaseExpression(ExpressionType type, ExpressionClass exprClass) : AstNode(NodeType::EXPRESSION), type(type), exprClass(exprClass) {}
 
-  ExpressionType type;
+   ExpressionClass exprClass;
+   ExpressionType type;
    //! The alias of the expression,
    std::string alias;
 };
