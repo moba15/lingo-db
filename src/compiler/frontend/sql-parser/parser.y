@@ -19,6 +19,7 @@
   #include "lingodb/compiler/frontend/sql-parser/node_factory.h"
   #include "lingodb/compiler/frontend/sql-parser/query_node/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref.h"
+  #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
   #include "lingodb/compiler/frontend/sql-parser/parsed_expression/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref/list.h"
   #include "lingodb/compiler/frontend/sql-parser/common/binding_alias.h"
@@ -222,8 +223,12 @@
 
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr func_expr where_clause group_by_item 
-                                                        func_application func_arg_expr 
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr  where_clause group_by_item 
+                                                        func_arg_expr 
+
+%type<std::shared_ptr<lingodb::ast::FunctionExpression>> func_expr func_application
+
+%type<std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>>> func_expr_list
 
 %type<lingodb::ast::jointCondOrUsingCols> join_qual
 
@@ -244,6 +249,8 @@
 %type<std::shared_ptr<lingodb::ast::PipeOperator>> pipe_operator pipe_start
 
 %type<lingodb::ast::JoinType> join_type
+
+%type<std::shared_ptr<lingodb::ast::AggregationNode>> agg_expr
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -1145,17 +1152,37 @@ pipe_operator:
     }
     //TODO check if this does not allow to much!
     | AGGREGATE agg_expr
+    {
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $agg_expr);
+    }
     | alias_clause
     //...
 
     ;
 
 agg_expr: 
-    func_expr_list group_clause
+    func_expr_list group_clause 
+    {
+        auto aggNode = mkNode<lingodb::ast::AggregationNode>(@$);
+        aggNode->groupByNode = $group_clause;
+        aggNode->aggregations = $func_expr_list;
+        $$ = aggNode;
+      
+        
+    }
     ;
 func_expr_list: 
-    func_expr opt_alias_clause
-    | func_expr_list COMMA func_expr_list opt_alias_clause
+    func_expr opt_alias_clause 
+    {
+        auto list = mkListShared<lingodb::ast::FunctionExpression>();
+        list.emplace_back($func_expr);
+        $$ = list;
+    }
+    | func_expr_list[list] COMMA func_expr opt_alias_clause
+    {
+        $list.emplace_back($func_expr);
+        $$ = $list;
+    }
     ;
 
 
