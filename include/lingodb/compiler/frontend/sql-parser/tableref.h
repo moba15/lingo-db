@@ -15,6 +15,7 @@ class TableRef : public AstNode {
    std::string alias;
 
    virtual std::string toAsciiAST(uint32_t depth ) = 0;
+   virtual  std::string toDotGraph(uint32_t depth) = 0;
 
 };
 

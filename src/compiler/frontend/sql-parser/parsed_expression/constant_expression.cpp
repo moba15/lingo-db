@@ -12,13 +12,33 @@ ConstantExpression::ConstantExpression() :ParsedExpression(ExpressionType::VALUE
 
 }
 
-std::string ConstantExpression::toAsciiAST(uint32_t depth ) {
+std::string ConstantExpression::toAsciiAST(uint32_t depth) {
    toAsciiASTPrefix
-   ast.append("ConstantExpression: ");
+      ast.append("ConstantExpression: ");
    ast.append(std::to_string(iVal));
    ast.append("\n");
 
    return ast;
 }
+std::string ConstantExpression::toDotGraph(uint32_t depth) {
+    std::string dot{};
+    
+    // Create node identifier for the constant
+    std::string nodeId;
+    nodeId.append("node");
+    nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+    
+    // Create label with constant value
+    std::string label;
+    label.append("Constant\\n");
+    label.append(std::to_string(iVal));
+    
+    // Create the node
+    dot.append(nodeId);
+    dot.append(" [label=\"");
+    dot.append(label);
+    dot.append("\"];\n");
+    
+    return dot;
+}
 } // namespace lingodb::ast
-

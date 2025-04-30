@@ -25,7 +25,6 @@ std::string ComparisonExpression::toAsciiAST(uint32_t depth ) {
 
 std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
    switch (type) {
-
       case ExpressionType::COMPARE_EQUAL: return "=";
       case ExpressionType::COMPARE_GREATERTHAN: return ">";
       case ExpressionType::COMPARE_LESSTHAN: return "<";
@@ -34,6 +33,48 @@ std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
       case ExpressionType::COMPARE_NOTEQUAL: return "<>";
       default: "Unknown";
    }
+}
+std::string ComparisonExpression::toDotGraph(uint32_t depth) {
+    std::string dot{};
+    
+    // Create node identifier for the comparison expression
+    std::string nodeId;
+    nodeId.append("node");
+    nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+    
+    // Create the node with operator label
+    dot.append(nodeId);
+    dot.append(" [label=\"");
+    dot.append(typeToAscii(type));
+    dot.append("\"];\n");
+    
+    // Handle left operand
+    if (left) {
+        std::string leftId;
+        leftId.append("node");
+        leftId.append(std::to_string(reinterpret_cast<uintptr_t>(left.get())));
+        
+        dot.append(nodeId);
+        dot.append(" -> ");
+        dot.append(leftId);
+        dot.append(" [label=\"left\"];\n");
+        dot.append(left->toDotGraph(depth + 1));
+    }
+    
+    // Handle right operand
+    if (right) {
+        std::string rightId;
+        rightId.append("node");
+        rightId.append(std::to_string(reinterpret_cast<uintptr_t>(right.get())));
+        
+        dot.append(nodeId);
+        dot.append(" -> ");
+        dot.append(rightId);
+        dot.append(" [label=\"right\"];\n");
+        dot.append(right->toDotGraph(depth + 1));
+    }
+    
+    return dot;
 }
 
 } // namespace lingodb::ast

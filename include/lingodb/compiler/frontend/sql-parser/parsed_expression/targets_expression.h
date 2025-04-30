@@ -13,5 +13,6 @@ class TargetsExpression : public ParsedExpression {
 
    std::vector<std::shared_ptr<ParsedExpression>> targets{};
    std::string toAsciiAST(uint32_t depth ) override;
+   std::string toDotGraph(uint32_t depth) override;
 };
 } // namespace lingodb::ast
