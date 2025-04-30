@@ -21,6 +21,9 @@ public:
  //TODO  unique_ptr<AtClause> at_clause;
 
    std::string toAsciiAST(uint32_t depth ) override;
+   std::string toDotGraph(uint32_t depth) override;
+
+
 
 };
 } // namespace lingodb::ast
