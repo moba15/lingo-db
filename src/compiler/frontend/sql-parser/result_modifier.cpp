@@ -4,8 +4,7 @@ std::string ResultModifier::toAsciiAST(uint32_t depth) {
    return "ResultModifier: Not implemented";
 }
 std::string ResultModifier::toDotGraph(uint32_t depth) {
-  return "ResultModifier: Not implemented";
-
+   return "ResultModifier: Not implemented";
 }
 std::string OrderByModifier::toAsciiAST(uint32_t depth) {
    return ResultModifier::toAsciiAST(depth);

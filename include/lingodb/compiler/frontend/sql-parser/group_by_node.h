@@ -15,7 +15,7 @@ class GroupByNode : public AstNode {
    //! The different grouping sets as they map to the group expressions
    std::vector<GroupingSet> grouping_sets;
 
-   std::string toAsciiAST(uint32_t depth ) override;
+   std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth) override;
 };
 } // namespace lingodb::ast

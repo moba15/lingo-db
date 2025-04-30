@@ -21,72 +21,71 @@ std::string FunctionExpression::toAsciiAST(uint32_t depth) {
    return ast;
 }
 std::string FunctionExpression::toDotGraph(uint32_t depth) {
-    std::string dot{};
-    // Create node identifier for the function
-    std::string nodeId;
-    nodeId.append("node");
-    nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   std::string dot{};
+   // Create node identifier for the function
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
 
-    // Create the function node with its label
-    dot.append(nodeId);
-    dot.append(" [label=\"Function\nname: ");
-    dot.append(functionName);
-    if (distinct) {
-        dot.append("\\nDISTINCT");
-    }
+   // Create the function node with its label
+   dot.append(nodeId);
+   dot.append(" [label=\"Function\nname: ");
+   dot.append(functionName);
+   if (distinct) {
+      dot.append("\\nDISTINCT");
+   }
    if (type == ExpressionType::AGGREGATE) {
       dot.append("\nagg\n");
    }
-    dot.append("\"];\n");
+   dot.append("\"];\n");
 
-    // Add all function arguments
-    for (size_t i = 0; i < arguments.size(); ++i) {
-        if (arguments[i]) {
-            std::string argId;
-            argId.append("node");
-            argId.append(std::to_string(reinterpret_cast<uintptr_t>(arguments[i].get())));
+   // Add all function arguments
+   for (size_t i = 0; i < arguments.size(); ++i) {
+      if (arguments[i]) {
+         std::string argId;
+         argId.append("node");
+         argId.append(std::to_string(reinterpret_cast<uintptr_t>(arguments[i].get())));
 
-            // Create edge from function to this argument
-            dot.append(nodeId);
-            dot.append(" -> ");
-            dot.append(argId);
-            dot.append(" [label=\"arg ");
-            dot.append(std::to_string(i + 1));
-            dot.append("\"];\n");
+         // Create edge from function to this argument
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(argId);
+         dot.append(" [label=\"arg ");
+         dot.append(std::to_string(i + 1));
+         dot.append("\"];\n");
 
-            // Add the argument's graph representation
-            dot.append(arguments[i]->toDotGraph(depth + 1));
-        }
-    }
+         // Add the argument's graph representation
+         dot.append(arguments[i]->toDotGraph(depth + 1));
+      }
+   }
 
-    // Add filter if present
-    if (filter) {
-        std::string filterId;
-        filterId.append("node");
-        filterId.append(std::to_string(reinterpret_cast<uintptr_t>(filter.get())));
+   // Add filter if present
+   if (filter) {
+      std::string filterId;
+      filterId.append("node");
+      filterId.append(std::to_string(reinterpret_cast<uintptr_t>(filter.get())));
 
-        dot.append(nodeId);
-        dot.append(" -> ");
-        dot.append(filterId);
-        dot.append(" [label=\"filter\"];\n");
-        dot.append(filter->toDotGraph(depth + 1));
-    }
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(filterId);
+      dot.append(" [label=\"filter\"];\n");
+      dot.append(filter->toDotGraph(depth + 1));
+   }
 
-    // Add order by if present
-    if (orderBy) {
-        std::string orderId;
-        orderId.append("node");
-        orderId.append(std::to_string(reinterpret_cast<uintptr_t>(orderBy.get())));
+   // Add order by if present
+   if (orderBy) {
+      std::string orderId;
+      orderId.append("node");
+      orderId.append(std::to_string(reinterpret_cast<uintptr_t>(orderBy.get())));
 
-        dot.append(nodeId);
-        dot.append(" -> ");
-        dot.append(orderId);
-        dot.append(" [label=\"order by\"];\n");
-        dot.append(orderBy->toDotGraph(depth + 1));
-    }
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(orderId);
+      dot.append(" [label=\"order by\"];\n");
+      dot.append(orderBy->toDotGraph(depth + 1));
+   }
 
-    return dot;
+   return dot;
 }
-
 
 } // namespace lingodb::ast

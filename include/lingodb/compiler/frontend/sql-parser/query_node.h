@@ -5,39 +5,39 @@
 #include <cstdint>
 #include <memory>
 #include <string>
-#define toAsciiASTPrefix std::string ast{}; \
-   for (uint32_t i = 0; i < depth-1; ++i) { \
-      ast.append("\t"); \
-       \
-         ast.append(""); \
-   } \
-ast.append("\t"); \
-ast.append("└──");
+#define toAsciiASTPrefix                      \
+   std::string ast{};                         \
+   for (uint32_t i = 0; i < depth - 1; ++i) { \
+      ast.append("\t");                       \
+                                              \
+      ast.append("");                         \
+   }                                          \
+   ast.append("\t");                          \
+   ast.append("└──");
 namespace lingodb::ast {
 enum class QueryNodeType : uint8_t {
-  SELECT_NODE,
-  SET_OPERATION_NODE = 2,
-  BOUND_SUBQUERY_NODE = 3,
-  RECURSIVE_CTE_NODE = 4,
-  CTE_NODE = 5,
-  PIPE_NODE = 6
+   SELECT_NODE,
+   SET_OPERATION_NODE = 2,
+   BOUND_SUBQUERY_NODE = 3,
+   RECURSIVE_CTE_NODE = 4,
+   CTE_NODE = 5,
+   PIPE_NODE = 6
 
 };
 class QueryNode : public AstNode {
-public:
-   virtual ~QueryNode() ;
-  explicit QueryNode(QueryNodeType type) : AstNode(NodeType::QUERY_NODE), type(type) {};
+   public:
+   virtual ~QueryNode();
+   explicit QueryNode(QueryNodeType type) : AstNode(NodeType::QUERY_NODE), type(type) {};
 
-  //! The type of the query node, either SetOperation or Select
-  QueryNodeType type;
+   //! The type of the query node, either SetOperation or Select
+   QueryNodeType type;
 
    /// The set of result modifiers associated with this query node
    std::vector<std::shared_ptr<ResultModifier>> modifiers{};
 
    virtual std::string toString(uint32_t depth) = 0;
 
-   virtual std::string toAsciiAST(uint32_t depth ) = 0;
-   virtual  std::string toDotGraph(uint32_t depth) = 0;
+   virtual std::string toAsciiAST(uint32_t depth) = 0;
+   virtual std::string toDotGraph(uint32_t depth) = 0;
 };
 } // namespace lingodb::ast
-

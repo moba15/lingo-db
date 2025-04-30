@@ -30,16 +30,12 @@ class FunctionExpression : public ParsedExpression {
    //! whether this function should export its state or not
    bool exportState;
 
-
-   std::string toAsciiAST(uint32_t depth ) override;
+   std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth) override;
-
 };
-
 
 static std::vector<std::string> aggregationFunctions{
    "min",
    "max",
-   "avg"
-};
+   "avg"};
 } // namespace lingodb::ast
