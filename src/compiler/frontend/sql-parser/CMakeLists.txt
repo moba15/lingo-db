@@ -19,6 +19,7 @@ add_library(lingo-db-parser
         ast_node.cpp
         pipe_operator.cpp
         aggregation_node.cpp
+        result_modifier.cpp
 
         query_node/select_node.cpp
         query_node/pipe_select_node.cpp

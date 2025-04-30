@@ -1,0 +1,76 @@
+#pragma once
+#include "parsed_expression.h"
+#include <memory>
+#include <vector>
+namespace lingodb::ast {
+enum class OrderType : uint8_t {
+    ASCENDING = 1,
+    DESCENDING = 2
+};
+enum class ResultModifierType : uint8_t {
+    ORDER_BY = 1,
+    LIMIT = 2,
+    OFFSET = 3,
+};
+enum class OrderByNullType : uint8_t {
+   INVALID = 0,
+   ORDER_DEFAULT = 1,
+   NULLS_FIRST = 2,
+   NULLS_LAST = 3
+};
+
+class ResultModifier : public AstNode {
+public:
+   explicit ResultModifier(ResultModifierType type)
+        : AstNode(NodeType::RESULT_MODIFIER), modifierType(type) {}
+
+   virtual ~ResultModifier() = default;
+
+   ResultModifierType modifierType;
+   virtual std::string toAsciiAST(uint32_t depth);
+   virtual std::string toDotGraph(uint32_t depth);
+};
+
+class OrderByElement  {
+   public:
+   OrderByElement(OrderType type, OrderByNullType nullOrder) : type(type), nullOrder(nullOrder) {};
+
+   /// Sort order
+   OrderType type;
+   /// Expression to order by
+   std::shared_ptr<ParsedExpression> expression;
+   /// The NULL sort order, NULLS_FIRST or NULLS_LAST
+   OrderByNullType nullOrder;
+
+  location loc;
+
+
+};
+
+
+class OrderByModifier : public ResultModifier {
+public:
+
+
+   OrderByModifier() : ResultModifier(ResultModifierType::ORDER_BY) {}
+
+   std::vector<std::shared_ptr<OrderByElement>> orderByElements;
+   std::string toAsciiAST(uint32_t depth) override;
+   std::string toDotGraph(uint32_t depth) override;
+};
+
+
+class LimitModifier : public ResultModifier {
+public:
+    LimitModifier() : ResultModifier(ResultModifierType::LIMIT) {}
+    std::shared_ptr<ParsedExpression> limitExpression;
+    // ... implementation ...
+};
+
+class OffsetModifier : public ResultModifier {
+public:
+    OffsetModifier() : ResultModifier(ResultModifierType::OFFSET) {}
+    std::shared_ptr<ParsedExpression> offsetExpression;
+};
+
+} // namespace lingodb::ast

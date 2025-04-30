@@ -140,9 +140,11 @@ identifier      {ident_start}{ident_cont}*
 [aA][gG][gG][rR][eE][gG][aA][tT][eE]  { return lingodb::parser::make_AGGREGATE(loc); }
 [aA][nN][dD]                          { return lingodb::parser::make_AND(loc);}
 [aA][sS]                              { return lingodb::parser::make_AS(loc);}
+[aA][sS][cC]                          { return lingodb::parser::make_ASC(loc); }
 
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
+[dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
 
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
@@ -163,6 +165,7 @@ not                                   { return lingodb::parser::make_NOT(loc); }
 
 right                                 { return lingodb::parser::make_RIGHT(loc); }
 
+[oO][rR][dD][eE][rR]                  { return lingodb::parser::make_ORDER(loc); }
 on                                    { return lingodb::parser::make_ON(loc); }
 or                                    { return lingodb::parser::make_OR(loc); }
 outer                                 { return lingodb::parser::make_OUTER_P(loc); }

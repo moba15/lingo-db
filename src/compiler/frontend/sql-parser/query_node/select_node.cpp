@@ -92,6 +92,38 @@ std::string SelectNode::toDotGraph(uint32_t depth) {
         dot += nodeId + " -> " + havingId + " [label=\"HAVING\"];\n";
         dot += having->toDotGraph(depth + 1);
     }
+
+   for (const auto& modifier : modifiers) {
+      if (modifier) {
+         std::string modifierId;
+         modifierId.append("node");
+         modifierId.append(std::to_string(reinterpret_cast<uintptr_t>(modifier.get())));
+
+         // Add edge from select node to modifier
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(modifierId);
+
+         // Add appropriate label based on modifier type
+         dot.append(" [label=\"");
+         switch (modifier->modifierType) {
+            case ResultModifierType::ORDER_BY:
+               dot.append("ORDER BY");
+               break;
+            case ResultModifierType::LIMIT:
+               dot.append("LIMIT");
+               break;
+            case ResultModifierType::OFFSET:
+               dot.append("OFFSET");
+               break;
+         }
+         dot.append("\"];\n");
+
+         // Add the modifier's graph representation
+         dot.append(modifier->toDotGraph(depth + 1));
+      }
+   }
+
     
     return dot;
 }

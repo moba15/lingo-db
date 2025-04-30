@@ -1,7 +1,9 @@
 #pragma once
 #include "ast_node.h"
+#include "result_modifier.h"
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #define toAsciiASTPrefix std::string ast{}; \
    for (uint32_t i = 0; i < depth-1; ++i) { \
@@ -28,6 +30,9 @@ public:
 
   //! The type of the query node, either SetOperation or Select
   QueryNodeType type;
+
+   /// The set of result modifiers associated with this query node
+   std::vector<std::shared_ptr<ResultModifier>> modifiers{};
 
    virtual std::string toString(uint32_t depth) = 0;
 
