@@ -26,7 +26,7 @@ ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) :
 
 std::string ColumnRefExpression::toAsciiAST(uint32_t depth) {
    toAsciiASTPrefix
-   ast.append("ColumnRefExpression: [");
+      ast.append("ColumnRefExpression: [");
    for (auto& columnName : column_names) {
       ast.append(columnName);
       ast.append(",");
@@ -35,5 +35,32 @@ std::string ColumnRefExpression::toAsciiAST(uint32_t depth) {
    ast.append("]");
    ast.append("\n");
    return ast;
+}
+std::string ColumnRefExpression::toDotGraph(uint32_t depth) {
+    std::string dot{};
+    
+    // Create node identifier
+    std::string nodeId;
+    nodeId.append("node");
+    nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+    
+    // Create the label with column names
+    std::string label;
+    label.append("ColumnRef\\n");
+    
+    // Add all column names with dots between them
+    for (size_t i = 0; i < column_names.size(); ++i) {
+        if (i > 0) {
+            label.append(".");
+        }
+        label.append(column_names[i]);
+    }
+    
+    // Create the node
+    dot.append(nodeId);
+    dot.append(" [label=\"");
+    dot.append(label);
+    dot.append("\"];\n");
+    return dot;
 }
 } // namespace lingodb::ast

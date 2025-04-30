@@ -32,6 +32,7 @@ public:
    virtual std::string toString(uint32_t depth) = 0;
 
    virtual std::string toAsciiAST(uint32_t depth ) = 0;
+   virtual  std::string toDotGraph(uint32_t depth) = 0;
 };
-}
+} // namespace lingodb::ast
 
