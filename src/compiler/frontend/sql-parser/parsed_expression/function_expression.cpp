@@ -2,7 +2,13 @@
 
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 namespace lingodb::ast {
-FunctionExpression::FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState) : ParsedExpression(ExpressionType::FUNCTION, TYPE), catalog(catalog), schema(schema), functionName(functionName), isOperator(isOperator), distinct(distinct), exportState(exportState) {}
+FunctionExpression::FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState) : ParsedExpression(ExpressionType::FUNCTION, TYPE), catalog(catalog), schema(schema), functionName(functionName), isOperator(isOperator), distinct(distinct), exportState(exportState) {
+   auto found = std::find(aggregationFunctions.begin(), aggregationFunctions.end(), functionName);
+   if (found != aggregationFunctions.end()) {
+      //! TODO Check if this make sense here
+      this->type = ExpressionType::AGGREGATE;
+   }
+}
 std::string FunctionExpression::toAsciiAST(uint32_t depth) {
    toAsciiASTPrefix
       ast.append("FunctionExpression: ");
@@ -16,7 +22,6 @@ std::string FunctionExpression::toAsciiAST(uint32_t depth) {
 }
 std::string FunctionExpression::toDotGraph(uint32_t depth) {
     std::string dot{};
-
     // Create node identifier for the function
     std::string nodeId;
     nodeId.append("node");
@@ -29,6 +34,9 @@ std::string FunctionExpression::toDotGraph(uint32_t depth) {
     if (distinct) {
         dot.append("\\nDISTINCT");
     }
+   if (type == ExpressionType::AGGREGATE) {
+      dot.append("\nagg\n");
+   }
     dot.append("\"];\n");
 
     // Add all function arguments
