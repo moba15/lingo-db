@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+
 namespace lingodb::ast {
 class FunctionExpression : public ParsedExpression {
    public:
@@ -33,5 +34,12 @@ class FunctionExpression : public ParsedExpression {
    std::string toAsciiAST(uint32_t depth ) override;
    std::string toDotGraph(uint32_t depth) override;
 
+};
+
+
+static std::vector<std::string> aggregationFunctions{
+   "min",
+   "max",
+   "avg"
 };
 } // namespace lingodb::ast
