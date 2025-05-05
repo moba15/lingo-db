@@ -26,7 +26,7 @@ std::string ConjunctionExpression::toAsciiAST(uint32_t depth) {
    }
    return ast;
 };
-std::string ConjunctionExpression::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
+std::string ConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the conjunction

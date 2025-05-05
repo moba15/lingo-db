@@ -61,7 +61,7 @@ std::string SelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    if (select_list) {
       std::string selectListId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(select_list.get())));
       dot += nodeId + " -> " + selectListId + " [label=\"select list\"];\n";
-      dot += select_list->toDotGraph(depth + 1,idGen);
+      dot += select_list->toDotGraph(depth + 1, idGen);
    }
 
    // Handle FROM clause

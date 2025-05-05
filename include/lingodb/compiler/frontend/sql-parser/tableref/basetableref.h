@@ -19,6 +19,6 @@ class BaseTableRef : public TableRef {
    //TODO  unique_ptr<AtClause> at_clause;
 
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

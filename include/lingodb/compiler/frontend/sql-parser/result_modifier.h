@@ -51,7 +51,7 @@ class OrderByModifier : public ResultModifier {
 
    std::vector<std::shared_ptr<OrderByElement>> orderByElements;
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
 class LimitModifier : public ResultModifier {
