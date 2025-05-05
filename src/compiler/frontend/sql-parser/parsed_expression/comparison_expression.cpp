@@ -32,17 +32,17 @@ std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
       default: "Unknown";
    }
 }
-std::string ComparisonExpression::toDotGraph(uint32_t depth) {
+std::string ComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the comparison expression
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the node with operator label
    dot.append(nodeId);
-   dot.append(" [label=\"");
+   dot.append(" [label=\"σ\n");
    dot.append(typeToAscii(type));
    dot.append("\"];\n");
 
@@ -50,26 +50,26 @@ std::string ComparisonExpression::toDotGraph(uint32_t depth) {
    if (left) {
       std::string leftId;
       leftId.append("node");
-      leftId.append(std::to_string(reinterpret_cast<uintptr_t>(left.get())));
+      leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(left.get()))));
 
       dot.append(nodeId);
       dot.append(" -> ");
       dot.append(leftId);
       dot.append(" [label=\"left\"];\n");
-      dot.append(left->toDotGraph(depth + 1));
+      dot.append(left->toDotGraph(depth + 1, idGen));
    }
 
    // Handle right operand
    if (right) {
       std::string rightId;
       rightId.append("node");
-      rightId.append(std::to_string(reinterpret_cast<uintptr_t>(right.get())));
+      rightId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(right.get()))));
 
       dot.append(nodeId);
       dot.append(" -> ");
       dot.append(rightId);
       dot.append(" [label=\"right\"];\n");
-      dot.append(right->toDotGraph(depth + 1));
+      dot.append(right->toDotGraph(depth + 1, idGen));
    }
 
    return dot;

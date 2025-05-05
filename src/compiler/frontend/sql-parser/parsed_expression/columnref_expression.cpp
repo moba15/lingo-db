@@ -29,13 +29,13 @@ std::string ColumnRefExpression::toAsciiAST(uint32_t depth) {
    ast.append("\n");
    return ast;
 }
-std::string ColumnRefExpression::toDotGraph(uint32_t depth) {
+std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the label with column names
    std::string label;

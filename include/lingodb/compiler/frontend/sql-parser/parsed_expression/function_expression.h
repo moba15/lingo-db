@@ -31,7 +31,7 @@ class FunctionExpression : public ParsedExpression {
    bool exportState;
 
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
 static std::vector<std::string> aggregationFunctions{

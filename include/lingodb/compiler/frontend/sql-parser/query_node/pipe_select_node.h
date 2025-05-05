@@ -18,6 +18,6 @@ class PipeSelectNode : public QueryNode {
    std::shared_ptr<PipeOperator> endPipeOperator;
    std::string toString(uint32_t depth) override;
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

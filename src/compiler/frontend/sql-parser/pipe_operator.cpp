@@ -15,7 +15,7 @@ std::string PipeOperator::toAsciiAST(uint32_t depth) {
       ast.append(next->toAsciiAST(depth));
    return ast;
 }
-std::string PipeOperator::toDotGraph(uint32_t depth) {
+std::string PipeOperator::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    dot += "node" + std::to_string(reinterpret_cast<uintptr_t>(this)) +
@@ -24,7 +24,7 @@ std::string PipeOperator::toDotGraph(uint32_t depth) {
    dot += "node" + std::to_string(reinterpret_cast<uintptr_t>(this)) +
       " -> node" + std::to_string(reinterpret_cast<uintptr_t>(node.get())) + ";\n";
 
-   dot += node->toDotGraph(depth + 1);
+   dot += node->toDotGraph(depth + 1, idGen);
 
    return dot;
 }

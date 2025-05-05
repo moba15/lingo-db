@@ -7,7 +7,7 @@
 # include "lingodb/compiler/frontend/sql-parser/driver.h"
 # include "parser.hpp"
 # include <algorithm>
-#include <location.hh>
+#include <lingodb/compiler/frontend/sql-parser/gen/location.hh>
 
 %}
 
@@ -170,7 +170,7 @@ on                                    { return lingodb::parser::make_ON(loc); }
 or                                    { return lingodb::parser::make_OR(loc); }
 outer                                 { return lingodb::parser::make_OUTER_P(loc); }
 
-select                                { return lingodb::parser::make_SELECT(loc); }
+[sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
 
 
 <<EOF>>    return lingodb::parser::make_YYEOF (loc);
@@ -193,6 +193,11 @@ driver::scan_begin ()
   yy_flex_debug = trace_scanning;
   if (file.empty () || file == "-")
     yyin = stdin;
+  if(file.starts_with(":")) {
+     const char* sql = file.c_str() + 1; // Skip the ":" prefix
+     YY_BUFFER_STATE buffer = yy_scan_string(sql);
+     yy_switch_to_buffer(buffer);
+  }
   else if (!(yyin = fopen (file.c_str (), "r")))
     {
       std::cerr << "cannot open " << file << ": " << strerror (errno) << '\n';
@@ -203,5 +208,10 @@ driver::scan_begin ()
 void
 driver::scan_end ()
 {
-  fclose (yyin);
+  if (YY_CURRENT_BUFFER) {
+      yy_delete_buffer(YY_CURRENT_BUFFER);
+   }
+   if (yyin && yyin != stdin) {
+      fclose (yyin);
+   }
 }

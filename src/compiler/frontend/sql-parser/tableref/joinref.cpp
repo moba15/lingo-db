@@ -34,13 +34,13 @@ std::string JoinRef::toAsciiAST(uint32_t depth) {
 
    return ast;
 }
-std::string JoinRef::toDotGraph(uint32_t depth) {
+std::string JoinRef::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the join
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the join node with its label
    dot.append(nodeId);
@@ -81,26 +81,26 @@ std::string JoinRef::toDotGraph(uint32_t depth) {
       if (leftRef) {
          std::string leftId;
          leftId.append("node");
-         leftId.append(std::to_string(reinterpret_cast<uintptr_t>(leftRef.get())));
+         leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(leftRef.get()))));
 
          dot.append(nodeId);
          dot.append(" -> ");
          dot.append(leftId);
          dot.append(" [label=\"left\"];\n");
-         dot.append(leftRef->toDotGraph(depth + 1));
+         dot.append(leftRef->toDotGraph(depth + 1, idGen));
       }
    } else if (std::holds_alternative<std::shared_ptr<QueryNode>>(left)) {
       auto leftQuery = std::get<std::shared_ptr<QueryNode>>(left);
       if (leftQuery) {
          std::string leftId;
          leftId.append("node");
-         leftId.append(std::to_string(reinterpret_cast<uintptr_t>(leftQuery.get())));
+         leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(leftQuery.get()))));
 
          dot.append(nodeId);
          dot.append(" -> ");
          dot.append(leftId);
          dot.append(" [label=\"left\"];\n");
-         dot.append(leftQuery->toDotGraph(depth + 1));
+         dot.append(leftQuery->toDotGraph(depth + 1, idGen));
       }
    }
 
@@ -108,13 +108,13 @@ std::string JoinRef::toDotGraph(uint32_t depth) {
    if (right) {
       std::string rightId;
       rightId.append("node");
-      rightId.append(std::to_string(reinterpret_cast<uintptr_t>(right.get())));
+      rightId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(right.get()))));
 
       dot.append(nodeId);
       dot.append(" -> ");
       dot.append(rightId);
       dot.append(" [label=\"right\"];\n");
-      dot.append(right->toDotGraph(depth + 1));
+      dot.append(right->toDotGraph(depth + 1, idGen));
    }
 
    // Add condition
@@ -123,13 +123,13 @@ std::string JoinRef::toDotGraph(uint32_t depth) {
       if (condExpr) {
          std::string condId;
          condId.append("node");
-         condId.append(std::to_string(reinterpret_cast<uintptr_t>(condExpr.get())));
+         condId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(condExpr.get()))));
 
          dot.append(nodeId);
          dot.append(" -> ");
          dot.append(condId);
          dot.append(" [label=\"ON\"];\n");
-         dot.append(condExpr->toDotGraph(depth + 1));
+         dot.append(condExpr->toDotGraph(depth + 1, idGen));
       }
    } else if (std::holds_alternative<std::vector<std::shared_ptr<ColumnRefExpression>>>(condition)) {
       auto usingCols = std::get<std::vector<std::shared_ptr<ColumnRefExpression>>>(condition);
@@ -137,13 +137,13 @@ std::string JoinRef::toDotGraph(uint32_t depth) {
          if (usingCols[i]) {
             std::string colId;
             colId.append("node");
-            colId.append(std::to_string(reinterpret_cast<uintptr_t>(usingCols[i].get())));
+            colId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(usingCols[i].get()))));
 
             dot.append(nodeId);
             dot.append(" -> ");
             dot.append(colId);
             dot.append(" [label=\"USING\"];\n");
-            dot.append(usingCols[i]->toDotGraph(depth + 1));
+            dot.append(usingCols[i]->toDotGraph(depth + 1, idGen));
          }
       }
    }
