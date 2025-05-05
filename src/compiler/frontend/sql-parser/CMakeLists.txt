@@ -1,12 +1,10 @@
 set(BISON_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/sql-parser/parser.y)
 set(FLEX_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/sql-parser/lexer.l)
-#set(GEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/src/compiler/frontend/sql-parser/gen )
 BISON_TARGET(parser ${BISON_INPUT_FILE} ${GEN_OUTPUT_DIR}/parser.cpp)
 FLEX_TARGET(lexer ${FLEX_INPUT_FILE} ${GEN_OUTPUT_DIR}/lexer.cpp)
 
 
 ADD_FLEX_BISON_DEPENDENCY(lexer parser)
-include_directories(lingo-db-parser ${GEN_OUTPUT_DIR})
 add_library(lingo-db-parser
         driver.cpp
 
@@ -38,8 +36,11 @@ add_library(lingo-db-parser
         tableref/basetableref.cpp
         tableref/joinref.cpp
 
+        common/node_id_generator.cpp
+
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
+
     )
 
 add_executable(lingo-db-parser-main main.cpp)

@@ -9,12 +9,12 @@ std::string ResultModifier::toDotGraph(uint32_t depth) {
 std::string OrderByModifier::toAsciiAST(uint32_t depth) {
    return ResultModifier::toAsciiAST(depth);
 }
-std::string OrderByModifier::toDotGraph(uint32_t depth) {
+std::string OrderByModifier::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    std::string dot{};
    // Create node identifier
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the order by node
    dot.append(nodeId);
@@ -26,7 +26,7 @@ std::string OrderByModifier::toDotGraph(uint32_t depth) {
       if (element->expression) {
          std::string elementId;
          elementId.append("node");
-         elementId.append(std::to_string(reinterpret_cast<uintptr_t>(element->expression.get())));
+         elementId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(element->expression.get()))));
 
          // Create edge with ordering information
          dot.append(nodeId);
@@ -40,7 +40,7 @@ std::string OrderByModifier::toDotGraph(uint32_t depth) {
          dot.append("\"];\n");
 
          // Add the expression's graph
-         dot.append(element->expression->toDotGraph(depth + 1));
+         dot.append(element->expression->toDotGraph(depth + 1, idGen));
       }
    }
    return dot;

@@ -13,13 +13,13 @@ std::string AggregationNode::toAsciiAST(uint32_t depth) {
    ast.append(groupByNode->toAsciiAST(depth + 1));
    return ast;
 }
-std::string AggregationNode::toDotGraph(uint32_t depth) {
+std::string AggregationNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the aggregation node
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the aggregation node with its label
    dot.append(nodeId);
@@ -30,7 +30,7 @@ std::string AggregationNode::toDotGraph(uint32_t depth) {
       if (aggregations[i]) {
          std::string aggId;
          aggId.append("node");
-         aggId.append(std::to_string(reinterpret_cast<uintptr_t>(aggregations[i].get())));
+         aggId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(aggregations[i].get()))));
 
          // Create edge from aggregation node to function
          dot.append(nodeId);
@@ -41,7 +41,7 @@ std::string AggregationNode::toDotGraph(uint32_t depth) {
          dot.append("\"];\n");
 
          // Add the function's graph representation
-         dot.append(aggregations[i]->toDotGraph(depth + 1));
+         dot.append(aggregations[i]->toDotGraph(depth + 1, idGen));
       }
    }
 
@@ -49,7 +49,7 @@ std::string AggregationNode::toDotGraph(uint32_t depth) {
    if (groupByNode) {
       std::string groupId;
       groupId.append("node");
-      groupId.append(std::to_string(reinterpret_cast<uintptr_t>(groupByNode.get())));
+      groupId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(groupByNode.get()))));
 
       // Create edge from aggregation to group by
       dot.append(nodeId);
@@ -58,7 +58,7 @@ std::string AggregationNode::toDotGraph(uint32_t depth) {
       dot.append(" [label=\"group_by\"];\n");
 
       // Add the group by's graph representation
-      dot.append(groupByNode->toDotGraph(depth + 1));
+      dot.append(groupByNode->toDotGraph(depth + 1, idGen));
    }
 
    return dot;

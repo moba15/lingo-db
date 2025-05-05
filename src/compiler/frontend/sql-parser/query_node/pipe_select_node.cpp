@@ -19,13 +19,13 @@ std::string PipeSelectNode::toAsciiAST(uint32_t depth) {
 
    return ast;
 }
-std::string PipeSelectNode::toDotGraph(uint32_t depth) {
+std::string PipeSelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the pipe select node
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the pipe select node with its label
    dot.append(nodeId);
@@ -34,10 +34,10 @@ std::string PipeSelectNode::toDotGraph(uint32_t depth) {
    std::shared_ptr<PipeOperator> currentOp = startPipeOperator;
    size_t i = 0;
    while (currentOp) {
-      dot.append(currentOp->node->toDotGraph(depth + 1));
+      dot.append(currentOp->node->toDotGraph(depth + 1, idGen));
       std::string startOpId;
       startOpId.append("node");
-      startOpId.append(std::to_string(reinterpret_cast<uintptr_t>(currentOp->node.get())));
+      startOpId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(currentOp->node.get()))));
 
       // Create edge from pipe select to start operator
       dot.append(nodeId);
@@ -50,7 +50,7 @@ std::string PipeSelectNode::toDotGraph(uint32_t depth) {
 
       nodeId.clear();
       nodeId.append("node");
-      nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(currentOp->node.get())));
+      nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(currentOp->node.get()))));
 
       currentOp = currentOp->next;
       i++;

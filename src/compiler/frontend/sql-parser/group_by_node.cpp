@@ -9,13 +9,13 @@ std::string GroupByNode::toAsciiAST(uint32_t depth) {
    }
    return ast;
 }
-std::string GroupByNode::toDotGraph(uint32_t depth) {
+std::string GroupByNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the group by node
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the group by node with its label
    dot.append(nodeId);
@@ -26,7 +26,7 @@ std::string GroupByNode::toDotGraph(uint32_t depth) {
       if (group_expressions[i]) {
          std::string exprId;
          exprId.append("node");
-         exprId.append(std::to_string(reinterpret_cast<uintptr_t>(group_expressions[i].get())));
+         exprId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(group_expressions[i].get()))));
 
          // Create edge from group by to this expression
          dot.append(nodeId);
@@ -37,7 +37,7 @@ std::string GroupByNode::toDotGraph(uint32_t depth) {
          dot.append("\"];\n");
 
          // Add the expression's graph representation
-         dot.append(group_expressions[i]->toDotGraph(depth + 1));
+         dot.append(group_expressions[i]->toDotGraph(depth + 1, idGen));
       }
    }
 
@@ -46,7 +46,7 @@ std::string GroupByNode::toDotGraph(uint32_t depth) {
       for (size_t i = 0; i < grouping_sets.size(); ++i) {
          std::string setId;
          setId.append("node");
-         setId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+         setId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
          setId.append("_set");
          setId.append(std::to_string(i));
 

@@ -13,13 +13,13 @@ std::string TargetsExpression::toAsciiAST(uint32_t depth) {
    }
    return ast;
 }
-std::string TargetsExpression::toDotGraph(uint32_t depth) {
+std::string TargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the targets list
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the targets list node
    dot.append(nodeId);
@@ -30,7 +30,7 @@ std::string TargetsExpression::toDotGraph(uint32_t depth) {
       if (targets[i]) {
          std::string targetId;
          targetId.append("node");
-         targetId.append(std::to_string(reinterpret_cast<uintptr_t>(targets[i].get())));
+         targetId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(targets[i].get()))));
 
          // Create edge from targets list to this target
          dot.append(nodeId);
@@ -41,7 +41,7 @@ std::string TargetsExpression::toDotGraph(uint32_t depth) {
          dot.append("\"];\n");
 
          // Add the target's graph representation
-         dot.append(targets[i]->toDotGraph(depth + 1));
+         dot.append(targets[i]->toDotGraph(depth + 1, idGen));
       }
    }
 

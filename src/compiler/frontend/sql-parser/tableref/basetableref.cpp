@@ -18,11 +18,11 @@ std::string BaseTableRef::toAsciiAST(uint32_t depth) {
    ast.append(")\n");
    return ast;
 }
-std::string BaseTableRef::toDotGraph(uint32_t depth) {
+std::string BaseTableRef::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the base table reference
-   std::string nodeId = "node" + std::to_string(reinterpret_cast<uintptr_t>(this));
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
 
    // Create label with all table information
    std::string label = "BaseTable\\n table: " + tableName + "\\n" +
