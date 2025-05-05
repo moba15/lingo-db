@@ -1,4 +1,3 @@
-
 #include "lingodb/compiler/frontend/sql-parser/driver.h"
 #include "lingodb/runtime/LingoDBHashIndex.h"
 
@@ -126,6 +125,54 @@ TEST_CASE("Parser:simplePipeJoins") {
                         "node34 -> node35 [label=\"1: DESC\"];"
                         "node35 [label=\"ColumnRef\\ns.semester\"];"
                         "node27 -> node34 [label=\"next\"];"};
+
+   std::erase(resultToDot, '\n');
+   REQUIRE(resultToDot == expected);
+}
+TEST_CASE("Parser:simplePipeAggregation") {
+   std::string sql{":FROM studenten as s "
+            "|> where s.semester>2 or s.semester>1 "
+            "|> AGGREGATE max(s.semster), min(s.semester) GROUP BY s.matrnr "
+            "|> Order by zesz"};
+   driver drv{};
+   drv.parse(sql);
+   lingodb::ast::NodeIdGenerator idGen{};
+   auto resultToDot = drv.result->toDotGraph(1, idGen);
+   std::string expected{"node0 [label=\"PIPE SELECT NODE\"];"
+            "node1 [label=\"BaseTable\\n table: studenten\\nschema: \\ncatalog: \\nalias: s\"];"
+            "node0 -> node1 [label=\"start\"];"
+            "node2 [label=\"σOR\"];"
+            "node2 -> node3 [label=\"child 1\"];"
+            "node3 [label=\"σ>\"];"
+            "node3 -> node4 [label=\"left\"];"
+            "node4 [label=\"ColumnRef\\ns.semester\"];"
+            "node3 -> node5 [label=\"right\"];"
+            "node5 [label=\"Constant\\n2\"];"
+            "node2 -> node6 [label=\"child 2\"];"
+            "node6 [label=\"σ>\"];"
+            "node6 -> node7 [label=\"left\"];"
+            "node7 [label=\"ColumnRef\\ns.semester\"];"
+            "node6 -> node8 [label=\"right\"];"
+            "node8 [label=\"Constant\\n1\"];"
+            "node1 -> node2 [label=\"next\"];"
+            "node9 [label=\"Aggregation\"];"
+            "node9 -> node10 [label=\"agg_0\"];"
+            "node10 [label=\"Functionname: maxagg\"];"
+            "node10 -> node11 [label=\"arg 1\"];"
+            "node11 [label=\"ColumnRef\\ns.semster\"];"
+            "node9 -> node12 [label=\"agg_1\"];"
+            "node12 [label=\"Functionname: minagg\"];"
+            "node12 -> node13 [label=\"arg 1\"];"
+            "node13 [label=\"ColumnRef\\ns.semester\"];"
+            "node9 -> node14 [label=\"group_by\"];"
+            "node14 [label=\"GROUP BY\"];"
+            "node14 -> node15 [label=\"expr 1\"];"
+            "node15 [label=\"ColumnRef\\ns.matrnr\"];"
+            "node2 -> node9 [label=\"next\"];"
+            "node16 [label=\"ORDER BY\"];"
+            "node16 -> node17 [label=\"1: ASC\"];"
+            "node17 [label=\"ColumnRef\\nzesz\"];"
+            "node9 -> node16 [label=\"next\"];"};
 
    std::erase(resultToDot, '\n');
    REQUIRE(resultToDot == expected);
