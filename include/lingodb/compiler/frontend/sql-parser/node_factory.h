@@ -1,5 +1,5 @@
 #pragma once
-#include "location.hh"
+#include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
 #include <memory>
 #include <vector>
 namespace lingodb::ast {

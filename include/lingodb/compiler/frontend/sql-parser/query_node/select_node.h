@@ -35,6 +35,6 @@ class SelectNode : public QueryNode {
    std::string toString(uint32_t depth) override;
 
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

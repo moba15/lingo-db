@@ -18,13 +18,13 @@ std::string ConstantExpression::toAsciiAST(uint32_t depth) {
 
    return ast;
 }
-std::string ConstantExpression::toDotGraph(uint32_t depth) {
+std::string ConstantExpression::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    std::string dot{};
 
    // Create node identifier for the constant
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create label with constant value
    std::string label;

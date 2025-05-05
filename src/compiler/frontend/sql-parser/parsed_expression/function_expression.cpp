@@ -20,12 +20,12 @@ std::string FunctionExpression::toAsciiAST(uint32_t depth) {
 
    return ast;
 }
-std::string FunctionExpression::toDotGraph(uint32_t depth) {
+std::string FunctionExpression::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    std::string dot{};
    // Create node identifier for the function
    std::string nodeId;
    nodeId.append("node");
-   nodeId.append(std::to_string(reinterpret_cast<uintptr_t>(this)));
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
 
    // Create the function node with its label
    dot.append(nodeId);
@@ -44,7 +44,7 @@ std::string FunctionExpression::toDotGraph(uint32_t depth) {
       if (arguments[i]) {
          std::string argId;
          argId.append("node");
-         argId.append(std::to_string(reinterpret_cast<uintptr_t>(arguments[i].get())));
+         argId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(arguments[i].get()))));
 
          // Create edge from function to this argument
          dot.append(nodeId);
@@ -55,7 +55,7 @@ std::string FunctionExpression::toDotGraph(uint32_t depth) {
          dot.append("\"];\n");
 
          // Add the argument's graph representation
-         dot.append(arguments[i]->toDotGraph(depth + 1));
+         dot.append(arguments[i]->toDotGraph(depth + 1, idGen));
       }
    }
 
@@ -63,26 +63,26 @@ std::string FunctionExpression::toDotGraph(uint32_t depth) {
    if (filter) {
       std::string filterId;
       filterId.append("node");
-      filterId.append(std::to_string(reinterpret_cast<uintptr_t>(filter.get())));
+      filterId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(filter.get()))));
 
       dot.append(nodeId);
       dot.append(" -> ");
       dot.append(filterId);
       dot.append(" [label=\"filter\"];\n");
-      dot.append(filter->toDotGraph(depth + 1));
+      dot.append(filter->toDotGraph(depth + 1, idGen));
    }
 
    // Add order by if present
    if (orderBy) {
       std::string orderId;
       orderId.append("node");
-      orderId.append(std::to_string(reinterpret_cast<uintptr_t>(orderBy.get())));
+      orderId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(orderBy.get()))));
 
       dot.append(nodeId);
       dot.append(" -> ");
       dot.append(orderId);
       dot.append(" [label=\"order by\"];\n");
-      dot.append(orderBy->toDotGraph(depth + 1));
+      dot.append(orderBy->toDotGraph(depth + 1, idGen));
    }
 
    return dot;
