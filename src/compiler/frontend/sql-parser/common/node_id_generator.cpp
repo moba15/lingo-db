@@ -8,7 +8,6 @@ void NodeIdGenerator::reset() {
 }
 
 uint64_t NodeIdGenerator::getId(uintptr_t id) {
-
    if (!idMap.contains(id)) {
       idMap[id] = currentId;
       currentId++;

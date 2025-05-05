@@ -37,7 +37,7 @@ class JoinRef : public TableRef {
    vector<unique_ptr<ParsedExpression>> duplicate_eliminated_columns;*/
 
    std::string toAsciiAST(uint32_t depth) override;
-   std::string toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
 enum class JoinCondType : uint8_t {
