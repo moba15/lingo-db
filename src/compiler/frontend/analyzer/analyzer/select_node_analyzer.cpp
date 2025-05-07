@@ -1,39 +1,54 @@
 #include "lingodb/compiler/frontend/analyzer/analyzer/select_node_analyzer.h"
 
-#include "lingodb/compiler/frontend/sql-parser/query_node/pipe_select_node.h"
-#include "lingodb/compiler/frontend/sql-parser/query_node/select_node.h"
+#include "lingodb/compiler/frontend/analyzer/analyzer/expression_analyzer.h"
 
 namespace lingodb::analyzer {
+SelectNodeAnalyzer::SelectNodeAnalyzer(std::shared_ptr<catalog::Catalog> catalog) : catalog(std::move(catalog)) {
+}
+
 void SelectNodeAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context) {
+   context->pushNewScope();
+   transform(rootNode, context);
    auto selectNode = std::static_pointer_cast<ast::SelectNode>(rootNode);
    auto selectList = selectNode->select_list;
+   analyzeFromClause(selectNode, selectNode->from_clause, context);
+   analyzeTargetSelections(selectNode, selectList, context);
+   analyzeWhereClause(selectNode, selectNode->where_clause, context);
+}
+
+void SelectNodeAnalyzer::transform(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context) {
+   auto selectNode = std::static_pointer_cast<ast::SelectNode>(rootNode);
+   auto selectList = selectNode->select_list;
+
    /**
     * analyzeTargetSelections and analyzeGroupByClause
     * and extract aggregations
     */
-   analyzeTargetSelections(selectList, context);
-   analyzeGroupByClause(selectNode, selectNode->groups, context);
+   transformTargetSelections(selectList, context);
+   transformGroupByClause(selectNode, selectNode->groups, context);
+   if (aggregation && !aggregation->aggregations.empty()) {
+      auto pipeOperator = drv.nf.node<ast::PipeOperator>(aggregation->loc, aggregation);
 
-   auto pipeOperator = drv.nf.node<ast::PipeOperator>(aggregation->loc, aggregation);
-
-   selectNode->startPipeOperator = pipeOperator;
-   if (selectNode->endPipeOperator) {
-      selectNode->endPipeOperator->next = pipeOperator;
-   }
-   if (selectNode->startPipeOperator) {
       selectNode->startPipeOperator = pipeOperator;
-   }
-   selectNode->endPipeOperator = pipeOperator;
+      if (selectNode->endPipeOperator) {
+         selectNode->endPipeOperator->next = pipeOperator;
+      }
+      if (selectNode->startPipeOperator) {
+         selectNode->startPipeOperator = pipeOperator;
+      }
+      selectNode->endPipeOperator = pipeOperator;
 
-   if (selectNode->having) {
-      auto havingPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->having->loc, selectNode->having);
-      //TODO check
-      selectNode->having.reset();
-      selectNode->endPipeOperator->next = havingPipeOp;
-      selectNode->endPipeOperator = havingPipeOp;
+      if (selectNode->having) {
+         auto havingPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->having->loc, selectNode->having);
+         //TODO check
+         selectNode->having.reset();
+         selectNode->endPipeOperator->next = havingPipeOp;
+         selectNode->endPipeOperator = havingPipeOp;
+      }
    }
 }
-void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context) {
+
+void SelectNodeAnalyzer::transformTargetSelections(std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context) {
    if (!targetSelection || targetSelection->targets.empty())
       error("Empty target selection", targetSelection->loc);
    /**
@@ -57,21 +72,81 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::TargetsExp
                      return std::static_pointer_cast<ast::FunctionExpression>(expr);
                   });
 }
-void SelectNodeAnalyzer::analyzeFromClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<SQLContext> context) {
-   //TODO
-}
-void SelectNodeAnalyzer::analyzeWhereClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::vector<std::shared_ptr<ast::ParsedExpression>> whereClause, std::shared_ptr<SQLContext> context) {
-   /**
-    * Put into pipe sql similiar structure
-    * //TODO Handle subquerys
-    */
-}
-
-void SelectNodeAnalyzer::analyzeGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context) {
+void SelectNodeAnalyzer::transformGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context) {
    if (groupByNode) {
       aggregation->groupByNode = std::move(groupByNode);
       rootSelectNode->groups = nullptr;
    }
+}
+
+void SelectNodeAnalyzer::analyzeFromClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context) {
+   if (!tableRef) {
+      return;
+   }
+   if (tableRef->type == ast::TableReferenceType::BASE_TABLE) {
+      auto baseTableRef = std::static_pointer_cast<ast::BaseTableRef>(tableRef);
+      auto catalogEntry = catalog->getTypedEntry<catalog::TableCatalogEntry>(baseTableRef->tableName);
+      if (!catalogEntry.has_value()) {
+         error("No Catalog found with name " + baseTableRef->tableName, baseTableRef->loc);
+         return;
+      }
+      baseTableRef->catalogEntry = catalogEntry.value();
+      auto tableName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
+      context->currentScope->tables.emplace(std::pair{tableName, catalogEntry.value()});
+   } else if (tableRef->type == ast::TableReferenceType::JOIN) {
+      auto join = std::static_pointer_cast<ast::JoinRef>(tableRef);
+      if (std::holds_alternative<std::shared_ptr<ast::TableRef>>(join->left)) {
+         analyzeFromClause(rootNode, std::get<std::shared_ptr<ast::TableRef>>(join->left), context);
+      } else {
+         throw std::runtime_error("Not implemented: join->left");
+      }
+
+      analyzeFromClause(rootNode, join->right, context);
+      ExpressionAnalyzer exprAnalyzer{};
+      if (std::holds_alternative<std::shared_ptr<ast::ParsedExpression>>(join->condition)) {
+         auto cond = std::get<std::shared_ptr<ast::ParsedExpression>>(join->condition);
+         if (cond) {
+            exprAnalyzer.analyze(cond, context);
+         } else {
+            if (join->refType != ast::JoinCondType::CROSS) {
+               error("Join condition is empty", join->loc);
+            }
+         }
+
+      } else if (std::holds_alternative<std::vector<std::shared_ptr<ast::ColumnRefExpression>>>(join->condition)) {
+         for (auto& col : std::get<std::vector<std::shared_ptr<ast::ColumnRefExpression>>>(join->condition)) {
+            exprAnalyzer.analyze(col, context);
+         }
+      }
+
+   } else {
+      throw std::runtime_error("Not implemented");
+   }
+}
+void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer expressionAnalyzer{};
+   if (targetSelection) {
+      for (auto& target : targetSelection->targets) {
+         expressionAnalyzer.analyze(target, context);
+         if (target->type == ast::ExpressionType::COLUMN_REF) {
+            auto columnRef = std::static_pointer_cast<ast::ColumnRefExpression>(target);
+            for (auto column : columnRef->columns) {
+               targetSelection->targetColumns.emplace_back(std::pair<std::string, catalog::Column&>(column.getColumnName(), column));
+               auto name = target->alias.empty() ? column.getColumnName() : target->alias;
+               rootSelectNode->targetInfo.map(name, ast::ColumnInfo(columnRef->scope, column));
+            }
+         }
+      }
+   }
+}
+void SelectNodeAnalyzer::analyzeWhereClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer exprAnalyzer{};
+   if (whereClause) {
+      exprAnalyzer.analyze(whereClause, context);
+   }
+}
+
+void SelectNodeAnalyzer::analyzeGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context) {
 }
 void SelectNodeAnalyzer::analyzeOrderByClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<SQLContext> context) {
    //TODO

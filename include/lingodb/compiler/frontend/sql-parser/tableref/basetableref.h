@@ -1,4 +1,6 @@
 #pragma once
+#include "lingodb/catalog/Catalog.h"
+#include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 #include "tabledescription.h"
 
@@ -17,6 +19,12 @@ class BaseTableRef : public TableRef {
    std::string tableName;
    //! The timestamp/version at which to read this table entry (if any)
    //TODO  unique_ptr<AtClause> at_clause;
+
+   /*
+    * Semantic
+   */
+   std::shared_ptr<catalog::TableCatalogEntry> catalogEntry = nullptr;
+   std::string scopeName;
 
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
