@@ -104,6 +104,11 @@ ident_start     [a-zA-Z]
 ident_cont      [a-zA-Z0-9]
 identifier      {ident_start}{ident_cont}*
 
+dquote			\"
+str       {dquote}{ident_cont}*{dquote}
+
+boolean [fF][aA][lL][sS][eE]
+
 %{
   // Code run each time a pattern is matched.
   # define YY_USER_ACTION  loc.columns (yyleng);
@@ -183,6 +188,12 @@ outer                                 { return lingodb::parser::make_OUTER_P(loc
 {decinteger}	{
 				    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
 			    }
+{str} {
+  std::string ident(yytext);
+  ident.erase(0,1);
+  ident.erase(ident.size()-1,1);
+  return lingodb::parser::make_STRING_VALUE(std::move(ident), loc);
+}
 %%
 
 
