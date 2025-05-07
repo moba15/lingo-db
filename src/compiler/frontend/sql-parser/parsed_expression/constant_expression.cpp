@@ -4,16 +4,13 @@
 
 #include <string>
 namespace lingodb::ast {
-ConstantExpression::ConstantExpression(int iVal) : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE), iVal(iVal) {}
-ConstantExpression::ConstantExpression(std::string) : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE), iVal(0) {
-}
-ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE), iVal(0) {
-}
+
+ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE) {}
 
 std::string ConstantExpression::toAsciiAST(uint32_t depth) {
    toAsciiASTPrefix
       ast.append("ConstantExpression: ");
-   ast.append(std::to_string(iVal));
+   ast.append(value->toString());
    ast.append("\n");
 
    return ast;
@@ -29,7 +26,8 @@ std::string ConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGe
    // Create label with constant value
    std::string label;
    label.append("Constant\\n");
-   label.append(std::to_string(iVal));
+
+   label.append(value->toString());
 
    // Create the node
    dot.append(nodeId);
