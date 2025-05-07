@@ -37,6 +37,7 @@ add_library(lingo-db-parser
         tableref/joinref.cpp
 
         common/node_id_generator.cpp
+        common/constant_value.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}

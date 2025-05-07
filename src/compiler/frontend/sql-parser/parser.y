@@ -24,6 +24,7 @@
   #include "lingodb/compiler/frontend/sql-parser/parsed_expression/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref/list.h"
   #include "lingodb/compiler/frontend/sql-parser/common/binding_alias.h"
+  #include "lingodb/compiler/frontend/sql-parser/common/constant_value.h"
   class driver;
 }
 
@@ -56,7 +57,7 @@
 %token <uint64_t>	INTEGER_VALUE	"integer_value"
 %token <double>		FLOAT_VALUE	"float_value"
 %token <std::string>	IDENTIFIER	"identifier"
-%token <std::string>	STRING_VALUE	"string"
+%token <std::string>	STRING_VALUE
 %token <std::string>	BIT_VALUE	"bit_string"
 %token <std::string>	HEX_VALUE	"hex_string"
 %token <std::string>	NATIONAL_VALUE	"nat_string"
@@ -243,7 +244,7 @@
 
 %type<std::vector<std::string>> name_list
 
-%type<std::shared_ptr<lingodb::ast::ConstantExpression>> Iconst AexprConst 
+%type<std::shared_ptr<lingodb::ast::ConstantExpression>> Iconst AexprConst  Sconst Bconst
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
@@ -1162,12 +1163,17 @@ param_name: type_function_name
  //TODO Add missing AexprConst rules
 AexprConst: 
     Iconst { $$=$1;}
+    | Sconst {$$=$1;}
+    | Bconst {$$=$1;}
 ;
 Iconst:	
-    ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->iVal=$1; $$=t;  };
+    ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntConstantValue>($1); $$=t;  };
 
+Sconst: 
+    STRING_VALUE { auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::StringConstantValue>($1); $$=t; };
 
-
+Bconst: 
+    BCONST {};
 
 /*
 * GOOLE PIPE syntax
