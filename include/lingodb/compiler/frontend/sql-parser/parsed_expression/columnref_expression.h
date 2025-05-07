@@ -1,4 +1,6 @@
 #pragma once
+#include "lingodb/catalog/Column.h"
+#include "lingodb/catalog/IndexCatalogEntry.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include <string>
 #include <vector>
@@ -18,6 +20,14 @@ class ColumnRefExpression : public ParsedExpression {
 
    //! The stack of names in order of which they appear (column_names[0].column_names[1].column_names[2]....)
    std::vector<std::string> column_names;
+
+   /*
+    * Semantic
+    */
+   std::vector<catalog::Column> columns;
+   //TODO is this here good practice
+   ///The scope of the this->columns. Commonly the name of the table
+   std::string scope;
 
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;

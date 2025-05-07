@@ -53,6 +53,10 @@ std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idG
    dot.append(nodeId);
    dot.append(" [label=\"");
    dot.append(label);
+   if (!alias.empty()) {
+      dot.append("\\nalias: ");
+      dot.append(alias);
+   }
    dot.append("\"];\n");
    return dot;
 }

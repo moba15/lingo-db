@@ -1,4 +1,5 @@
 #pragma once
+#include "lingodb/catalog/Column.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include <memory>
 #include <vector>
@@ -12,6 +13,15 @@ class TargetsExpression : public ParsedExpression {
    TargetsExpression();
 
    std::vector<std::shared_ptr<ParsedExpression>> targets{};
+
+   /*
+    * Semantic
+    */
+   //TODO make std::vector<mlir::Attribute> names; instead of std::string vector
+   std::vector<std::string> names{};
+   //TODO only reference to column
+   std::vector<std::pair<std::string, catalog::Column>> targetColumns{};
+
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
