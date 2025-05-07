@@ -6,6 +6,7 @@
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
+#include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
 #include <memory>
 #include <vector>
 namespace lingodb::ast {
@@ -30,6 +31,11 @@ class SelectNode : public QueryNode {
    ///For pipe operators
    std::shared_ptr<PipeOperator> startPipeOperator;
    std::shared_ptr<PipeOperator> endPipeOperator;
+
+   /*
+    * Semantic
+    */
+   TargetInfo targetInfo{};
 
    //TODO add missing parameters
    std::string toString(uint32_t depth) override;

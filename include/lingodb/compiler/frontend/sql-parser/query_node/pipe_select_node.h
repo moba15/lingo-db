@@ -6,6 +6,7 @@
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
 #include <memory>
+#include <variant>
 #include <vector>
 namespace lingodb::ast {
 using pipeOp = std::variant<std::shared_ptr<QueryNode>, std::shared_ptr<TableRef>, std::shared_ptr<ParsedExpression>, std::shared_ptr<TargetsExpression>>;

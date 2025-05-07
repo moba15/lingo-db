@@ -990,7 +990,7 @@ target_list:
     | target_list[list] COMMA target_el { $list.emplace_back($target_el); $$=$list;}
     ;
 target_el:
-    a_expr AS ColLabel {}
+    a_expr AS ColLabel {  $a_expr->alias = $ColLabel; $$ = $a_expr;}
     | a_expr BareColLabel {}
     | a_expr { $$=$a_expr;}
     | STAR {  $$ =mkNode<lingodb::ast::StarExpression>(@$,"");  }
