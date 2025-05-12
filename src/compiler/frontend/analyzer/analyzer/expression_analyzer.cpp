@@ -15,6 +15,9 @@ void ExpressionAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode, std::sh
       } else if (expr->exprClass == ast::ExpressionClass::CONJUNCTION) {
          auto conjunction = std::static_pointer_cast<ast::ConjunctionExpression>(expr);
          analyzeConjunctionExpression(conjunction, context);
+      } else if (expr->exprClass == ast::ExpressionClass::STAR) {
+         auto star = std::static_pointer_cast<ast::StarExpression>(expr);
+         analyzeStarRefExpression(star, context);
       } else {
          throw std::runtime_error("Not implemented");
       }
@@ -69,6 +72,16 @@ void ExpressionAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnR
    columnRef->columns = columns;
    columnRef->resultType = columns.at(0).getLogicalType();
    columnRef->scope = std::move(scope);
+}
+
+void ExpressionAnalyzer::analyzeStarRefExpression(const std::shared_ptr<ast::StarExpression> star, const std::shared_ptr<SQLContext> context) {
+   std::vector<catalog::Catalog> catalogs;
+   std::string scope;
+   if (star->relationName.empty()) {
+      star->columns = std::move(context->getColumns());
+   } else {
+      star->columns = std::move(context->getColumns(star->relationName));
+   }
 }
 
 void ExpressionAnalyzer::analyzeConstExpression(std::shared_ptr<ast::ConstantExpression> constExpr, std::shared_ptr<SQLContext> context) {

@@ -8,12 +8,29 @@ SelectNodeAnalyzer::SelectNodeAnalyzer(std::shared_ptr<catalog::Catalog> catalog
 
 void SelectNodeAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context) {
    context->pushNewScope();
-   transform(rootNode, context);
-   auto selectNode = std::static_pointer_cast<ast::SelectNode>(rootNode);
-   auto selectList = selectNode->select_list;
-   analyzeFromClause(selectNode, selectNode->from_clause, context);
-   analyzeTargetSelections(selectNode, selectList, context);
-   analyzeWhereClause(selectNode, selectNode->where_clause, context);
+   if (rootNode->nodeType == ast::NodeType::QUERY_NODE) {
+      auto queryNode = std::static_pointer_cast<ast::QueryNode>(rootNode);
+      if (queryNode->type == ast::QueryNodeType::SELECT_NODE) {
+         transform(rootNode, context);
+         auto selectNode = std::static_pointer_cast<ast::SelectNode>(rootNode);
+
+         auto selectList = selectNode->select_list;
+         analyzeFromClause(selectNode, selectNode->from_clause, context);
+         analyzeTargetSelections(selectNode, selectList, context);
+         analyzeWhereClause(selectNode, selectNode->where_clause, context);
+      } else if (queryNode->type == ast::QueryNodeType::PIPE_NODE) {
+         auto pipeSelectNode = std::static_pointer_cast<ast::PipeSelectNode>(rootNode);
+         if (pipeSelectNode->startPipeOperator->node->nodeType != ast::NodeType::TABLE_REF) {
+            throw std::runtime_error("Should not happen");
+         }
+         analyzeFromClause(queryNode, std::static_pointer_cast<ast::TableRef>(pipeSelectNode->startPipeOperator->node), context);
+         auto currentPipeOp = pipeSelectNode->startPipeOperator->next;
+         while (currentPipeOp) {
+            analyzePipeOperator(pipeSelectNode, currentPipeOp, context);
+            currentPipeOp = currentPipeOp->next;
+         }
+      }
+   }
 }
 
 void SelectNodeAnalyzer::transform(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context) {
@@ -27,7 +44,7 @@ void SelectNodeAnalyzer::transform(std::shared_ptr<ast::AstNode> rootNode, std::
    transformTargetSelections(selectList, context);
    transformGroupByClause(selectNode, selectNode->groups, context);
    if (aggregation && !aggregation->aggregations.empty()) {
-      auto pipeOperator = drv.nf.node<ast::PipeOperator>(aggregation->loc, aggregation);
+      auto pipeOperator = drv.nf.node<ast::PipeOperator>(aggregation->loc, lingodb::ast::PipeOperatorType::AGGREGATE, aggregation);
 
       selectNode->startPipeOperator = pipeOperator;
       if (selectNode->endPipeOperator) {
@@ -39,7 +56,7 @@ void SelectNodeAnalyzer::transform(std::shared_ptr<ast::AstNode> rootNode, std::
       selectNode->endPipeOperator = pipeOperator;
 
       if (selectNode->having) {
-         auto havingPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->having->loc, selectNode->having);
+         auto havingPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->having->loc, ast::PipeOperatorType::WHERE, selectNode->having);
          //TODO check
          selectNode->having.reset();
          selectNode->endPipeOperator->next = havingPipeOp;
@@ -120,7 +137,7 @@ void SelectNodeAnalyzer::analyzeFromClause(std::shared_ptr<ast::QueryNode> rootN
       }
 
    } else {
-      throw std::runtime_error("Not implemented");
+      throw std::runtime_error("Not implemented4");
    }
 }
 void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context) {
@@ -135,10 +152,36 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::SelectNode
                auto name = target->alias.empty() ? column.getColumnName() : target->alias;
                rootSelectNode->targetInfo.map(name, ast::ColumnInfo(columnRef->scope, column));
             }
+         } else if (target->type == ast::ExpressionType::STAR) {
+            auto star = std::static_pointer_cast<ast::StarExpression>(target);
+            for (auto [scope, column] : star->columns) {
+               targetSelection->targetColumns.emplace_back(std::pair<std::string, catalog::Column&>(column.getColumnName(), column));
+               auto name = target->alias.empty() ? column.getColumnName() : target->alias;
+               //TODO check for correct scope
+               rootSelectNode->targetInfo.map(name, ast::ColumnInfo(scope, column));
+            }
          }
       }
    }
 }
+void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<ast::PipeSelectNode> rootPipeSelectNode, std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer expressionAnalyzer{};
+   rootPipeSelectNode->targetInfo.namedResults.clear();
+   if (targetSelection) {
+      for (auto& target : targetSelection->targets) {
+         expressionAnalyzer.analyze(target, context);
+         if (target->type == ast::ExpressionType::COLUMN_REF) {
+            auto columnRef = std::static_pointer_cast<ast::ColumnRefExpression>(target);
+            for (auto column : columnRef->columns) {
+               targetSelection->targetColumns.emplace_back(std::pair<std::string, catalog::Column&>(column.getColumnName(), column));
+               auto name = target->alias.empty() ? column.getColumnName() : target->alias;
+               rootPipeSelectNode->targetInfo.map(name, ast::ColumnInfo(columnRef->scope, column));
+            }
+         }
+      }
+   }
+}
+
 void SelectNodeAnalyzer::analyzeWhereClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context) {
    ExpressionAnalyzer exprAnalyzer{};
    if (whereClause) {

@@ -14,7 +14,10 @@ class SQLContext {
    std::shared_ptr<SQLScope> currentScope;
    void pushNewScope();
    void popCurrentScope();
-   std::pair<std::string, std::vector<catalog::Column>> findColumn(const std::string& column_name) const;
-   std::pair<std::string, std::vector<catalog::Column>> findColumn(const std::string& column_name, const std::string& alias) const;
+   std::pair<std::string, std::vector<catalog::Column>> findColumn(const std::string& columnName) const;
+   std::pair<std::string, std::vector<catalog::Column>> findColumn(const std::string& columnName, const std::string& alias) const;
+
+   std::vector<std::pair<std::string, catalog::Column>> getColumns() const;
+   std::vector<std::pair<std::string, catalog::Column>> getColumns(std::string& tableName) const;
 };
 } // namespace lingodb::analyzer
