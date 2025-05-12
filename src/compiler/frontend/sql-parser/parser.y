@@ -234,11 +234,14 @@
 
 %type<lingodb::ast::jointCondOrUsingCols> join_qual
 
-%type<std::shared_ptr<lingodb::ast::ColumnRefExpression>> columnref
+/*
+* Columnref or Starexpression for instance
+*/
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>> columnref indirection indirection_el
 
 %type<std::shared_ptr<lingodb::ast::TableRef>> from_clause table_ref from_list joined_table
 
-%type<std::string>  ColId ColLabel indirection attr_name indirection_el 
+%type<std::string>  ColId ColLabel attr_name 
                     qualified_name relation_expr alias_clause opt_alias_clause 
                     name type_function_name func_name
 
@@ -373,7 +376,7 @@ select_no_parens:
     | from_clause 
      {
         auto pipeNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
-        auto p = mkNode<lingodb::ast::PipeOperator>(@$, $from_clause);
+        auto p = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::FROM, $from_clause);
         pipeNode->startPipeOperator = p;
         $$ = pipeNode;
         
@@ -389,7 +392,7 @@ select_no_parens:
             tmp = pipeNode->startPipeOperator;
         }
         if( $parens->type == lingodb::ast::QueryNodeType::SELECT_NODE) {
-            pipeNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$,$parens);
+            pipeNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::SELECT ,$parens);
         }
             
         if($pipe_operator->node->nodeType == lingodb::ast::NodeType::TABLE_REF 
@@ -397,7 +400,7 @@ select_no_parens:
             auto joinRef = std::static_pointer_cast<lingodb::ast::JoinRef>($pipe_operator->node);
             joinRef->left = pipeNode;
             auto newNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
-            newNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+            newNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::JOIN, joinRef);
             $$ = newNode;
            
         } else {
@@ -957,7 +960,22 @@ func_arg_expr:
 
 columnref: 
     ColId {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);}
-    | ColId indirection {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $indirection, $ColId);} //TODO Add table name
+    | ColId indirection {
+        auto in = $indirection;
+        if(in->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF) {
+            auto columnref = std::static_pointer_cast<lingodb::ast::ColumnRefExpression>(in);
+            auto newColumnRef = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);
+            newColumnRef->column_names.insert(newColumnRef->column_names.end(), columnref->column_names.begin(), columnref->column_names.end() );
+            $$ = newColumnRef;
+            
+
+        } else if(in->exprClass == lingodb::ast::ExpressionClass::STAR) {
+            auto star = std::static_pointer_cast<lingodb::ast::StarExpression>(in);
+            star->relationName = $ColId;
+            $$ = star;
+        }
+        
+    } //TODO Add table name
     ;
 //! TODO For what exactly is this here
 indirection:
@@ -965,8 +983,8 @@ indirection:
     | indirection indirection_el {$$=$1;}
     ;
 indirection_el:
-    DOT attr_name {$$=$attr_name;}
-    | DOT STAR //TODO make star
+    DOT attr_name {$$=mkNode<lingodb::ast::ColumnRefExpression>(@$, $attr_name);}
+    | DOT STAR { $$=mkNode<lingodb::ast::StarExpression>(@$, "");}
     | LB a_expr RB
    //TODO | LB opt_slice_bound ':' opt_slice_bound RB
 
@@ -1182,16 +1200,16 @@ Bconst:
 pipe_operator: 
     where_clause 
     {
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $where_clause);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::WHERE, $where_clause);
         
     }
     | SELECT opt_target_list 
     {
-       $$ = mkNode<lingodb::ast::PipeOperator>(@$, $opt_target_list);
+       $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::SELECT, $opt_target_list);
     }
     | sort_clause 
     {
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $sort_clause);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::ORDER_BY, $sort_clause);
     }
     | join_type JOIN table_ref join_qual
     {
@@ -1199,19 +1217,19 @@ pipe_operator:
         auto joinRef = mkNode<lingodb::ast::JoinRef>(@$, joinType, lingodb::ast::JoinCondType::REGULAR );
         joinRef->right = $table_ref;
         joinRef->condition = $join_qual;
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::JOIN, joinRef);
     }
     | JOIN table_ref join_qual
     {
         auto joinRef = mkNode<lingodb::ast::JoinRef>(@$, lingodb::ast::JoinType::INNER, lingodb::ast::JoinCondType::REGULAR );
         joinRef->right = $table_ref;
         joinRef->condition = $join_qual;
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, joinRef);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::JOIN, joinRef);
     }
     //TODO check if this does not allow to much!
     | AGGREGATE agg_expr
     {
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, $agg_expr);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::AGGREGATE, $agg_expr);
     }
     | alias_clause
     //...
