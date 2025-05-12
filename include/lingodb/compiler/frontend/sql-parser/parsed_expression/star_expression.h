@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 namespace lingodb::ast {
 class StarExpression : public ParsedExpression {
    public:
@@ -18,7 +19,13 @@ class StarExpression : public ParsedExpression {
    std::shared_ptr<ParsedExpression> expr;
 
    //! Whether or not this is a COLUMNS expression
-   bool columns = false;
+   bool columnsExpr = false;
+
+   /*
+    * Semantic
+    */
+   //Columns and their scope
+   std::vector<std::pair<std::string, catalog::Column>> columns{};
 
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
