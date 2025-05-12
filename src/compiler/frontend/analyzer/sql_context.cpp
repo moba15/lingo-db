@@ -55,4 +55,23 @@ std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(cons
 
    return std::make_pair(alias, columns);
 }
+
+std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns() const {
+   std::vector<std::pair<std::string, catalog::Column>> columns{};
+   for (auto [tableName, table] : currentScope->tables) {
+      std::transform(table->getColumns().begin(), table->getColumns().end(), std::back_inserter(columns), [&tableName](catalog::Column column) {
+         return std::make_pair(tableName, column);
+      });
+   }
+   return columns;
+}
+std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns(std::string& tableName) const {
+   auto table = currentScope->tables.find(tableName);
+   std::vector<std::pair<std::string, catalog::Column>> columns{};
+   std::transform(table->second->getColumns().begin(), table->second->getColumns().end(), std::back_inserter(columns), [&tableName](catalog::Column column) {
+      return std::make_pair(tableName, column);
+   });
+   return columns;
+}
+
 } // namespace lingodb::analyzer
