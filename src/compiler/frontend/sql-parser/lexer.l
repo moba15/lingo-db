@@ -103,9 +103,9 @@ numeric         ({decinteger}\.{decinteger}?)|(\.{decinteger})
 ident_start     [a-zA-Z]
 ident_cont      [a-zA-Z0-9]
 identifier      {ident_start}{ident_cont}*
-
+squote			\'
 dquote			\"
-str       {dquote}{ident_cont}*{dquote}
+str       {squote}{ident_cont}*{squote}
 
 boolean [fF][aA][lL][sS][eE]
 
