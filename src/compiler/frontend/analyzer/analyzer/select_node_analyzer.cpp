@@ -123,7 +123,13 @@ void SelectNodeAnalyzer::analyzeFromClause(std::shared_ptr<ast::QueryNode> rootN
       if (std::holds_alternative<std::shared_ptr<ast::TableRef>>(join->left)) {
          analyzeFromClause(rootNode, std::get<std::shared_ptr<ast::TableRef>>(join->left), context);
       } else {
-         throw std::runtime_error("Not implemented: join->left");
+         auto queryNode = std::get<std::shared_ptr<ast::QueryNode>>(join->left);
+         if (queryNode->type == ast::QueryNodeType::PIPE_NODE) {
+            auto pipeNode = std::static_pointer_cast<ast::PipeSelectNode>(queryNode);
+            analyze(pipeNode, context);
+         } else {
+            throw std::runtime_error("Not implemented");
+         }
       }
 
       analyzeFromClause(rootNode, join->right, context);
@@ -144,7 +150,17 @@ void SelectNodeAnalyzer::analyzeFromClause(std::shared_ptr<ast::QueryNode> rootN
          }
       }
 
-   } else {
+   } else if (tableRef->type == ast::TableReferenceType::SUBQUERY) {
+      auto subQueryRef = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
+      if (subQueryRef->alias.empty()) {
+         error("Alias for subquery must not be empty", subQueryRef->loc);
+         return;
+      }
+      analyze(subQueryRef->subSelectNode, context);
+
+   }
+
+   else {
       throw std::runtime_error("Not implemented4");
    }
 }
