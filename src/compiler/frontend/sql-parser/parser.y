@@ -526,7 +526,12 @@ table_ref:
     | joined_table { $$ = $1;}
     | LP joined_table RP alias_clause
     | joined_table opt_alias_clause
-    | select_with_parens opt_alias_clause
+    | select_with_parens opt_alias_clause 
+    {
+        auto subquery = mkNode<lingodb::ast::SubqueryRef>(@$, $select_with_parens);
+        subquery->alias = $opt_alias_clause;
+        $$ = subquery;
+    }
 
 
     ;
