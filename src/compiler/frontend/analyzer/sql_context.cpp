@@ -80,4 +80,21 @@ std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns(std:
    return columns;
 }
 
+std::string SQLContext::toString() const {
+   std::ostringstream oss{};
+   oss << "SQLContext:\n";
+   auto current = currentScope;
+   for (auto scope : scopes) {
+      for (const auto& [tableName, table] : scope->tables) {
+         oss << "  Tabelle: " << tableName << "\n";
+         for (const auto& column : table->getColumns()) {
+            oss << "    - Spalte: " << std::setw(20) << column.getColumnName()
+                << " | Typ: " << column.getLogicalType().toString() << "\n";
+         }
+      }
+   }
+
+   return oss.str();
+}
+
 } // namespace lingodb::analyzer
