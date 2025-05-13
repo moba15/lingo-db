@@ -2,6 +2,7 @@
 #include "lingodb/compiler/frontend/analyzer/sql_scope.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/columnref_expression.h"
 
+#include <iomanip>
 #include <memory>
 #include <vector>
 namespace lingodb::analyzer {
@@ -19,5 +20,7 @@ class SQLContext {
 
    std::vector<std::pair<std::string, catalog::Column>> getColumns() const;
    std::vector<std::pair<std::string, catalog::Column>> getColumns(std::string& tableName) const;
+
+   std::string toString() const;
 };
 } // namespace lingodb::analyzer
