@@ -1,4 +1,5 @@
 #pragma once
+#include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/targets_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/pipe_operator.h"
@@ -17,6 +18,11 @@ class PipeSelectNode : public QueryNode {
    ~PipeSelectNode() override;
    std::shared_ptr<PipeOperator> startPipeOperator;
    std::shared_ptr<PipeOperator> endPipeOperator;
+
+   /*
+    *Semantic
+    */
+   TargetInfo targetInfo{};
    std::string toString(uint32_t depth) override;
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
