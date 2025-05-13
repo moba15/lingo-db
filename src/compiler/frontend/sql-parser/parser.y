@@ -499,7 +499,7 @@ from_list:
     table_ref { $$=$1;}
     | from_list[list] COMMA table_ref 
     {
-        auto join = mkNode<lingodb::ast::JoinRef>(@$, lingodb::ast::JoinType::OUTER, lingodb::ast::JoinCondType::CROSS);
+        auto join = mkNode<lingodb::ast::JoinRef>(@$, lingodb::ast::JoinType::MARK, lingodb::ast::JoinCondType::CROSS);
         join->left = $list;
         join->right = $table_ref;
         $$ = join;
