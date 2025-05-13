@@ -31,7 +31,9 @@ class SelectNodeAnalyzer : public Analyzer {
    void analyzeOrderByClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<SQLContext> context);
 
    void error(std::string message, location loc) {
-      std::cerr << message << " at " << loc << std::endl;
+      std::ostringstream s{};
+      s << message << " at " << loc << std::endl;
+      throw std::runtime_error(s.str());
    }
 };
 } // namespace lingodb::analyzer
