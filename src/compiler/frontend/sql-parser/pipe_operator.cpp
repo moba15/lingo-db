@@ -2,7 +2,7 @@
 
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 namespace lingodb::ast {
-PipeOperator::PipeOperator(std::shared_ptr<AstNode> node) : AstNode(NodeType::PIPE_OP), node(node) {
+PipeOperator::PipeOperator(PipeOperatorType type, std::shared_ptr<AstNode> node) : AstNode(NodeType::PIPE_OP), node(node), type(type) {
 }
 bool PipeOperator::isLast() {
    return next == nullptr;
