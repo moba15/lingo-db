@@ -35,6 +35,7 @@ add_library(lingo-db-parser
 
         tableref/basetableref.cpp
         tableref/joinref.cpp
+        tableref/subqueryref.cpp
 
         common/node_id_generator.cpp
         common/constant_value.cpp
