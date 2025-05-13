@@ -25,7 +25,7 @@ std::string StarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
       dot.append(".");
    }
    dot.append("*");
-   if (columns) {
+   if (columnsExpr) {
       dot.append("\\nCOLUMNS");
    }
    dot.append("\"];\n");
