@@ -113,6 +113,8 @@ void ExpressionAnalyzer::analyzeConjunctionExpression(std::shared_ptr<ast::Conju
 }
 
 void ExpressionAnalyzer::error(std::string message, lingodb::location loc) {
-   std::cerr << message << " at " << loc << std::endl;
+   std::ostringstream s{};
+   s << message << " at " << loc << std::endl;
+   throw std::runtime_error(s.str());
 }
 } // namespace lingodb::analyzer
