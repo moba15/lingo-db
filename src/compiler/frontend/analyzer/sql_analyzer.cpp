@@ -8,7 +8,7 @@ void SQLQueryAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode) {
    //Analyze Select node
    if (rootNode->nodeType == ast::NodeType::QUERY_NODE) {
       auto queryNode = std::static_pointer_cast<ast::QueryNode>(rootNode);
-      if (queryNode->type == ast::QueryNodeType::SELECT_NODE) {
+      if (queryNode->type == ast::QueryNodeType::SELECT_NODE || queryNode->type == ast::QueryNodeType::PIPE_NODE) {
          selectNodeAnalyzer.analyze(rootNode, context);
       }
    }
