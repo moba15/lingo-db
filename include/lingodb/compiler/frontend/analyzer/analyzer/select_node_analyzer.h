@@ -21,15 +21,19 @@ class SelectNodeAnalyzer : public Analyzer {
 
    void transformTargetSelections(std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context);
    void transformGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context);
-
-   void analyzePipeOperator(std::shared_ptr<ast::PipeSelectNode> rootNode, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context);
+   template <class T>
+   void analyzePipeOperator(std::shared_ptr<T> rootNode, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context);
    template <class T>
    void analyzeTargetSelections(std::shared_ptr<T> rootSelectNode, std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context);
 
    void analyzeFromClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context);
-   void analyzeWhereClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context);
-   void analyzeGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context);
-   void analyzeOrderByClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<SQLContext> context);
+   void analyzeWhereClause(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context);
+
+   void analyzeAggregation(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::AggregationNode> aggregationNode, std::shared_ptr<SQLContext> context);
+   void analyzeGroupByNode(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context);
+
+   void analyzeModifiers(std::shared_ptr<ast::SelectNode> rootNode, std::vector<std::shared_ptr<ast::ResultModifier>> modifiers, std::shared_ptr<SQLContext> context);
+   void analyzeOrderByModifier(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<ast::OrderByModifier> orderByModifier, std::shared_ptr<SQLContext> context);
 
    void error(std::string message, location loc) {
       std::ostringstream s{};

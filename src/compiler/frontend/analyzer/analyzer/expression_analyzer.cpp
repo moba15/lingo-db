@@ -18,6 +18,13 @@ void ExpressionAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode, std::sh
       } else if (expr->exprClass == ast::ExpressionClass::STAR) {
          auto star = std::static_pointer_cast<ast::StarExpression>(expr);
          analyzeStarRefExpression(star, context);
+      } else if (expr->exprClass == ast::ExpressionClass::FUNCTION) {
+         if (expr->type == ast::ExpressionType::AGGREGATE) {
+            analyzeAggregationFunctionExpression(std::static_pointer_cast<ast::FunctionExpression>(expr), context);
+
+         } else {
+            throw std::runtime_error("Not implemented");
+         }
       } else {
          throw std::runtime_error("Not implemented");
       }
@@ -110,6 +117,12 @@ void ExpressionAnalyzer::analyzeConjunctionExpression(std::shared_ptr<ast::Conju
       }
    }
    conjunction->resultType = catalog::Type::boolean();
+}
+
+void ExpressionAnalyzer::analyzeAggregationFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context) {
+   for (auto arg : function->arguments) {
+      analyze(arg, context);
+   }
 }
 
 void ExpressionAnalyzer::error(std::string message, lingodb::location loc) {

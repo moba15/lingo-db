@@ -1,6 +1,7 @@
 #include "lingodb/compiler/frontend/analyzer/analyzer/select_node_analyzer.h"
 
 #include "lingodb/compiler/frontend/analyzer/analyzer/expression_analyzer.h"
+#include "lingodb/runtime/RecordBatchInfo.h"
 
 namespace lingodb::analyzer {
 SelectNodeAnalyzer::SelectNodeAnalyzer(std::shared_ptr<catalog::Catalog> catalog) : catalog(std::move(catalog)) {
@@ -18,6 +19,11 @@ void SelectNodeAnalyzer::analyze(std::shared_ptr<ast::AstNode> rootNode, std::sh
          analyzeFromClause(selectNode, selectNode->from_clause, context);
          analyzeTargetSelections(selectNode, selectList, context);
          analyzeWhereClause(selectNode, selectNode->where_clause, context);
+         analyzeModifiers(selectNode, selectNode->modifiers, context);
+         if (selectNode->startPipeOperator) {
+            //! TODO LOOP
+            analyzePipeOperator(selectNode, selectNode->startPipeOperator, context);
+         }
       } else if (queryNode->type == ast::QueryNodeType::PIPE_NODE) {
          auto pipeSelectNode = std::static_pointer_cast<ast::PipeSelectNode>(rootNode);
          if (pipeSelectNode->startPipeOperator->node->nodeType != ast::NodeType::TABLE_REF) {
@@ -51,7 +57,7 @@ void SelectNodeAnalyzer::transform(std::shared_ptr<ast::AstNode> rootNode, std::
     */
    transformTargetSelections(selectList, context);
    transformGroupByClause(selectNode, selectNode->groups, context);
-   if (aggregation && !aggregation->aggregations.empty()) {
+   if (aggregation && (!aggregation->aggregations.empty() || aggregation->groupByNode)) {
       auto pipeOperator = drv.nf.node<ast::PipeOperator>(aggregation->loc, lingodb::ast::PipeOperatorType::AGGREGATE, aggregation);
 
       selectNode->startPipeOperator = pipeOperator;
@@ -85,10 +91,9 @@ void SelectNodeAnalyzer::transformTargetSelections(std::shared_ptr<ast::TargetsE
    while (it != targetSelection->targets.end()) {
       if ((*it)->type == ast::ExpressionType::AGGREGATE && (*it)->exprClass == ast::ExpressionClass::FUNCTION) {
          aggregation->aggregations.emplace_back(std::static_pointer_cast<ast::FunctionExpression>(*it));
-         it = targetSelection->targets.erase(it);
-      } else {
-         ++it;
+
       }
+      ++it;
    }
 
    std::transform(aggregationExpressions.begin(), aggregationExpressions.end(),
@@ -177,7 +182,7 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<T> rootPipeSele
             for (auto column : columnRef->columns) {
                targetSelection->targetColumns.emplace_back(std::pair<std::string, catalog::Column&>(column.getColumnName(), column));
                auto name = target->alias.empty() ? column.getColumnName() : target->alias;
-               rootPipeSelectNode->targetInfo.map(name, ast::ColumnInfo(columnRef->scope, column));
+               rootPipeSelectNode->targetInfo.map(name, std::make_shared<ast::ColumnInfo>(columnRef->scope, column));
             }
          } else if (target->type == ast::ExpressionType::STAR) {
             auto star = std::static_pointer_cast<ast::StarExpression>(target);
@@ -185,27 +190,65 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<T> rootPipeSele
                targetSelection->targetColumns.emplace_back(std::pair<std::string, catalog::Column&>(column.getColumnName(), column));
                auto name = target->alias.empty() ? column.getColumnName() : target->alias;
                //TODO check for correct scope
-               rootPipeSelectNode->targetInfo.map(name, ast::ColumnInfo(scope, column));
+               rootPipeSelectNode->targetInfo.map(name, std::make_shared<ast::ColumnInfo>(scope, column));
             }
+         } else if (target->type == ast::ExpressionType::AGGREGATE && target->exprClass == ast::ExpressionClass::FUNCTION) {
+            //Aggregation function
+            auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
+            rootPipeSelectNode->targetInfo.map(function->alias.empty() ? function->functionName : function->alias, std::make_shared<ast::FunctionInfo>("fScope", "fName"));
+         }
+         else {
+            error("Currently this Targetselection is not implemented", target->loc);
          }
       }
    }
 }
 
-void SelectNodeAnalyzer::analyzeWhereClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context) {
+void SelectNodeAnalyzer::analyzeWhereClause(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::ParsedExpression> whereClause, std::shared_ptr<SQLContext> context) {
    ExpressionAnalyzer exprAnalyzer{};
    if (whereClause) {
       exprAnalyzer.analyze(whereClause, context);
    }
 }
 
-void SelectNodeAnalyzer::analyzeGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context) {
-}
-void SelectNodeAnalyzer::analyzeOrderByClause(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<SQLContext> context) {
-   //TODO
+void SelectNodeAnalyzer::analyzeAggregation(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::AggregationNode> aggregationNode, std::shared_ptr<SQLContext> context) {
+   if (aggregationNode->groupByNode) {
+      analyzeGroupByNode(rootSelectNode, aggregationNode->groupByNode, context);
+   }
+   ExpressionAnalyzer exprAnalyzer{};
+   for (auto aggregation : aggregationNode->aggregations) {
+      exprAnalyzer.analyze(aggregation, context);
+   }
 }
 
-void SelectNodeAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeSelectNode> rootNode, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context) {
+void SelectNodeAnalyzer::analyzeGroupByNode(std::shared_ptr<ast::QueryNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer exprAnalyzer{};
+   for (auto expr : groupByNode->group_expressions) {
+      exprAnalyzer.analyze(expr, context);
+   }
+}
+
+void SelectNodeAnalyzer::analyzeModifiers(std::shared_ptr<ast::SelectNode> rootNode, std::vector<std::shared_ptr<ast::ResultModifier>> modifiers, std::shared_ptr<SQLContext> context) {
+   for (auto modifier : modifiers) {
+      if (modifier->modifierType == ast::ResultModifierType::ORDER_BY) {
+         auto orderModifier = std::static_pointer_cast<ast::OrderByModifier>(modifier);
+         analyzeOrderByModifier(rootNode, orderModifier, context);
+      } else {
+         throw std::runtime_error("Modifier not implemented");
+      }
+   }
+}
+void SelectNodeAnalyzer::analyzeOrderByModifier(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<ast::OrderByModifier> orderByModifier, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer exprAnalyzer{};
+   for (auto orderByElements : orderByModifier->orderByElements) {
+      if (orderByElements->expression) {
+         exprAnalyzer.analyze(orderByElements->expression, context);
+      }
+   }
+}
+
+template <class T>
+void SelectNodeAnalyzer::analyzePipeOperator(std::shared_ptr<T> rootNode, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context) {
    ExpressionAnalyzer exprAnalyzer{};
    if (pipeOperator->type == ast::PipeOperatorType::SELECT) {
       assert(pipeOperator->node->nodeType == ast::NodeType::EXPRESSION);
@@ -214,6 +257,14 @@ void SelectNodeAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeSelectNode
       //TODO also call exprAnalyzer
       analyzeTargetSelections(rootNode, targetSelection, context);
 
+   } else if (pipeOperator->type == ast::PipeOperatorType::AGGREGATE) {
+      assert(pipeOperator->node->nodeType == ast::NodeType::AGGREGATION);
+      auto aggregation = std::static_pointer_cast<ast::AggregationNode>(pipeOperator->node);
+      analyzeAggregation(rootNode, aggregation, context);
+
+   } else if (pipeOperator->type == ast::PipeOperatorType::ORDER_BY) {
+      auto orderBy = std::static_pointer_cast<ast::OrderByModifier>(pipeOperator->node);
+      analyzeOrderByModifier(rootNode, orderBy, context);
    } else {
       auto nodeType = pipeOperator->node->nodeType;
       if (nodeType == ast::NodeType::EXPRESSION) {
