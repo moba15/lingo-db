@@ -66,6 +66,16 @@ void ExpressionAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnR
    }
 
    if (columns.empty()) {
+      //TODO check function
+      auto function = context->findFunction(columnRef->column_names[0]);
+      if (function.second) {
+         columnRef->scope = function.second->scope;
+         //TODO type!
+         columnRef->resultType = catalog::Type::int64();
+         columnRef->refsAggregationFunction = true;
+         columnRef->fName = function.second->name;
+         return;
+      }
       if (columnRef->column_names.size() == 1)
          error("No column found with name " + columnName, columnRef->loc);
       else
@@ -120,9 +130,16 @@ void ExpressionAnalyzer::analyzeConjunctionExpression(std::shared_ptr<ast::Conju
 }
 
 void ExpressionAnalyzer::analyzeAggregationFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context) {
+   //TODO Better
+   if (!function->scope.empty()) {
+      return;
+   }
    for (auto arg : function->arguments) {
       analyze(arg, context);
    }
+   function->scope = createTmpScope();
+   auto fName = function->alias.empty() ? function->functionName : function->alias;
+   context->currentScope->functionsEntry.emplace(fName, std::make_shared<ast::FunctionInfo>(function->scope, fName));
 }
 
 void ExpressionAnalyzer::error(std::string message, lingodb::location loc) {

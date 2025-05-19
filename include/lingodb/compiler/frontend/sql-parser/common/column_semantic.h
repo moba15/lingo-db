@@ -1,5 +1,6 @@
 #pragma once
 #include "lingodb/catalog/Column.h"
+#include "lingodb/compiler/Dialect/TupleStream/ColumnManager.h"
 
 #include <string>
 #include <vector>
@@ -12,14 +13,23 @@ struct NamedResult {
    NamedResultType type;
    std::string scope;
    NamedResult(NamedResultType type, std::string scope) : type(type), scope(scope) {}
+
+   virtual compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) = 0;
 };
 struct FunctionInfo : public NamedResult {
    std::string name;
    FunctionInfo(std::string scope, std::string name) : NamedResult(NamedResultType::Function, scope), name(name) {}
+
+   compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
+      return attrManager.createRef(this->scope, name);
+   }
 };
-struct ColumnInfo : public  NamedResult {
+struct ColumnInfo : public NamedResult {
    catalog::Column column;
    ColumnInfo(std::string scope, catalog::Column column) : NamedResult(NamedResultType::Column, scope), column(column) {}
+   compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
+      return attrManager.createRef(this->scope, column.getColumnName());
+   }
 };
 struct TargetInfo {
    std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults;

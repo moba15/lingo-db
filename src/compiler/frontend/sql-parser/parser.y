@@ -226,9 +226,9 @@
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr  where_clause group_by_item 
-                                                        func_arg_expr 
+                                                        func_arg_expr select_limit_value func_expr
 
-%type<std::shared_ptr<lingodb::ast::FunctionExpression>> func_expr func_application
+%type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application
 
 %type<std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>>> func_expr_list
 
@@ -266,6 +266,10 @@
 %type<lingodb::ast::OrderType> opt_asc_desc
 
 %type<lingodb::ast::OrderByNullType> opt_nulls_order
+
+%type<std::optional<std::shared_ptr<lingodb::ast::ResultModifier>>> opt_sort_clause opt_select_limit
+
+%type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -366,7 +370,16 @@ select_no_parens:
         $select_clause->modifiers.emplace_back($sort_clause);
         $$ = $select_clause;
     }
-    //TODO | select_clause opt_sort_clause for_locking_clause opt_select_limit 
+    | select_clause opt_sort_clause  opt_select_limit 
+    {
+        if ($opt_sort_clause.has_value()) {
+            $select_clause->modifiers.emplace_back($opt_sort_clause.value());
+        }
+        if($opt_select_limit.has_value()) {
+            $select_clause->modifiers.emplace_back($opt_select_limit.value());
+        }
+        $$ = $select_clause;
+    }
     //TODO | select_clause opt_sort_clause select_limit opt_for_locking_clause
     //TODO | with_clause select_clause
     //TODO | with_clause select_clause sort_clause
@@ -602,6 +615,29 @@ having_clause:
     HAVING a_expr {$$=$a_expr;}
     | %empty
     ;
+
+
+for_locking_clause:
+    for_locking_items
+    | FOR READ ONLY
+    ;
+for_locking_items:
+    for_locking_item
+    | for_locking_items for_locking_item
+    ;
+for_locking_item:
+        for_locking_strength locked_rels_list opt_nowait_or_skip
+    ;
+for_locking_strength:
+    FOR UPDATE
+    | FOR NO KEY UPDATE
+    | FOR SHARE
+    | FOR KEY SHARE
+    ;
+locked_rels_list: 
+    OF qualified_name_list
+    | %empty
+    ;
 /* Postgres
  * It may seem silly to separate joined_table from table_ref, but there is
  * method in SQL's madness: if you don't do it this way you get reduce-
@@ -674,6 +710,12 @@ opt_asc_desc:
     | %empty {
         $$ = lingodb::ast::OrderType::ASCENDING;
     }
+    ;
+opt_nowait_or_skip:
+    NOWAIT
+    | SKIP LOCKED
+    | %empty
+    ;
 
 join_type: 
     FULL opt_outer
@@ -732,8 +774,8 @@ opt_all_clause:
     | %empty
     ;
 opt_sort_clause:
-    sort_clause
-    | %empty
+    sort_clause {$$ = $1;}
+    | %empty {$$ = std::nullopt;}
     ;
 sort_clause:
     ORDER BY sortby_list 
@@ -766,6 +808,41 @@ sortby:
         $$ = orderByElement;
     }
     ;
+
+
+
+select_limit:
+    limit_clause offset_clause
+    | offset_clause limit_clause
+    | limit_clause {$$ = $1;}
+    | offset_clause
+    ;
+
+opt_select_limit:
+    select_limit {$$=$1;}
+    | %empty {$$=std::nullopt;}
+    ;
+//TODO missing rules
+limit_clause:
+    LIMIT select_limit_value {$$ = mkNode<lingodb::ast::LimitModifier>(@$, $select_limit_value);}
+    | LIMIT select_limit_value COMMA select_offset_value
+    ;
+//TODO missing rules
+offset_clause:
+    OFFSET select_offset_value
+    ;
+
+select_limit_value:
+    a_expr {$$=$1;}
+    | ALL
+    ;
+
+select_offset_value:
+    a_expr
+    ;
+
+
+
 /*****************************************************************************
  *
  *	expression grammar
@@ -814,7 +891,7 @@ a_expr:
     | MINUS a_expr
     | a_expr PLUS a_expr
     | a_expr MINUS a_expr
-    | a_expr STAR a_expr
+    | a_expr STAR a_expr {error(@$, "Not implemented");}
     | a_expr SLASH a_expr
     | a_expr PERCENT a_expr
     | a_expr HAT a_expr
@@ -930,11 +1007,12 @@ func_application:
  */
  //TODO add missing rules
  func_expr:
-    func_application //within_group_clause filter_clause over_clause
+    func_application //within_group_clause filter_clause 
     {
         //TODO within_group_clause filter_clause over_clause
         $$ = $func_application;
     }
+    
     //| func_expr_common_subexpr
     ;
 
@@ -963,6 +1041,19 @@ func_arg_expr:
     | param_name GREATER_EQUAL a_expr
     ;
 
+
+
+over_clause:
+    OVER window_specification
+    | OVER ColId 
+    ;
+//TODO missing
+window_specification:
+    LP opt_sort_clause RP
+    ;
+
+
+
 columnref: 
     ColId {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);}
     | ColId indirection {
@@ -982,6 +1073,7 @@ columnref:
         
     } //TODO Add table name
     ;
+
 //! TODO For what exactly is this here
 indirection:
     indirection_el { $$=$1;}
@@ -1256,7 +1348,9 @@ func_expr_list:
     func_expr opt_alias_clause 
     {
         auto list = mkListShared<lingodb::ast::FunctionExpression>();
+        $func_expr->alias=$opt_alias_clause;
         list.emplace_back($func_expr);
+        
         $$ = list;
     }
     | func_expr_list[list] COMMA func_expr opt_alias_clause
