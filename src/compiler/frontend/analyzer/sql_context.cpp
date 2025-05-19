@@ -62,6 +62,21 @@ std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(cons
    return std::make_pair(alias, columns);
 }
 
+std::pair<std::string, std::shared_ptr<ast::FunctionInfo>> SQLContext::findFunction(const std::string& functionName) const {
+   auto current = currentScope;
+   while (current) {
+      //TODO use hashmap for faster search
+      auto function = std::find_if(current->functionsEntry.begin(), current->functionsEntry.end(), [&functionName](const auto& entry) {
+         return entry.first == functionName;
+      });
+      if (function != current->functionsEntry.end()) {
+         return std::make_pair(function->first, function->second);
+      }
+      current = current->parent;
+   }
+   return std::make_pair("", nullptr);
+}
+
 std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns() const {
    std::vector<std::pair<std::string, catalog::Column>> columns{};
    for (auto [tableName, table] : currentScope->tables) {

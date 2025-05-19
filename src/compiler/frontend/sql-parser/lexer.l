@@ -153,14 +153,15 @@ boolean [fF][aA][lL][sS][eE]
 
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
-left                                  { return lingodb::parser::make_LEFT(loc); }
+
 
 [gG][rR][oO][uU][pP]                  { return lingodb::parser::make_GROUP_P(loc);}
 
 having                                { return lingodb::parser::make_HAVING(loc);}
 
 inner                                 { return lingodb::parser::make_INNER_P(loc); }
-
+[lL][eE][fF][tT]                      { return lingodb::parser::make_LEFT(loc); }
+[lL][iI][mM][iI][tT]                  { return lingodb::parser::make_LIMIT(loc); }
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
 not                                   { return lingodb::parser::make_NOT(loc); }
 
@@ -174,6 +175,7 @@ right                                 { return lingodb::parser::make_RIGHT(loc);
 on                                    { return lingodb::parser::make_ON(loc); }
 or                                    { return lingodb::parser::make_OR(loc); }
 outer                                 { return lingodb::parser::make_OUTER_P(loc); }
+[oO][vV][eE][rR]                      { return lingodb::parser::make_OVER(loc); }
 
 [sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
 
