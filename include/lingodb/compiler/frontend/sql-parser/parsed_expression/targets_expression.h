@@ -22,7 +22,7 @@ class TargetsExpression : public ParsedExpression {
    //TODO only reference to column
    std::vector<std::pair<std::string, catalog::Column>> targetColumns{};
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

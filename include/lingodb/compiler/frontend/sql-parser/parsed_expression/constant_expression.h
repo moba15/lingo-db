@@ -12,7 +12,7 @@ class ConstantExpression : public ParsedExpression {
 
    std::shared_ptr<ConstantValue> value;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

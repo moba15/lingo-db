@@ -23,7 +23,7 @@ class SubqueryRef : public TableRef {
    //!TODO correct Type
    std::shared_ptr<QueryNode> subSelectNode;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 

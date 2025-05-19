@@ -26,7 +26,7 @@ class BaseTableRef : public TableRef {
    std::shared_ptr<catalog::TableCatalogEntry> catalogEntry = nullptr;
    std::string scopeName;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

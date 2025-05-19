@@ -6,9 +6,7 @@ StarExpression::StarExpression(std::string relationName)
    : ParsedExpression(ExpressionType::STAR, ExpressionClass::STAR), relationName(std::move(relationName)) {
 }
 
-std::string StarExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix return "";
-}
+
 std::string StarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

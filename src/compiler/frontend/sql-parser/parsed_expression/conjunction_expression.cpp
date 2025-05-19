@@ -16,16 +16,7 @@ std::string ConjunctionExpression::typeToAscii(ExpressionType type) const {
    }
 }
 
-std::string ConjunctionExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("ConjunctionExpression: ");
-   ast.append(typeToAscii(type));
-   ast.append("\n");
-   for (auto& child : children) {
-      ast.append(child->toAsciiAST(depth + 1));
-   }
-   return ast;
-};
+
 std::string ConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
