@@ -4,15 +4,7 @@
 namespace lingodb::ast {
 TargetsExpression::TargetsExpression() : ParsedExpression(ExpressionType::TARGETS, TYPE) {
 }
-std::string TargetsExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("TargetsList\n");
-   for (auto& target : targets) {
-      if (target)
-         ast.append(target->toAsciiAST(depth + 1));
-   }
-   return ast;
-}
+
 std::string TargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

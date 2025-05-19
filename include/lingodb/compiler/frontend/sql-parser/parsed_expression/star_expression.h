@@ -27,7 +27,7 @@ class StarExpression : public ParsedExpression {
    //Columns and their scope
    std::vector<std::pair<std::string, catalog::Column>> columns{};
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

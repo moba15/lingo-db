@@ -7,14 +7,7 @@ namespace lingodb::ast {
 
 ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE) {}
 
-std::string ConstantExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("ConstantExpression: ");
-   ast.append(value->toString());
-   ast.append("\n");
 
-   return ast;
-}
 std::string ConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

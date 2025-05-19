@@ -4,15 +4,7 @@
 namespace lingodb::ast {
 AggregationNode::AggregationNode() : AstNode(NodeType::AGGREGATION) {
 }
-std::string AggregationNode::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("AggregationNode\n");
-   for (auto& aggregation : aggregations) {
-      ast.append(aggregation->toAsciiAST(depth + 1));
-   }
-   ast.append(groupByNode->toAsciiAST(depth + 1));
-   return ast;
-}
+
 std::string AggregationNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

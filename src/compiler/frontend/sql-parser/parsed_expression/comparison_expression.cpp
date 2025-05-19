@@ -7,19 +7,7 @@ ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpressi
 ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
 }
 
-std::string ComparisonExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
 
-      ast.append("ComparisonExpression: $1 ");
-   ast.append(typeToAscii(type));
-   ast.append(" $2\n");
-   if (left)
-      ast.append(left->toAsciiAST(depth + 1));
-   if (right)
-      ast.append(right->toAsciiAST(depth + 1));
-
-   return ast;
-}
 
 std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
    switch (type) {

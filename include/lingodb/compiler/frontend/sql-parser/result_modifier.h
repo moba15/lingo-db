@@ -27,7 +27,7 @@ class ResultModifier : public AstNode {
    virtual ~ResultModifier() = default;
 
    ResultModifierType modifierType;
-   virtual std::string toAsciiAST(uint32_t depth);
+
    virtual std::string toDotGraph(uint32_t depth);
 };
 
@@ -50,7 +50,7 @@ class OrderByModifier : public ResultModifier {
    OrderByModifier() : ResultModifier(ResultModifierType::ORDER_BY) {}
 
    std::vector<std::shared_ptr<OrderByElement>> orderByElements;
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
@@ -58,7 +58,7 @@ class LimitModifier : public ResultModifier {
    public:
    explicit LimitModifier(std::shared_ptr<ParsedExpression> limitExpression) : ResultModifier(ResultModifierType::LIMIT), limitExpression(std::move(limitExpression)) {}
    std::shared_ptr<ParsedExpression> limitExpression;
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
    // ... implementation ...
 };

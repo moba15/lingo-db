@@ -17,18 +17,7 @@ ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) :
    }
 }
 
-std::string ColumnRefExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("ColumnRefExpression: [");
-   for (auto& columnName : column_names) {
-      ast.append(columnName);
-      ast.append(",");
-   }
-   ast = ast.substr(0, ast.size() - 1);
-   ast.append("]");
-   ast.append("\n");
-   return ast;
-}
+
 std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

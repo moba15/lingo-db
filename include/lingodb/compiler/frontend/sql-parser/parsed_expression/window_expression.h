@@ -22,7 +22,6 @@ class WindowExpression : public ParsedExpression {
    static constexpr const ExpressionClass TYPE = ExpressionClass::WINDOW;
    WindowExpression(ExpressionType type, std::string catalogName, std::string schemaName, std::string functionName);
 
-
    //TODO
 
    std::string functionName;
@@ -33,11 +32,8 @@ class WindowExpression : public ParsedExpression {
 
    std::vector<OrderByModifier> orders;
 
-
    /// The window boundaries
    WindowBoundary start = WindowBoundary::INVALID;
    WindowBoundary end = WindowBoundary::INVALID;
-
-
 };
 } // namespace lingodb::ast

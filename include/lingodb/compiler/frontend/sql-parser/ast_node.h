@@ -18,8 +18,7 @@ class AstNode {
 
    NodeType nodeType;
    location loc;
-
-   virtual std::string toAsciiAST(uint32_t depth) = 0;
+   
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
 } // namespace lingodb::ast

@@ -14,7 +14,7 @@ class ConjunctionExpression : public ParsedExpression {
 
    std::vector<std::shared_ptr<ParsedExpression>> children;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    private:
