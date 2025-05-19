@@ -91,7 +91,6 @@ void SelectNodeAnalyzer::transformTargetSelections(std::shared_ptr<ast::TargetsE
    while (it != targetSelection->targets.end()) {
       if ((*it)->type == ast::ExpressionType::AGGREGATE && (*it)->exprClass == ast::ExpressionClass::FUNCTION) {
          aggregation->aggregations.emplace_back(std::static_pointer_cast<ast::FunctionExpression>(*it));
-
       }
       ++it;
    }
@@ -184,6 +183,9 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<T> rootPipeSele
                auto name = target->alias.empty() ? column.getColumnName() : target->alias;
                rootPipeSelectNode->targetInfo.map(name, std::make_shared<ast::ColumnInfo>(columnRef->scope, column));
             }
+            if (columnRef->refsAggregationFunction) {
+               rootPipeSelectNode->targetInfo.map(columnRef->fName, context->currentScope->functionsEntry.at(columnRef->fName));
+            }
          } else if (target->type == ast::ExpressionType::STAR) {
             auto star = std::static_pointer_cast<ast::StarExpression>(target);
             for (auto [scope, column] : star->columns) {
@@ -195,9 +197,9 @@ void SelectNodeAnalyzer::analyzeTargetSelections(std::shared_ptr<T> rootPipeSele
          } else if (target->type == ast::ExpressionType::AGGREGATE && target->exprClass == ast::ExpressionClass::FUNCTION) {
             //Aggregation function
             auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
-            rootPipeSelectNode->targetInfo.map(function->alias.empty() ? function->functionName : function->alias, std::make_shared<ast::FunctionInfo>("fScope", "fName"));
-         }
-         else {
+            auto fName = function->alias.empty() ? function->functionName : function->alias;
+            rootPipeSelectNode->targetInfo.map(fName, context->currentScope->functionsEntry.at(fName));
+         } else {
             error("Currently this Targetselection is not implemented", target->loc);
          }
       }
@@ -233,6 +235,9 @@ void SelectNodeAnalyzer::analyzeModifiers(std::shared_ptr<ast::SelectNode> rootN
       if (modifier->modifierType == ast::ResultModifierType::ORDER_BY) {
          auto orderModifier = std::static_pointer_cast<ast::OrderByModifier>(modifier);
          analyzeOrderByModifier(rootNode, orderModifier, context);
+      } else if (modifier->modifierType == ast::ResultModifierType::LIMIT) {
+         auto limitModifier = std::static_pointer_cast<ast::LimitModifier>(modifier);
+         analyzeLimitModifier(rootNode, limitModifier, context);
       } else {
          throw std::runtime_error("Modifier not implemented");
       }
@@ -244,6 +249,25 @@ void SelectNodeAnalyzer::analyzeOrderByModifier(std::shared_ptr<ast::QueryNode> 
       if (orderByElements->expression) {
          exprAnalyzer.analyze(orderByElements->expression, context);
       }
+   }
+}
+
+void SelectNodeAnalyzer::analyzeLimitModifier(std::shared_ptr<ast::QueryNode> rootNode, std::shared_ptr<ast::LimitModifier> limitModifier, std::shared_ptr<SQLContext> context) {
+   ExpressionAnalyzer exprAnalyzer{};
+   if (!limitModifier->limitExpression) {
+      throw std::runtime_error("Limit expression is empty");
+   }
+   exprAnalyzer.analyze(limitModifier->limitExpression, context);
+   if (limitModifier->limitExpression->exprClass != ast::ExpressionClass::CONSTANT && limitModifier->limitExpression->type != ast::ExpressionType::VALUE_CONSTANT) {
+      throw std::runtime_error("Limit expression is not a constant");
+   }
+   auto constantExpression = std::static_pointer_cast<ast::ConstantExpression>(limitModifier->limitExpression);
+   if (constantExpression->value->type != ast::ConstantType::INT) {
+      throw std::runtime_error("Limit expression is not an integer");
+   }
+   auto intValue = std::static_pointer_cast<ast::IntConstantValue>(constantExpression->value);
+   if (intValue < 0) {
+      throw std::runtime_error("Limit expression is negative");
    }
 }
 

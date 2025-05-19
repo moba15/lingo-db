@@ -21,6 +21,8 @@ class SQLContext {
    std::vector<std::pair<std::string, catalog::Column>> getColumns() const;
    std::vector<std::pair<std::string, catalog::Column>> getColumns(std::string& tableName) const;
 
+   std::pair<std::string, std::shared_ptr<ast::FunctionInfo>> findFunction(const std::string& functionName) const;
+
    std::string toString() const;
 };
 } // namespace lingodb::analyzer

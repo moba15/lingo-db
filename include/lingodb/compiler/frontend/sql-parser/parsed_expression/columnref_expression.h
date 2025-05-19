@@ -28,6 +28,9 @@ class ColumnRefExpression : public ParsedExpression {
    //TODO is this here good practice
    ///The scope of the this->columns. Commonly the name of the table
    std::string scope;
+   // If ColumnRefs refs a Function
+   bool refsAggregationFunction = false;
+   std::string fName;
 
    std::string toAsciiAST(uint32_t depth) override;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;

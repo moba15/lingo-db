@@ -45,4 +45,11 @@ std::string OrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) 
    }
    return dot;
 }
+
+std::string LimitModifier::toAsciiAST(uint32_t depth) {
+   return ResultModifier::toAsciiAST(depth);
+}
+std::string LimitModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast

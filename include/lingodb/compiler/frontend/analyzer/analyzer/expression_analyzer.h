@@ -17,5 +17,12 @@ class ExpressionAnalyzer : public Analyzer {
    void analyzeConstExpression(std::shared_ptr<ast::ConstantExpression> constExpr, std::shared_ptr<SQLContext> context);
    void analyzeConjunctionExpression(std::shared_ptr<ast::ConjunctionExpression> conjunction, std::shared_ptr<SQLContext> context);
    void analyzeAggregationFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context);
+
+   std::string createTmpScope() {
+      static size_t tmpScopeCounter = 0;
+      std::string scope{"tmp_attr"};
+      scope.append(std::to_string(tmpScopeCounter++));
+      return scope;
+   }
 };
 } // namespace lingodb::analyzer

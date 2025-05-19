@@ -6,3 +6,4 @@
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/function_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/star_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/targets_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/parsed_expression/window_expression.h"
