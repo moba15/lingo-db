@@ -226,9 +226,9 @@
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr  where_clause group_by_item 
-                                                        func_arg_expr select_limit_value func_expr
+                                                        func_arg_expr select_limit_value
 
-%type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application
+%type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr
 
 %type<std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>>> func_expr_list
 
