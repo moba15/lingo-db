@@ -35,7 +35,7 @@ class FunctionExpression : public ParsedExpression {
     */
    std::string scope;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 

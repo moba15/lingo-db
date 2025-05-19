@@ -9,25 +9,6 @@ std::string SelectNode::toString(uint32_t depth) {
 };
 SelectNode::~SelectNode() = default;
 
-std::string SelectNode::toAsciiAST(uint32_t depth) {
-   std::string ast{};
-   ast.append(std::string(depth, '\t'));
-   ast.append("└──");
-   ast.append("SelectNode");
-   ast.append("\n");
-
-   if (select_list) {
-      ast.append(std::string(depth + 1, '\t'));
-      ast.append("└── selectList\n");
-      ast.append(select_list->toAsciiAST(depth + 2));
-   }
-
-   if (where_clause) {
-      ast.append(std::string(depth + 1, '\t'));
-      ast.append("└── whereClause\n");
-
-      ast.append(where_clause->toAsciiAST(depth + 2));
-   }
 
    if (from_clause) {
       ast.append(std::string(depth + 1, '\t'));

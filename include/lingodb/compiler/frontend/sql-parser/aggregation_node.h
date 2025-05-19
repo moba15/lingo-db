@@ -11,7 +11,7 @@ class AggregationNode : public AstNode {
    std::vector<std::shared_ptr<FunctionExpression>> aggregations;
    //TODO having clause
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

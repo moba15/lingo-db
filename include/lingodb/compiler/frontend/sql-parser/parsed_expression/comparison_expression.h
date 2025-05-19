@@ -15,7 +15,7 @@ class ComparisonExpression : public ParsedExpression {
    std::shared_ptr<ParsedExpression> left;
    std::shared_ptr<ParsedExpression> right;
 
-   std::string toAsciiAST(uint32_t depth) override;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    private:

@@ -7,9 +7,6 @@ PipeOperator::PipeOperator(PipeOperatorType type, std::shared_ptr<AstNode> node)
 bool PipeOperator::isLast() {
    return next == nullptr;
 }
-std::string PipeOperator::toAsciiAST(uint32_t depth) {
-   std::string ast{};
-   ast.append(node->toAsciiAST(depth));
 
    if (next)
       ast.append(next->toAsciiAST(depth));

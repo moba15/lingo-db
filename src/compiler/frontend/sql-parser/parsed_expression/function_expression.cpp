@@ -9,17 +9,7 @@ FunctionExpression::FunctionExpression(std::string catalog, std::string schema, 
       this->type = ExpressionType::AGGREGATE;
    }
 }
-std::string FunctionExpression::toAsciiAST(uint32_t depth) {
-   toAsciiASTPrefix
-      ast.append("FunctionExpression: ");
-   ast.append(functionName);
-   ast.append("\n");
-   for (auto& argument : arguments) {
-      ast.append(argument->toAsciiAST(depth + 1));
-   }
 
-   return ast;
-}
 std::string FunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
    // Create node identifier for the function

@@ -4,9 +4,7 @@
 namespace lingodb::ast {
 SubqueryRef::SubqueryRef(std::shared_ptr<QueryNode> subSelectNode) : TableRef(TYPE), subSelectNode(std::move(subSelectNode)) {
 }
-std::string SubqueryRef::toAsciiAST(uint32_t depth) {
-   throw std::runtime_error("SubqueryRef::toAsciiAST");
-}
+
 std::string SubqueryRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 

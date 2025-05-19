@@ -1,14 +1,10 @@
 #include "lingodb/compiler/frontend/sql-parser/result_modifier.h"
 namespace lingodb::ast {
-std::string ResultModifier::toAsciiAST(uint32_t depth) {
-   return "ResultModifier: Not implemented";
-}
+
 std::string ResultModifier::toDotGraph(uint32_t depth) {
    return "ResultModifier: Not implemented";
 }
-std::string OrderByModifier::toAsciiAST(uint32_t depth) {
-   return ResultModifier::toAsciiAST(depth);
-}
+
 std::string OrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
    // Create node identifier
@@ -46,9 +42,7 @@ std::string OrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) 
    return dot;
 }
 
-std::string LimitModifier::toAsciiAST(uint32_t depth) {
-   return ResultModifier::toAsciiAST(depth);
-}
+
 std::string LimitModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
