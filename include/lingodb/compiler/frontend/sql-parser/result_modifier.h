@@ -56,8 +56,10 @@ class OrderByModifier : public ResultModifier {
 
 class LimitModifier : public ResultModifier {
    public:
-   LimitModifier() : ResultModifier(ResultModifierType::LIMIT) {}
+   explicit LimitModifier(std::shared_ptr<ParsedExpression> limitExpression) : ResultModifier(ResultModifierType::LIMIT), limitExpression(std::move(limitExpression)) {}
    std::shared_ptr<ParsedExpression> limitExpression;
+   std::string toAsciiAST(uint32_t depth) override;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
    // ... implementation ...
 };
 
