@@ -31,3 +31,6 @@ add_library(lingo-db-parser
 
 add_executable(lingo-db-parser-main main.cpp)
 target_link_libraries(lingo-db-parser-main lingo-db-parser)
+
+target_link_libraries(lingo-db-parser-main runner utility runtime mlir-support scheduler)
+set_target_properties(lingo-db-parser-main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
