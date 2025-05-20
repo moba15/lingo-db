@@ -1,6 +1,6 @@
 #pragma once
 #include "lingodb/compiler/frontend/analyzer/sql_scope.h"
-#include "lingodb/compiler/frontend/sql-parser/parsed_expression/columnref_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 
 #include <iomanip>
 #include <memory>
