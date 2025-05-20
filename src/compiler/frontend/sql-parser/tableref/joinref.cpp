@@ -47,7 +47,29 @@ std::string JoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    dot.append("\"];\n");
 
    // Add left side
-   if (std::holds_alternative<std::shared_ptr<TableRef>>(left)) {
+   if (left) {
+      std::string leftId;
+      leftId.append("node");
+      leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(left.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(leftId);
+      dot.append(" [label=\"left\"];\n");
+      dot.append(left->toDotGraph(depth + 1, idGen));
+   }
+   if (right) {
+      std::string rightId;
+      rightId.append("node");
+      rightId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(right.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(rightId);
+      dot.append(" [label=\"right\"];\n");
+      dot.append(right->toDotGraph(depth + 1, idGen));
+   }
+   /*if (std::holds_alternative<std::shared_ptr<TableRef>>(left)) {
       auto leftRef = std::get<std::shared_ptr<TableRef>>(left);
       if (leftRef) {
          std::string leftId;
@@ -117,7 +139,7 @@ std::string JoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
             dot.append(usingCols[i]->toDotGraph(depth + 1, idGen));
          }
       }
-   }
+   }*/
 
    return dot;
 }
