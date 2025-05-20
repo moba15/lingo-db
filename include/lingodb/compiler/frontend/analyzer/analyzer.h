@@ -1,7 +1,6 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/driver.h"
 #include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
-#include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "sql_context.h"
 
 #include <memory>
