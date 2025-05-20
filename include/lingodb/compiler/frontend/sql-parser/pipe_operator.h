@@ -1,5 +1,6 @@
 #pragma once
 #include "parsed_expression.h"
+#include "tabel_producer.h"
 #include "tableref.h"
 
 #include <memory>
@@ -18,15 +19,13 @@ enum class PipeOperatorType : uint8_t {
    AGGREGATE = 11,
 
 };
-class PipeOperator : public AstNode {
+class PipeOperator : public TableProducer {
    public:
-   PipeOperator(PipeOperatorType type, std::shared_ptr<AstNode> node);
-   PipeOperatorType type;
+   PipeOperator(PipeOperatorType pipeOpType, std::shared_ptr<AstNode> node);
+   PipeOperatorType pipeOpType;
    std::shared_ptr<AstNode> node;
-   std::shared_ptr<PipeOperator> next;
 
    bool isLast();
-
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
