@@ -1,8 +1,8 @@
 #pragma once
-#include "lingodb/compiler/frontend/sql-parser/ast_node.h"
 #include "common/constant_value.h"
 #include "lingodb/catalog/Column.h"
 #include "lingodb/catalog/Types.h"
+#include "lingodb/compiler/frontend/sql-parser/ast_node.h"
 
 #include <string>
 #include <vector>
@@ -215,8 +215,6 @@ enum class ExpressionClass : uint8_t {
    TARGETS = 52
 };
 
-
-
 class ParsedExpression : public BaseExpression {
    public:
    ParsedExpression(ExpressionType type, ExpressionClass expression_class) : BaseExpression(type, expression_class) {
@@ -226,7 +224,6 @@ class ParsedExpression : public BaseExpression {
     * Semantic
     */
    std::optional<catalog::Type> resultType = std::nullopt;
-
 
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
@@ -260,11 +257,8 @@ class ColumnRefExpression : public ParsedExpression {
    bool refsAggregationFunction = false;
    std::string fName;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
-
 
 class ComparisonExpression : public ParsedExpression {
    public:
@@ -276,14 +270,11 @@ class ComparisonExpression : public ParsedExpression {
    std::shared_ptr<ParsedExpression> left;
    std::shared_ptr<ParsedExpression> right;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    private:
    std::string typeToAscii(ExpressionType type) const;
 };
-
-
 
 class ConjunctionExpression : public ParsedExpression {
    public:
@@ -294,14 +285,11 @@ class ConjunctionExpression : public ParsedExpression {
 
    std::vector<std::shared_ptr<ParsedExpression>> children;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    private:
    std::string typeToAscii(ExpressionType type) const;
 };
-
-
 
 class ConstantExpression : public ParsedExpression {
    public:
@@ -310,11 +298,8 @@ class ConstantExpression : public ParsedExpression {
 
    std::shared_ptr<ConstantValue> value;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
-
 
 class FunctionExpression : public ParsedExpression {
    public:
@@ -346,15 +331,12 @@ class FunctionExpression : public ParsedExpression {
     */
    std::string scope;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 static std::vector<std::string> aggregationFunctions{
    "min",
    "max",
    "avg"};
-
-
 
 class StarExpression : public ParsedExpression {
    public:
@@ -378,10 +360,8 @@ class StarExpression : public ParsedExpression {
    //Columns and their scope
    std::vector<std::pair<std::string, catalog::Column>> columns{};
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
 
 //List of targets
 //Used for the select_list
@@ -401,11 +381,8 @@ class TargetsExpression : public ParsedExpression {
    //TODO only reference to column
    std::vector<std::pair<std::string, catalog::Column>> targetColumns{};
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
-
 
 enum class WindowBoundary : uint8_t {
    INVALID = 0,

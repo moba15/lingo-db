@@ -42,7 +42,6 @@ std::string OrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) 
    return dot;
 }
 
-
 std::string LimitModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
