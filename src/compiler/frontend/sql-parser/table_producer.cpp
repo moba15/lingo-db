@@ -1,4 +1,4 @@
-#include "lingodb/compiler/frontend/sql-parser/tabel_producer.h"
+#include "lingodb/compiler/frontend/sql-parser/table_producer.h"
 namespace lingodb::ast {
 TableProducer::TableProducer(NodeType type) : AstNode(type) {
 }
