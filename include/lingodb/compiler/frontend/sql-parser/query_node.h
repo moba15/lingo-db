@@ -1,6 +1,7 @@
 #pragma once
 #include "ast_node.h"
 #include "result_modifier.h"
+#include "tabel_producer.h"
 
 #include <cstdint>
 #include <memory>
@@ -24,10 +25,10 @@ enum class QueryNodeType : uint8_t {
    PIPE_NODE = 6
 
 };
-class QueryNode : public AstNode {
+class QueryNode : public TableProducer {
    public:
    virtual ~QueryNode();
-   explicit QueryNode(QueryNodeType type) : AstNode(NodeType::QUERY_NODE), type(type) {};
+   explicit QueryNode(QueryNodeType type) : TableProducer(NodeType::QUERY_NODE), type(type) {};
 
    //! The type of the query node, either SetOperation or Select
    QueryNodeType type;
