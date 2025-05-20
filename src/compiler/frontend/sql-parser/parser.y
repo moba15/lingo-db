@@ -22,7 +22,7 @@
   #include "lingodb/compiler/frontend/sql-parser/tableref.h"
   #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
   #include "lingodb/compiler/frontend/sql-parser/result_modifier.h"
-  #include "lingodb/compiler/frontend/sql-parser/parsed_expression/list.h"
+  #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref/list.h"
   #include "lingodb/compiler/frontend/sql-parser/common/binding_alias.h"
   #include "lingodb/compiler/frontend/sql-parser/common/constant_value.h"
