@@ -4,7 +4,6 @@ namespace lingodb::ast {
 BaseTableRef::BaseTableRef(TableDescription tableDescription) : TableRef(TYPE), catalogName(tableDescription.database), schemaName(tableDescription.schema), tableName(tableDescription.table) {
 }
 
-
 std::string BaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
@@ -26,8 +25,6 @@ std::string BaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
 
    return dot;
 }
-
-
 
 /// JoinRef
 JoinRef::JoinRef(JoinType type, JoinCondType refType) : TableRef(TYPE), type(type), refType(refType) {
@@ -100,8 +97,6 @@ std::string JoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
 
    return dot;
 }
-
-
 
 ///SuqueryRef
 SubqueryRef::SubqueryRef(std::shared_ptr<QueryNode> subSelectNode) : TableRef(TYPE), subSelectNode(std::move(subSelectNode)) {

@@ -37,8 +37,6 @@ enum class TableReferenceType : uint8_t {
    DELIM_GET = 12 // Delim get ref
 };
 
-
-
 class BaseTableRef : public TableRef {
    public:
    static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;
@@ -59,11 +57,8 @@ class BaseTableRef : public TableRef {
    std::shared_ptr<catalog::TableCatalogEntry> catalogEntry = nullptr;
    std::string scopeName;
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
-
 
 enum class JoinCondType : uint8_t {
    REGULAR, // Explicit conditions
@@ -115,11 +110,8 @@ class JoinRef : public TableRef {
    /*//! Duplicate eliminated columns (if any)
    vector<unique_ptr<ParsedExpression>> duplicate_eliminated_columns;*/
 
-
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-
-
 
 class SubqueryRef : public TableRef {
    static constexpr TableReferenceType TYPE = TableReferenceType::SUBQUERY;
@@ -130,7 +122,6 @@ class SubqueryRef : public TableRef {
    //! The subquery
    //!TODO correct Type
    std::shared_ptr<QueryNode> subSelectNode;
-
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
