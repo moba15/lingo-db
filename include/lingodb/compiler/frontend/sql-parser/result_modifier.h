@@ -1,5 +1,5 @@
 #pragma once
-#include "parsed_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include <memory>
 #include <vector>
 namespace lingodb::ast {
