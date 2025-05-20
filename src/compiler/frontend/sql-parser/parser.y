@@ -17,6 +17,7 @@
   #include <vector>
 
   #include "lingodb/compiler/frontend/sql-parser/node_factory.h"
+  #include "lingodb/compiler/frontend/sql-parser/table_node.h"
   #include "lingodb/compiler/frontend/sql-parser/query_node/list.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref.h"
   #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
@@ -218,8 +219,8 @@
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
 
-
-%type <std::shared_ptr<lingodb::ast::QueryNode>> stmtmulti select_no_parens select_clause toplevel_stmt stmt simple_select SelectStmt select_with_parens
+%type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens
+%type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select
 
 %type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list
 
@@ -388,43 +389,25 @@ select_no_parens:
     //PIPE:
     | from_clause 
      {
-        auto pipeNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
         auto p = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::FROM, $from_clause);
-        pipeNode->startPipeOperator = p;
-        $$ = pipeNode;
+        $$ = p;
         
      }
      //TODO DOC
     | select_no_parens[parens] PIPE pipe_operator 
     {
-        auto pipeNode = $parens->type == lingodb::ast::QueryNodeType::SELECT_NODE 
-                            ? mkNode<lingodb::ast::PipeSelectNode>(@$)
-                            : std::static_pointer_cast<lingodb::ast::PipeSelectNode>($parens);
-        std::shared_ptr<lingodb::ast::PipeOperator> tmp;
-        if(pipeNode->startPipeOperator) {
-            tmp = pipeNode->startPipeOperator;
-        }
-        if( $parens->type == lingodb::ast::QueryNodeType::SELECT_NODE) {
-            pipeNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::SELECT ,$parens);
-        }
-            
-        if($pipe_operator->node->nodeType == lingodb::ast::NodeType::TABLE_REF 
-            && std::static_pointer_cast<lingodb::ast::TableRef>($pipe_operator->node)->type == lingodb::ast::TableReferenceType::JOIN) {
-            auto joinRef = std::static_pointer_cast<lingodb::ast::JoinRef>($pipe_operator->node);
-            joinRef->left = pipeNode;
-            auto newNode = mkNode<lingodb::ast::PipeSelectNode>(@$);
-            newNode->startPipeOperator = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::JOIN, joinRef);
-            $$ = newNode;
-           
+
+        auto pipeOp = std::static_pointer_cast<lingodb::ast::PipeOperator>($pipe_operator);
+        if(pipeOp->pipeOpType == lingodb::ast::PipeOperatorType::JOIN) {
+            auto join = std::static_pointer_cast<lingodb::ast::JoinRef>(pipeOp->node);
+            join->left = $parens;
         } else {
-            if(pipeNode->endPipeOperator) {
-                pipeNode->endPipeOperator->next  = $pipe_operator;
-            } else {
-                pipeNode->startPipeOperator->next = $pipe_operator;
-            }
-            pipeNode->endPipeOperator = $pipe_operator;
-            $$ = pipeNode;
+            $pipe_operator->input = $parens;
         }
+        
+        
+        $$ = $pipe_operator;
+        
     }
     ;
 pipe_start:
@@ -541,7 +524,8 @@ table_ref:
     | joined_table opt_alias_clause
     | select_with_parens opt_alias_clause 
     {
-        auto subquery = mkNode<lingodb::ast::SubqueryRef>(@$, $select_with_parens);
+        //TODO
+        auto subquery = mkNode<lingodb::ast::SubqueryRef>(@$, std::static_pointer_cast<lingodb::ast::SelectNode>($select_with_parens));
         subquery->alias = $opt_alias_clause;
         $$ = subquery;
     }
