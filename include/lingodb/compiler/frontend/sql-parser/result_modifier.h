@@ -1,5 +1,6 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
+#include "table_producer.h"
 #include <memory>
 #include <vector>
 namespace lingodb::ast {
@@ -19,10 +20,10 @@ enum class OrderByNullType : uint8_t {
    NULLS_LAST = 3
 };
 
-class ResultModifier : public AstNode {
+class ResultModifier : public TableProducer {
    public:
    explicit ResultModifier(ResultModifierType type)
-      : AstNode(NodeType::RESULT_MODIFIER), modifierType(type) {}
+      : TableProducer(NodeType::RESULT_MODIFIER), modifierType(type) {}
 
    virtual ~ResultModifier() = default;
 
