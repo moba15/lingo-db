@@ -21,13 +21,6 @@ add_library(lingo-db-parser
 
         query_node/select_node.cpp
 
-
-
-
-        tableref/basetableref.cpp
-        tableref/joinref.cpp
-        tableref/subqueryref.cpp
-
         common/node_id_generator.cpp
         common/constant_value.cpp
 
