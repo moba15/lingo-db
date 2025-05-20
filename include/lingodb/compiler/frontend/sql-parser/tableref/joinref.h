@@ -2,7 +2,6 @@
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression/columnref_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/pipe_operator.h"
-#include "lingodb/compiler/frontend/sql-parser/query_node/pipe_select_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 
 #include <memory>
