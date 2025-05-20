@@ -21,7 +21,6 @@ add_library(lingo-db-parser
         tabel_producer.cpp
 
         query_node/select_node.cpp
-        query_node/pipe_select_node.cpp
 
 
         parsed_expression/comparison_expression.cpp
