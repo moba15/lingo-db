@@ -3,10 +3,6 @@ add_library(lingo-db-analyzer
         sql_scope.cpp
         sql_analyzer.cpp
         sql_context.cpp
-        sql_pass.cpp
-
-        analyzer/select_node_analyzer.cpp
-        analyzer/expression_analyzer.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
