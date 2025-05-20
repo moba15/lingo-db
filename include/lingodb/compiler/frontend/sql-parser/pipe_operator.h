@@ -1,6 +1,6 @@
 #pragma once
 #include "parsed_expression.h"
-#include "tabel_producer.h"
+#include "table_producer.h"
 #include "tableref.h"
 
 #include <memory>
