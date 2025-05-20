@@ -1,19 +1,19 @@
 #pragma once
 #include "ast_node.h"
+#include "tabel_producer.h"
 
 #include <cstdint>
 #include <string>
 namespace lingodb::ast {
 enum class TableReferenceType : uint8_t;
 
-class TableRef : public AstNode {
+class TableRef : public TableProducer {
    public:
-   explicit TableRef(TableReferenceType type) : AstNode(NodeType::TABLE_REF), type(type) {
+   explicit TableRef(TableReferenceType type) : TableProducer(NodeType::TABLE_REF), type(type) {
    }
    TableReferenceType type;
    //TODO missing variables
    std::string alias;
-
 
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };

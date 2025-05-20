@@ -20,9 +20,9 @@ class JoinRef : public TableRef {
 
    //! The left hand side of the join
    //! QueryNode as variant is needed for pipe syntax. Example: FROM Test |> join ok on id1=id2
-   std::variant<std::shared_ptr<TableRef>, std::shared_ptr<QueryNode>> left;
+   std::shared_ptr<TableProducer> left;
    //! The right hand side of the join
-   std::shared_ptr<TableRef> right;
+   std::shared_ptr<TableProducer> right;
    //TODO is this condition a good solution for on condiotion and using?
    //! The joint condition or a vector of ColumnRefExpression if USING
    jointCondOrUsingCols condition;
