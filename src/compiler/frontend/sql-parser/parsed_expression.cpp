@@ -17,7 +17,6 @@ ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) :
    }
 }
 
-
 std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
@@ -50,15 +49,11 @@ std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idG
    return dot;
 }
 
-
-
 /// ComparisonExpression
 ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpression(type, TYPE) {
 }
 ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
 }
-
-
 
 std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
    switch (type) {
@@ -128,7 +123,6 @@ std::string ConjunctionExpression::typeToAscii(ExpressionType type) const {
    }
 }
 
-
 std::string ConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
@@ -167,7 +161,6 @@ std::string ConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& i
 }
 /// ConstantExpression
 ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE) {}
-
 
 std::string ConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
@@ -271,7 +264,6 @@ std::string FunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGe
 StarExpression::StarExpression(std::string relationName)
    : ParsedExpression(ExpressionType::STAR, ExpressionClass::STAR), relationName(std::move(relationName)) {
 }
-
 
 std::string StarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
