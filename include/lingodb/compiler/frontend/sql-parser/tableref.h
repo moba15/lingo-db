@@ -1,6 +1,6 @@
 #pragma once
 #include "ast_node.h"
-#include "tabel_producer.h"
+#include "table_producer.h"
 
 #include <cstdint>
 #include <string>

@@ -18,7 +18,7 @@ add_library(lingo-db-parser
         pipe_operator.cpp
         aggregation_node.cpp
         result_modifier.cpp
-        tabel_producer.cpp
+        table_producer.cpp
 
         query_node/select_node.cpp
 
