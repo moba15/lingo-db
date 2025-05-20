@@ -9,28 +9,6 @@ std::string SelectNode::toString(uint32_t depth) {
 };
 SelectNode::~SelectNode() = default;
 
-
-   if (from_clause) {
-      ast.append(std::string(depth + 1, '\t'));
-      ast.append("└── from_clause\n");
-
-      ast.append(from_clause->toAsciiAST(depth + 2));
-   }
-
-   if (groups) {
-      ast.append(std::string(depth + 1, '\t'));
-      ast.append("└── groups\n");
-      ast.append(groups->toAsciiAST(depth + 2));
-   }
-
-   if (having) {
-      ast.append(std::string(depth + 1, '\t'));
-      ast.append("└── having\n");
-      ast.append(having->toAsciiAST(depth + 2));
-   }
-
-   return ast;
-}
 std::string SelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
@@ -123,7 +101,7 @@ std::string SelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
       nodeId.append("node");
       nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(currentOp->node.get()))));
 
-      currentOp = currentOp->next;
+      currentOp = nullptr;
       i++;
    }
 
