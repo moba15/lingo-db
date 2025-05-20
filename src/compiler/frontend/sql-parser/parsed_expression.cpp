@@ -1,1 +1,350 @@
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
+
+#include <cassert>
+namespace lingodb::ast {
+
+///ColumnRef
+//TODO Find better solution for ColumnRefExpression than duckdb does with columnName and tableName
+ColumnRefExpression::ColumnRefExpression(std::string columnName, std::string tableName)
+   : ColumnRefExpression(tableName.empty() ? std::vector<std::string>{std::move(columnName)} : std::vector<std::string>{std::move(tableName), std::move(columnName)}) {
+}
+ColumnRefExpression::ColumnRefExpression(std::string columnName) : ColumnRefExpression(std::vector<std::string>{std::move(columnName)}) {
+}
+
+ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) : ParsedExpression(ExpressionType::COLUMN_REF, TYPE), column_names(columnNames) {
+   for (auto& columnName : columnNames) {
+      assert(!columnName.empty());
+   }
+}
+
+
+std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the label with column names
+   std::string label;
+   label.append("ColumnRef\\n");
+
+   // Add all column names with dots between them
+   for (size_t i = 0; i < column_names.size(); ++i) {
+      if (i > 0) {
+         label.append(".");
+      }
+      label.append(column_names[i]);
+   }
+
+   // Create the node
+   dot.append(nodeId);
+   dot.append(" [label=\"");
+   dot.append(label);
+   if (!alias.empty()) {
+      dot.append("\\nalias: ");
+      dot.append(alias);
+   }
+   dot.append("\"];\n");
+   return dot;
+}
+
+
+
+/// ComparisonExpression
+ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpression(type, TYPE) {
+}
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
+}
+
+
+
+std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
+   switch (type) {
+      case ExpressionType::COMPARE_EQUAL: return "=";
+      case ExpressionType::COMPARE_GREATERTHAN: return ">";
+      case ExpressionType::COMPARE_LESSTHAN: return "<";
+      case ExpressionType::COMPARE_GREATERTHANOREQUALTO: return ">=";
+      case ExpressionType::COMPARE_LESSTHANOREQUALTO: return "<=";
+      case ExpressionType::COMPARE_NOTEQUAL: return "<>";
+      default: "Unknown";
+   }
+}
+std::string ComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the comparison expression
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the node with operator label
+   dot.append(nodeId);
+   dot.append(" [label=\"σ\n");
+   dot.append(typeToAscii(type));
+   dot.append("\"];\n");
+
+   // Handle left operand
+   if (left) {
+      std::string leftId;
+      leftId.append("node");
+      leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(left.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(leftId);
+      dot.append(" [label=\"left\"];\n");
+      dot.append(left->toDotGraph(depth + 1, idGen));
+   }
+
+   // Handle right operand
+   if (right) {
+      std::string rightId;
+      rightId.append("node");
+      rightId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(right.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(rightId);
+      dot.append(" [label=\"right\"];\n");
+      dot.append(right->toDotGraph(depth + 1, idGen));
+   }
+
+   return dot;
+}
+
+/// ConjunctionExpression
+ConjunctionExpression::ConjunctionExpression(ExpressionType type) : ParsedExpression(type, TYPE), children() {}
+ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::shared_ptr<lingodb::ast::ParsedExpression> left, std::shared_ptr<lingodb::ast::ParsedExpression> right) : ConjunctionExpression(type, std::vector{left, right}) {}
+ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<ParsedExpression>> children) : ParsedExpression(type, TYPE), children(std::move(children)) {
+}
+
+std::string ConjunctionExpression::typeToAscii(ExpressionType type) const {
+   switch (type) {
+      case ExpressionType::CONJUNCTION_AND: return "AND";
+      case ExpressionType::CONJUNCTION_OR: return "OR";
+      default: return "Not found";
+   }
+}
+
+
+std::string ConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the conjunction
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the conjunction node
+   dot.append(nodeId);
+   dot.append(" [label=\"σ\n");
+   dot.append(typeToAscii(type));
+   dot.append("\"];\n");
+
+   // Add all child expressions
+   for (size_t i = 0; i < children.size(); ++i) {
+      if (children[i]) {
+         std::string childId;
+         childId.append("node");
+         childId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(children[i].get()))));
+
+         // Create edge from conjunction to this child
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(childId);
+         dot.append(" [label=\"child ");
+         dot.append(std::to_string(i + 1));
+         dot.append("\"];\n");
+
+         // Add the child's graph representation
+         dot.append(children[i]->toDotGraph(depth + 1, idGen));
+      }
+   }
+
+   return dot;
+}
+/// ConstantExpression
+ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE) {}
+
+
+std::string ConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the constant
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create label with constant value
+   std::string label;
+   label.append("Constant\\n");
+
+   label.append(value->toString());
+
+   // Create the node
+   dot.append(nodeId);
+   dot.append(" [label=\"");
+   dot.append(label);
+   dot.append("\"];\n");
+
+   return dot;
+}
+/// FunctionExpression
+FunctionExpression::FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState) : ParsedExpression(ExpressionType::FUNCTION, TYPE), catalog(catalog), schema(schema), functionName(functionName), isOperator(isOperator), distinct(distinct), exportState(exportState) {
+   auto found = std::find(aggregationFunctions.begin(), aggregationFunctions.end(), functionName);
+   if (found != aggregationFunctions.end()) {
+      //! TODO Check if this make sense here
+      this->type = ExpressionType::AGGREGATE;
+   }
+}
+
+std::string FunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+   // Create node identifier for the function
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the function node with its label
+   dot.append(nodeId);
+   dot.append(" [label=\"Function\nname: ");
+   dot.append(functionName);
+   if (distinct) {
+      dot.append("\\nDISTINCT");
+   }
+   if (type == ExpressionType::AGGREGATE) {
+      dot.append("\nagg\n");
+   }
+   dot.append("\"];\n");
+
+   // Add all function arguments
+   for (size_t i = 0; i < arguments.size(); ++i) {
+      if (arguments[i]) {
+         std::string argId;
+         argId.append("node");
+         argId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(arguments[i].get()))));
+
+         // Create edge from function to this argument
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(argId);
+         dot.append(" [label=\"arg ");
+         dot.append(std::to_string(i + 1));
+         dot.append("\"];\n");
+
+         // Add the argument's graph representation
+         dot.append(arguments[i]->toDotGraph(depth + 1, idGen));
+      }
+   }
+
+   // Add filter if present
+   if (filter) {
+      std::string filterId;
+      filterId.append("node");
+      filterId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(filter.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(filterId);
+      dot.append(" [label=\"filter\"];\n");
+      dot.append(filter->toDotGraph(depth + 1, idGen));
+   }
+
+   // Add order by if present
+   if (orderBy) {
+      std::string orderId;
+      orderId.append("node");
+      orderId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(orderBy.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(orderId);
+      dot.append(" [label=\"order by\"];\n");
+      dot.append(orderBy->toDotGraph(depth + 1, idGen));
+   }
+
+   return dot;
+}
+///StarExpression
+StarExpression::StarExpression(std::string relationName)
+   : ParsedExpression(ExpressionType::STAR, ExpressionClass::STAR), relationName(std::move(relationName)) {
+}
+
+
+std::string StarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the star expression
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the star node with its label
+   dot.append(nodeId);
+   dot.append(" [label=\"");
+   if (!relationName.empty()) {
+      dot.append(relationName);
+      dot.append(".");
+   }
+   dot.append("*");
+   if (columnsExpr) {
+      dot.append("\\nCOLUMNS");
+   }
+   dot.append("\"];\n");
+
+   // Add expression if present
+   if (expr) {
+      std::string exprId;
+      exprId.append("node");
+      exprId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(expr.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(exprId);
+      dot.append(" [label=\"expr\"];\n");
+      dot.append(expr->toDotGraph(depth + 1, idGen));
+   }
+
+   return dot;
+}
+///TargetsExpression
+TargetsExpression::TargetsExpression() : ParsedExpression(ExpressionType::TARGETS, TYPE) {
+}
+
+std::string TargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the targets list
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the targets list node
+   dot.append(nodeId);
+   dot.append(" [label=\"Targets List\"];\n");
+
+   // Add all target expressions
+   for (size_t i = 0; i < targets.size(); ++i) {
+      if (targets[i]) {
+         std::string targetId;
+         targetId.append("node");
+         targetId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(targets[i].get()))));
+
+         // Create edge from targets list to this target
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(targetId);
+         dot.append(" [label=\"target ");
+         dot.append(std::to_string(i + 1));
+         dot.append("\"];\n");
+
+         // Add the target's graph representation
+         dot.append(targets[i]->toDotGraph(depth + 1, idGen));
+      }
+   }
+
+   return dot;
+}
+}

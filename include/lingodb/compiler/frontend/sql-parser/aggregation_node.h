@@ -1,7 +1,7 @@
 #pragma once
 #include "ast_node.h"
 #include "group_by_node.h"
-#include "parsed_expression/function_expression.h"
+#include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 namespace lingodb::ast {
 class AggregationNode : public AstNode {
    public:

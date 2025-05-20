@@ -1,7 +1,6 @@
 #pragma once
 #include "lingodb/compiler/frontend/sql-parser/group_by_node.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
-#include "lingodb/compiler/frontend/sql-parser/parsed_expression/targets_expression.h"
 #include "lingodb/compiler/frontend/sql-parser/pipe_operator.h"
 #include "lingodb/compiler/frontend/sql-parser/query_node.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"

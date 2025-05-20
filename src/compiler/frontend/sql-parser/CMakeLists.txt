@@ -9,7 +9,6 @@ add_library(lingo-db-parser
         driver.cpp
 
         node_factory.cpp
-        base_expression.cpp
         parsed_expression.cpp
         query_node.cpp
         tableref.cpp
@@ -22,14 +21,6 @@ add_library(lingo-db-parser
 
         query_node/select_node.cpp
 
-
-        parsed_expression/comparison_expression.cpp
-        parsed_expression/columnref_expression.cpp
-        parsed_expression/star_expression.cpp
-        parsed_expression/constant_expression.cpp
-        parsed_expression/conjunction_expression.cpp
-        parsed_expression/function_expression.cpp
-        parsed_expression/targets_expression.cpp
 
 
 
