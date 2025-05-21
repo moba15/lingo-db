@@ -128,6 +128,34 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
 
          return pipeOp;
       }
+      case ast::NodeType::TABLE_REF: {
+         auto tableRef = std::static_pointer_cast<ast::TableRef>(rootNode);
+         switch (tableRef->type) {
+            case ast::TableReferenceType::BASE_TABLE: {
+               return tableRef;
+            }
+            case ast::TableReferenceType::JOIN: {
+               auto joinRef = std::static_pointer_cast<ast::JoinRef>(tableRef);
+               if (joinRef->left) {
+                  joinRef->left = transform(joinRef->left, context);
+               }
+               if (joinRef->right) {
+                  joinRef->right = transform(joinRef->right, context);
+               }
+
+               return tableRef;
+
+            }
+            case ast::TableReferenceType::SUBQUERY: {
+               auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
+               auto transformedSubSelectNode = transform(subquery->subSelectNode, context);
+               subquery->subSelectNode = transformedSubSelectNode;
+               return subquery;
+
+            }
+            default: return tableRef;
+         }
+      }
       default:
          return rootNode;
    }
