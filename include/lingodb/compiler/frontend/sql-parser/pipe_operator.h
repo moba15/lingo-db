@@ -25,7 +25,7 @@ class PipeOperator : public TableProducer {
    PipeOperatorType pipeOpType;
    std::shared_ptr<AstNode> node;
 
-   bool isLast();
+   std::shared_ptr<TableProducer> input = nullptr;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
