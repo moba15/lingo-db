@@ -28,6 +28,7 @@ class ResultModifier : public TableProducer {
    virtual ~ResultModifier() = default;
 
    ResultModifierType modifierType;
+   std::shared_ptr<TableProducer> input = nullptr;
 
    virtual std::string toDotGraph(uint32_t depth);
 };

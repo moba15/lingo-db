@@ -8,7 +8,11 @@ std::string ResultModifier::toDotGraph(uint32_t depth) {
 std::string OrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
    // Create node identifier
-   dot.append(inputToDotGraph(depth, idGen));
+   if (input) {
+      dot += "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))) +
+         " -> node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(input.get()))) + "[label=\"has input\"];\n";
+      dot += input->toDotGraph(depth + 1, idGen);
+   }
    std::string nodeId;
    nodeId.append("node");
    nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
