@@ -120,8 +120,8 @@ class SubqueryRef : public TableRef {
    SubqueryRef(std::shared_ptr<QueryNode> subSelectNode);
 
    //! The subquery
-   //!TODO correct Type
-   std::shared_ptr<QueryNode> subSelectNode;
+   //TODO correct Type?
+   std::shared_ptr<TableProducer> subSelectNode;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
