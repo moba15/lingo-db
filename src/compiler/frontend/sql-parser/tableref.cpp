@@ -7,7 +7,6 @@ BaseTableRef::BaseTableRef(TableDescription tableDescription) : TableRef(TYPE), 
 std::string BaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
-   dot.append(inputToDotGraph(depth, idGen));
 
    // Create node identifier for the base table reference
    std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
@@ -34,7 +33,6 @@ JoinRef::JoinRef(JoinType type, JoinCondType refType) : TableRef(TYPE), type(typ
 
 std::string JoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
-   dot.append(inputToDotGraph(depth, idGen));
    // Create node identifier for the join
    std::string nodeId;
    nodeId.append("node");
@@ -106,7 +104,6 @@ SubqueryRef::SubqueryRef(std::shared_ptr<QueryNode> subSelectNode) : TableRef(TY
 
 std::string SubqueryRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
-   dot.append(inputToDotGraph(depth, idGen));
 
    // Create node identifier for the SELECT node
    std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
