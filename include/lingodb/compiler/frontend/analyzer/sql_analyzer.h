@@ -12,16 +12,19 @@ class SQLQueryAnalyzer {
    std::shared_ptr<SQLContext> context = std::make_shared<SQLContext>();
 
    std::shared_ptr<ast::TableProducer> analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
-
+   std::shared_ptr<ast::TableProducer> transform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
    private:
    std::shared_ptr<catalog::Catalog> catalog;
    driver drv{};
 
    void analyzeRootNode(std::shared_ptr<ast::AstNode> rootNode);
-   std::shared_ptr<ast::TableProducer> transform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
+
+
+   template<class T>
+   std::shared_ptr<T> transformCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
 
    private:
-   std::shared_ptr<ast::AggregationNode> aggregation = std::make_shared<ast::AggregationNode>();
+
 
    void transformTargetSelections(std::shared_ptr<ast::TargetsExpression> targetSelection, std::shared_ptr<SQLContext> context);
    void transformGroupByClause(std::shared_ptr<ast::SelectNode> rootSelectNode, std::shared_ptr<ast::GroupByNode> groupByNode, std::shared_ptr<SQLContext> context);
