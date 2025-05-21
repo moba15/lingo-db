@@ -107,6 +107,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
       }
       case ast::NodeType::PIPE_OP: {
          auto pipeOp = std::static_pointer_cast<ast::PipeOperator>(rootNode);
+         if (pipeOp->input) {
+           pipeOp->input = transform(pipeOp->input, context);
+         }
+
          switch (pipeOp->pipeOpType) {
             case ast::PipeOperatorType::SELECT: {
                auto selectNode = std::static_pointer_cast<ast::TargetsExpression>(pipeOp->node);
@@ -116,6 +120,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                      context->aggregationNode->aggregations.push_back(std::static_pointer_cast<ast::FunctionExpression>(target));
                   }
                }
+
+               return pipeOp;
             }
             default: return pipeOp;
          }
