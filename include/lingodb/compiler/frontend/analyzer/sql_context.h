@@ -1,11 +1,20 @@
 #pragma once
 #include "lingodb/compiler/frontend/analyzer/sql_scope.h"
+#include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
+#include "lingodb/compiler/frontend/sql-parser/group_by_node.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 
 #include <iomanip>
 #include <memory>
 #include <vector>
 namespace lingodb::analyzer {
+
+class ASTTransformContext {
+   public:
+   ASTTransformContext();
+   std::shared_ptr<ast::AggregationNode> aggregationNode;
+
+};
 
 class SQLContext {
    public:

@@ -2,6 +2,9 @@
 
 #include <iostream>
 namespace lingodb::analyzer {
+ASTTransformContext::ASTTransformContext() :aggregationNode(std::make_shared<ast::AggregationNode>()){
+}
+
 void SQLContext::pushNewScope() {
    auto newScope = std::make_shared<SQLScope>();
    newScope->parent = currentScope;
