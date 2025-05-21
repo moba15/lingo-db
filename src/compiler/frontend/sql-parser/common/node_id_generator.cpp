@@ -14,4 +14,8 @@ uint64_t NodeIdGenerator::getId(uintptr_t id) {
    }
    return idMap[id];
 }
+
+void NodeIdGenerator::setId(uint64_t id, uint64_t setID) {
+   idMap[id] = setID;
+}
 } // namespace lingodb::ast
