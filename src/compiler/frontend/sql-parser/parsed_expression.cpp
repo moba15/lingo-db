@@ -339,4 +339,74 @@ std::string TargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen
 
    return dot;
 }
+
+OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), children(std::vector<std::shared_ptr<ParsedExpression>>{}) {
+   children.push_back(std::move(left));
+   children.push_back(std::move(right));
 }
+std::string OperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the operator expression
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the operator node with its label
+   dot.append(nodeId);
+   dot.append(" [label=\"Operator\\n");
+   switch (type) {
+      case ExpressionType::OPERATOR_PLUS:
+         dot.append("+");
+         break;
+      case ExpressionType::OPERATOR_MINUS:
+         dot.append("-");
+         break;
+      case ExpressionType::OPERATOR_TIMES:
+         dot.append("*");
+         break;
+      case ExpressionType::OPERATOR_DIVIDE:
+         dot.append("/");
+         break;
+      case ExpressionType::OPERATOR_MOD:
+         dot.append("%");
+         break;
+      case ExpressionType::OPERATOR_NOT:
+         dot.append("NOT");
+         break;
+      case ExpressionType::OPERATOR_IS_NULL:
+         dot.append("IS NULL");
+         break;
+      case ExpressionType::OPERATOR_IS_NOT_NULL:
+         dot.append("IS NOT NULL");
+         break;
+      default:
+         dot.append("Unknown Operator");
+         break;
+   }
+   dot.append("\"];\n");
+
+   // Add all child expressions
+   for (size_t i = 0; i < children.size(); ++i) {
+      if (children[i]) {
+         std::string childId;
+         childId.append("node");
+         childId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(children[i].get()))));
+
+         // Create edge from operator to this child
+         dot.append(nodeId);
+         dot.append(" -> ");
+         dot.append(childId);
+         dot.append(" [label=\"child ");
+         dot.append(std::to_string(i + 1));
+         dot.append("\"];\n");
+
+         // Add the child's graph representation
+         dot.append(children[i]->toDotGraph(depth + 1, idGen));
+      }
+   }
+
+   return dot;
+}
+
+} // namespace lingodb::ast
