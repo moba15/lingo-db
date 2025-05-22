@@ -37,6 +37,11 @@ enum class ExpressionType : uint8_t {
    OPERATOR_IS_NOT_NULL = 15,
    // unpack operator
    OPERATOR_UNPACK = 16,
+   OPERATOR_MINUS = 17,
+   OPERATOR_PLUS = 18,
+   OPERATOR_TIMES = 19,
+   OPERATOR_DIVIDE = 20,
+   OPERATOR_MOD = 21,
 
    // -----------------------------
    // Comparison Operators
@@ -228,8 +233,7 @@ class ParsedExpression : public BaseExpression {
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
 
-//! ComparisonExpression represents a boolean comparison (e.g. =, >=, <>). Always returns a boolean
-//! and has two children.
+
 class ColumnRefExpression : public ParsedExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::COLUMN_REF;
@@ -260,6 +264,9 @@ class ColumnRefExpression : public ParsedExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
+
+//! ComparisonExpression represents a boolean comparison (e.g. =, >=, <>). Always returns a boolean
+//! and has two children.
 class ComparisonExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::COMPARISON;
@@ -382,6 +389,15 @@ class TargetsExpression : public ParsedExpression {
    std::vector<std::pair<std::string, catalog::Column>> targetColumns{};
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
+class OperatorExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::OPERATOR;
+   OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
+   std::vector<std::shared_ptr<ParsedExpression>> children;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
 };
 
 enum class WindowBoundary : uint8_t {
