@@ -4,26 +4,36 @@
 
 #include <memory>
 namespace lingodb::ast {
-ConstantValue::ConstantValue(ConstantType type) : type(type) {
+Value::Value(ConstantType type) : type(type) {
 }
-std::string ConstantValue::toString() {
+std::string Value::toString() {
+   return "ConstantValue: " + std::to_string(static_cast<int>(type));
    throw std::runtime_error("toString() not implemented for ConstantValue");
 }
 /*
  * IntConstantValue
  */
-IntConstantValue::IntConstantValue(int iVal) : ConstantValue(ConstantType::INT), iVal(iVal) {
+IntValue::IntValue(int iVal) : Value(ConstantType::INT), iVal(iVal) {
 }
-std::string IntConstantValue::toString() {
-   return std::to_string(iVal);
+std::string IntValue::toString() {
+   return "int:" + std::to_string(iVal);
 }
 
 /*
  * StringConstantValue
  */
-StringConstantValue::StringConstantValue(std::string sVal) : ConstantValue(ConstantType::STRING), sVal(sVal) {
+StringValue::StringValue(std::string sVal) : Value(ConstantType::STRING), sVal(sVal) {
 }
-std::string StringConstantValue::toString() {
-   return sVal;
+std::string StringValue::toString() {
+   return "string: " + sVal;
+}
+
+/*
+ * IntervalValue
+*/
+IntervalValue::IntervalValue(Interval iVal) : Value(ConstantType::INTERVAL), iVal(iVal) {
+}
+std::string IntervalValue::toString() {
+   return Value::toString();
 }
 } // namespace lingodb::ast
