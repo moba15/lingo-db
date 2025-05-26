@@ -4,6 +4,12 @@ add_library(lingo-db-analyzer
         sql_analyzer.cpp
         sql_context.cpp
 
+        bound/bound_tableref.cpp
+        bound/bound_expression.cpp
+        bound/bound_resultmodifier.cpp
+        bound/bound_groupby.cpp
+        bound/bound_aggregation.cpp
+
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
 
