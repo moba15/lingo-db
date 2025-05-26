@@ -169,6 +169,7 @@ enum class ExpressionType : uint8_t {
    BOUND_LAMBDA_REF = 233,
    BOUND_EXPANDED = 234,
    TARGETS = 240,
+   BOUND_TARGETS = 241,
 };
 
 enum class ExpressionClass : uint8_t {
@@ -221,7 +222,8 @@ enum class ExpressionClass : uint8_t {
    //===--------------------------------------------------------------------===//
    BOUND_EXPRESSION = 50,
    BOUND_EXPANDED = 51,
-   TARGETS = 52
+   TARGETS = 52,
+   BOUND_TARGETS = 53,
 };
 
 class ParsedExpression : public BaseExpression {
@@ -236,7 +238,6 @@ class ParsedExpression : public BaseExpression {
 
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
-
 
 class ColumnRefExpression : public ParsedExpression {
    public:
@@ -386,7 +387,6 @@ class TargetsExpression : public ParsedExpression {
    //TODO make std::vector<mlir::Attribute> names; instead of std::string vector
    std::vector<std::string> names{};
    //TODO only reference to column
-   std::vector<std::pair<std::string, catalog::Column>> targetColumns{};
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
