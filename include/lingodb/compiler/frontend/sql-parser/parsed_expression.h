@@ -333,10 +333,7 @@ class FunctionExpression : public ParsedExpression {
    //! whether this function should export its state or not
    bool exportState;
 
-   /*
-    * Semanatic
-    */
-   std::string scope;
+   bool star = false;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
