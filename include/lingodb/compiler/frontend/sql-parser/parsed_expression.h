@@ -303,7 +303,7 @@ class ConstantExpression : public ParsedExpression {
    static constexpr ExpressionClass TYPE = ExpressionClass::CONSTANT;
    ConstantExpression();
 
-   std::shared_ptr<ConstantValue> value;
+   std::shared_ptr<Value> value;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

@@ -1294,15 +1294,31 @@ AexprConst:
     Iconst { $$=$1;}
     | Sconst {$$=$1;}
     | Bconst {$$=$1;}
+    | ConstInterval Sconst opt_interval
+    {
+        //TODO
+        auto interval = mkNode<lingodb::ast::ConstantExpression>(@$);
+        interval->value = std::make_shared<lingodb::ast::IntervalValue>(lingodb::ast::Interval{});
+        $$ = interval;
+    }
 ;
 Iconst:	
-    ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntConstantValue>($1); $$=t;  };
+    ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntValue>($1); $$=t;  };
 
 Sconst: 
-    STRING_VALUE { auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::StringConstantValue>($1); $$=t; };
+    STRING_VALUE { auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::StringValue>($1); $$=t; };
 
 Bconst: 
     BCONST {};
+
+ConstInterval:
+    | INTERVAL
+    ;
+
+//TODO missing
+opt_interval: 
+    DAY_P
+    ;
 
 /*
 * GOOLE PIPE syntax
