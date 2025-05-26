@@ -993,7 +993,22 @@ func_application:
 
         $$ = funcExpr;
     }
-    | func_name LP STAR RP
+    | func_name LP STAR RP 
+    {
+        std::string catalog("");
+        std::string schema("");
+        std::string functionName = $func_name;
+        bool isOperator = false;
+        bool distinct = false;
+        bool exportState = false;
+        auto funcExpr = mkNode<lingodb::ast::FunctionExpression>(@$, catalog, schema, functionName, isOperator, distinct, exportState);
+
+      
+        auto l = mkListShared<lingodb::ast::ParsedExpression>();
+        funcExpr->star = true;
+        funcExpr->arguments = l;
+        $$ = funcExpr;
+    }
 
 /*
  * func_expr and its cousin func_expr_windowless are split out from c_expr just
