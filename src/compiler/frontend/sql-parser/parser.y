@@ -389,8 +389,8 @@ select_no_parens:
     //PIPE:
     | from_clause 
      {
-        auto p = mkNode<lingodb::ast::PipeOperator>(@$,lingodb::ast::PipeOperatorType::FROM, $from_clause);
-        $$ = p;
+        
+        $$ = $from_clause;
         
      }
      //TODO DOC
