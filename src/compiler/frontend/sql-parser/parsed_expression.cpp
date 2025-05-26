@@ -409,4 +409,41 @@ std::string OperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGe
    return dot;
 }
 
+CastExpression::CastExpression(LogicalType logicalType, std::shared_ptr<ParsedExpression> child) : ParsedExpression(ExpressionType::CAST, TYPE), logicalType(logicalType), child(std::move(child)) {
+}
+std::string CastExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the cast expression
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
+
+   // Create the label with cast information
+   std::string label = "Cast\\nType: ";
+   switch (logicalType) {
+      case LogicalType::DATE:
+         label += "DATE";
+         break;
+         // TODO: Add other logical types as needed
+      default:
+         label += "Unknown";
+         break;
+   }
+
+   // Create the node
+   dot += nodeId + " [label=\"" + label + "\"];\n";
+
+   // Add the child expression if present
+   if (child) {
+      std::string childId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(child.get())));
+
+      // Create edge from cast to its child
+      dot += nodeId + " -> " + childId + " [label=\"child\"];\n";
+
+      // Add the child's graph representation
+      dot += child->toDotGraph(depth + 1, idGen);
+   }
+
+   return dot;
+}
+
 } // namespace lingodb::ast
