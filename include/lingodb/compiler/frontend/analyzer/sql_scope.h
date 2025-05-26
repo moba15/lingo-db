@@ -10,6 +10,8 @@ class SQLScope {
    public:
    std::map<std::string, std::shared_ptr<catalog::TableCatalogEntry>> tables;
    std::map<std::string, std::shared_ptr<ast::FunctionInfo>> functionsEntry;
+   //Stores the columns that should be produced at the end
+   ast::TargetInfo targetInfo;
    std::shared_ptr<SQLScope> parent;
 };
 }
