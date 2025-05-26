@@ -874,10 +874,25 @@ a_expr:
     | PLUS a_expr
     | MINUS a_expr
     | a_expr PLUS a_expr
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_PLUS, $1,$3);
+    }
     | a_expr MINUS a_expr
-    | a_expr STAR a_expr {error(@$, "Not implemented");}
-    | a_expr SLASH a_expr
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_MINUS, $1,$3);
+    }
+    | a_expr STAR a_expr 
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_TIMES, $1,$3);
+    }
+    | a_expr SLASH a_expr 
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_DIVIDE, $1,$3);
+    }
     | a_expr PERCENT a_expr
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_MOD, $1,$3);
+    }
     | a_expr HAT a_expr
     | a_expr LESS a_expr 
     {
