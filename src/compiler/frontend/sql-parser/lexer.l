@@ -101,7 +101,7 @@ decinteger		{decdigit}+
 numeric         ({decinteger}\.{decinteger}?)|(\.{decinteger})
 
 ident_start     [a-zA-Z]
-ident_cont      [a-zA-Z0-9]
+ident_cont      [a-zA-Z0-9_-]
 identifier      {ident_start}{ident_cont}*
 squote			\'
 dquote			\"
@@ -149,6 +149,7 @@ boolean [fF][aA][lL][sS][eE]
 
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
+[dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
 
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
@@ -160,10 +161,12 @@ boolean [fF][aA][lL][sS][eE]
 having                                { return lingodb::parser::make_HAVING(loc);}
 
 inner                                 { return lingodb::parser::make_INNER_P(loc); }
+[Ii][nN]                              { return lingodb::parser::make_IN_P(loc); }
+[iI][nN][tT][eE][rR][vV][aA][lL]      { return lingodb::parser::make_INTERVAL(loc); }
 [lL][eE][fF][tT]                      { return lingodb::parser::make_LEFT(loc); }
 [lL][iI][mM][iI][tT]                  { return lingodb::parser::make_LIMIT(loc); }
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
-not                                   { return lingodb::parser::make_NOT(loc); }
+[nN][oO][tT]                          { return lingodb::parser::make_NOT(loc); }
 
 [wW][hH][eE][rR][eE]                  { return lingodb::parser::make_WHERE(loc); }
 
