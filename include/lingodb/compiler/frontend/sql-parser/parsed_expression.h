@@ -10,6 +10,10 @@ namespace lingodb::ast {
 class OrderByModifier;
 enum class ExpressionType : uint8_t;
 enum class ExpressionClass : uint8_t;
+enum LogicalType : uint8_t {
+   DATE = 1,
+   //TODO other
+};
 
 class BaseExpression : public AstNode {
    public:
@@ -264,7 +268,6 @@ class ColumnRefExpression : public ParsedExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
-
 //! ComparisonExpression represents a boolean comparison (e.g. =, >=, <>). Always returns a boolean
 //! and has two children.
 class ComparisonExpression : public ParsedExpression {
@@ -394,7 +397,15 @@ class OperatorExpression : public ParsedExpression {
    OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
    std::vector<std::shared_ptr<ParsedExpression>> children;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
 
+class CastExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::CAST;
+   CastExpression(LogicalType logicalType, std::shared_ptr<ParsedExpression> child);
+   LogicalType logicalType;
+   std::shared_ptr<ParsedExpression> child;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
 enum class WindowBoundary : uint8_t {
