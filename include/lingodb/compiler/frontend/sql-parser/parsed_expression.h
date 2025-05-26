@@ -344,7 +344,8 @@ class FunctionExpression : public ParsedExpression {
 static std::vector<std::string> aggregationFunctions{
    "min",
    "max",
-   "avg"};
+   "avg",
+   "sum"};
 
 class StarExpression : public ParsedExpression {
    public:
