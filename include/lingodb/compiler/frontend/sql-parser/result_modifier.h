@@ -14,6 +14,7 @@ enum class ResultModifierType : uint8_t {
    OFFSET = 3,
 
    BOUND_ORDER_BY = 11,
+   BOUND_LIMIT = 12,
 };
 enum class OrderByNullType : uint8_t {
    INVALID = 0,

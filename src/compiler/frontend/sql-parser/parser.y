@@ -248,7 +248,7 @@
 
 %type<std::vector<std::string>> name_list
 
-%type<std::shared_ptr<lingodb::ast::ConstantExpression>> Iconst AexprConst  Sconst Bconst
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
@@ -271,6 +271,8 @@
 %type<std::optional<std::shared_ptr<lingodb::ast::ResultModifier>>> opt_sort_clause opt_select_limit
 
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
+
+%type<std::optional<lingodb::ast::TypeMods>> opt_interval
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -1294,11 +1296,21 @@ AexprConst:
     Iconst { $$=$1;}
     | Sconst {$$=$1;}
     | Bconst {$$=$1;}
+    | func_name Sconst {
+        //TODO move logic to analyzer?
+        if($func_name == "date") {
+            auto dateExpr = mkNode<lingodb::ast::CastExpression>(@$, lingodb::ast::LogicalType::DATE, $Sconst);
+            
+            $$ = dateExpr;
+        } else {
+            error(@$, "Unknown function for constant: " + $func_name);
+        }
+    }
     | ConstInterval Sconst opt_interval
     {
         //TODO
-        auto interval = mkNode<lingodb::ast::ConstantExpression>(@$);
-        interval->value = std::make_shared<lingodb::ast::IntervalValue>(lingodb::ast::Interval{});
+        auto interval = mkNode<lingodb::ast::CastExpression>(@$, lingodb::ast::LogicalType::INTERVAL, $Sconst);
+        interval->typeMods = $opt_interval;
         $$ = interval;
     }
 ;
@@ -1317,7 +1329,10 @@ ConstInterval:
 
 //TODO missing
 opt_interval: 
-    DAY_P
+    DAY_P 
+     {
+        $$ = lingodb::ast::TypeMods::DAYS;
+     }
     ;
 
 /*
