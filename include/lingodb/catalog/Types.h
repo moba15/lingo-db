@@ -76,6 +76,13 @@ class Type {
    static Type intervalDaytime();
    static Type intervalMonths();
 };
+class NullableType  {
+   public:
+   NullableType(Type type);
+   NullableType(Type type, bool isNullable);
+   Type type;
+   bool isNullable;
+};
 class IntTypeInfo : public TypeInfo {
    bool isSigned;
    size_t bitWidth;
