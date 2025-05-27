@@ -9,9 +9,9 @@ namespace lingodb::ast {
 class BoundResultModifier : public TableProducer {
    public:
    explicit BoundResultModifier(ResultModifierType type)
-      : TableProducer(NodeType::RESULT_MODIFIER), modifierType(type) {}
+      : TableProducer(NodeType::BOUND_RESULT_MODIFIER), modifierType(type) {}
    BoundResultModifier(ResultModifierType type, std::shared_ptr<TableProducer> input)
-      : TableProducer(NodeType::RESULT_MODIFIER), modifierType(type), input(input) {}
+      : TableProducer(NodeType::BOUND_RESULT_MODIFIER), modifierType(type), input(input) {}
 
    virtual ~BoundResultModifier() = default;
 
@@ -40,6 +40,15 @@ class BoundOrderByModifier : public BoundResultModifier {
    BoundOrderByModifier(std::vector<std::shared_ptr<BoundOrderByElement>> orderByElements, std::shared_ptr<TableProducer> input) : BoundResultModifier(ResultModifierType::BOUND_ORDER_BY, input), orderByElements(orderByElements) {}
 
    std::vector<std::shared_ptr<BoundOrderByElement>> orderByElements;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
+class BoundLimitModifier : public BoundResultModifier {
+   public:
+   BoundLimitModifier(std::shared_ptr<BoundExpression> limitExpression, std::shared_ptr<TableProducer> input) : BoundResultModifier(ResultModifierType::BOUND_LIMIT, input), limitExpression(limitExpression) {}
+
+   std::shared_ptr<BoundExpression> limitExpression;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
