@@ -6,6 +6,8 @@ class BoundTableRef : public TableProducer {
    public:
    explicit BoundTableRef(TableReferenceType type) : TableProducer(NodeType::BOUND_TABLE_REF), type(type) {
    }
+   BoundTableRef(TableReferenceType type, std::string alias) : TableProducer(NodeType::BOUND_TABLE_REF, alias), type(type) {
+   }
    TableReferenceType type;
 
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
@@ -15,6 +17,7 @@ class BoundBaseTableRef : public BoundTableRef {
    public:
    static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;
    BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
+   BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias);
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
