@@ -380,15 +380,16 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          return boundComparison;
       }
       case ast::ExpressionClass::CONJUNCTION: {
-         error("Not implemented", rootNode->loc);
          auto conjunction = std::static_pointer_cast<ast::ConjunctionExpression>(rootNode);
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundChildren{};
          for (auto expr : conjunction->children) {
-            analyzeExpression(expr, context);
-            if (!expr->resultType.has_value() || expr->resultType.value().getTypeId() != catalog::Type::boolean().getTypeId()) {
+            auto boundExpr = analyzeExpression(expr, context);
+            boundChildren.push_back(boundExpr);
+            if (!boundExpr->resultType.has_value() || boundExpr->resultType.value().type.getTypeId() != catalog::Type::boolean().getTypeId()) {
                error("Conjunction is not possible with children of type boolean", expr->loc);
             }
          }
-         conjunction->resultType = catalog::Type::boolean();
+         return drv.nf.node<ast::BoundConjunctionExpression>(conjunction->loc, conjunction->type, boundChildren);
          break;
       }
       case ast::ExpressionClass::OPERATOR: {
