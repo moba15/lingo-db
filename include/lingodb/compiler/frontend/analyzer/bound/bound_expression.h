@@ -6,14 +6,15 @@ class BoundExpression : public AstNode {
    public:
    //TODO make enums sense
    BoundExpression(ExpressionClass exprClass, ExpressionType type) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type) {}
-   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(resultType) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(catalog::NullableType(resultType)) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::NullableType resultType) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(resultType) {}
 
    ExpressionClass exprClass;
    ExpressionType type;
    //! The alias of the expression
    std::string alias;
 
-   std::optional<catalog::Type> resultType = std::nullopt;
+   std::optional<catalog::NullableType> resultType = std::nullopt;
 };
 
 class BoundColumnRefExpression : public BoundExpression {
@@ -21,7 +22,7 @@ class BoundColumnRefExpression : public BoundExpression {
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_COLUMN_REF;
 
    //! Specify both the column and table name
-   BoundColumnRefExpression(std::string scope, catalog::Type resultType, catalog::Column boundColumn);
+   BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, catalog::Column boundColumn);
 
    //TODO semenatic
    std::string scope;
