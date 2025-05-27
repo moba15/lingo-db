@@ -22,4 +22,8 @@ std::string BoundOrderByModifier::toDotGraph(uint32_t depth, NodeIdGenerator& id
       " [label=\"BoundOrderByModifier\\n\"]";
    return dot;
 }
+
+std::string BoundLimitModifier::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast
