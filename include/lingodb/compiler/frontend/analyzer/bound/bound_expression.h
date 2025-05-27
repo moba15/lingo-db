@@ -120,8 +120,10 @@ class BoundOperatorExpression : public BoundExpression {
 class BoundCastExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CAST;
-   BoundCastExpression(catalog::Type resultType, std::shared_ptr<BoundExpression> child);
+   BoundCastExpression(catalog::Type resultType, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods);
+   std::optional<TypeMods> typeMods;
    std::shared_ptr<BoundExpression> child;
+   LogicalType logicalType;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
