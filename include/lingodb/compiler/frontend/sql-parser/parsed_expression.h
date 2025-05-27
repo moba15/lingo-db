@@ -12,6 +12,12 @@ enum class ExpressionType : uint8_t;
 enum class ExpressionClass : uint8_t;
 enum LogicalType : uint8_t {
    DATE = 1,
+   INTERVAL = 2,
+   //TODO other
+};
+
+enum class TypeMods : uint8_t {
+   DAYS = 1,
    //TODO other
 };
 
@@ -231,11 +237,6 @@ class ParsedExpression : public BaseExpression {
    ParsedExpression(ExpressionType type, ExpressionClass expression_class) : BaseExpression(type, expression_class) {
    }
 
-   /*
-    * Semantic
-    */
-   std::optional<catalog::Type> resultType = std::nullopt;
-
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
 
@@ -405,6 +406,7 @@ class CastExpression : public ParsedExpression {
    static constexpr const ExpressionClass TYPE = ExpressionClass::CAST;
    CastExpression(LogicalType logicalType, std::shared_ptr<ParsedExpression> child);
    LogicalType logicalType;
+   std::optional<TypeMods> typeMods;
    std::shared_ptr<ParsedExpression> child;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

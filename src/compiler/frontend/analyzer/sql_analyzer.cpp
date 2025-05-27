@@ -488,6 +488,36 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             throw std::runtime_error("FunctionType Not implemented");
          }
          break;
+      } case ast::ExpressionClass::CAST: {
+         auto castExpr = std::static_pointer_cast<ast::CastExpression>(rootNode);
+         auto boundChild = analyzeExpression(castExpr->child, context);
+         switch (castExpr->logicalType) {
+            case ast::DATE: {
+               switch (boundChild->type) {
+                  case ast::ExpressionType::VALUE_CONSTANT: {
+                     auto constExpr = std::static_pointer_cast<ast::BoundConstantExpression>(boundChild);
+                         if (constExpr->value->type != ast::ConstantType::STRING) {
+                            error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
+                         }
+                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), boundChild, castExpr->logicalType, castExpr->typeMods);
+
+
+                  }
+                     default: error("Not implemented", rootNode->loc);
+               }
+            }
+            case ast::LogicalType::INTERVAL: {
+               auto constExpr = std::static_pointer_cast<ast::BoundConstantExpression>(boundChild);
+               if (constExpr->value->type != ast::ConstantType::STRING) {
+                  error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
+               }
+               //TODO hardcoded
+               //!Shortcutted here, implement different interval types later
+               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type::intervalDaytime(), boundChild, castExpr->logicalType, castExpr->typeMods);
+
+            }
+            default: error("Not implemented", rootNode->loc);
+         }
       }
       default: error("Not implemented", rootNode->loc);
    }
