@@ -1,6 +1,5 @@
 #include "lingodb/compiler/frontend/analyzer/sql_analyzer.h"
 
-#include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/compiler/frontend/SQL/Parser.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_groupby.h"
@@ -205,7 +204,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
       case ast::PipeOperatorType::WHERE: {
          auto whereClause = std::static_pointer_cast<ast::ParsedExpression>(pipeOperator->node);
          boundAstNode = analyzeExpression(whereClause, context);
-         if (std::static_pointer_cast<ast::BoundExpression>(boundAstNode)->resultType->getTypeId() != catalog::LogicalTypeId::BOOLEAN) {
+         if (std::static_pointer_cast<ast::BoundExpression>(boundAstNode)->resultType->type.getTypeId() != catalog::LogicalTypeId::BOOLEAN) {
             error("Where clause is not a boolean expression", whereClause->loc);
          }
          break;
@@ -247,7 +246,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          if (!catalogEntry.has_value()) {
             error("No Catalog found with name " + baseTableRef->tableName, baseTableRef->loc);
          }
-         auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, catalogEntry.value());
+         auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, catalogEntry.value(), baseTableRef->alias);
          //Add to current scope
          auto tableName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
          context->currentScope->tables.emplace(std::pair{tableName, catalogEntry.value()});
@@ -363,9 +362,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          if (!right->resultType.has_value()) {
             error("Right side of comparison is not a valid expression", comparison->right->loc);
          }
-         if (left->resultType.value().getTypeId() != right->resultType.value().getTypeId()) {
-            error("Comparison is not possible between " + comparison->left->resultType.value().toString() + " and " + comparison->right->resultType.value().toString(), comparison->loc);
-         }
+         getCommonType(left->resultType.value().type, right->resultType.value().type);
+
 
          auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, left, right);
          return boundComparison;
@@ -401,7 +399,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          //Get common type
          //TODO BETTER, maybe create directly mlir::TYPE
          auto types = boundChildren | std::ranges::views::transform([](std::shared_ptr<ast::BoundExpression> c) {
-                         return c->resultType.value();
+                         return c->resultType.value().type;
                       }) |
             std::ranges::to<std::vector<catalog::Type>>();
          auto commonType = getCommonBaseType(types);
@@ -429,10 +427,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                if (!boundArguments[0]->resultType.has_value()) {
                   error("Argument of aggregation function is not a valid expression", boundArguments[0]->loc);
                }
-               if (boundArguments[0]->resultType.value().getTypeId() != catalog::LogicalTypeId::INT &&
-                   boundArguments[0]->resultType.value().getTypeId() != catalog::LogicalTypeId::FLOAT &&
-                   boundArguments[0]->resultType.value().getTypeId() != catalog::LogicalTypeId::DECIMAL &&
-                   boundArguments[0]->resultType.value().getTypeId() != catalog::LogicalTypeId::DOUBLE) {
+               if (boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::INT &&
+                   boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::FLOAT &&
+                   boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DECIMAL &&
+                   boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DOUBLE) {
                   error("AVG function needs argument of type int or float", function->loc);
                }
             } else {
@@ -442,7 +440,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             auto scope = createTmpScope();
             auto fName = function->alias.empty() ? function->functionName : function->alias;
             context->currentScope->functionsEntry.emplace(fName, std::make_shared<ast::FunctionInfo>(scope, fName));
-            return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value(), function->functionName, scope, function->alias, boundArguments);
+            return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, function->alias, boundArguments);
          } else {
             //TODO hardcoded
             if (function->functionName == "date") {
@@ -450,7 +448,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   error("Function date needs exactly one argument", function->loc);
                }
                auto arg = analyzeExpression(function->arguments[0], context);
-               if (arg->resultType.has_value() && arg->resultType.value().getTypeId() != catalog::Type::stringType().getTypeId()) {
+               if (arg->resultType.has_value() && arg->resultType.value().type.getTypeId() != catalog::Type::stringType().getTypeId()) {
                   error("Function date needs argument of type string", function->loc);
                }
                auto scope = createTmpScope();
@@ -511,7 +509,9 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
       error(columnName + " is ambiguous", columnRef->loc);
    }
 
-   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, scope, columns.at(0).getLogicalType(), columns.at(0));
+
+
+   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, scope, catalog::NullableType(columns.at(0).getLogicalType(), columns.at(0).getIsNullable()), columns.at(0));
 }
 
 catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type type2) {
@@ -530,7 +530,7 @@ catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type
       return type1;
    }
 
-   throw std::runtime_error("Not implemented");
+   throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
 }
 catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types) {
    auto commonType = types.back();
