@@ -303,6 +303,17 @@ std::shared_ptr<ast::BoundResultModifier> SQLQueryAnalyzer::analyzeResultModifie
          }
          return drv.nf.node<ast::BoundOrderByModifier>(resultModifier->loc, boundOrderByElements, resultModifier->input);
       }
+      case ast::ResultModifierType::LIMIT :  {
+         auto limitModifier = std::static_pointer_cast<ast::LimitModifier>(resultModifier);
+         auto limitExpression = analyzeExpression(limitModifier->limitExpression, context);
+         if (limitExpression->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
+            error("Limit expression must be a constant expression", limitModifier->loc);
+         }
+         if (limitExpression->resultType->type.getTypeId() != catalog::LogicalTypeId::INT) {
+            error("Limit expression must be of type INT", limitModifier->loc);
+         }
+         return drv.nf.node<ast::BoundLimitModifier>(limitModifier->loc, limitExpression, resultModifier->input);
+      }
       default: error("Not implemented", resultModifier->loc);
    }
 }
