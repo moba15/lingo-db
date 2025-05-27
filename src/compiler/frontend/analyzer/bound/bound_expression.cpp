@@ -21,7 +21,21 @@ std::string BoundComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerato
 }
 
 /*
- * BoundComparisonExpression
+ * BoundConjunctionExpression
+*/
+BoundConjunctionExpression::BoundConjunctionExpression(ExpressionType type, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right) : BoundExpression(TYPE, type, catalog::Type::boolean()), children(std::vector{left, right}) {
+   if (type != ExpressionType::CONJUNCTION_AND && type != ExpressionType::CONJUNCTION_OR) {
+      throw std::runtime_error("Invalid type for BoundConjunctionExpression");
+   }
+}
+BoundConjunctionExpression::BoundConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<BoundExpression>> children) : BoundExpression(TYPE, type, catalog::Type::boolean()), children(std::move(children)){
+}
+std::string BoundConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
+
+/*
+ * BoundConstantExpression
 */
 BoundConstantExpression::BoundConstantExpression(catalog::Type resultType, std::shared_ptr<Value> value) : BoundExpression(TYPE, ExpressionType::VALUE_CONSTANT, resultType), value(std::move(value)) {
 }

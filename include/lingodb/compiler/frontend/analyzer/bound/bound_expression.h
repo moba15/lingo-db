@@ -45,7 +45,20 @@ class BoundComparisonExpression : public BoundExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
-//TODO ConjunctionExpression
+class BoundConjunctionExpression : public BoundExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CONJUNCTION;
+   BoundConjunctionExpression(ExpressionType type, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+   BoundConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<BoundExpression>> children);
+
+   std::vector<std::shared_ptr<BoundExpression>> children;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
+   private:
+   std::string typeToAscii(ExpressionType type) const;
+};
+
 
 class BoundConstantExpression : public BoundExpression {
    public:
