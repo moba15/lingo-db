@@ -36,7 +36,7 @@ int main(int argc, char* argv[]) {
       auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
       sqlContext->catalog = session->getCatalog();
       lingodb::analyzer::SQLQueryAnalyzer analyzer{session->getCatalog()};
-      analyzer.analyze(drv.result);
+      drv.result = analyzer.analyzeAndTransform(drv.result, sqlContext);
       std::cout << std::endl
                 << std::endl;
       std::cout << "After" << std::endl;
@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
       {
          mlir::OpBuilder::InsertionGuard guard(builder);
          builder.setInsertionPointToStart(queryBlock);
-         auto val = translator.translate(builder, drv.result, sqlContext);
+         auto val = translator.translateStart(builder, drv.result, sqlContext);
          if (val.has_value()) {
             builder.create<lingodb::compiler::dialect::subop::SetResultOp>(builder.getUnknownLoc(), 0, val.value());
          }
