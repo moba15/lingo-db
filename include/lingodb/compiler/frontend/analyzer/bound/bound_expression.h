@@ -85,11 +85,12 @@ class BoundTargetsExpression : public BoundExpression {
 class BoundFunctionExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_FUNCTION;
-   BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string alias, std::vector<std::shared_ptr<BoundExpression>> arguments);
+   BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments);
 
    std::string functionName;
    std::string scope;
-   std::string alias;
+   //TODO!!!!!!!
+   std::string aliasOrUniqueIdentifier;
    std::vector<std::shared_ptr<BoundExpression>> arguments;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
