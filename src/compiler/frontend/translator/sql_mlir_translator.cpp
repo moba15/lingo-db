@@ -50,9 +50,9 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
          } else {
             auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named.second);
             names.push_back(builder.getStringAttr(functionInfo->name));
-            auto colMemberName = memberManager.getUniqueMember("max");
+            auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
             colMemberNames.push_back(builder.getStringAttr(colMemberName));
-            colTypes.push_back(mlir::TypeAttr::get(builder.getI64Type()));
+            colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
             auto attrDef = functionInfo->createRef(attrManager);
             attrs.push_back(attrDef);
          }
@@ -451,8 +451,16 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             assert(aggrFunction->arguments.size() == 1);
             tuples::ColumnRefAttr refAttr;
             switch (aggrFunction->arguments[0]->type) {
-               case ast::ExpressionType::BOUND_COLUMN_REF: refAttr = attrManager.createRef("s1", "t2"); break;
-               default: error("could not resolve aggr attribute", aggrFunction->loc);
+               case ast::ExpressionType::BOUND_COLUMN_REF: {
+                  auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(aggrFunction->arguments[0]);
+                  refAttr = attrManager.createRef(columnRef->scope, columnRef->boundColumn.getColumnName());
+                  break;
+               }
+               default: {
+                  //Is in map
+                  refAttr = attrManager.createRef(aggregation->mapName, aggrFunction->arguments[0]->alias);
+                  break;
+               };
             }
 
             mlir::Value currRel = relation;
@@ -464,17 +472,29 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             if (relalgAggrFunc == relalg::AggrFunc::count) {
                aggrResultType = builder.getI64Type();
             } else {
+               assert(aggrFunction->resultType.has_value());
+               aggrResultType = aggrFunction->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
                //TODO define type
                if (relalgAggrFunc == relalg::AggrFunc::avg) {
                   error("Complete implementation here", aggrFunction->loc);
                }
+               //TODO For what is this?
+               /* if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
+                  aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
+               }*/
             }
+            expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
          }
+         attrDef.getColumn().type = expr.getType();
+         //TODO mapping.insert({12, "&attrDef.getColumn()"});
+         createdCols.push_back(attrDef);
+         createdValues.push_back(expr);
       }
 
       aggrBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), createdValues);
       auto groupByOp = builder.create<relalg::AggregationOp>(builder.getUnknownLoc(), tupleStreamType, tree, builder.getArrayAttr(groupByAttrs), builder.getArrayAttr(createdCols));
       groupByOp.getAggrFunc().push_back(block);
+      return groupByOp.getResult();
    }
    return tree;
 }
