@@ -59,7 +59,6 @@ class BoundConjunctionExpression : public BoundExpression {
    std::string typeToAscii(ExpressionType type) const;
 };
 
-
 class BoundConstantExpression : public BoundExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_CONSTANT;

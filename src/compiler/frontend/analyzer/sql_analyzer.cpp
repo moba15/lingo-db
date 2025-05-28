@@ -5,13 +5,16 @@
 #include "lingodb/compiler/frontend/analyzer/bound/bound_groupby.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
 
-#include <functional>
 #include <ranges>
 namespace lingodb::analyzer {
 SQLQueryAnalyzer::SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog) : catalog(std::move(catalog)) {
 }
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeAndTransform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context) {
    auto transformed = transform(rootNode, std::make_shared<ASTTransformContext>());
+   ast::NodeIdGenerator idGen{};
+   std::cout << "digraph ast {" << std::endl;
+   std::cout << transformed->toDotGraph(1, idGen) << std::endl;
+
    context->pushNewScope();
    analyze(transformed, context);
    return transformed;
@@ -303,7 +306,7 @@ std::shared_ptr<ast::BoundResultModifier> SQLQueryAnalyzer::analyzeResultModifie
          }
          return drv.nf.node<ast::BoundOrderByModifier>(resultModifier->loc, boundOrderByElements, resultModifier->input);
       }
-      case ast::ResultModifierType::LIMIT :  {
+      case ast::ResultModifierType::LIMIT: {
          auto limitModifier = std::static_pointer_cast<ast::LimitModifier>(resultModifier);
          auto limitExpression = analyzeExpression(limitModifier->limitExpression, context);
          if (limitExpression->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
@@ -374,7 +377,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             error("Right side of comparison is not a valid expression", comparison->right->loc);
          }
          getCommonType(left->resultType.value().type, right->resultType.value().type);
-
 
          auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, left, right);
          return boundComparison;
@@ -488,7 +490,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             throw std::runtime_error("FunctionType Not implemented");
          }
          break;
-      } case ast::ExpressionClass::CAST: {
+      }
+      case ast::ExpressionClass::CAST: {
          auto castExpr = std::static_pointer_cast<ast::CastExpression>(rootNode);
          auto boundChild = analyzeExpression(castExpr->child, context);
          switch (castExpr->logicalType) {
@@ -496,14 +499,12 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                switch (boundChild->type) {
                   case ast::ExpressionType::VALUE_CONSTANT: {
                      auto constExpr = std::static_pointer_cast<ast::BoundConstantExpression>(boundChild);
-                         if (constExpr->value->type != ast::ConstantType::STRING) {
-                            error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
-                         }
+                     if (constExpr->value->type != ast::ConstantType::STRING) {
+                        error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
+                     }
                      return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), boundChild, castExpr->logicalType, castExpr->typeMods);
-
-
                   }
-                     default: error("Not implemented", rootNode->loc);
+                  default: error("Not implemented", rootNode->loc);
                }
             }
             case ast::LogicalType::INTERVAL: {
@@ -514,7 +515,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
                return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type::intervalDaytime(), boundChild, castExpr->logicalType, castExpr->typeMods);
-
             }
             default: error("Not implemented", rootNode->loc);
          }
@@ -550,8 +550,6 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
    if (columns.size() > 1) {
       error(columnName + " is ambiguous", columnRef->loc);
    }
-
-
 
    return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, scope, catalog::NullableType(columns.at(0).getLogicalType(), columns.at(0).getIsNullable()), columns.at(0));
 }

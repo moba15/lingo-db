@@ -5,7 +5,6 @@ namespace lingodb::ast {
 PipeOperator::PipeOperator(PipeOperatorType pipeOpType, std::shared_ptr<AstNode> node) : TableProducer(NodeType::PIPE_OP), node(node), pipeOpType(pipeOpType) {
 }
 
-
 std::string PipeOperator::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
@@ -14,30 +13,28 @@ std::string PipeOperator::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
          " -> node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(input.get()))) + "[label=\"has input\"];\n";
       dot += input->toDotGraph(depth + 1, idGen);
    }
-  
 
    dot += "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))) +
       " [label=\"Pipe Operator\\n";
    dot += "<<";
-        switch (pipeOpType) {
-        case PipeOperatorType::SELECT:
-                dot += "SELECT";
-                break;
-        case PipeOperatorType::AGGREGATE:
-                dot += "AGGREGATE";
-                break;
-        case PipeOperatorType::ORDER_BY:
-                dot += "ORDER BY";
-                break;
-        case PipeOperatorType::WHERE:
-                dot += "WHERE";
-                break;
-        default:
-                dot += "UNKNOWN";
-        }
+   switch (pipeOpType) {
+      case PipeOperatorType::SELECT:
+         dot += "SELECT";
+         break;
+      case PipeOperatorType::AGGREGATE:
+         dot += "AGGREGATE";
+         break;
+      case PipeOperatorType::ORDER_BY:
+         dot += "ORDER BY";
+         break;
+      case PipeOperatorType::WHERE:
+         dot += "WHERE";
+         break;
+      default:
+         dot += "UNKNOWN";
+   }
    dot += ">>";
    dot += "\"];\n";
-
 
    dot += "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))) +
       " -> node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(node.get()))) + ";\n";

@@ -14,7 +14,6 @@ class NodeIdGenerator {
    private:
    uint64_t currentId;
    std::unordered_map<uint64_t, uint64_t> idMap;
-
 };
 
 } // namespace lingodb::ast
