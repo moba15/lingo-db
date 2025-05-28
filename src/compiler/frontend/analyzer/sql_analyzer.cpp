@@ -69,13 +69,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   transformed = transFormededWhereClause;
                }
 
-               //Transform modifiers
-               for (auto modifier : selectNode->modifiers) {
-                  auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
-                  transformedModifier->input = transformed;
-                  transformed = transformedModifier;
-               }
-               selectNode->modifiers.clear();
 
                //Transform Group by
                if (selectNode->groups) {
@@ -86,6 +79,14 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   transFormedAggregation->input = transformed;
                   transformed = transFormedAggregation;
                }
+
+               //Transform modifiers
+               for (auto modifier : selectNode->modifiers) {
+                  auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
+                  transformedModifier->input = transformed;
+                  transformed = transformedModifier;
+               }
+               selectNode->modifiers.clear();
 
                //Transform target selection
                auto select_list = selectNode->select_list;
