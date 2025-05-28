@@ -1,5 +1,4 @@
 #include "lingodb/compiler/frontend/analyzer/sql_analyzer.h"
-#include "lingodb/compiler/frontend/analyzer/sql_pass/resolve_name_pass.h"
 
 #include "lingodb/compiler/frontend/sql-parser/driver.h"
 #include <iostream>
@@ -27,13 +26,16 @@ int main(int argc, char* argv[]) {
       auto context = std::make_shared<lingodb::analyzer::SQLContext>();
       context->catalog = session->getCatalog();
       lingodb::analyzer::SQLQueryAnalyzer analyzer{session->getCatalog()};
-      analyzer.analyze(drv.result);
+      drv.result = analyzer.analyzeAndTransform(drv.result, context);
       std::cout << std::endl
                 << std::endl;
       std::cout << "After" << std::endl;
       std::cout << "digraph ast {" << std::endl;
       std::cout << drv.result->toDotGraph(1, idGen) << std::endl;
       std::cout << "}" << std::endl;
+
+      std::cout << "Context:" << std::endl;
+      std::cout << analyzer.context->toString() << std::endl;
 
    } else {
       return 1;
