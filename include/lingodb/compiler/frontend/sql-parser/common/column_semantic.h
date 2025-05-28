@@ -18,7 +18,8 @@ struct NamedResult {
 };
 struct FunctionInfo : public NamedResult {
    std::string name;
-   FunctionInfo(std::string scope, std::string name) : NamedResult(NamedResultType::Function, scope), name(name) {}
+   catalog::NullableType resultType;
+   FunctionInfo(std::string scope, std::string name, catalog::NullableType resultType) : NamedResult(NamedResultType::Function, scope), name(name), resultType(resultType) {}
 
    compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
       return attrManager.createRef(this->scope, name);
