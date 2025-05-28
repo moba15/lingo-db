@@ -13,7 +13,6 @@ class ASTTransformContext {
    public:
    ASTTransformContext();
    std::shared_ptr<ast::AggregationNode> aggregationNode;
-
 };
 
 class SQLContext {
