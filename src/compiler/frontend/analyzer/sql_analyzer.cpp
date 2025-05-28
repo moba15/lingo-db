@@ -217,18 +217,18 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          assert(aggregationNode->groupByNode);
 
          //TODO parse aggregations sets
+         std::vector<std::shared_ptr<ast::BoundExpression>> transFormedGroupExpressions{};
+         std::ranges::transform(aggregationNode->groupByNode->group_expressions, std::back_inserter(transFormedGroupExpressions), [&](auto expr) {
+            return analyzeExpression(expr, context);
+         });
 
-         auto transFormedGroupExpressions = aggregationNode->groupByNode->group_expressions | std::views::transform([&](const auto& expr) {
-                                               return analyzeExpression(expr, context);
-                                            }) |
-            std::ranges::to<std::vector<std::shared_ptr<ast::BoundExpression>>>();
 
-         auto transFormedAggregationExpressions = aggregationNode->aggregations | std::views::transform([&](const auto& expr) {
-                                                     auto boundExpr = analyzeExpression(expr, context);
-                                                     assert(boundExpr->exprClass == ast::ExpressionClass::BOUND_FUNCTION);
-                                                     return std::static_pointer_cast<ast::BoundFunctionExpression>(boundExpr);
-                                                  }) |
-            std::ranges::to<std::vector<std::shared_ptr<ast::BoundFunctionExpression>>>();
+         std::vector<std::shared_ptr<ast::BoundFunctionExpression>> transFormedAggregationExpressions{};
+         std::ranges::transform(aggregationNode->aggregations, std::back_inserter(transFormedAggregationExpressions), [&](auto expr) {
+            auto boundExpr = analyzeExpression(expr, context);
+            assert(boundExpr->exprClass == ast::ExpressionClass::BOUND_FUNCTION);
+            return std::static_pointer_cast<ast::BoundFunctionExpression>(boundExpr);
+         });
 
          auto boundGroupByNode = drv.nf.node<ast::BoundGroupByNode>(aggregationNode->groupByNode->loc, transFormedGroupExpressions);
          boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, transFormedAggregationExpressions);
@@ -400,9 +400,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          if (operatorExpr->children.size() == 0) {
             error("Operator expression has no children", operatorExpr->loc);
          }
-         auto boundChildren = operatorExpr->children | std::ranges::views::transform([&](auto c) {
-                                 return analyzeExpression(c, context);
-                              });
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundChildren{};
+         std::ranges::transform(operatorExpr->children, std::back_inserter(boundChildren), [&](auto c) {
+            return analyzeExpression(c, context);
+         });
          //TODO determine common type instead of take one. For exampel int32-int64=>int64
          auto resultType = std::find_if(boundChildren.begin(), boundChildren.end(), [](auto c) {
             return !c->resultType.has_value();
