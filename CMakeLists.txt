@@ -172,6 +172,7 @@ set(LIBS
         MLIRTransforms
         MLIRMathTransforms
 )
+set(GEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/include/lingodb/compiler/frontend/sql-parser/gen  )
 find_package(BISON REQUIRED)
 find_package(FLEX REQUIRED)
 set(PRECOMPILED_CC_PATH "${CMAKE_CURRENT_BINARY_DIR}/precompiled_bitcode.cc")
@@ -180,6 +181,8 @@ add_subdirectory(src/runtime)
 add_subdirectory(src/execution)
 add_subdirectory(src/compiler/frontend/SQL)
 add_subdirectory(src/compiler/frontend/sql-parser)
+add_subdirectory(src/compiler/frontend/analyzer)
+add_subdirectory(src/compiler/frontend/translator)
 add_subdirectory(src/tools)
 add_subdirectory(tools)
 if (ENABLE_TESTS)
