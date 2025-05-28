@@ -438,7 +438,7 @@ class WindowExpression : public ParsedExpression {
 
    std::vector<std::shared_ptr<ParsedExpression>> partitions;
 
-   std::vector<OrderByModifier> orders;
+   std::vector<std::shared_ptr<OrderByModifier>> orders;
 
    /// The window boundaries
    WindowBoundary start = WindowBoundary::INVALID;
