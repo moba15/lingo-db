@@ -424,7 +424,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
          mlir::Value expr; //TODO??
          auto aggrFuncName = aggrFunction->functionName;
          //TODO distinct
-         auto attrDef = attrManager.createDef("groupByName", "toAggr.first->colId");
+         auto attrDef = attrManager.createDef(aggrFunction->scope, aggrFunction->aliasOrUniqueIdentifier);
          if (aggrFuncName == "count") {
             expr = aggrBuilder.create<relalg::CountRowsOp>(builder.getUnknownLoc(), builder.getI64Type(), relation);
             //TODO use zero instead of null
