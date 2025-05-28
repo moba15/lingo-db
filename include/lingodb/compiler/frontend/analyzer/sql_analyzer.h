@@ -48,6 +48,12 @@ class SQLQueryAnalyzer {
       scope.append(std::to_string(tmpScopeCounter++));
       return scope;
    }
+   std::string createMapName() {
+      static size_t mapCounter = 0;
+      std::string mapName{"map"};
+      mapName.append(std::to_string(mapCounter++));
+      return mapName;
+   }
 };
 
 } // namespace lingodb::analyzer
