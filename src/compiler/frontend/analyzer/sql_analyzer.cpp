@@ -232,7 +232,22 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          });
 
          auto boundGroupByNode = drv.nf.node<ast::BoundGroupByNode>(aggregationNode->groupByNode->loc, transFormedGroupExpressions);
-         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, transFormedAggregationExpressions);
+         std::vector<std::shared_ptr<ast::BoundExpression>> toMap{};
+         for (auto& aggr : transFormedAggregationExpressions) {
+            assert(aggr->arguments.size() == 1);
+            if(aggr->arguments[0]->type == ast::ExpressionType::BOUND_COLUMN_REF) {
+               continue;
+            }
+            toMap.emplace_back(aggr->arguments[0]);
+            aggr->arguments[0]->alias = createTmpScope();
+         }
+         //ADD to TargetInfo, see Google PIPE sql paper!
+         //Maybe Not the best way!
+         for (auto& aggr : transFormedAggregationExpressions) {
+            assert(aggr->resultType.has_value());
+            context->currentScope->targetInfo.map(aggr->scope, std::make_shared<ast::FunctionInfo>(aggr->scope, aggr->aliasOrUniqueIdentifier, aggr->resultType.value()));
+         }
+         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, transFormedAggregationExpressions, toMap, createMapName());
 
          break;
       }

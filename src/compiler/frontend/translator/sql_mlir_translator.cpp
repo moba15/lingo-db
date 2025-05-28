@@ -371,6 +371,10 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 }
 
 mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {
+
+   //create map
+   tree = createMap(builder, aggregation->mapName, aggregation->toMapExpressions, context, tree);
+
    //Translate group by Attributes
    std::vector<mlir::Attribute> groupByAttrs;
    std::unordered_map<std::string, mlir::Attribute> groupedExpressions;
@@ -473,6 +477,38 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
       groupByOp.getAggrFunc().push_back(block);
    }
    return tree;
+}
+
+mlir::Value SQLMlirTranslator::createMap(mlir::OpBuilder& builder, std::string mapName, std::vector<std::shared_ptr<ast::BoundExpression>> toMap, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {
+   if (toMap.empty()) {
+      return tree;
+   }
+   auto* block = new mlir::Block;
+   static size_t mapId = 0;
+
+   mlir::OpBuilder mapBuilder(builder.getContext());
+   block->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+   auto tupleScope = translationContext->createTupleScope();
+   mlir::Value tuple = block->getArgument(0);
+   translationContext->setCurrentTuple(tuple);
+
+   mapBuilder.setInsertionPointToStart(block);
+   std::vector<mlir::Value> createdValues;
+   std::vector<mlir::Attribute> createdCols;
+
+   for (auto p : toMap) {
+      mlir::Value expr = translateExpression(mapBuilder, p, context, tree);
+      //TODO does the use of alias make sense here?
+      auto attrDef = attrManager.createDef(mapName, p->alias);
+      attrDef.getColumn().type = expr.getType();
+     //TODO MAP context.mapAttribute(scope, p.first->colId, &attrDef.getColumn());
+      createdCols.push_back(attrDef);
+      createdValues.push_back(expr);
+   }
+   auto mapOp = builder.create<relalg::MapOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), tree, builder.getArrayAttr(createdCols));
+   mapOp.getPredicate().push_back(block);
+   mapBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), createdValues);
+   return mapOp.getResult();
 }
 
 /*

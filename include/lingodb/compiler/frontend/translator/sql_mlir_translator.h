@@ -44,6 +44,7 @@ class SQLMlirTranslator {
    mlir::Value translateTableRef(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundTableRef> tableRef, std::shared_ptr<analyzer::SQLContext> context);
 
    mlir::Value translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
+   mlir::Value createMap(mlir::OpBuilder& builder, std::string mapName, std::vector<std::shared_ptr<ast::BoundExpression>> toMap, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
 
    mlir::Value translateGroupByNode(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundGroupByNode> groupByNode, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
 
