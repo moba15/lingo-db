@@ -73,6 +73,10 @@ std::shared_ptr<TypeInfo> TypeInfo::deserialize(utility::Deserializer& deseriali
          return IntervalTypeInfo::deserialize(deserializer);
    }
 }
+NullableType::NullableType(Type type) : type(type), isNullable(false){
+}
+NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(isNullable){
+}
 void IntTypeInfo::serializeConcrete(utility::Serializer& serializer) const {
    serializer.writeProperty(0, isSigned);
    serializer.writeProperty(1, bitWidth);
