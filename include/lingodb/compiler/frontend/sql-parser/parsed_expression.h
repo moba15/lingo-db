@@ -346,7 +346,7 @@ static std::vector<std::string> aggregationFunctions{
    "min",
    "max",
    "avg",
-   "sum"};
+   "sum", "count"};
 
 class StarExpression : public ParsedExpression {
    public:
@@ -443,5 +443,19 @@ class WindowExpression : public ParsedExpression {
    /// The window boundaries
    WindowBoundary start = WindowBoundary::INVALID;
    WindowBoundary end = WindowBoundary::INVALID;
+};
+
+class BetweenExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BETWEEN;
+
+   BetweenExpression(ExpressionType type, std::shared_ptr<ParsedExpression> input, std::shared_ptr<ParsedExpression> lower, std::shared_ptr<ParsedExpression> upper);
+
+   std::shared_ptr<ParsedExpression> input;
+   std::shared_ptr<ParsedExpression> lower;
+   std::shared_ptr<ParsedExpression> upper;
+   bool asymmetric = false; // If true, the lower and upper bounds are not symmetric (e.g., BETWEEN x AND y vs. BETWEEN y AND x)
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast

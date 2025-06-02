@@ -20,6 +20,14 @@ class IntValue : public Value {
    std::string toString() override;
 };
 
+class FloatValue : public Value {
+   public:
+   explicit FloatValue(std::string fVal);
+   //TODO float or double?
+   std::string fVal;
+   std::string toString() override;
+};
+
 class StringValue : public Value {
    public:
    explicit StringValue(std::string iVal);
@@ -43,8 +51,10 @@ class IntervalValue : public Value {
 
 enum class ConstantType : uint8_t {
    INT = 1,
-   STRING = 2,
-   INTERVAL = 3,
+   FLOAT = 2,
+   STRING = 3,
+   INTERVAL = 4,
+
    INVALID = 99,
 
 };

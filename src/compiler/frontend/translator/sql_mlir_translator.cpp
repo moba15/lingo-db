@@ -36,8 +36,35 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
       std::vector<mlir::Attribute> colMemberNames;
       std::vector<mlir::Attribute> colTypes;
       auto& memberManager = builder.getContext()->getLoadedDialect<compiler::dialect::subop::SubOperatorDialect>()->getMemberManager();
-      for (auto& named : context->currentScope->targetInfo.namedResults) {
-         auto name = named.first;
+      for (auto& named : context->currentScope->targetInfo.targetColumns) {
+         auto name = named->displayName;
+
+         auto colMemberName = memberManager.getUniqueMember(name.empty() ? "unnamed" : name);
+         auto columns = context->findColumn(named->index);
+         if (columns.empty()) {
+            auto functionInfo = context->findFunction(named->index);
+            assert(functionInfo.has_value());
+            names.push_back(builder.getStringAttr(functionInfo->second.name));
+            auto colMemberName = memberManager.getUniqueMember(functionInfo->second.name);
+            colMemberNames.push_back(builder.getStringAttr(colMemberName));
+            if (translationContext->translatedValuesType.contains(named->index)) {
+               colTypes.push_back(mlir::TypeAttr::get(translationContext->translatedValuesType[named->index]));
+            } else {
+               colTypes.push_back(mlir::TypeAttr::get(functionInfo->second.resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
+            }
+            auto attrDef = functionInfo.value().second.createRef(attrManager);
+            attrs.push_back(attrDef);
+
+            continue;
+         }
+         names.push_back(builder.getStringAttr(name));
+         assert(columns.size() == 1);
+         auto type = createTypeForColumn(builder.getContext(), columns[0].second.column);
+         colTypes.push_back(mlir::TypeAttr::get(type));
+         colMemberNames.push_back(builder.getStringAttr(colMemberName));
+         auto attrDef = columns[0].second.createRef(attrManager);
+         attrs.push_back(attrDef);
+         /*auto name = named.first;
          if (named.second->type == ast::NamedResultType::Column) {
             auto columnInfo = std::static_pointer_cast<ast::ColumnInfo>(named.second);
             names.push_back(builder.getStringAttr(name));
@@ -55,7 +82,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
             colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
             auto attrDef = functionInfo->createRef(attrManager);
             attrs.push_back(attrDef);
-         }
+         }*/
       }
 
       localTableType = compiler::dialect::subop::LocalTableType::get(
@@ -159,8 +186,19 @@ mlir::Value SQLMlirTranslator::translateResultModifier(mlir::OpBuilder& builder,
             }
             if (orderByElement->expression->type == ast::ExpressionType::BOUND_COLUMN_REF) {
                auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(orderByElement->expression);
-               auto attrDef = attrManager.createRef(columnRef->scope, columnRef->boundColumn.getColumnName());
-               mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
+               auto column = context->findColumn(columnRef->boundColumnEntry->index);
+               if (column.empty()) {
+                  auto function = context->findFunction(columnRef->boundColumnEntry->index);
+                  assert(function.has_value());
+                  auto attrDef = function->second.createRef(attrManager);
+                  mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
+
+               } else {
+                  auto attrDef = attrManager.createRef(columnRef->scope, column[0].second.column.getColumnName());
+                  mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
+               }
+
+
             } else {
                error("Not implemented", orderByElement->expression->loc);
             }
@@ -180,11 +218,13 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
    switch (expression->exprClass) {
       case ast::ExpressionClass::BOUND_COLUMN_REF: {
          auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(expression);
-         auto name = columnRef->alias.empty() ? columnRef->boundColumn.getColumnName() : columnRef->alias;
+         auto column = context->findColumn(columnRef->boundColumnEntry->index);
+         assert(column.size() == 1);
+         auto name = columnRef->alias.empty() ? column[0].second.column.getColumnName() : columnRef->alias;
          auto attrDef = attrManager.createRef(columnRef->scope, name);
          return builder.create<compiler::dialect::tuples::GetColumnOp>(
             builder.getUnknownLoc(),
-            createTypeForColumn(builder.getContext(), columnRef->boundColumn), attrDef, translationContext->getCurrentTuple());
+            createTypeForColumn(builder.getContext(), column[0].second.column), attrDef, translationContext->getCurrentTuple());
       }
       case ast::ExpressionClass::BOUND_CONSTANT: {
          auto constExpr = std::static_pointer_cast<ast::BoundConstantExpression>(expression);
@@ -200,6 +240,11 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                   stringType = compiler::dialect::db::CharType::get(builder.getContext(), value->sVal.size());
                };
                return builder.create<compiler::dialect::db::ConstantOp>(builder.getUnknownLoc(), stringType, builder.getStringAttr(value->sVal));
+            }
+            case ast::ConstantType::FLOAT: {
+               auto value = std::static_pointer_cast<ast::FloatValue>(constExpr->value);
+               assert(constExpr->resultType.has_value());
+               return builder.create<compiler::dialect::db::ConstantOp>(builder.getUnknownLoc(), constExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext()), builder.getStringAttr(value->fVal));
             }
 
             default: error("Not implemented", expression->loc);
@@ -303,6 +348,16 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             return compiler::frontend::sql::SQLTypeInference::castValueToType(builder, toCast, resType);
          }
       }
+      case ast::ExpressionClass::BOUND_BETWEEN: {
+         auto boundBetween = std::static_pointer_cast<ast::BoundBetweenExpression>(expression);
+         mlir::Value input, lower, upper;
+         input = translateExpression(builder, boundBetween->input, context, tree);
+         lower = translateExpression(builder, boundBetween->lower, context, tree);
+         upper = translateExpression(builder, boundBetween->upper, context, tree);
+         auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {input, lower, upper});
+         mlir::Value between = builder.create<db::BetweenOp>(builder.getUnknownLoc(), ct[0], ct[1], ct[2], true, true);
+         return between;
+      }
 
       default: error("Not implemented", expression->loc);
    }
@@ -371,7 +426,9 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 }
 
 mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {
-
+   if (aggregation->groupByNode && aggregation->aggregations.empty()) {
+      return tree;
+   }
    //create map
    tree = createMap(builder, aggregation->mapName, aggregation->toMapExpressions, context, tree);
 
@@ -382,7 +439,9 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
    for (auto& groupBy : aggregation->groupByNode->groupExpressions) {
       if (groupBy->type == ast::ExpressionType::BOUND_COLUMN_REF) {
          auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(groupBy);
-         auto attrDef = attrManager.createRef(columnRef->scope, columnRef->boundColumn.getColumnName());
+         auto column = context->findColumn(columnRef->boundColumnEntry->index);
+         assert(column.size() == 1);
+         auto attrDef = attrManager.createRef(columnRef->scope, column[0].second.column.getColumnName());
          //TODO
          /*auto attrName = fieldsToString(columnRef->fields_);
          groupByAttrToPos[attrName] = i;*/
@@ -453,12 +512,15 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             switch (aggrFunction->arguments[0]->type) {
                case ast::ExpressionType::BOUND_COLUMN_REF: {
                   auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(aggrFunction->arguments[0]);
-                  refAttr = attrManager.createRef(columnRef->scope, columnRef->boundColumn.getColumnName());
+                  auto column = context->findColumn(columnRef->boundColumnEntry->index);
+                  assert(column.size() == 1);
+                  refAttr = attrManager.createRef(columnRef->scope, column[0].second.column.getColumnName());
                   break;
                }
                default: {
                   //Is in map
                   refAttr = attrManager.createRef(aggregation->mapName, aggrFunction->arguments[0]->alias);
+
                   break;
                };
             }
@@ -473,10 +535,38 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                aggrResultType = builder.getI64Type();
             } else {
                assert(aggrFunction->resultType.has_value());
+
                aggrResultType = aggrFunction->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
+               if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
+                  //TODO better, over context!!
+                  assert(aggrFunction->arguments[0]->resultMlirType.has_value());
+                  aggrResultType = aggrFunction->arguments[0]->resultMlirType.value();
+               }
                //TODO define type
                if (relalgAggrFunc == relalg::AggrFunc::avg) {
-                  error("Complete implementation here", aggrFunction->loc);
+                  auto baseType = getBaseType(aggrResultType);
+                  if (baseType.isIntOrFloat() && !baseType.isIntOrIndex()) {
+                     //keep aggrResultType
+                  } else if (mlir::isa<db::DecimalType>(baseType)) {
+                     mlir::OpBuilder b(builder.getContext());
+                     mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), baseType, b.getUnitAttr());
+                     mlir::Value x2 = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
+                     mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x2);
+                     aggrResultType = div.getType();
+                     div.getDefiningOp()->erase();
+                     x2.getDefiningOp()->erase();
+                     x.getDefiningOp()->erase();
+                  } else {
+                     mlir::OpBuilder b(builder.getContext());
+                     mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
+                     mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x);
+                     aggrResultType = div.getType();
+                     div.getDefiningOp()->erase();
+                     x.getDefiningOp()->erase();
+                  }
+                  if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
+                     aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
+                  }
                }
                //TODO For what is this?
                /* if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
@@ -486,6 +576,9 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
          }
          attrDef.getColumn().type = expr.getType();
+         translationContext->translatedValuesType.emplace(aggrFunction->boundColumnEntry->index, expr.getType());
+         aggrFunction->resultMlirType = expr.getType();
+
          //TODO mapping.insert({12, "&attrDef.getColumn()"});
          createdCols.push_back(attrDef);
          createdValues.push_back(expr);
@@ -521,7 +614,8 @@ mlir::Value SQLMlirTranslator::createMap(mlir::OpBuilder& builder, std::string m
       //TODO does the use of alias make sense here?
       auto attrDef = attrManager.createDef(mapName, p->alias);
       attrDef.getColumn().type = expr.getType();
-     //TODO MAP context.mapAttribute(scope, p.first->colId, &attrDef.getColumn());
+      p->resultMlirType = expr.getType();
+      //TODO MAP context.mapAttribute(scope, p.first->colId, &attrDef.getColumn());
       createdCols.push_back(attrDef);
       createdValues.push_back(expr);
    }

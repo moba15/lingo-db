@@ -1,6 +1,7 @@
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
 
 #include <cassert>
+#include <clang/AST/Type.h>
 namespace lingodb::ast {
 
 ///ColumnRef
@@ -446,4 +447,67 @@ std::string CastExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return dot;
 }
 
+BetweenExpression::BetweenExpression(ExpressionType type, std::shared_ptr<ParsedExpression> input, std::shared_ptr<ParsedExpression> lower, std::shared_ptr<ParsedExpression> upper) : ParsedExpression(type, TYPE), input(input), lower(lower), upper(upper) {
+   assert(lower != nullptr && upper != nullptr && input != nullptr);
+   assert(type == ExpressionType::COMPARE_BETWEEN || type == ExpressionType::COMPARE_NOT_BETWEEN);
+}
+
+std::string BetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot{};
+
+   // Create node identifier for the between expression
+   std::string nodeId;
+   nodeId.append("node");
+   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+
+   // Create the node with operator label
+   dot.append(nodeId);
+   dot.append(" [label=\"");
+   dot.append(type == ExpressionType::COMPARE_BETWEEN ? "BETWEEN" : "NOT BETWEEN");
+   if (asymmetric) {
+      dot.append("\\nASYMMETRIC");
+   }
+   dot.append("\"];\n");
+
+   // Add input expression
+   if (input) {
+      std::string inputId;
+      inputId.append("node");
+      inputId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(input.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(inputId);
+      dot.append(" [label=\"input\"];\n");
+      dot.append(input->toDotGraph(depth + 1, idGen));
+   }
+
+   // Add lower bound expression
+   if (lower) {
+      std::string lowerId;
+      lowerId.append("node");
+      lowerId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(lower.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(lowerId);
+      dot.append(" [label=\"lower\"];\n");
+      dot.append(lower->toDotGraph(depth + 1, idGen));
+   }
+
+   // Add upper bound expression
+   if (upper) {
+      std::string upperId;
+      upperId.append("node");
+      upperId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(upper.get()))));
+
+      dot.append(nodeId);
+      dot.append(" -> ");
+      dot.append(upperId);
+      dot.append(" [label=\"upper\"];\n");
+      dot.append(upper->toDotGraph(depth + 1, idGen));
+   }
+
+   return dot;
+}
 } // namespace lingodb::ast

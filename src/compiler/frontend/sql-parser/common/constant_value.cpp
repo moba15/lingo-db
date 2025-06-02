@@ -19,6 +19,12 @@ std::string IntValue::toString() {
    return "int:" + std::to_string(iVal);
 }
 
+FloatValue::FloatValue(std::string fVal) : Value(ConstantType::FLOAT), fVal(fVal) {
+}
+std::string FloatValue::toString() {
+   return "float: " + fVal;
+}
+
 /*
  * StringConstantValue
  */

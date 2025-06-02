@@ -147,6 +147,8 @@ boolean [fF][aA][lL][sS][eE]
 [aA][sS]                              { return lingodb::parser::make_AS(loc);}
 [aA][sS][cC]                          { return lingodb::parser::make_ASC(loc); }
 
+
+[bB][eE][tT][wW][eE][eE][nN]          { return lingodb::parser::make_BETWEEN(loc);}
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
@@ -192,6 +194,9 @@ outer                                 { return lingodb::parser::make_OUTER_P(loc
                 }
 {decinteger}	{
 				    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
+			    }
+{numeric}	{
+				    return lingodb::parser::make_FCONST(yytext, loc);
 			    }
 {str} {
   std::string ident(yytext);

@@ -7,7 +7,6 @@ BaseTableRef::BaseTableRef(TableDescription tableDescription) : TableRef(TYPE), 
 std::string BaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
 
-
    // Create node identifier for the base table reference
    std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
 
