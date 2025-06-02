@@ -3,7 +3,7 @@ namespace lingodb::ast {
 /*
  * BoundColumnRefExpression
 */
-BoundColumnRefExpression::BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, catalog::Column boundColumn) : BoundExpression(TYPE, ExpressionType::BOUND_COLUMN_REF, resultType), scope(scope), boundColumn(std::move(boundColumn)) {
+BoundColumnRefExpression::BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<BoundColumnEntry> boundColumnEntry) : BoundExpression(TYPE, ExpressionType::BOUND_COLUMN_REF, resultType), scope(scope), boundColumnEntry(std::move(boundColumnEntry)) {
 }
 std::string BoundColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
@@ -28,7 +28,7 @@ BoundConjunctionExpression::BoundConjunctionExpression(ExpressionType type, std:
       throw std::runtime_error("Invalid type for BoundConjunctionExpression");
    }
 }
-BoundConjunctionExpression::BoundConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<BoundExpression>> children) : BoundExpression(TYPE, type, catalog::Type::boolean()), children(std::move(children)){
+BoundConjunctionExpression::BoundConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<BoundExpression>> children) : BoundExpression(TYPE, type, catalog::Type::boolean()), children(std::move(children)) {
 }
 std::string BoundConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
@@ -46,7 +46,7 @@ std::string BoundConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator&
 /*
  * BoundTargetsExpression
 */
-BoundTargetsExpression::BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::pair<std::string, catalog::Column>> targetColumns) : BoundExpression(TYPE, ExpressionType::BOUND_TARGETS), targets(std::move(targets)), targetColumns(std::move(targetColumns)) {
+BoundTargetsExpression::BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<BoundColumnEntry>> targetColumns) : BoundExpression(TYPE, ExpressionType::BOUND_TARGETS), targets(std::move(targets)), targetColumns(std::move(targetColumns)) {
    for (const auto& target : this->targets) {
       if (target->type == ExpressionType::AGGREGATE && target->exprClass == ExpressionClass::FUNCTION) {
          //TODO handle aggregation
@@ -60,7 +60,7 @@ std::string BoundTargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& 
 /*
  * BoundFunctionExpression
 */
-BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments) : BoundExpression(TYPE, type, resultType), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), arguments(arguments) {
+BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<BoundColumnEntry> boundColumnEntry) : BoundExpression(TYPE, type, resultType), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), arguments(arguments), boundColumnEntry(boundColumnEntry) {
 }
 std::string BoundFunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
@@ -91,6 +91,15 @@ std::string BoundOperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator&
 BoundCastExpression::BoundCastExpression(catalog::Type resultType, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods) : BoundExpression(TYPE, ExpressionType::CAST, resultType), child(std::move(child)), logicalType(logicalType), typeMods(typeMods) {
 }
 std::string BoundCastExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
+
+/*
+ * BoundBetweenExpression
+ */
+BoundBetweenExpression::BoundBetweenExpression(ExpressionType type, catalog::Type resultType, std::shared_ptr<BoundExpression> input, std::shared_ptr<BoundExpression> lower, std::shared_ptr<BoundExpression> upper) : BoundExpression(TYPE, type, resultType), input(std::move(input)), lower(std::move(lower)), upper(std::move(upper)) {
+}
+std::string BoundBetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
 } // namespace lingodb::ast

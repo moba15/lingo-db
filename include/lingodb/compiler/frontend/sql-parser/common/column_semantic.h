@@ -19,6 +19,7 @@ struct NamedResult {
 struct FunctionInfo : public NamedResult {
    std::string name;
    catalog::NullableType resultType;
+
    FunctionInfo(std::string scope, std::string name, catalog::NullableType resultType) : NamedResult(NamedResultType::Function, scope), name(name), resultType(resultType) {}
 
    compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
@@ -32,10 +33,26 @@ struct ColumnInfo : public NamedResult {
       return attrManager.createRef(this->scope, column.getColumnName());
    }
 };
-struct TargetInfo {
-   std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults;
-   void map(std::string name, std::shared_ptr<NamedResult> cInfo) {
-      namedResults.push_back({name, std::move(cInfo)});
+class BoundColumnEntry {
+   public:
+   size_t index;
+   std::string displayName{};
+
+   static std::shared_ptr<BoundColumnEntry> create() {
+      static size_t currentId = 0;
+      return std::make_shared<BoundColumnEntry>(currentId++);
    }
+};
+struct TargetInfo {
+   public:
+   std::vector<std::shared_ptr<BoundColumnEntry>> targetColumns;
+   void add(std::shared_ptr<BoundColumnEntry> entry) {
+      targetColumns.push_back(std::move(entry));
+   }
+
+   //std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults;
+   /*void map(std::string name, std::shared_ptr<NamedResult> cInfo) {
+      namedResults.push_back({name, std::move(cInfo)});
+   }*/
 };
 } // namespace lingodb::ast

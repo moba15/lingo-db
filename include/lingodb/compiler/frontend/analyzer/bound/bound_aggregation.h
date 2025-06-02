@@ -5,7 +5,7 @@
 namespace lingodb::ast {
 class BoundAggregationNode : public AstNode {
    public:
-   BoundAggregationNode(std::shared_ptr<BoundGroupByNode> groupByNode, std::vector<std::shared_ptr<BoundFunctionExpression>> aggregations,  std::vector<std::shared_ptr<BoundExpression>> toMapExpressions, std::string mapName);
+   BoundAggregationNode(std::shared_ptr<BoundGroupByNode> groupByNode, std::vector<std::shared_ptr<BoundFunctionExpression>> aggregations, std::vector<std::shared_ptr<BoundExpression>> toMapExpressions, std::string mapName);
 
    std::shared_ptr<BoundGroupByNode> groupByNode;
    std::vector<std::shared_ptr<BoundFunctionExpression>> aggregations;

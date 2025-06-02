@@ -1,5 +1,7 @@
 #include "lingodb/compiler/frontend/analyzer/sql_context.h"
 
+#include "lingodb/runtime/RecordBatchInfo.h"
+
 #include <iostream>
 namespace lingodb::analyzer {
 ASTTransformContext::ASTTransformContext() : aggregationNode(std::make_shared<ast::AggregationNode>()) {
@@ -19,16 +21,16 @@ void SQLContext::popCurrentScope() {
    currentScope = currentScope->parent;
    scopes.pop_back();
 }
-std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(const std::string& columnName) const {
-   std::vector<catalog::Column> columns{};
+std::vector<std::pair<size_t, ast::ColumnInfo>> SQLContext::findColumn(const std::string& columnName) const {
+   std::vector<std::pair<size_t, ast::ColumnInfo>> columns{};
    std::string foundTable;
    auto current = currentScope;
    while (current) {
-      for (auto t : current->tables) {
-         auto colsOfTable = t.second->getColumns();
+      for (auto t : current->columns) {
+         auto colsOfTable = t.second;
          foundTable = t.first;
-         auto it = std::find_if(colsOfTable.begin(), colsOfTable.end(), [&columnName](const catalog::Column& col) {
-            const std::string& colName = col.getColumnName();
+         auto it = std::find_if(colsOfTable.begin(), colsOfTable.end(), [&columnName](std::pair<size_t, ast::ColumnInfo> col) {
+            const std::string& colName = col.second.column.getColumnName();
             return colName.length() == columnName.length() &&
                std::equal(colName.begin(), colName.end(), columnName.begin(),
                           [](char a, char b) { return std::tolower(a) == std::tolower(b); });
@@ -39,18 +41,38 @@ std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(cons
       }
       current = current->parent;
    }
-   return std::make_pair(foundTable, columns);
+   return columns;
 }
 
-std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(const std::string& columnName, const std::string& alias) const {
-   std::vector<catalog::Column> columns{};
+std::vector<std::pair<size_t, ast::ColumnInfo>> SQLContext::findColumn(const size_t id) const {
+   std::vector<std::pair<size_t, ast::ColumnInfo>> columns{};
+   std::string foundTable;
    auto current = currentScope;
    while (current) {
-      auto table = current->tables.find(alias);
-      if (table != current->tables.end()) {
-         auto colsOfTable = table->second->getColumns();
-         auto it = std::find_if(colsOfTable.begin(), colsOfTable.end(), [&columnName](const catalog::Column& col) {
-            const std::string& colName = col.getColumnName();
+      for (auto t : current->columns) {
+         auto colsOfTable = t.second;
+         foundTable = t.first;
+         auto it = std::find_if(colsOfTable.begin(), colsOfTable.end(), [&id](std::pair<size_t, ast::ColumnInfo> col) {
+            return col.first == id;
+         });
+         if (it != colsOfTable.end()) {
+            columns.emplace_back(*it);
+         }
+      }
+      current = current->parent;
+   }
+   return columns;
+}
+
+std::vector<std::pair<size_t, ast::ColumnInfo>> SQLContext::findColumn(const std::string& columnName, const std::string& alias) const {
+   std::vector<std::pair<size_t, ast::ColumnInfo>> columns{};
+   auto current = currentScope;
+   while (current) {
+      auto table = current->columns.find(alias);
+      if (table != current->columns.end()) {
+         auto colsOfTable = table->second;
+         auto it = std::find_if(colsOfTable.begin(), colsOfTable.end(), [&columnName](std::pair<size_t, ast::ColumnInfo> col) {
+            const std::string& colName = col.second.column.getColumnName();
             return colName.length() == columnName.length() &&
                std::equal(colName.begin(), colName.end(), columnName.begin(),
                           [](char a, char b) { return std::tolower(a) == std::tolower(b); });
@@ -62,10 +84,10 @@ std::pair<std::string, std::vector<catalog::Column>> SQLContext::findColumn(cons
       current = current->parent;
    }
 
-   return std::make_pair(alias, columns);
+   return columns;
 }
 
-std::pair<std::string, std::shared_ptr<ast::FunctionInfo>> SQLContext::findFunction(const std::string& functionName) const {
+std::optional<std::pair<size_t, ast::FunctionInfo>> SQLContext::findFunction(const std::string& functionName) const {
    auto current = currentScope;
    while (current) {
       //TODO use hashmap for faster search
@@ -73,46 +95,58 @@ std::pair<std::string, std::shared_ptr<ast::FunctionInfo>> SQLContext::findFunct
          return entry.first == functionName;
       });
       if (function != current->functionsEntry.end()) {
-         return std::make_pair(function->first, function->second);
+         auto functionInfos = function->second;
+         if (functionInfos.empty()) {
+            return std::nullopt;
+         }
+         return functionInfos[0];
       }
       current = current->parent;
    }
-   return std::make_pair("", nullptr);
+   return std::nullopt;
+}
+
+std::optional<std::pair<size_t, ast::FunctionInfo>> SQLContext::findFunction(const size_t id) const {
+   auto current = currentScope;
+   while (current) {
+      //TODO use hashmap for faster search
+      auto function = std::find_if(current->functionsEntry.begin(), current->functionsEntry.end(), [&id](const auto& entry) {
+         return entry.second[0].first == id;
+      });
+      if (function != current->functionsEntry.end()) {
+         auto functionInfos = function->second;
+         if (functionInfos.empty()) {
+            return std::nullopt;
+         }
+         return functionInfos[0];
+      }
+      current = current->parent;
+   }
+   return std::nullopt;
 }
 
 std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns() const {
-   std::vector<std::pair<std::string, catalog::Column>> columns{};
+   throw std::runtime_error("Not implemented getColumns");
+   /* std::vector<std::pair<std::string, catalog::Column>> columns{};
    for (auto [tableName, table] : currentScope->tables) {
       std::transform(table->getColumns().begin(), table->getColumns().end(), std::back_inserter(columns), [&tableName](catalog::Column column) {
          return std::make_pair(tableName, column);
       });
    }
-   return columns;
+   return columns;*/
 }
 std::vector<std::pair<std::string, catalog::Column>> SQLContext::getColumns(std::string& tableName) const {
-   auto table = currentScope->tables.find(tableName);
+   throw std::runtime_error("Not implemented getColumns");
+   /* auto table = currentScope->tables.find(tableName);
    std::vector<std::pair<std::string, catalog::Column>> columns{};
    std::transform(table->second->getColumns().begin(), table->second->getColumns().end(), std::back_inserter(columns), [&tableName](catalog::Column column) {
       return std::make_pair(tableName, column);
    });
-   return columns;
+   return columns;*/
 }
 
 std::string SQLContext::toString() const {
-   std::ostringstream oss{};
-   oss << "SQLContext:\n";
-   auto current = currentScope;
-   for (auto scope : scopes) {
-      for (const auto& [tableName, table] : scope->tables) {
-         oss << "  Tabelle: " << tableName << "\n";
-         for (const auto& column : table->getColumns()) {
-            oss << "    - Spalte: " << std::setw(20) << column.getColumnName()
-                << " | Typ: " << column.getLogicalType().toString() << "\n";
-         }
-      }
-   }
-
-   return oss.str();
+   return "";
 }
 
 } // namespace lingodb::analyzer

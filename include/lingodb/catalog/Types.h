@@ -76,7 +76,7 @@ class Type {
    static Type intervalDaytime();
    static Type intervalMonths();
 };
-class NullableType  {
+class NullableType {
    public:
    NullableType(Type type);
    NullableType(Type type, bool isNullable);

@@ -55,8 +55,8 @@
 %define api.token.prefix {TOK_}
 //TODO check if int?
 %token <int> ICONST
-%token <uint64_t>	INTEGER_VALUE	"integer_value"
-%token <double>		FLOAT_VALUE	"float_value"
+%token <uint64_t>	    INTEGER_VALUE	"integer_value"
+%token <std::string>	FCONST
 %token <std::string>	IDENTIFIER	"identifier"
 %token <std::string>	STRING_VALUE
 %token <std::string>	BIT_VALUE	"bit_string"
@@ -99,7 +99,7 @@
  * DOT_DOT is unused in the core SQL grammar, and so will always provoke
  * parse errors.  It is needed by PL/pgSQL.
  */
-%token <std::string>	        UIDENT FCONST SCONST USCONST BCONST XCONST Op
+%token <std::string>	        UIDENT SCONST USCONST BCONST XCONST Op
 %token 	        PARAM
 %token			TYPECAST DOT_DOT COLON_EQUALS
 
@@ -226,7 +226,7 @@
 
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr  where_clause group_by_item 
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
                                                         func_arg_expr select_limit_value
 
 %type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr
@@ -248,7 +248,7 @@
 
 %type<std::vector<std::string>> name_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst Fconst
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
@@ -273,6 +273,7 @@
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
 %type<std::optional<lingodb::ast::TypeMods>> opt_interval
+%type<bool> opt_asymmetric
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -754,7 +755,10 @@ extended_relation_expr:
     | ONLY qualified_name
     | ONLY LP qualified_name RP
     ;
-
+opt_asymmetric:
+    ASYMMETRIC {$$=true;}
+    | %empty {$$=false;}
+    ;
 opt_all_clause:
     ALL
     | %empty
@@ -929,6 +933,31 @@ a_expr:
         $$ = mkNode<lingodb::ast::ConjunctionExpression>(@$, lingodb::ast::ExpressionType::CONJUNCTION_OR, $1, $3);
     }
     | NOT a_expr
+    | a_expr[input] BETWEEN opt_asymmetric b_expr[lower] AND a_expr[upper] //%prec BETWEEN
+    {
+        auto node = mkNode<lingodb::ast::BetweenExpression>(@$, lingodb::ast::ExpressionType::COMPARE_BETWEEN, $input, $lower, $upper);
+        node->asymmetric = $opt_asymmetric;
+        $$ = node;
+    }
+    ;
+b_expr:
+    c_expr { $$ = $c_expr;}
+    | b_expr PLUS b_expr
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_PLUS, $1,$3);
+    }
+    | b_expr MINUS b_expr
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_MINUS, $1,$3);
+    }
+    | b_expr STAR b_expr 
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_TIMES, $1,$3);
+    }
+    | b_expr SLASH b_expr 
+    {
+        $$ = mkNode<lingodb::ast::OperatorExpression>(@$, lingodb::ast::ExpressionType::OPERATOR_DIVIDE, $1,$3);
+    }
     ;
 /*
  * Productions that can be used in both a_expr and b_expr.
@@ -1294,6 +1323,7 @@ param_name: type_function_name
  //TODO Add missing AexprConst rules
 AexprConst: 
     Iconst { $$=$1;}
+    | Fconst { $$=$1;}
     | Sconst {$$=$1;}
     | Bconst {$$=$1;}
     | func_name Sconst {
@@ -1317,6 +1347,10 @@ AexprConst:
 Iconst:	
     ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntValue>($1); $$=t;  };
 
+Fconst:
+    FCONST  {auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::FloatValue>($1); $$=t; }
+    | PLUS FCONST
+    | MINUS FCONST {error(@$, "Negative float constants are not supported yet!");}
 Sconst: 
     STRING_VALUE { auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::StringValue>($1); $$=t; };
 

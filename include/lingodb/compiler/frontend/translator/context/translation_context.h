@@ -20,5 +20,7 @@ class TranslationContext {
       return TupleScope(this);
    }
    std::stack<mlir::Value> currTuple;
+
+   std::map<size_t, mlir::Type> translatedValuesType;
 };
 } // namespace lingodb::translator
