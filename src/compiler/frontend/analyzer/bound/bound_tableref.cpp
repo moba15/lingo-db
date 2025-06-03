@@ -25,4 +25,11 @@ std::string BoundBaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen
 
    return dot;
 }
+
+BoundJoinRef::BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, jointCondOrUsingCols condition) : BoundTableRef(TYPE), type(type), refType(refType), left(std::move(left)), right(std::move(right)), condition(std::move(condition)) {
+
+}
+std::string BoundJoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast

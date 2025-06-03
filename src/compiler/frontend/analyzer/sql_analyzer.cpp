@@ -301,13 +301,14 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
       }
       case ast::TableReferenceType::JOIN: {
          auto join = std::static_pointer_cast<ast::JoinRef>(tableRef);
+         std::shared_ptr<ast::TableProducer> left, right;
          if (join->left) {
-            analyze(join->left, context);
+            left = analyze(join->left, context);
          } else {
             error("Left side of join is empty", join->loc);
          }
          if (join->right) {
-            analyze(join->right, context);
+            right = analyze(join->right, context);
          } else {
             error("Right side of join is empty", join->loc);
          }
@@ -320,7 +321,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          } else {
             error("Not implemented", join->loc);
          }
-
+         return drv.nf.node<ast::BoundJoinRef>(join->loc, join->type, join->refType, left, right, join->condition);
          break;
       }
       case ast::TableReferenceType::SUBQUERY: {

@@ -417,6 +417,44 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          return builder.create<compiler::dialect::relalg::BaseTableOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), relation, builder.getDictionaryAttr(columns));
       }
       case ast::TableReferenceType::JOIN: {
+         auto boundJoin = std::static_pointer_cast<ast::BoundJoinRef>(tableRef);
+         mlir::Value left, right;
+         left = translateTableProducer(builder, boundJoin->left, context);
+         right = translateTableProducer(builder, boundJoin->right, context);
+         switch (boundJoin->type) {
+            case ast::JoinType::INNER: {
+               switch (boundJoin->refType) {
+                  case ast::JoinCondType::CROSS: {
+                     auto joinOp = builder.create<compiler::dialect::relalg::CrossProductOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), left, right);
+                     return joinOp;
+                  }
+                     default: error("Not implemented", tableRef->loc);
+               }
+
+               //TODO translate predicate
+               auto joinOp = builder.create<compiler::dialect::relalg::InnerJoinOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), left, right);
+
+               return joinOp;
+
+            }
+
+            case ast::JoinType::LEFT: {
+               //TODO translate predicate
+               //TODO mapping
+
+
+            }
+            case ast::JoinType::OUTER: {
+
+
+            }
+               default: error("Not implemented", tableRef->loc);
+         }
+
+
+         right = translateTableProducer(builder, boundJoin->right, context);
+         error("TODO hier weiter machen", tableRef->loc);
+
       }
       case ast::TableReferenceType::SUBQUERY: {
       }
