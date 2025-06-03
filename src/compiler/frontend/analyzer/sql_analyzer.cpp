@@ -666,6 +666,13 @@ catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type
    if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::INT) {
       return type1;
    }
+   if (type1.getTypeId() == catalog::LogicalTypeId::CHAR && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
+      return type2;
+   }
+
+   if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type1.getTypeId() == catalog::LogicalTypeId::STRING) {
+      return type1;
+   }
 
    throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
 }
