@@ -933,6 +933,14 @@ a_expr:
         $$ = mkNode<lingodb::ast::ConjunctionExpression>(@$, lingodb::ast::ExpressionType::CONJUNCTION_OR, $1, $3);
     }
     | NOT a_expr
+    | a_expr LIKE a_expr
+    {
+        $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_LIKE, $1, $3);
+    }
+    | a_expr NOT_LA LIKE a_expr
+    {
+        $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_NOT_LIKE, $1, $4);
+    }
     | a_expr[input] BETWEEN opt_asymmetric b_expr[lower] AND a_expr[upper] //%prec BETWEEN
     {
         auto node = mkNode<lingodb::ast::BetweenExpression>(@$, lingodb::ast::ExpressionType::COMPARE_BETWEEN, $input, $lower, $upper);

@@ -108,7 +108,7 @@ decinteger		{decdigit}+
 numeric         ({decinteger}\.{decinteger}?)|(\.{decinteger})
 
 ident_start     [a-zA-Z]
-ident_cont      [a-zA-Z0-9_-]
+ident_cont      [a-zA-Z0-9_%\-]
 identifier      {ident_start}{ident_cont}*
 squote			\'
 dquote			\"
@@ -173,6 +173,7 @@ inner                                 { return lingodb::parser::make_INNER_P(loc
 [Ii][nN]                              { return lingodb::parser::make_IN_P(loc); }
 [iI][nN][tT][eE][rR][vV][aA][lL]      { return lingodb::parser::make_INTERVAL(loc); }
 [lL][eE][fF][tT]                      { return lingodb::parser::make_LEFT(loc); }
+[lL][iI][kK][eE]                       { return lingodb::parser::make_LIKE(loc); }
 [lL][iI][mM][iI][tT]                  { return lingodb::parser::make_LIMIT(loc); }
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
 [nN][oO][tT]                          { return lingodb::parser::make_NOT(loc); }

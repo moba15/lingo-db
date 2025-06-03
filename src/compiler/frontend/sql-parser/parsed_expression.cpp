@@ -64,7 +64,9 @@ std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
       case ExpressionType::COMPARE_GREATERTHANOREQUALTO: return ">=";
       case ExpressionType::COMPARE_LESSTHANOREQUALTO: return "<=";
       case ExpressionType::COMPARE_NOTEQUAL: return "<>";
-      default: "Unknown";
+      case ExpressionType::COMPARE_LIKE: return "LIKE";
+      case ExpressionType::COMPARE_NOT_LIKE: return "NOT LIKE";
+      default: return  "Unknown";
    }
 }
 std::string ComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {

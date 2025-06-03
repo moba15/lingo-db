@@ -254,6 +254,14 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto comparisonExpr = std::static_pointer_cast<ast::BoundComparisonExpression>(expression);
          auto left = translateExpression(builder, comparisonExpr->left, context, tree);
          auto right = translateExpression(builder, comparisonExpr->right, context, tree);
+         if (comparisonExpr->type == ast::ExpressionType::COMPARE_LIKE || comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE) {
+            auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right});
+            auto isNullable = mlir::isa<db::NullableType>(left.getType()) || mlir::isa<db::NullableType>(right.getType());
+            mlir::Type resType = isNullable ? (mlir::Type) db::NullableType::get(builder.getContext(), builder.getI1Type()) : (mlir::Type) builder.getI1Type();
+            auto like = builder.create<db::RuntimeCall>(builder.getUnknownLoc(), resType, "Like", mlir::ValueRange({ct[0], ct[1]})).getRes();
+            return comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE ? builder.create<db::NotOp>(builder.getUnknownLoc(), like) : like;
+
+         }
          compiler::dialect::db::DBCmpPredicate pred;
          switch (expression->type) {
             case ast::ExpressionType::COMPARE_EQUAL:
