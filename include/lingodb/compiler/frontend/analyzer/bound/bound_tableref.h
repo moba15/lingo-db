@@ -29,7 +29,7 @@ class BoundJoinRef : public BoundTableRef {
    static constexpr TableReferenceType TYPE = TableReferenceType::JOIN;
 
    public:
-   BoundJoinRef(JoinType type, JoinCondType refType);
+   BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, jointCondOrUsingCols condition);
 
    //! The left hand side of the join
    //! QueryNode as variant is needed for pipe syntax. Example: FROM Test |> join ok on id1=id2
