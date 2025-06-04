@@ -100,7 +100,7 @@ non_newline			[^\n\r]
 
 comment			("--"{non_newline}*)
 
-whitespace		({space}+|{comment})
+whitespace		({comment})
 
 decdigit        [0-9]
 decinteger		{decdigit}+
@@ -147,7 +147,7 @@ boolean [fF][aA][lL][sS][eE]
 "||"            { return lingodb::parser::make_CONCAT(loc); }
 "#"             { return lingodb::parser::make_YYEOF(loc);}
 "|>"            { return lingodb::parser::make_PIPE(loc); }
-\n              { loc.lines();}
+{newline}              { loc.lines();}
 [aA][lL][lL]                          { return lingodb::parser::make_ALL(loc); }
 [aA][gG][gG][rR][eE][gG][aA][tT][eE]  { return lingodb::parser::make_AGGREGATE(loc); }
 [aA][nN][dD]                          { return lingodb::parser::make_AND(loc);}
@@ -194,6 +194,7 @@ outer                                 { return lingodb::parser::make_OUTER_P(loc
 
 
 <<EOF>>    return lingodb::parser::make_YYEOF (loc);
+
 {whitespace}    {
                   /*Ignore*/
                 }
