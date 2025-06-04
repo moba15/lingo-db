@@ -82,8 +82,9 @@ enum class JoinType : uint8_t {
    // (and NULL if no partner is found)
    RIGHT_SEMI = 9, // RIGHT SEMI join is created by the optimizer when the children of a semi join need to be switched
    // so that the build side can be the smaller table
-   RIGHT_ANTI = 10 // RIGHT ANTI join is created by the optimizer when the children of an anti join need to be
+   RIGHT_ANTI = 10, // RIGHT ANTI join is created by the optimizer when the children of an anti join need to be
    // switched so that the build side can be the smaller table
+   CROSS = 11, // CROSS join is a special case of INNER JOIN where no condition is specified
 };
 using jointCondOrUsingCols = std::variant<std::shared_ptr<ParsedExpression>, std::vector<std::shared_ptr<ColumnRefExpression>>>;
 class JoinRef : public TableRef {

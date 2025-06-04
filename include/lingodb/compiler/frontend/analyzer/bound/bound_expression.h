@@ -35,11 +35,12 @@ class BoundColumnRefExpression : public BoundExpression {
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_COLUMN_REF;
 
    //! Specify both the column and table name
-   BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<BoundColumnEntry> boundColumnEntry);
+   BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<NamedResult> namedResult);
 
    //TODO semenatic
    std::string scope;
-   std::shared_ptr<BoundColumnEntry> boundColumnEntry;
+   std::shared_ptr<NamedResult> namedResult;
+
    //TODO type etc
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
@@ -87,11 +88,11 @@ class BoundTargetsExpression : public BoundExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_TARGETS;
    //BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::pair<std::string, catalog::Column>> targetColumns);
-   BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<BoundColumnEntry>> targetColumns);
+   BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<NamedResult>> targetColumns);
 
    std::vector<std::shared_ptr<BoundExpression>> targets;
    //std::vector<std::pair<std::string, catalog::Column>> targetColumns;
-   std::vector<std::shared_ptr<BoundColumnEntry>> targetColumns;
+   std::vector<std::shared_ptr<NamedResult>> targetColumns;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
@@ -99,14 +100,14 @@ class BoundTargetsExpression : public BoundExpression {
 class BoundFunctionExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_FUNCTION;
-   BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<BoundColumnEntry> boundColumnEntry);
+   BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<FunctionInfo> functionInfo);
 
    std::string functionName;
    std::string scope;
    //TODO!!!!!!!
    std::string aliasOrUniqueIdentifier;
    std::vector<std::shared_ptr<BoundExpression>> arguments;
-   std::shared_ptr<BoundColumnEntry> boundColumnEntry;
+   std::shared_ptr<FunctionInfo> functionInfo;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

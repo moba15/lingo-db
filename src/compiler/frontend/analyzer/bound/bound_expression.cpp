@@ -3,7 +3,7 @@ namespace lingodb::ast {
 /*
  * BoundColumnRefExpression
 */
-BoundColumnRefExpression::BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<BoundColumnEntry> boundColumnEntry) : BoundExpression(TYPE, ExpressionType::BOUND_COLUMN_REF, resultType), scope(scope), boundColumnEntry(std::move(boundColumnEntry)) {
+BoundColumnRefExpression::BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<NamedResult> namedResult) : BoundExpression(TYPE, ExpressionType::BOUND_COLUMN_REF, resultType), scope(scope), namedResult(std::move(namedResult)) {
 }
 std::string BoundColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
@@ -46,7 +46,7 @@ std::string BoundConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator&
 /*
  * BoundTargetsExpression
 */
-BoundTargetsExpression::BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<BoundColumnEntry>> targetColumns) : BoundExpression(TYPE, ExpressionType::BOUND_TARGETS), targets(std::move(targets)), targetColumns(std::move(targetColumns)) {
+BoundTargetsExpression::BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<NamedResult>> targetColumns) : BoundExpression(TYPE, ExpressionType::BOUND_TARGETS), targets(std::move(targets)), targetColumns(std::move(targetColumns)) {
    for (const auto& target : this->targets) {
       if (target->type == ExpressionType::AGGREGATE && target->exprClass == ExpressionClass::FUNCTION) {
          //TODO handle aggregation
@@ -60,7 +60,7 @@ std::string BoundTargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& 
 /*
  * BoundFunctionExpression
 */
-BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<BoundColumnEntry> boundColumnEntry) : BoundExpression(TYPE, type, resultType), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), arguments(arguments), boundColumnEntry(boundColumnEntry) {
+BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<FunctionInfo> functionInfo) : BoundExpression(TYPE, type, resultType), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), arguments(arguments), functionInfo(functionInfo) {
 }
 std::string BoundFunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
