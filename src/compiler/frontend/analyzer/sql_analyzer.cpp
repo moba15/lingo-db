@@ -243,7 +243,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                default: error("Not implemented", target->loc);
             }
          }
-         boundAstNode = drv.nf.node<ast::BoundTargetsExpression>(targetSelection->loc, boundTargetExpressions, targetColumns);
+         boundAstNode = drv.nf.node<ast::BoundTargetsExpression>(targetSelection->loc, targetSelection->alias,  boundTargetExpressions, targetColumns);
          break;
       }
       case ast::PipeOperatorType::WHERE: {
@@ -292,7 +292,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             assert(aggr->resultType.has_value());
             //TODO context->currentScope->targetInfo.map(aggr->scope, std::make_shared<ast::FunctionInfo>(aggr->scope, aggr->aliasOrUniqueIdentifier, aggr->resultType.value()));
          }
-         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, transFormedAggregationExpressions, toMap, mapName );
+         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc,boundGroupByNode, transFormedAggregationExpressions, toMap, mapName );
 
          break;
       }
@@ -441,7 +441,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             default:
                error("Not implemented", constExpr->loc);
          }
-         return drv.nf.node<ast::BoundConstantExpression>(constExpr->loc, type, constExpr->value);
+         return drv.nf.node<ast::BoundConstantExpression>(constExpr->loc, type, constExpr->value, constExpr->alias);
       }
       case ast::ExpressionClass::COLUMN_REF: {
          auto columnRef = std::static_pointer_cast<ast::ColumnRefExpression>(rootNode);
@@ -473,7 +473,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          }
          getCommonType(left->resultType.value().type, right->resultType.value().type);
 
-         auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, left, right);
+         auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, comparison->alias, left, right);
          return boundComparison;
       }
       case ast::ExpressionClass::CONJUNCTION: {
@@ -486,7 +486,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                error("Conjunction is not possible with children of type boolean", expr->loc);
             }
          }
-         return drv.nf.node<ast::BoundConjunctionExpression>(conjunction->loc, conjunction->type, boundChildren);
+         return drv.nf.node<ast::BoundConjunctionExpression>(conjunction->loc, conjunction->type, conjunction->alias, boundChildren);
          break;
       }
       case ast::ExpressionClass::OPERATOR: {
@@ -515,7 +515,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          });
          auto commonType = getCommonBaseType(types);
 
-         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, boundChildren);
+         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, operatorExpr->alias, boundChildren);
       }
       case ast::ExpressionClass::FUNCTION: {
          auto function = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
@@ -622,7 +622,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                      if (constExpr->value->type != ast::ConstantType::STRING) {
                         error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
                      }
-                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), boundChild, castExpr->logicalType, castExpr->typeMods);
+                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
                   }
                   default: error("Not implemented", rootNode->loc);
                }
@@ -634,7 +634,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                }
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
-               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type::intervalDaytime(), boundChild, castExpr->logicalType, castExpr->typeMods);
+               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type::intervalDaytime(), castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
             }
             default: error("Not implemented", rootNode->loc);
          }
@@ -649,7 +649,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          }
          //Check for correct Types
          auto commonType = getCommonBaseType(std::vector{boundInput->resultType.value().type, boundLower->resultType.value().type, boundUpper->resultType.value().type});
-         return drv.nf.node<ast::BoundBetweenExpression>(rootNode->loc, between->type, catalog::Type::boolean(), boundInput, boundLower, boundUpper);
+         return drv.nf.node<ast::BoundBetweenExpression>(rootNode->loc, between->type, catalog::Type::boolean(), rootNode->alias, boundInput, boundLower, boundUpper);
       }
       default: error("Not implemented", rootNode->loc);
    }
@@ -677,7 +677,7 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
       error("Column not found", columnRef->loc);
    }
    found->displayName = columnRef->alias.empty() ? found->displayName : columnRef->alias;
-   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc,found->scope, found->resultType, found);
+   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc,found->scope, found->resultType, found, columnRef->alias);
 }
 
 catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type type2) {

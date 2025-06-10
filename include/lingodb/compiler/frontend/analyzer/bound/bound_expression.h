@@ -14,9 +14,9 @@ enum class BindingType : uint8_t {
 class BoundExpression : public AstNode {
    public:
    //TODO make enums sense
-   BoundExpression(ExpressionClass exprClass, ExpressionType type) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type) {}
-   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(catalog::NullableType(resultType)) {}
-   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::NullableType resultType) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(resultType) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), alias(alias) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(catalog::NullableType(resultType)), alias(alias) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::NullableType resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(resultType), alias(alias) {}
 
    ExpressionClass exprClass;
    ExpressionType type;
@@ -37,7 +37,7 @@ class BoundColumnRefExpression : public BoundExpression {
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_COLUMN_REF;
 
    //! Specify both the column and table name
-   BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<NamedResult> namedResult);
+   BoundColumnRefExpression(std::string scope, catalog::NullableType resultType, std::shared_ptr<NamedResult> namedResult, std::string alias);
 
    //TODO semenatic
    std::string scope;
@@ -52,8 +52,8 @@ class BoundComparisonExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_COMPARISON;
 
-   explicit BoundComparisonExpression(ExpressionType type);
-   BoundComparisonExpression(ExpressionType type, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+   explicit BoundComparisonExpression(ExpressionType type, std::string alias);
+   BoundComparisonExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
 
    std::shared_ptr<BoundExpression> left;
    std::shared_ptr<BoundExpression> right;
@@ -64,8 +64,8 @@ class BoundComparisonExpression : public BoundExpression {
 class BoundConjunctionExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CONJUNCTION;
-   BoundConjunctionExpression(ExpressionType type, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
-   BoundConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<BoundExpression>> children);
+   BoundConjunctionExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+   BoundConjunctionExpression(ExpressionType type, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children);
 
    std::vector<std::shared_ptr<BoundExpression>> children;
 
@@ -78,7 +78,7 @@ class BoundConjunctionExpression : public BoundExpression {
 class BoundConstantExpression : public BoundExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_CONSTANT;
-   BoundConstantExpression(catalog::Type resultType, std::shared_ptr<Value> value);
+   BoundConstantExpression(catalog::Type resultType, std::shared_ptr<Value> value, std::string alias);
 
    std::shared_ptr<Value> value;
 
@@ -90,7 +90,7 @@ class BoundTargetsExpression : public BoundExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_TARGETS;
    //BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::pair<std::string, catalog::Column>> targetColumns);
-   BoundTargetsExpression(std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<NamedResult>> targetColumns);
+   BoundTargetsExpression(std::string alias, std::vector<std::shared_ptr<BoundExpression>> targets, std::vector<std::shared_ptr<NamedResult>> targetColumns);
 
    std::vector<std::shared_ptr<BoundExpression>> targets;
    //std::vector<std::pair<std::string, catalog::Column>> targetColumns;
@@ -128,8 +128,8 @@ class BoundStarExpression : public BoundExpression {
 class BoundOperatorExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_OPERATOR;
-   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::vector<std::shared_ptr<BoundExpression>> children);
-   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children);
+   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
 
    std::vector<std::shared_ptr<BoundExpression>> children;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
@@ -138,7 +138,7 @@ class BoundOperatorExpression : public BoundExpression {
 class BoundCastExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CAST;
-   BoundCastExpression(catalog::Type resultType, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods);
+   BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods);
    std::optional<TypeMods> typeMods;
    std::shared_ptr<BoundExpression> child;
    LogicalType logicalType;
@@ -149,7 +149,7 @@ class BoundBetweenExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_BETWEEN;
 
-   BoundBetweenExpression(ExpressionType type, catalog::Type resultType, std::shared_ptr<BoundExpression> input, std::shared_ptr<BoundExpression> lower, std::shared_ptr<BoundExpression> upper);
+   BoundBetweenExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> input, std::shared_ptr<BoundExpression> lower, std::shared_ptr<BoundExpression> upper);
 
    std::shared_ptr<BoundExpression> input;
    std::shared_ptr<BoundExpression> lower;
