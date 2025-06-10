@@ -21,7 +21,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeAndTransform(std::s
 
    context->pushNewScope();
    auto scope = context->createResolverScope();
-   analyze(transformed, context, scope);
+  transformed = analyze(transformed, context, scope);
    return transformed;
 }
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
@@ -84,13 +84,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   context->aggregationNode->groupByNode = std::move(selectNode->groups);
                }
 
-               //Transform modifiers
-               for (auto modifier : selectNode->modifiers) {
-                  auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
-                  transformedModifier->input = transformed;
-                  transformed = transformedModifier;
-               }
-               selectNode->modifiers.clear();
+
+
 
                //Transform target selection
                auto select_list = selectNode->select_list;
@@ -101,6 +96,13 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   transformed = transformedSelect;
                   selectNode->select_list = nullptr;
                }
+               //Transform modifiers
+               for (auto modifier : selectNode->modifiers) {
+                  auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
+                  transformedModifier->input = transformed;
+                  transformed = transformedModifier;
+               }
+               selectNode->modifiers.clear();
 
                return transformed;
             }
