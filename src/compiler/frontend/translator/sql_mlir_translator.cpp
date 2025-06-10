@@ -29,11 +29,12 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
    {
       mlir::OpBuilder::InsertionGuard guard(builder);
       builder.setInsertionPointToStart(block);
+
       auto tree = translateTableProducer(builder, tableProducer, context);
 
 
 
-      tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
+
 
       std::vector<mlir::Attribute> attrs;
       std::vector<mlir::Attribute> names;
@@ -173,6 +174,8 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
       case ast::NodeType::BOUND_TABLE_REF: {
          auto tableRef = std::static_pointer_cast<ast::BoundTableRef>(tableProducer);
          tree = translateTableRef(builder, tableRef, context);
+         //TODO find correct place
+         tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
          break;
       }
       case ast::NodeType::BOUND_RESULT_MODIFIER: {
@@ -235,22 +238,9 @@ mlir::Value SQLMlirTranslator::translateResultModifier(mlir::OpBuilder& builder,
             if (orderByElement->expression->type == ast::ExpressionType::BOUND_COLUMN_REF) {
                auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(orderByElement->expression);
                auto namedResult = columnRef->namedResult;
-               switch (namedResult->type) {
-                  case ast::NamedResultType::Column: {
-                     auto attrDef = std::static_pointer_cast<ast::ColumnInfo>(namedResult)->createRef(attrManager);
-                     mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
-                     break;
-                  }
-                  case ast::NamedResultType::Function: {
-                     auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(namedResult);
-                     auto attrDef = functionInfo->createRef(attrManager);
-                     mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
-                     break;
-                  }
-                  default: {
-                     error("Not implememted", resultModifier->loc);
-                  }
-               }
+               auto attrDef = namedResult->createRef(attrManager);
+               mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
+
 
 
             } else {
