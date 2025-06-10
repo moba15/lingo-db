@@ -1066,7 +1066,7 @@ func_application:
         $$ = $func_application;
     }
     
-    //| func_expr_common_subexpr
+    | func_expr_common_subexpr
     ;
 
 /* function arguments can have names */    
@@ -1094,8 +1094,26 @@ func_arg_expr:
     | param_name GREATER_EQUAL a_expr
     ;
 
+//TOOD missing rules
+func_expr_common_subexpr: 
+    EXTRACT LP extract_list RP 
+    {
 
+    }
+    
+;
 
+extract_list: 
+    extract_arg FROM a_expr 
+    {
+
+    }
+    ;
+extract_arg: 
+    YEAR_P
+    | MONTH_P
+    | DAY_P
+    ;
 over_clause:
     OVER window_specification
     | OVER ColId 

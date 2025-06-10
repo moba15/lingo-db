@@ -78,14 +78,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                auto transFormedAggregation = transformCast<ast::PipeOperator>(aggPipeNode, context);
                transFormedAggregation->input = transformed;
                transformed = transFormedAggregation;
-               //Transform Group by
-               if (selectNode->groups) {
-                  auto loc = selectNode->groups->loc;
-                  context->aggregationNode->groupByNode = std::move(selectNode->groups);
-               }
-
-
-
 
                //Transform target selection
                auto select_list = selectNode->select_list;
@@ -96,6 +88,17 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   transformed = transformedSelect;
                   selectNode->select_list = nullptr;
                }
+
+               //Transform Group by
+               if (selectNode->groups) {
+                  auto loc = selectNode->groups->loc;
+                  context->aggregationNode->groupByNode = std::move(selectNode->groups);
+               }
+
+
+
+
+
                //Transform modifiers
                for (auto modifier : selectNode->modifiers) {
                   auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
@@ -170,8 +173,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                return tableRef;
             }
             case ast::TableReferenceType::SUBQUERY: {
+
                auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
-               auto transformedSubSelectNode = transform(subquery->subSelectNode, context);
+               auto transformedSubSelectNode = transform(subquery->subSelectNode, std::make_shared<ASTTransformContext>());
+
                subquery->subSelectNode = transformedSubSelectNode;
                return subquery;
             }
@@ -362,11 +367,40 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          break;
       }
       case ast::TableReferenceType::SUBQUERY: {
-         error("Not implemented", tableRef->loc);
          auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
-         context->pushNewScope();
-         auto subQueryResolverScope = context->createResolverScope();
-         analyze(subquery->subSelectNode, context, subQueryResolverScope);
+         ast::TargetInfo targetInfo;
+         std::shared_ptr<ast::TableProducer> t;
+         std::vector<std::shared_ptr<ast::BoundExpression>> evalBefore;
+         {
+            auto subQueryResolverScope = context->createResolverScope();
+            auto defineScope = context->createDefineScope();
+            context->pushNewScope();
+            t = analyze(subquery->subSelectNode, context, subQueryResolverScope);
+            targetInfo = context->currentScope->targetInfo;
+            evalBefore = context->currentScope->evalBeforeAggr;
+            context->popCurrentScope();
+
+
+         }
+         context->currentScope->evalBeforeAggr.insert(context->currentScope->evalBeforeAggr.end(), evalBefore.begin(), evalBefore.end());
+
+         for (auto target : targetInfo.targetColumns) {
+            assert(!subquery->alias.empty());
+
+
+            if (!target->displayName.empty()) {
+               context->mapAttribute(resolverScope, subquery->alias + "." + target->displayName, target);
+               context->mapAttribute(resolverScope,  target->displayName, target);
+            } else {
+               context->mapAttribute(resolverScope, subquery->alias  +"." + target->name, target);
+               context->mapAttribute(resolverScope, target->name, target);
+            }
+
+
+         }
+
+         return drv.nf.node<ast::BoundSubqueryRef>(subquery->loc, t);
+
          break;
       }
 

@@ -32,4 +32,10 @@ BoundJoinRef::BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<
 std::string BoundJoinRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
+
+BoundSubqueryRef::BoundSubqueryRef(std::shared_ptr<TableProducer> subSelect) : BoundTableRef(TYPE), subSelect(subSelect){
+}
+std::string BoundSubqueryRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast

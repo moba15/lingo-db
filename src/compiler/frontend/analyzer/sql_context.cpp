@@ -23,7 +23,7 @@ void SQLContext::pushNewScope() {
    scopes.push_back(newScope);
 }
 void SQLContext::popCurrentScope() {
-   if (currentScope->parent) {
+   if (!currentScope->parent) {
       std::cerr << "Cannot pop root scope" << std::endl;
       return;
    }

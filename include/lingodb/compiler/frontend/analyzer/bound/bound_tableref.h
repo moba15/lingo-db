@@ -52,4 +52,15 @@ class BoundJoinRef : public BoundTableRef {
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
+class BoundSubqueryRef : public BoundTableRef {
+   static constexpr TableReferenceType TYPE = TableReferenceType::SUBQUERY;
+
+   public:
+   BoundSubqueryRef(std::shared_ptr<TableProducer> subSelect);
+   //! The subquery
+   //TODO correct Type?
+   std::shared_ptr<TableProducer> subSelect;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
 } // namespace lingodb::ast
