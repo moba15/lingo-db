@@ -31,11 +31,16 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
       builder.setInsertionPointToStart(block);
       auto tree = translateTableProducer(builder, tableProducer, context);
 
+
+
+      tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
+
       std::vector<mlir::Attribute> attrs;
       std::vector<mlir::Attribute> names;
       std::vector<mlir::Attribute> colMemberNames;
       std::vector<mlir::Attribute> colTypes;
       auto& memberManager = builder.getContext()->getLoadedDialect<compiler::dialect::subop::SubOperatorDialect>()->getMemberManager();
+
       for (auto& named : context->currentScope->targetInfo.targetColumns) {
          switch (named->type) {
             case ast::NamedResultType::Column: {
@@ -62,6 +67,23 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                auto attrDef = functionInfo->createRef(attrManager);
                attrs.push_back(attrDef);
                break;
+            }
+            case ast::NamedResultType::EXPRESSION: {
+               names.push_back(builder.getStringAttr(named->displayName));
+               auto colMemberName = memberManager.getUniqueMember(named->name);
+               colMemberNames.push_back(builder.getStringAttr(colMemberName));
+               if (named->mlirType.has_value()) {
+                  colTypes.push_back(mlir::TypeAttr::get(named->mlirType.value()));
+               } else {
+                  colTypes.push_back(mlir::TypeAttr::get(named->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
+               }
+               colTypes.push_back(mlir::TypeAttr::get(named->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
+
+               auto attrDef = named->createRef(attrManager);
+               attrs.push_back(attrDef);
+               break;
+
+
             }
                default: {error("Not implemented", tableProducer->loc); }
          }
@@ -625,8 +647,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                aggrResultType = aggrFunction->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
                if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
                   //TODO better, over context!!
-                  assert(aggrFunction->arguments[0]->resultMlirType.has_value());
-                  aggrResultType = aggrFunction->arguments[0]->resultMlirType.value();
+                  assert(aggrFunction->arguments[0]->namedResult.has_value() && aggrFunction->arguments[0]->namedResult.value()->mlirType.has_value());
+                  aggrResultType = aggrFunction->arguments[0]->namedResult.value()->mlirType.value();
                }
                //TODO define type
                if (relalgAggrFunc == relalg::AggrFunc::avg) {
@@ -664,7 +686,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
          attrDef.getColumn().type = expr.getType();
          aggrFunction->functionInfo->mlirType = expr.getType();
 
-         aggrFunction->resultMlirType = expr.getType();
+         aggrFunction->namedResult.value()->mlirType = expr.getType();
 
          //TODO mapping.insert({12, "&attrDef.getColumn()"});
          createdCols.push_back(attrDef);
@@ -700,8 +722,13 @@ mlir::Value SQLMlirTranslator::createMap(mlir::OpBuilder& builder, std::string m
       mlir::Value expr = translateExpression(mapBuilder, p, context, tree);
       //TODO does the use of alias make sense here?
       auto attrDef = attrManager.createDef(mapName, p->alias);
+      if (p->namedResult.has_value()) {
+         p->namedResult.value()->scope = mapName;
+         attrDef = p->namedResult.value()->createDef(attrManager);
+         p->namedResult.value()->mlirType = expr.getType();
+      }
+
       attrDef.getColumn().type = expr.getType();
-      p->resultMlirType = expr.getType();
       //TODO MAP context.mapAttribute(scope, p.first->colId, &attrDef.getColumn());
       createdCols.push_back(attrDef);
       createdValues.push_back(expr);

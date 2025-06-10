@@ -9,41 +9,45 @@ class BoundFunctionExpression;
 
 enum class NamedResultType : uint8_t {
    Column = 1,
-   Function = 2
+   Function = 2,
+   EXPRESSION = 3,
 };
 struct NamedResult {
    NamedResultType type;
    std::string scope;
    catalog::NullableType resultType;
+   std::string name;
    std::string displayName{"no display name"};
+   std::optional<mlir::Type> mlirType;
+   NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType, std::string name) : type(type), scope(scope), resultType(resultType), name(name) {}
 
+    virtual  compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) {
+      return attrManager.createRef(this->scope, name);
+   };
 
-   NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType) : type(type), scope(scope), resultType(resultType) {}
-
-   virtual compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) = 0;
+   virtual  compiler::dialect::tuples::ColumnDefAttr createDef(compiler::dialect::tuples::ColumnManager& attrManager) {
+      return attrManager.createDef(this->scope, name);
+   };
 };
 struct FunctionInfo : public NamedResult {
-   std::string name;
-   std::optional<mlir::Type> mlirType;
 
 
-   FunctionInfo(std::string scope, std::string name, catalog::NullableType resultType) : NamedResult(NamedResultType::Function, scope, resultType), name(name) {}
 
-   compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
-      return attrManager.createRef(this->scope, name);
-   }
+
+   FunctionInfo(std::string scope, std::string name, catalog::NullableType resultType) : NamedResult(NamedResultType::Function, scope, resultType, name) {}
+
+
 };
 struct ColumnInfo : public NamedResult {
    catalog::Column column;
 
 
-   ColumnInfo(std::string scope, catalog::Column column) : NamedResult(NamedResultType::Column, scope,catalog::NullableType(column.getLogicalType(), column.getIsNullable())), column(column) {
+   ColumnInfo(std::string scope, catalog::Column column) : NamedResult(NamedResultType::Column, scope,catalog::NullableType(column.getLogicalType(), column.getIsNullable()), column.getColumnName()), column(column) {
       displayName = column.getColumnName();
    }
-   compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) override {
-      return attrManager.createRef(this->scope, column.getColumnName());
-   }
+
 };
+
 class BoundColumnEntry {
    public:
    size_t index;
