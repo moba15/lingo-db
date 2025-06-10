@@ -1,4 +1,5 @@
 #pragma once
+#include "bound/bound_expression.h"
 #include "lingodb/catalog/Defs.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
@@ -14,6 +15,7 @@ class SQLScope {
    std::map<std::string, std::vector<std::pair<size_t, ast::FunctionInfo>>> functionsEntry;
    //Stores the columns that should be produced at the end
    ast::TargetInfo targetInfo;
+   std::vector<std::shared_ptr<ast::BoundExpression>> evalBeforeAggr;
    std::shared_ptr<SQLScope> parent;
    size_t id = 0;
 };

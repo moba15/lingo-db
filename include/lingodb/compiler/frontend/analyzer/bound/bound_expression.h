@@ -25,9 +25,11 @@ class BoundExpression : public AstNode {
 
    std::optional<catalog::NullableType> resultType = std::nullopt;
 
-   //! For translation purposes
-   //TODO make it better
-   std::optional<mlir::Type> resultMlirType;
+
+
+
+   //If this expression is a column reference or (SELECT 2*d from t), it can be used to find the named result
+   std::optional<std::shared_ptr<NamedResult>> namedResult;
 };
 
 class BoundColumnRefExpression : public BoundExpression {
