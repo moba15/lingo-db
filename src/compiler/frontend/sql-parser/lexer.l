@@ -161,6 +161,8 @@ boolean [fF][aA][lL][sS][eE]
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
 
+[eE][xX][tT][rR][aA][cC][tT]          { return lingodb::parser::make_EXTRACT(loc); }
+
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
 
@@ -192,6 +194,7 @@ outer                                 { return lingodb::parser::make_OUTER_P(loc
 
 [sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
 
+[yY][eE][aA][rR]                      { return lingodb::parser::make_YEAR_P(loc); }
 
 <<EOF>>    return lingodb::parser::make_YYEOF (loc);
 

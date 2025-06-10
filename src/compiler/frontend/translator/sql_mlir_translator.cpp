@@ -32,10 +32,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
 
       auto tree = translateTableProducer(builder, tableProducer, context);
 
-
-
-
-
+      context->currentScope->evalBeforeAggr.clear();
       std::vector<mlir::Attribute> attrs;
       std::vector<mlir::Attribute> names;
       std::vector<mlir::Attribute> colMemberNames;
@@ -163,6 +160,7 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
 
    switch (tableProducer->nodeType) {
       case ast::NodeType::PIPE_OP: {
+
          auto pipeOperator = std::static_pointer_cast<ast::PipeOperator>(tableProducer);
 
          if (pipeOperator->input) {
@@ -174,8 +172,7 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
       case ast::NodeType::BOUND_TABLE_REF: {
          auto tableRef = std::static_pointer_cast<ast::BoundTableRef>(tableProducer);
          tree = translateTableRef(builder, tableRef, context);
-         //TODO find correct place
-         tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
+
          break;
       }
       case ast::NodeType::BOUND_RESULT_MODIFIER: {
@@ -216,6 +213,8 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          return sel.getResult();
       }
       case ast::PipeOperatorType::AGGREGATE: {
+         tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
+         context->currentScope->evalBeforeAggr.clear();
          assert(pipeOperator->node->nodeType == ast::NodeType::BOUND_AGGREGATION);
          auto aggregationNode = std::static_pointer_cast<ast::BoundAggregationNode>(pipeOperator->node);
          //TODO logic here
@@ -516,6 +515,12 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 
       }
       case ast::TableReferenceType::SUBQUERY: {
+         auto subquery = std::static_pointer_cast<ast::BoundSubqueryRef>(tableRef);
+         mlir::Value subQuery;
+         auto translated = translateTableProducer(builder, subquery->subSelect, context);
+
+         return translated;
+
       }
       default:
          error("Not implemented", tableRef->loc);
@@ -537,8 +542,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
       if (groupBy->type == ast::ExpressionType::BOUND_COLUMN_REF) {
          auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(groupBy);
          auto namedResult = columnRef->namedResult;
-         assert(namedResult->type == ast::NamedResultType::Column);
-         auto attrDef = attrManager.createRef(columnRef->scope, std::static_pointer_cast<ast::ColumnInfo>(namedResult)->column.getColumnName());
+
+         auto attrDef = namedResult->createRef(attrManager);
          //TODO
          /*auto attrName = fieldsToString(columnRef->fields_);
          groupByAttrToPos[attrName] = i;*/
@@ -610,9 +615,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                case ast::ExpressionType::BOUND_COLUMN_REF: {
                   auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(aggrFunction->arguments[0]);
                   auto namedResult = columnRef->namedResult;
-                  assert(namedResult->type == ast::NamedResultType::Column);
-                  auto columnInfo = std::static_pointer_cast<ast::ColumnInfo>(namedResult);
-                  refAttr = attrManager.createRef(columnRef->scope, columnInfo->column.getColumnName());
+                  refAttr = namedResult->createRef(attrManager);
                   break;
                }
                default: {
