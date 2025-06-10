@@ -9,6 +9,7 @@
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
 #include "lingodb/compiler/frontend/SQL/Parser.h"
+#include "lingodb/compiler/frontend/analyzer/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
 #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
 #include "lingodb/compiler/runtime/ExecutionContext.h"
@@ -220,6 +221,11 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          //TODO logic here
          return translateAggregation(builder, aggregationNode, context, tree);
       }
+      case ast::PipeOperatorType::EXTEND: {
+         auto extendNode = std::static_pointer_cast<ast::BoundExtendNode>(pipeOperator->node);
+         tree = createMap(builder, extendNode->mapName, extendNode->extensions, context, tree);
+         return tree;
+      }
       default: error("Not implememted", pipeOperator->loc);
    }
 }
@@ -410,6 +416,17 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {input, lower, upper});
          mlir::Value between = builder.create<db::BetweenOp>(builder.getUnknownLoc(), ct[0], ct[1], ct[2], true, true);
          return between;
+      }
+      case ast::ExpressionClass::BOUND_FUNCTION: {
+
+         auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(expression);
+         if (function->functionName == "EXTRACT") {
+            assert(function->arguments.size() == 2);
+            auto part = translateExpression(builder, function->arguments[0], context, tree);
+            auto arg2 = translateExpression(builder, function->arguments[1], context, tree);
+            return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), wrapNullableType(builder.getContext(), builder.getI64Type(), {part, arg2}), "ExtractFromDate", mlir::ValueRange({part, arg2})).getRes();
+
+         }
       }
 
       default: error("Not implemented", expression->loc);

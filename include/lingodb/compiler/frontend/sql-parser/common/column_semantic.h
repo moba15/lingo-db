@@ -17,7 +17,8 @@ struct NamedResult {
    std::string scope;
    catalog::NullableType resultType;
    std::string name;
-   std::string displayName{"no display name"};
+   //TODO find better name
+   std::string displayName{};
    std::optional<mlir::Type> mlirType;
    NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType, std::string name) : type(type), scope(scope), resultType(resultType), name(name) {}
 
@@ -30,10 +31,6 @@ struct NamedResult {
    };
 };
 struct FunctionInfo : public NamedResult {
-
-
-
-
    FunctionInfo(std::string scope, std::string name, catalog::NullableType resultType) : NamedResult(NamedResultType::Function, scope, resultType, name) {}
 
 
