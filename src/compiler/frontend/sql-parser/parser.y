@@ -222,16 +222,17 @@
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens
 %type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list extract_list
 
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
                                                         func_arg_expr select_limit_value
 
-%type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr
+%type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr func_expr_common_subexpr
 
 %type<std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>>> func_expr_list
+%type<std::shared_ptr<ast::ConstantExpression>> extract_arg
 
 %type<lingodb::ast::jointCondOrUsingCols> join_qual
 
@@ -1067,6 +1068,9 @@ func_application:
     }
     
     | func_expr_common_subexpr
+    {
+        $$ = $1;
+    }
     ;
 
 /* function arguments can have names */    
@@ -1098,7 +1102,10 @@ func_arg_expr:
 func_expr_common_subexpr: 
     EXTRACT LP extract_list RP 
     {
-
+        auto function  = mkNode<lingodb::ast::FunctionExpression>(@$, "", "", "EXTRACT", false, false, false);
+        function->arguments = $extract_list;
+     
+        $$ = function;
     }
     
 ;
@@ -1106,13 +1113,31 @@ func_expr_common_subexpr:
 extract_list: 
     extract_arg FROM a_expr 
     {
-
+        auto list = mkListShared<lingodb::ast::ParsedExpression>();
+        list.emplace_back($extract_arg);
+        list.emplace_back($a_expr);
+        $$ = list;
     }
     ;
 extract_arg: 
     YEAR_P
+    {
+        auto constant = mkNode<lingodb::ast::ConstantExpression>(@$);
+        constant->value = std::make_shared<lingodb::ast::StringValue>("year");
+        $$ = constant;
+    }
     | MONTH_P
-    | DAY_P
+    {
+        auto constant = mkNode<lingodb::ast::ConstantExpression>(@$);
+        constant->value = std::make_shared<lingodb::ast::StringValue>("month");
+        $$ = constant;
+    }
+    | DAY_P 
+    {
+        auto constant = mkNode<lingodb::ast::ConstantExpression>(@$);
+        constant->value = std::make_shared<lingodb::ast::StringValue>("day");
+        $$ = constant;
+    }
     ;
 over_clause:
     OVER window_specification

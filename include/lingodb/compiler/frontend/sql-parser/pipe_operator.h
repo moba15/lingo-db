@@ -17,6 +17,7 @@ enum class PipeOperatorType : uint8_t {
    EXCEPT = 9,
    FROM = 10,
    AGGREGATE = 11,
+   EXTEND = 12,
 
 };
 class PipeOperator : public TableProducer {

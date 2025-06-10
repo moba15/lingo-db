@@ -10,6 +10,7 @@ enum class NodeType : uint8_t {
    GROUP_BY = 5,
    AGGREGATION = 6,
    RESULT_MODIFIER = 7,
+   EXTEND_NODE=8,
 
    //Bound
    BOUND_TABLE_REF = 20,
@@ -17,7 +18,7 @@ enum class NodeType : uint8_t {
    BOUND_GROUP_BY = 25,
    BOUND_AGGREGATION = 26,
    BOUND_RESULT_MODIFIER = 27,
-
+   BOUND_EXTEND_NODE = 28,
 };
 class AstNode {
    public:
