@@ -2,6 +2,7 @@
 
 
 #include "lingodb/compiler/frontend/analyzer/bound/bound_aggregation.h"
+#include "lingodb/compiler/frontend/analyzer/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_groupby.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
 #include "lingodb/runtime/RecordBatchInfo.h"
@@ -45,6 +46,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
          }
          return analyzeResultModifier(resultModifier, context);
       }
+
       default: throw std::runtime_error("Not implemented");
    }
 }
@@ -65,6 +67,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   transformed = transformedFrom;
                }
 
+               auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->extendNode);
+               extendPipeOp->input = transformed;
+               transformed = extendPipeOp;
                //Transform where_clause
                if (selectNode->where_clause) {
                   auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->where_clause->loc, ast::PipeOperatorType::WHERE, selectNode->where_clause);
@@ -125,9 +130,13 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                std::vector<std::shared_ptr<ast::ParsedExpression>> toRemove{};
                int i = 0;
                for (auto& target : selectNode->targets) {
-                  if (target->type == ast::ExpressionType::AGGREGATE && target->exprClass == ast::ExpressionClass::FUNCTION) {
+                  if ( target->exprClass == ast::ExpressionClass::FUNCTION ) {
                      auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
-                     context->aggregationNode->aggregations.push_back(function);
+                     if (target->type == ast::ExpressionType::AGGREGATE) {
+                        context->aggregationNode->aggregations.push_back(function);
+                     } else {
+                        context->extendNode->extensions.push_back(function);
+                     }
                      //TODO better
                      if (function->alias.empty()) {
                         //TODO make unique alias
@@ -135,6 +144,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                      }
                      toRemove.emplace_back(target);
                      i++;
+
                   }
                }
 
@@ -224,13 +234,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                }
                case ast::ExpressionClass::BOUND_FUNCTION: {
                   error("Not implemented", target->loc);
-                 /* auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(parsedExpression);
-                  auto fName = function->alias.empty() ? function->functionName : function->alias;
-                  if (!context->currentScope->functionsEntry.contains(function->aliasOrUniqueIdentifier)) {
-                     error("Function entry not found", function->loc)
-                  }
 
-                  context->currentScope->targetInfo.add(function->boundColumnEntry);*/
+                 auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(parsedExpression);
+                  auto fName = function->alias.empty() ? function->functionName : function->alias;
+                  assert(function->functionInfo && function->namedResult.has_value());
+                  context->currentScope->targetInfo.add(function->functionInfo);
                   break;
                }
                case ast::ExpressionClass::BOUND_OPERATOR: {
@@ -301,6 +309,16 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          }
          boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc,boundGroupByNode, transFormedAggregationExpressions, toMap, mapName );
 
+         break;
+      }
+      case ast::PipeOperatorType::EXTEND: {
+         assert(pipeOperator->node->nodeType == ast::NodeType::EXTEND_NODE);
+         auto extendNode = std::static_pointer_cast<ast::ExtendNode>(pipeOperator->node);
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundExtensions;
+         std::ranges::transform(extendNode->extensions, std::back_inserter(boundExtensions), [&](auto& expr) {
+            return analyzeExpression(expr, context, resolverScope);
+         });
+         boundAstNode =  drv.nf.node<ast::BoundExtendNode>(extendNode->loc, createMapName(), std::move(boundExtensions));
          break;
       }
       default: error("Not implemented", pipeOperator->loc);
@@ -584,6 +602,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, boundArguments[0]->resultType.value());
+               //TODO better
+               fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
 
                //auto e = context->currentScope->addFunctionEntry(fName, ast::FunctionInfo);
@@ -601,6 +621,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto resultType = catalog::Type::int64();
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+               //TODO better
+               fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, boundArguments, fInfo);
             } else {
@@ -633,6 +655,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, boundArguments[0]->resultType.value());
+               //TODO better
+               fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
                //context->currentScope->addFunctionEntry(fName, ast::FunctionInfo());
                //auto e = context->currentScope->addFunctionEntry(fName, fInfo);
@@ -642,6 +666,26 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto arg = analyzeExpression(function->arguments[0], context, resolverScope);
 
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, catalog::Type::int64(), function->functionName, "", function->alias, std::vector{arg}, fInfo);
+            }
+            if (function->functionName == "EXTRACT") {
+               if (function->arguments.size() != 2) {
+                  error("Function extract needs exactly two arguments", function->loc);
+               }
+               auto arg1 = analyzeExpression(function->arguments[0], context, resolverScope);
+               auto arg2 = analyzeExpression(function->arguments[1], context, resolverScope);
+               if (arg2->resultType.has_value() && arg2->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DATE && arg2->resultType.value().type.getTypeId() != catalog::LogicalTypeId::INTERVAL) {
+                  error("Function extract needs second argument of type date or interval", function->loc);
+               }
+               auto scope = createTmpScope();
+               auto fName = function->alias.empty() ? function->functionName : function->alias;
+               auto resultType = catalog::Type::int64();
+
+               auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+               fInfo->displayName = function->alias;
+               context->mapAttribute(resolverScope, fName, fInfo);
+
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, std::vector{arg1, arg2}, fInfo);
+
             }
             throw std::runtime_error("FunctionType Not implemented");
          }

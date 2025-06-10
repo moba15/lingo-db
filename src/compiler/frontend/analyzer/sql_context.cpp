@@ -5,7 +5,7 @@
 #include <iostream>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
-ASTTransformContext::ASTTransformContext() : aggregationNode(std::make_shared<ast::AggregationNode>()) {
+ASTTransformContext::ASTTransformContext() : aggregationNode(std::make_shared<ast::AggregationNode>()), extendNode(std::make_shared<ast::ExtendNode>()){
 }
 
 DefineScope::DefineScope(SQLContext& sqlContext) : sqlContext(sqlContext) {
