@@ -9,6 +9,7 @@ add_library(lingo-db-analyzer
         bound/bound_resultmodifier.cpp
         bound/bound_groupby.cpp
         bound/bound_aggregation.cpp
+        bound/bound_extend_node.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
