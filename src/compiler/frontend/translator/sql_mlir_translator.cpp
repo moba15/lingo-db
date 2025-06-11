@@ -19,10 +19,10 @@
 namespace lingodb::translator {
 using namespace lingodb::compiler::dialect;
 SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, std::shared_ptr<catalog::Catalog> catalog) : moduleOp(moduleOp),
-                                                                                                           attrManager(moduleOp->getContext()->getLoadedDialect<compiler::dialect::tuples::TupleStreamDialect>()->getColumnManager()), catalog(catalog), translationContext(std::make_shared<TranslationContext>())
+                                                                                                           attrManager(moduleOp->getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager()), catalog(catalog), translationContext(std::make_shared<TranslationContext>())
 
 {
-   moduleOp.getContext()->getLoadedDialect<lingodb::compiler::dialect::util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
+   moduleOp.getContext()->getLoadedDialect<util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
 }
 std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context) {
    mlir::Block* block = new mlir::Block();
@@ -38,7 +38,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
       std::vector<mlir::Attribute> names;
       std::vector<mlir::Attribute> colMemberNames;
       std::vector<mlir::Attribute> colTypes;
-      auto& memberManager = builder.getContext()->getLoadedDialect<compiler::dialect::subop::SubOperatorDialect>()->getMemberManager();
+      auto& memberManager = builder.getContext()->getLoadedDialect<subop::SubOperatorDialect>()->getMemberManager();
 
       for (auto& named : context->currentScope->targetInfo.targetColumns) {
          switch (named->type) {
@@ -54,7 +54,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                break;
             }
             case ast::NamedResultType::Function: {
-                 auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named);
+               auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named);
                names.push_back(builder.getStringAttr(functionInfo->name));
                auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
                colMemberNames.push_back(builder.getStringAttr(colMemberName));
@@ -81,66 +81,22 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                auto attrDef = named->createRef(attrManager);
                attrs.push_back(attrDef);
                break;
-
-
             }
-               default: {error("Not implemented", tableProducer->loc); }
+            default: {
+               error("Not implemented", tableProducer->loc);
+            }
          }
-
-
-
-
-
-         /*if (columns.empty()) {
-
-            auto functionInfo = context->findFunction(named->index);
-            assert(functionInfo.has_value());
-            names.push_back(builder.getStringAttr(functionInfo->second.name));
-            auto colMemberName = memberManager.getUniqueMember(functionInfo->second.name);
-            colMemberNames.push_back(builder.getStringAttr(colMemberName));
-            if (translationContext->translatedValuesType.contains(named->index)) {
-               colTypes.push_back(mlir::TypeAttr::get(translationContext->translatedValuesType[named->index]));
-            } else {
-               colTypes.push_back(mlir::TypeAttr::get(functionInfo->second.resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
-            }
-            auto attrDef = functionInfo.value().second.createRef(attrManager);
-            attrs.push_back(attrDef);
-
-            continue;
-         }*/
-
-
-
-         /*auto name = named.first;
-         if (named.second->type == ast::NamedResultType::Column) {
-            auto columnInfo = std::static_pointer_cast<ast::ColumnInfo>(named.second);
-            names.push_back(builder.getStringAttr(name));
-            auto colMemberName = memberManager.getUniqueMember(name.empty() ? "unnamed" : name);
-            auto type = createTypeForColumn(builder.getContext(), columnInfo->column);
-            colTypes.push_back(mlir::TypeAttr::get(type));
-            colMemberNames.push_back(builder.getStringAttr(colMemberName));
-            auto attrDef = columnInfo->createRef(attrManager);
-            attrs.push_back(attrDef);
-         } else {
-            auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named.second);
-            names.push_back(builder.getStringAttr(functionInfo->name));
-            auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
-            colMemberNames.push_back(builder.getStringAttr(colMemberName));
-            colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
-            auto attrDef = functionInfo->createRef(attrManager);
-            attrs.push_back(attrDef);
-         }*/
       }
 
-      localTableType = compiler::dialect::subop::LocalTableType::get(
+      localTableType = subop::LocalTableType::get(
          builder.getContext(),
-         compiler::dialect::subop::StateMembersAttr::get(
+         subop::StateMembersAttr::get(
             builder.getContext(),
             builder.getArrayAttr(colMemberNames),
             builder.getArrayAttr(colTypes)),
          builder.getArrayAttr(names));
 
-      mlir::Value result = builder.create<compiler::dialect::relalg::MaterializeOp>(
+      mlir::Value result = builder.create<relalg::MaterializeOp>(
          builder.getUnknownLoc(),
          localTableType,
          tree,
@@ -148,9 +104,9 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
          builder.getArrayAttr(names));
 
       // Use the materialized result in the QueryReturnOp instead of the input tree
-      builder.create<compiler::dialect::relalg::QueryReturnOp>(builder.getUnknownLoc(), result);
+      builder.create<relalg::QueryReturnOp>(builder.getUnknownLoc(), result);
    }
-   compiler::dialect::relalg::QueryOp queryOp = builder.create<compiler::dialect::relalg::QueryOp>(builder.getUnknownLoc(), mlir::TypeRange{localTableType}, mlir::ValueRange{});
+   relalg::QueryOp queryOp = builder.create<relalg::QueryOp>(builder.getUnknownLoc(), mlir::TypeRange{localTableType}, mlir::ValueRange{});
    queryOp.getQueryOps().getBlocks().clear();
    queryOp.getQueryOps().push_back(block);
    return queryOp.getResults()[0];
@@ -161,7 +117,6 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
 
    switch (tableProducer->nodeType) {
       case ast::NodeType::PIPE_OP: {
-
          auto pipeOperator = std::static_pointer_cast<ast::PipeOperator>(tableProducer);
 
          if (pipeOperator->input) {
@@ -201,15 +156,15 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          //Make predicate
          auto* pred = new mlir::Block;
          mlir::OpBuilder predBuilder(builder.getContext());
-         pred->addArgument(compiler::dialect::tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+         pred->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
          auto tupleScope = translationContext->createTupleScope();
          translationContext->setCurrentTuple(pred->getArgument(0));
 
          predBuilder.setInsertionPointToStart(pred);
          auto expr = translateExpression(predBuilder, whereClause, context, tree);
-         predBuilder.create<compiler::dialect::tuples::ReturnOp>(builder.getUnknownLoc(), expr);
+         predBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), expr);
 
-         auto sel = builder.create<compiler::dialect::relalg::SelectionOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), tree);
+         auto sel = builder.create<relalg::SelectionOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), tree);
          sel.getPredicate().push_back(pred);
          return sel.getResult();
       }
@@ -236,28 +191,26 @@ mlir::Value SQLMlirTranslator::translateResultModifier(mlir::OpBuilder& builder,
          auto orderByModifier = std::static_pointer_cast<ast::BoundOrderByModifier>(resultModifier);
          std::vector<mlir::Attribute> mapping;
          for (auto orderByElement : orderByModifier->orderByElements) {
-            compiler::dialect::relalg::SortSpec spec = compiler::dialect::relalg::SortSpec::asc;
+            relalg::SortSpec spec = relalg::SortSpec::asc;
             if (orderByElement->type == ast::OrderType::DESCENDING) {
-               spec = compiler::dialect::relalg::SortSpec::desc;
+               spec = relalg::SortSpec::desc;
             }
             if (orderByElement->expression->type == ast::ExpressionType::BOUND_COLUMN_REF) {
                auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(orderByElement->expression);
                auto namedResult = columnRef->namedResult;
                auto attrDef = namedResult->createRef(attrManager);
-               mapping.push_back(compiler::dialect::relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
-
-
+               mapping.push_back(relalg::SortSpecificationAttr::get(builder.getContext(), attrDef, spec));
 
             } else {
                error("Not implemented", orderByElement->expression->loc);
             }
          }
-         return builder.create<compiler::dialect::relalg::SortOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), tree, builder.getArrayAttr(mapping));
+         return builder.create<relalg::SortOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), tree, builder.getArrayAttr(mapping));
       }
       case ast::ResultModifierType::BOUND_LIMIT: {
          auto limitModifier = std::static_pointer_cast<ast::BoundLimitModifier>(resultModifier);
          auto value = std::static_pointer_cast<ast::IntValue>(std::static_pointer_cast<ast::BoundConstantExpression>(limitModifier->limitExpression)->value);
-         return builder.create<compiler::dialect::relalg::LimitOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), value->iVal, tree);
+         return builder.create<relalg::LimitOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), value->iVal, tree);
       }
       default: error("ResultModifier Not implemented", resultModifier->loc);
    }
@@ -273,29 +226,29 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto columnInfo = std::static_pointer_cast<ast::ColumnInfo>(nameResult);
          auto name = columnRef->alias.empty() ? columnInfo->column.getColumnName() : columnRef->alias;
          auto attrDef = attrManager.createRef(columnRef->scope, name);
-         return builder.create<compiler::dialect::tuples::GetColumnOp>(
+         return builder.create<tuples::GetColumnOp>(
             builder.getUnknownLoc(),
-            createTypeForColumn(builder.getContext(),columnInfo->column), attrDef, translationContext->getCurrentTuple());
+            createTypeForColumn(builder.getContext(), columnInfo->column), attrDef, translationContext->getCurrentTuple());
       }
       case ast::ExpressionClass::BOUND_CONSTANT: {
          auto constExpr = std::static_pointer_cast<ast::BoundConstantExpression>(expression);
          switch (constExpr->value->type) {
             case ast::ConstantType::INT: {
                auto value = std::static_pointer_cast<ast::IntValue>(constExpr->value);
-               return builder.create<compiler::dialect::db::ConstantOp>(builder.getUnknownLoc(), builder.getI32Type(), builder.getI32IntegerAttr(value->iVal));
+               return builder.create<db::ConstantOp>(builder.getUnknownLoc(), builder.getI32Type(), builder.getI32IntegerAttr(value->iVal));
             }
             case ast::ConstantType::STRING: {
                auto value = std::static_pointer_cast<ast::StringValue>(constExpr->value);
-               mlir::Type stringType = compiler::dialect::db::StringType::get(builder.getContext());
+               mlir::Type stringType = db::StringType::get(builder.getContext());
                if (value->sVal.size() <= 8 && value->sVal.size() > 0) {
-                  stringType = compiler::dialect::db::CharType::get(builder.getContext(), value->sVal.size());
+                  stringType = db::CharType::get(builder.getContext(), value->sVal.size());
                };
-               return builder.create<compiler::dialect::db::ConstantOp>(builder.getUnknownLoc(), stringType, builder.getStringAttr(value->sVal));
+               return builder.create<db::ConstantOp>(builder.getUnknownLoc(), stringType, builder.getStringAttr(value->sVal));
             }
             case ast::ConstantType::FLOAT: {
                auto value = std::static_pointer_cast<ast::FloatValue>(constExpr->value);
                assert(constExpr->resultType.has_value());
-               return builder.create<compiler::dialect::db::ConstantOp>(builder.getUnknownLoc(), constExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext()), builder.getStringAttr(value->fVal));
+               return builder.create<db::ConstantOp>(builder.getUnknownLoc(), constExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext()), builder.getStringAttr(value->fVal));
             }
 
             default: error("Not implemented", expression->loc);
@@ -311,32 +264,31 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             mlir::Type resType = isNullable ? (mlir::Type) db::NullableType::get(builder.getContext(), builder.getI1Type()) : (mlir::Type) builder.getI1Type();
             auto like = builder.create<db::RuntimeCall>(builder.getUnknownLoc(), resType, "Like", mlir::ValueRange({ct[0], ct[1]})).getRes();
             return comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE ? builder.create<db::NotOp>(builder.getUnknownLoc(), like) : like;
-
          }
-         compiler::dialect::db::DBCmpPredicate pred;
+         db::DBCmpPredicate pred;
          switch (expression->type) {
             case ast::ExpressionType::COMPARE_EQUAL:
-               pred = compiler::dialect::db::DBCmpPredicate::eq;
+               pred = db::DBCmpPredicate::eq;
                break;
             case ast::ExpressionType::COMPARE_NOTEQUAL:
-               pred = compiler::dialect::db::DBCmpPredicate::neq;
+               pred = db::DBCmpPredicate::neq;
                break;
             case ast::ExpressionType::COMPARE_LESSTHAN:
-               pred = compiler::dialect::db::DBCmpPredicate::lt;
+               pred = db::DBCmpPredicate::lt;
                break;
             case ast::ExpressionType::COMPARE_GREATERTHAN:
-               pred = compiler::dialect::db::DBCmpPredicate::gt;
+               pred = db::DBCmpPredicate::gt;
                break;
             case ast::ExpressionType::COMPARE_LESSTHANOREQUALTO:
-               pred = compiler::dialect::db::DBCmpPredicate::lte;
+               pred = db::DBCmpPredicate::lte;
                break;
             case ast::ExpressionType::COMPARE_GREATERTHANOREQUALTO:
-               pred = compiler::dialect::db::DBCmpPredicate::gte;
+               pred = db::DBCmpPredicate::gte;
                break;
             default: throw std::runtime_error("not implemented");
          }
          auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right});
-         return builder.create<compiler::dialect::db::CmpOp>(builder.getUnknownLoc(), pred, ct[0], ct[1]);
+         return builder.create<db::CmpOp>(builder.getUnknownLoc(), pred, ct[0], ct[1]);
       }
       case ast::ExpressionClass::BOUND_CONJUNCTION: {
          auto conjunction = std::static_pointer_cast<ast::BoundConjunctionExpression>(expression);
@@ -346,10 +298,10 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          }
          switch (conjunction->type) {
             case ast::ExpressionType::CONJUNCTION_AND: {
-               return builder.create<compiler::dialect::db::AndOp>(builder.getUnknownLoc(), values);
+               return builder.create<db::AndOp>(builder.getUnknownLoc(), values);
             }
             case ast::ExpressionType::CONJUNCTION_OR: {
-               return builder.create<compiler::dialect::db::OrOp>(builder.getUnknownLoc(), values);
+               return builder.create<db::OrOp>(builder.getUnknownLoc(), values);
             }
             default: throw std::runtime_error("not implemented");
          }
@@ -382,8 +334,8 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
 
          assert(castExpr->resultType.has_value());
          auto resType = castExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
-         if (auto constOp = mlir::dyn_cast_or_null<compiler::dialect::db::ConstantOp>(toCast.getDefiningOp())) {
-            if (auto intervalType = mlir::dyn_cast<compiler::dialect::db::IntervalType>(resType)) {
+         if (auto constOp = mlir::dyn_cast_or_null<db::ConstantOp>(toCast.getDefiningOp())) {
+            if (auto intervalType = mlir::dyn_cast<db::IntervalType>(resType)) {
                //TODO maybe create stringRepresentation at analyzer Level?
                auto stringRepresentation = mlir::cast<mlir::StringAttr>(constOp.getValue()).str();
                //!Shortcutted here, implement different interval types later
@@ -396,7 +348,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                      }
                 */
                //TODO maybe create stringRepresentation at analyzer Level?
-               if (intervalType.getUnit() == compiler::dialect::db::IntervalUnitAttr::daytime && !stringRepresentation.ends_with("days")) {
+               if (intervalType.getUnit() == db::IntervalUnitAttr::daytime && !stringRepresentation.ends_with("days")) {
                   stringRepresentation += "days";
                }
                constOp->setAttr("value", builder.getStringAttr(stringRepresentation));
@@ -418,14 +370,12 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          return between;
       }
       case ast::ExpressionClass::BOUND_FUNCTION: {
-
          auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(expression);
          if (function->functionName == "EXTRACT") {
             assert(function->arguments.size() == 2);
             auto part = translateExpression(builder, function->arguments[0], context, tree);
             auto arg2 = translateExpression(builder, function->arguments[1], context, tree);
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), wrapNullableType(builder.getContext(), builder.getI64Type(), {part, arg2}), "ExtractFromDate", mlir::ValueRange({part, arg2})).getRes();
-
          }
       }
 
@@ -437,30 +387,30 @@ mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder
    auto loc = builder.getUnknownLoc();
    switch (expression->type) {
       case ast::ExpressionType::OPERATOR_PLUS: {
-         if (mlir::isa<compiler::dialect::db::DateType>(getBaseType(left.getType())) && mlir::isa<compiler::dialect::db::IntervalType>(getBaseType(right.getType()))) {
-            return builder.create<compiler::dialect::db::RuntimeCall>(loc, left.getType(), "DateAdd", mlir::ValueRange({left, right})).getRes();
+         if (mlir::isa<db::DateType>(getBaseType(left.getType())) && mlir::isa<db::IntervalType>(getBaseType(right.getType()))) {
+            return builder.create<db::RuntimeCall>(loc, left.getType(), "DateAdd", mlir::ValueRange({left, right})).getRes();
          }
          //TODO use already found out common type!!!!!!
-         return builder.create<compiler::dialect::db::AddOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
+         return builder.create<db::AddOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
       }
       case ast::ExpressionType::OPERATOR_MINUS: {
-         if (mlir::isa<compiler::dialect::db::DateType>(left.getType()) && mlir::isa<compiler::dialect::db::IntervalType>(right.getType())) {
-            return builder.create<compiler::dialect::db::RuntimeCall>(loc, left.getType(), "DateSubtract", mlir::ValueRange({left, right})).getRes();
+         if (mlir::isa<db::DateType>(left.getType()) && mlir::isa<db::IntervalType>(right.getType())) {
+            return builder.create<db::RuntimeCall>(loc, left.getType(), "DateSubtract", mlir::ValueRange({left, right})).getRes();
          }
          //TODO use already found out common type!!!!!!
-         return builder.create<compiler::dialect::db::SubOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
+         return builder.create<db::SubOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
       }
       case ast::ExpressionType::OPERATOR_TIMES: {
          //TODO use already found out common type!!!!!!
-         return builder.create<compiler::dialect::db::MulOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         return builder.create<db::MulOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
       }
       case ast::ExpressionType::OPERATOR_DIVIDE: {
          //TODO use already found out common type!!!!!!
-         return builder.create<compiler::dialect::db::DivOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         return builder.create<db::DivOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
       }
       case ast::ExpressionType::OPERATOR_MOD: {
          //TODO use already found out common type!!!!!!
-         return builder.create<compiler::dialect::db::ModOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         return builder.create<db::ModOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
       }
       default: error("Not implemented", expression->loc);
    }
@@ -484,7 +434,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             attrDef.getColumn().type = createTypeForColumn(builder.getContext(), col);
             columns.push_back(builder.getNamedAttr(col.getColumnName(), attrDef));
          }
-         return builder.create<compiler::dialect::relalg::BaseTableOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), relation, builder.getDictionaryAttr(columns));
+         return builder.create<relalg::BaseTableOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), relation, builder.getDictionaryAttr(columns));
       }
       case ast::TableReferenceType::JOIN: {
          auto boundJoin = std::static_pointer_cast<ast::BoundJoinRef>(tableRef);
@@ -495,41 +445,33 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             case ast::JoinType::INNER: {
                switch (boundJoin->refType) {
                   case ast::JoinCondType::CROSS: {
-                     auto joinOp = builder.create<compiler::dialect::relalg::CrossProductOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), left, right);
+                     auto joinOp = builder.create<relalg::CrossProductOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), left, right);
                      return joinOp;
                   }
-                     default: error("Not implemented", tableRef->loc);
+                  default: error("Not implemented", tableRef->loc);
                }
 
                //TODO translate predicate
-               auto joinOp = builder.create<compiler::dialect::relalg::InnerJoinOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), left, right);
+               auto joinOp = builder.create<relalg::InnerJoinOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), left, right);
 
                return joinOp;
-
             }
-               case ast::JoinType::CROSS: {
-               auto joinOp = builder.create<compiler::dialect::relalg::CrossProductOp>(builder.getUnknownLoc(), compiler::dialect::tuples::TupleStreamType::get(builder.getContext()), left, right);
+            case ast::JoinType::CROSS: {
+               auto joinOp = builder.create<relalg::CrossProductOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), left, right);
                return joinOp;
-
             }
 
             case ast::JoinType::LEFT: {
                //TODO translate predicate
                //TODO mapping
-
-
             }
             case ast::JoinType::OUTER: {
-
-
             }
-               default: error("Not implemented", tableRef->loc);
+            default: error("Not implemented", tableRef->loc);
          }
-
 
          right = translateTableProducer(builder, boundJoin->right, context);
          error("TODO hier weiter machen", tableRef->loc);
-
       }
       case ast::TableReferenceType::SUBQUERY: {
          auto subquery = std::static_pointer_cast<ast::BoundSubqueryRef>(tableRef);
@@ -537,7 +479,6 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          auto translated = translateTableProducer(builder, subquery->subSelect, context);
 
          return translated;
-
       }
       default:
          error("Not implemented", tableRef->loc);
@@ -582,8 +523,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
       error("Not implemented", aggregation->loc);
    } else {
       static size_t groupById = 0;
-      auto tupleStreamType = compiler::dialect::tuples::TupleStreamType::get(builder.getContext());
-      auto tupleType = compiler::dialect::tuples::TupleType::get(builder.getContext());
+      auto tupleStreamType = tuples::TupleStreamType::get(builder.getContext());
+      auto tupleType = tuples::TupleType::get(builder.getContext());
 
       std::string groupByName = "aggr" + std::to_string(groupById++);
       auto tupleScope = translationContext->createTupleScope();
@@ -755,7 +696,7 @@ mlir::Value SQLMlirTranslator::createMap(mlir::OpBuilder& builder, std::string m
 
 mlir::Type SQLMlirTranslator::createTypeForColumn(mlir::MLIRContext* context, const catalog::Column& colDef) {
    mlir::Type baseType = createBaseTypeFromColumnType(context, colDef.getLogicalType());
-   return colDef.getIsNullable() ? compiler::dialect::db::NullableType::get(context, baseType) : baseType;
+   return colDef.getIsNullable() ? db::NullableType::get(context, baseType) : baseType;
 }
 
 mlir::Type SQLMlirTranslator::createBaseTypeFromColumnType(mlir::MLIRContext* context, const catalog::Type& t) {
