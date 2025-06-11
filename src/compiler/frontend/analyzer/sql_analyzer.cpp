@@ -249,6 +249,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   //ADD column_ref to targetInfo for the current scope!
                   auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(parsedExpression);
                   targetColumns.emplace_back(columnRef->namedResult);
+                  if (!columnRef->alias.empty()) {
+                     context->mapAttribute(resolverScope, columnRef->alias, columnRef->namedResult);
+                  }
+
                   /*auto name = target->alias.empty() ? column.getColumnName() : target->alias;
                   context->currentScope->targetInfo.map(name, std::make_shared<ast::ColumnInfo>(columnRef->scope, column));*/
                   context->currentScope->targetInfo.add(columnRef->namedResult);
