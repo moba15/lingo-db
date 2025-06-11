@@ -1,12 +1,16 @@
 #pragma once
-#include "bound/bound_expression.h"
+
 #include "lingodb/catalog/Defs.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
 
 #include <map>
 #include <memory>
+namespace lingodb::ast {
+class BoundExpression;
+}
 namespace lingodb::analyzer {
+
 
 class SQLScope {
    public:
