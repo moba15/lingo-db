@@ -957,7 +957,7 @@ a_expr:
     {
         $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_LIKE, $1, $3);
     }
-    | a_expr NOT_LA LIKE a_expr
+    | a_expr NOT LIKE a_expr
     {
         $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_NOT_LIKE, $1, $4);
     }
