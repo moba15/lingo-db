@@ -378,6 +378,23 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), wrapNullableType(builder.getContext(), builder.getI64Type(), {part, arg2}), "ExtractFromDate", mlir::ValueRange({part, arg2})).getRes();
          }
       }
+      case ast::ExpressionClass::BOUND_SUBQUERY: {
+         auto subquery = std::static_pointer_cast<ast::BoundSubqueryExpression>(expression);
+         auto translatedSubquery = translateTableProducer(builder, subquery->subquery, context);
+         mlir::Type resType = subquery->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
+         assert(subquery->namedResult.has_value());
+         if (subquery->namedResult.value()->resultType.isNullable) {
+            resType = db::NullableType::get(builder.getContext(), resType);
+         }
+         assert(subquery->namedResult.has_value());
+         //TODO use zero instead of null
+         mlir::Value scalarValue = builder.create<relalg::GetScalarOp>(builder.getUnknownLoc(), resType, subquery->namedResult.value()->createRef(attrManager), translatedSubquery);
+         return scalarValue;
+
+
+
+
+      }
 
       default: error("Not implemented", expression->loc);
    }
@@ -623,14 +640,15 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                      div.getDefiningOp()->erase();
                      x.getDefiningOp()->erase();
                   }
-                  if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
+                  if (mlir::isa<db::NullableType>(refAttr.getColumn().type) ) {
                      aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
                   }
                }
-               //TODO For what is this?
-               /* if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
+
+               if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
-               }*/
+                  aggrFunction->functionInfo->resultType.isNullable = true;
+               }
             }
             expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
          }

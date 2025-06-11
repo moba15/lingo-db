@@ -3,6 +3,7 @@
 #include "lingodb/catalog/Column.h"
 #include "lingodb/catalog/Types.h"
 #include "lingodb/compiler/frontend/sql-parser/ast_node.h"
+#include "table_producer.h"
 
 #include <string>
 #include <vector>
@@ -459,6 +460,18 @@ class BetweenExpression : public ParsedExpression {
    std::shared_ptr<ParsedExpression> lower;
    std::shared_ptr<ParsedExpression> upper;
    bool asymmetric = false; // If true, the lower and upper bounds are not symmetric (e.g., BETWEEN x AND y vs. BETWEEN y AND x)
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
+class SubqueryExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::SUBQUERY;
+
+   SubqueryExpression(std::shared_ptr<TableProducer> subquery);
+
+   //! The subquery expression
+   std::shared_ptr<TableProducer> subquery;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
