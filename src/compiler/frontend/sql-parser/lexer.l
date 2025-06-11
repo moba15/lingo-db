@@ -106,13 +106,13 @@ decdigit        [0-9]
 decinteger		{decdigit}+
 
 numeric         ({decinteger}\.{decinteger}?)|(\.{decinteger})
-
+op_chars		    [\~\!\@\#\^\&\|\`\?\+\-\*\/\%\<\>\=]
 ident_start     [a-zA-Z]
 ident_cont      [a-zA-Z0-9_%\-]
 identifier      {ident_start}{ident_cont}*
 squote			\'
 dquote			\"
-str       {squote}{ident_cont}*{squote}
+str       {squote}({ident_cont}|{op_chars}|[ ])*{squote}
 
 boolean [fF][aA][lL][sS][eE]
 

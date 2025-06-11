@@ -1,4 +1,5 @@
 #pragma once
+#include "lingodb/compiler/frontend/analyzer/sql_scope.h"
 #include "lingodb/compiler/frontend/sql-parser/table_producer.h"
 #include "lingodb/compiler/frontend/sql-parser/tableref.h"
 namespace lingodb::ast {
@@ -24,12 +25,12 @@ class BoundBaseTableRef : public BoundTableRef {
    //TODO missing semantic
    std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry;
 };
-
+using boundJoinCond = std::variant<std::shared_ptr<BoundExpression>, std::vector<std::shared_ptr<ColumnRefExpression>>>;
 class BoundJoinRef : public BoundTableRef {
    static constexpr TableReferenceType TYPE = TableReferenceType::JOIN;
 
    public:
-   BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, jointCondOrUsingCols condition);
+   BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, boundJoinCond condition);
 
    //! The left hand side of the join
    //! QueryNode as variant is needed for pipe syntax. Example: FROM Test |> join ok on id1=id2
@@ -39,11 +40,13 @@ class BoundJoinRef : public BoundTableRef {
    std::shared_ptr<TableProducer> right;
    //TODO is this condition a good solution for on condiotion and using?
    //! The joint condition or a vector of ColumnRefExpression if USING
-   jointCondOrUsingCols condition;
+   boundJoinCond condition;
    //! The join type
    JoinType type;
    //! Join condition type
    JoinCondType refType;
+
+   std::vector<std::shared_ptr<NamedResult>> outerJoinMapping;
 
    //! The set of USING columns (if any)
    //std::vector<std::string> usingColumns;
@@ -56,7 +59,9 @@ class BoundSubqueryRef : public BoundTableRef {
    static constexpr TableReferenceType TYPE = TableReferenceType::SUBQUERY;
 
    public:
-   BoundSubqueryRef(std::shared_ptr<TableProducer> subSelect);
+   BoundSubqueryRef(std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subSelect);
+
+   std::shared_ptr<analyzer::SQLScope> sqlScope;
    //! The subquery
    //TODO correct Type?
    std::shared_ptr<TableProducer> subSelect;

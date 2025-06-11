@@ -70,9 +70,10 @@ std::string BoundFunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator&
 /*
  * BoundStarExpression
 */
-BoundStarExpression::BoundStarExpression(std::string scope, std::vector<std::pair<std::string, catalog::Column>> columns) : BoundExpression(TYPE, ExpressionType::STAR, ""), scope(scope), columns(std::move(columns)) {
+BoundStarExpression::BoundStarExpression(std::string relationName, std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults) : BoundExpression(TYPE, ExpressionType::STAR, ""), relationName(relationName), namedResults(std::move(namedResults)) {
 }
 std::string BoundStarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
 }
 
 /*
@@ -107,7 +108,7 @@ std::string BoundBetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& 
 /*
  * BoundSubqueryExpression
  */
-BoundSubqueryExpression::BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<TableProducer> subquery) : BoundExpression(TYPE, ExpressionType::SUBQUERY, resultType, alias), subquery(std::move(subquery)) {
+BoundSubqueryExpression::BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope,  std::shared_ptr<TableProducer> subquery) : BoundExpression(TYPE, ExpressionType::SUBQUERY, resultType, alias), sqlScope(sqlScope), subquery(std::move(subquery)) {
    this->namedResult = namedResult;
 }
 std::string BoundSubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {

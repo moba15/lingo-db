@@ -228,6 +228,7 @@ enum class ExpressionClass : uint8_t {
    BOUND_UNNEST = 40,
    BOUND_LAMBDA = 41,
    BOUND_LAMBDA_REF = 42,
+   BOUND_STAR = 43,
    //===--------------------------------------------------------------------===//
    // Miscellaneous
    //===--------------------------------------------------------------------===//
@@ -235,6 +236,7 @@ enum class ExpressionClass : uint8_t {
    BOUND_EXPANDED = 51,
    TARGETS = 52,
    BOUND_TARGETS = 53,
+
 };
 
 class ParsedExpression : public BaseExpression {

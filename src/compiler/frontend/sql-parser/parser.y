@@ -649,7 +649,15 @@ locked_rels_list:
 joined_table: 
     LP joined_table RP {$$=$2;}
     | table_ref CROSS JOIN table_ref
-    | table_ref join_type JOIN table_ref join_qual
+    | table_ref[left] join_type JOIN table_ref[right] join_qual
+    {
+        auto join = mkNode<lingodb::ast::JoinRef>(@$, $join_type, lingodb::ast::JoinCondType::REGULAR);
+        join->left = $left;
+        join->right = $right;
+        join->condition = $join_qual;
+        $$ = join;
+
+    }
     | table_ref[left] JOIN table_ref[right] join_qual 
     {
         //TODO find out correct JoinCondType
@@ -710,18 +718,25 @@ opt_nowait_or_skip:
     ;
 
 join_type: 
-    FULL opt_outer
-    | LEFT opt_outer
-    | RIGHT opt_outer 
+    FULL
+    | FULL OUTER_P
+    | LEFT OUTER_P 
+    {
+
+    }
+    | LEFT 
+    {
+        $$ = lingodb::ast::JoinType::LEFT;
+    }
+    | RIGHT
+    {
+        $$ = lingodb::ast::JoinType::RIGHT; 
+    }
+    | RIGHT OUTER_P 
     | INNER_P 
     {
         $$ = lingodb::ast::JoinType::INNER;
     }
-    ;
-
-opt_outer: 
-    OUTER_P
-    | %empty
     ;
 
 /* JOIN qualification clauses

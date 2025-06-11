@@ -1,4 +1,5 @@
 #pragma once
+#include "lingodb/compiler/frontend/analyzer/sql_scope.h"
 #include "lingodb/compiler/frontend/sql-parser/ast_node.h"
 #include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
@@ -116,11 +117,11 @@ class BoundFunctionExpression : public BoundExpression {
 
 class BoundStarExpression : public BoundExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::STAR;
-   explicit BoundStarExpression(std::string scope, std::vector<std::pair<std::string, catalog::Column>> columns);
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_STAR;
+   explicit BoundStarExpression(std::string relationName, std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults);
 
-   std::string scope;
-   std::vector<std::pair<std::string, catalog::Column>> columns{};
+   std::string relationName;
+   std::vector<std::pair<std::string, std::shared_ptr<NamedResult>>> namedResults{};
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
@@ -163,10 +164,12 @@ class BoundSubqueryExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_SUBQUERY;
 
-   BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<TableProducer> subquery);
+   BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subquery);
 
    //! The subquery expression
    std::shared_ptr<TableProducer> subquery;
+   std::shared_ptr<analyzer::SQLScope> sqlScope;
+
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

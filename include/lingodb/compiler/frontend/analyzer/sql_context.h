@@ -50,6 +50,7 @@ class SQLContext {
    using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
 
    void pushNewScope();
+   void pushNewScope(std::shared_ptr<SQLScope> newScope);
    void popCurrentScope();
 
    ResolverScope createResolverScope();
