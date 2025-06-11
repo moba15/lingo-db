@@ -103,4 +103,14 @@ BoundBetweenExpression::BoundBetweenExpression(ExpressionType type, catalog::Typ
 std::string BoundBetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
+
+/*
+ * BoundSubqueryExpression
+ */
+BoundSubqueryExpression::BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<TableProducer> subquery) : BoundExpression(TYPE, ExpressionType::SUBQUERY, resultType, alias), subquery(std::move(subquery)) {
+   this->namedResult = namedResult;
+}
+std::string BoundSubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast

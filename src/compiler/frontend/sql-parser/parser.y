@@ -241,7 +241,7 @@
 */
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>> columnref indirection indirection_el
 
-%type<std::shared_ptr<lingodb::ast::TableRef>> from_clause table_ref from_list joined_table
+%type<std::shared_ptr<lingodb::ast::TableRef>> from_clause opt_from_clause table_ref from_list joined_table
 
 %type<std::string>  ColId ColLabel attr_name 
                     qualified_name relation_expr alias_clause opt_alias_clause 
@@ -279,7 +279,7 @@
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
 %type <std::shared_ptr<nodes::SelectStatement>> SelectStatement
-%type <std::vector<nodes::RelExpression>>	from_clause
+%type <std::vector<nodes::RelExpression>>	opt_from_clause
 %type <std::vector<nodes::RelExpression>>	from_list
 %type <nodes::RelExpression>						table_ref
 %type <std::shared_ptr<nodes::QualifiedName>>					qualified_name
@@ -463,13 +463,13 @@ select_clause:
 simple_select: 
     SELECT opt_all_clause opt_target_list 
     //TODO into_clause 
-    from_clause where_clause
+    opt_from_clause where_clause
     group_clause having_clause //TODO window_clause
     {
         auto t = mkNode<lingodb::ast::SelectNode>(@$);
         t->select_list = $opt_target_list;
         t->where_clause = $where_clause;
-        t->from_clause = $from_clause;
+        t->from_clause = $opt_from_clause;
         t->groups = $group_clause;
         t->having = $having_clause;
         $$ = t;
@@ -490,11 +490,15 @@ simple_select:
  *		where_clause	- qualifications for joins or restrictions
  *
  *****************************************************************************/
- from_clause:
+ opt_from_clause:
 			FROM from_list							{ $$=$from_list; }
 			| %empty								{  }
             ;
 
+
+ from_clause:
+			FROM from_list							{ $$=$from_list; }
+            ;
 from_list: 
     table_ref { $$=$1;}
     | from_list[list] COMMA table_ref 
@@ -980,7 +984,11 @@ c_expr:
     | LP a_expr RP {$$=$2;}//opt_indirection
     //TODO | case_expr
     | func_expr {$$=$1;}
-    //TODO | select_with_parens
+    | select_with_parens %prec UMINUS
+    {
+        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, $select_with_parens);
+        $$ = subquery;
+    }
     //TODO | select_with_parens indirection 
     //TODO | EXISTS select_with_parens
     //TODO | ARRAY select_with_parens

@@ -100,10 +100,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                   context->aggregationNode->groupByNode = std::move(selectNode->groups);
                }
 
-
-
-
-
                //Transform modifiers
                for (auto modifier : selectNode->modifiers) {
                   auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
@@ -130,7 +126,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                std::vector<std::shared_ptr<ast::ParsedExpression>> toRemove{};
                int i = 0;
                for (auto& target : selectNode->targets) {
-                  if ( target->exprClass == ast::ExpressionClass::FUNCTION ) {
+                  if (target->exprClass == ast::ExpressionClass::FUNCTION) {
                      auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
                      if (target->type == ast::ExpressionType::AGGREGATE) {
                         context->aggregationNode->aggregations.push_back(function);
@@ -144,22 +140,21 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                      }
                      toRemove.emplace_back(target);
                      i++;
-
                   }
                }
 
-               /*selectNode->targets.erase(
-                  std::remove_if(selectNode->targets.begin(), selectNode->targets.end(),
-                     [&toRemove](const auto& target) {
-                        return std::find(toRemove.begin(), toRemove.end(), target) != toRemove.end();
-               }),
-    selectNode->targets.end());*/
                for (auto& target : toRemove) {
                   std::replace_if(selectNode->targets.begin(), selectNode->targets.end(), [&target](const auto& t) { return t == target; }, drv.nf.node<ast::ColumnRefExpression>(target->loc, target->alias));
                }
 
                return pipeOp;
             }
+            case ast::PipeOperatorType::WHERE: {
+               assert(pipeOp->node->nodeType == ast::NodeType::EXPRESSION);
+               pipeOp->node = transformParsedExpression(std::static_pointer_cast<ast::ParsedExpression>(pipeOp->node), context);
+               return pipeOp;
+            }
+
             default: return pipeOp;
          }
 
@@ -183,7 +178,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
                return tableRef;
             }
             case ast::TableReferenceType::SUBQUERY: {
-
                auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
                auto transformedSubSelectNode = transform(subquery->subSelectNode, std::make_shared<ASTTransformContext>());
 
@@ -193,8 +187,45 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<
             default: return tableRef;
          }
       }
+
       default:
          return rootNode;
+   }
+}
+
+std::shared_ptr<ast::ParsedExpression> SQLQueryAnalyzer::transformParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context) {
+   switch (rootNode->exprClass) {
+      case ast::ExpressionClass::SUBQUERY: {
+         auto subqueryExpr = std::static_pointer_cast<ast::SubqueryExpression>(rootNode);
+         subqueryExpr->subquery = transformCast<ast::TableProducer>(subqueryExpr->subquery, std::make_shared<ASTTransformContext>());
+         return subqueryExpr;
+      }
+      case ast::ExpressionClass::OPERATOR: {
+         auto operatorExpr = std::static_pointer_cast<ast::OperatorExpression>(rootNode);
+         std::ranges::transform(operatorExpr->children, operatorExpr->children.begin(), [&](auto& child) {
+            return transformParsedExpression(child, context);
+         });
+         return operatorExpr;
+      }
+      case ast::ExpressionClass::CONJUNCTION: {
+         auto conjunctionExpr = std::static_pointer_cast<ast::ConjunctionExpression>(rootNode);
+
+         std::ranges::transform(conjunctionExpr->children, conjunctionExpr->children.begin(), [&](auto& child) {
+            return transformParsedExpression(child, context);
+         });
+         return conjunctionExpr;
+      }
+      case ast::ExpressionClass::COMPARISON: {
+         auto comparisonExpr = std::static_pointer_cast<ast::ComparisonExpression>(rootNode);
+         if (comparisonExpr->left) {
+            comparisonExpr->left = transformParsedExpression(comparisonExpr->left, context);
+         }
+         if (comparisonExpr->right) {
+            comparisonExpr->right = transformParsedExpression(comparisonExpr->right, context);
+         }
+         return comparisonExpr;
+      }
+      default: return rootNode;
    }
 }
 
@@ -586,7 +617,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
 
             }
             //TODO Check for correct value
-            if (function->functionName == "sum" || function->functionName == "avg") {
+            if (function->functionName == "sum" || function->functionName == "avg" || function->functionName == "min" || function->functionName == "max") {
                if (function->arguments.size() > 1) {
                   error("Aggregation with more than one argument not supported", function->loc);
                }
@@ -608,7 +639,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
 
                //auto e = context->currentScope->addFunctionEntry(fName, ast::FunctionInfo);
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, fName, boundArguments, fInfo);
-            } else if (function->functionName == "count") {
+            }
+            if (function->functionName == "count") {
                //TODO parse agrguments if not star!!
                if (function->arguments.size() > 1) {
                   error("Aggregation with more than one argument not supported", function->loc);
@@ -730,6 +762,28 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          //Check for correct Types
          auto commonType = getCommonBaseType(std::vector{boundInput->resultType.value().type, boundLower->resultType.value().type, boundUpper->resultType.value().type});
          return drv.nf.node<ast::BoundBetweenExpression>(rootNode->loc, between->type, catalog::Type::boolean(), rootNode->alias, boundInput, boundLower, boundUpper);
+      }
+      case ast::ExpressionClass::SUBQUERY: {
+         auto subqueryExpr = std::static_pointer_cast<ast::SubqueryExpression>(rootNode);
+         std::shared_ptr<ast::TableProducer> boundSubquery;
+         ast::TargetInfo subqueryTargetInfo;
+         {
+            auto subqueryResolver = context->createResolverScope();
+            auto subqueryDefineScope = context->createDefineScope();
+            context->pushNewScope();
+            boundSubquery = analyze(subqueryExpr->subquery, context, subqueryResolver);
+            subqueryTargetInfo = context->currentScope->targetInfo;
+            context->popCurrentScope();
+         }
+         //TODO check if subquery is a valid expression and has valid type
+         if (subqueryTargetInfo.targetColumns.size() != 1) {
+            error("subquery expressions must produce a single value", subqueryExpr->loc);
+         }
+         auto namedResult = subqueryTargetInfo.targetColumns[0];
+
+
+         return drv.nf.node<ast::BoundSubqueryExpression>(subqueryExpr->loc, namedResult->resultType, subqueryExpr->alias, namedResult, boundSubquery);
+
       }
       default: error("Not implemented", rootNode->loc);
    }

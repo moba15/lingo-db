@@ -159,4 +159,16 @@ class BoundBetweenExpression : public BoundExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
+class BoundSubqueryExpression : public BoundExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_SUBQUERY;
+
+   BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<TableProducer> subquery);
+
+   //! The subquery expression
+   std::shared_ptr<TableProducer> subquery;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
 } // namespace lingodb::ast

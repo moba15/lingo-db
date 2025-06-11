@@ -24,6 +24,7 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::TableProducer> analyzeAndTransform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
    std::shared_ptr<ast::TableProducer> analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::TableProducer> transform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
+   std::shared_ptr<ast::ParsedExpression> transformParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context);
 
    private:
    std::shared_ptr<catalog::Catalog> catalog;

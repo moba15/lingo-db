@@ -512,4 +512,26 @@ std::string BetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen
 
    return dot;
 }
+
+SubqueryExpression::SubqueryExpression(std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY,TYPE), subquery(subquery) {
+}
+std::string SubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot;
+
+   // Create node identifier for the subquery expression
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
+
+   // Create the subquery node with its label
+   dot += nodeId + " [label=\"Subquery\"];\n";
+
+   // Add the subquery TableProducer if present
+   if (subquery) {
+      std::string subqueryId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(subquery.get())));
+      dot += nodeId + " -> " + subqueryId + " [label=\"subquery\"];\n";
+      dot += subquery->toDotGraph(depth + 1, idGen);
+   }
+
+   return dot;
+}
+
 } // namespace lingodb::ast
