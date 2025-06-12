@@ -2,6 +2,7 @@
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/utility/Serialization.h"
 
+#include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 namespace lingodb::catalog {
 Type::Type(lingodb::catalog::LogicalTypeId id, std::shared_ptr<TypeInfo> infoInput) : id(id), info(std::move(infoInput)) {
    switch (id) {
@@ -78,9 +79,9 @@ NullableType::NullableType(Type type) : type(type), isNullable(false){
 NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(isNullable) {
 }
 mlir::Type NullableType::toMlirType(mlir::MLIRContext* context) const {
-   auto t = type.getMLIRTypeCreator()->createType(context);
+   mlir::Type t = type.getMLIRTypeCreator()->createType(context);
    if (isNullable) {
-
+      return  compiler::dialect::db::NullableType::get(context, t);
    }
    return t;
 }
