@@ -160,6 +160,7 @@ boolean [fF][aA][lL][sS][eE]
 
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
+[dD][iI][sS][tT][iI][nN][cC][tT]      { return lingodb::parser::make_DISTINCT(loc); }
 
 [eE][xX][tT][rR][aA][cC][tT]          { return lingodb::parser::make_EXTRACT(loc); }
 

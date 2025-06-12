@@ -59,7 +59,7 @@ std::string BoundTargetsExpression::toDotGraph(uint32_t depth, NodeIdGenerator& 
 /*
  * BoundFunctionExpression
 */
-BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<FunctionInfo> functionInfo) : BoundExpression(TYPE, type, resultType, aliasOrUniqueIdentifier), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), arguments(arguments), functionInfo(functionInfo) {
+BoundFunctionExpression::BoundFunctionExpression(ExpressionType type, catalog::Type resultType, std::string functionName, std::string scope, std::string aliasOrUniqueIdentifier, bool distinct, std::vector<std::shared_ptr<BoundExpression>> arguments, std::shared_ptr<FunctionInfo> functionInfo) : BoundExpression(TYPE, type, resultType, aliasOrUniqueIdentifier), functionName(functionName), scope(scope), aliasOrUniqueIdentifier(aliasOrUniqueIdentifier), distinct(distinct), arguments(arguments), functionInfo(functionInfo) {
    namedResult = functionInfo;
 }
 std::string BoundFunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {

@@ -651,10 +651,11 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
       for (auto aggrFunction : aggregation->aggregations) {
          mlir::Value expr; //TODO??
          auto aggrFuncName = aggrFunction->functionName;
-         //TODO distinct
+
          auto attrDef = attrManager.createDef(aggrFunction->scope, aggrFunction->aliasOrUniqueIdentifier);
-         if (aggrFuncName == "count") {
+         if (aggrFuncName == "count*") {
             expr = aggrBuilder.create<relalg::CountRowsOp>(builder.getUnknownLoc(), builder.getI64Type(), relation);
+            //TODO not star
             //TODO use zero instead of null
             /*if (groupByAttrs.empty()) {
                context.useZeroInsteadNull.insert(&attrDef.getColumn());
@@ -670,12 +671,12 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                                      .Case("stddev_samp", relalg::AggrFunc::stddev_samp)
                                      .Default(relalg::AggrFunc::count);
             //TODO use zero instead of null
-            if (relalgAggrFunc == relalg::AggrFunc::count) {
+            /*if (relalgAggrFunc == relalg::AggrFunc::count) {
                error("Use zero instead of null", aggrFunction->loc);
                /*if (groupByAttrs.empty()) {
                   context.useZeroInsteadNull.insert(&attrDef.getColumn());
                }*/
-            }
+            //}
             assert(aggrFunction->arguments.size() == 1);
             tuples::ColumnRefAttr refAttr;
             switch (aggrFunction->arguments[0]->type) {
@@ -695,55 +696,50 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
 
             mlir::Value currRel = relation;
             //TODO distinct
-            /*if (distinct) {
+            if (aggrFunction->distinct) {
                currRel = aggrBuilder.create<relalg::ProjectionOp>(builder.getUnknownLoc(), relalg::SetSemantic::distinct, currRel, builder.getArrayAttr({refAttr}));
-            }*/
+            }
             mlir::Type aggrResultType;
-            if (relalgAggrFunc == relalg::AggrFunc::count) {
-               aggrResultType = builder.getI64Type();
-            } else {
-               assert(aggrFunction->resultType.has_value());
-               aggrResultType = aggrFunction->resultType->toMlirType(builder.getContext());
+            assert(aggrFunction->resultType.has_value());
+            aggrResultType = aggrFunction->resultType->toMlirType(builder.getContext());
 
-
-
-               if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
-                  //TODO better, over context!!
-                  assert(aggrFunction->arguments[0]->namedResult.has_value());
-                  aggrResultType = aggrFunction->arguments[0]->namedResult.value()->resultType.toMlirType(builder.getContext());
+            if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
+               //TODO better, over context!!
+               assert(aggrFunction->arguments[0]->namedResult.has_value());
+               aggrResultType = aggrFunction->arguments[0]->namedResult.value()->resultType.toMlirType(builder.getContext());
+            }
+            //TODO define type
+            if (relalgAggrFunc == relalg::AggrFunc::avg) {
+               auto baseType = getBaseType(aggrResultType);
+               if (baseType.isIntOrFloat() && !baseType.isIntOrIndex()) {
+                  //keep aggrResultType
+               } else if (mlir::isa<db::DecimalType>(baseType)) {
+                  mlir::OpBuilder b(builder.getContext());
+                  mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), baseType, b.getUnitAttr());
+                  mlir::Value x2 = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
+                  mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x2);
+                  aggrResultType = div.getType();
+                  div.getDefiningOp()->erase();
+                  x2.getDefiningOp()->erase();
+                  x.getDefiningOp()->erase();
+               } else {
+                  mlir::OpBuilder b(builder.getContext());
+                  mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
+                  mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x);
+                  aggrResultType = div.getType();
+                  div.getDefiningOp()->erase();
+                  x.getDefiningOp()->erase();
                }
-               //TODO define type
-               if (relalgAggrFunc == relalg::AggrFunc::avg) {
-                  auto baseType = getBaseType(aggrResultType);
-                  if (baseType.isIntOrFloat() && !baseType.isIntOrIndex()) {
-                     //keep aggrResultType
-                  } else if (mlir::isa<db::DecimalType>(baseType)) {
-                     mlir::OpBuilder b(builder.getContext());
-                     mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), baseType, b.getUnitAttr());
-                     mlir::Value x2 = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
-                     mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x2);
-                     aggrResultType = div.getType();
-                     div.getDefiningOp()->erase();
-                     x2.getDefiningOp()->erase();
-                     x.getDefiningOp()->erase();
-                  } else {
-                     mlir::OpBuilder b(builder.getContext());
-                     mlir::Value x = b.create<db::ConstantOp>(b.getUnknownLoc(), db::DecimalType::get(b.getContext(), 19, 0), b.getUnitAttr());
-                     mlir::Value div = b.create<db::DivOp>(b.getUnknownLoc(), x, x);
-                     aggrResultType = div.getType();
-                     div.getDefiningOp()->erase();
-                     x.getDefiningOp()->erase();
-                  }
-                  if (mlir::isa<db::NullableType>(refAttr.getColumn().type) ) {
-                     aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
-                  }
-               }
-
-               if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
+               if (mlir::isa<db::NullableType>(refAttr.getColumn().type) ) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
-                  aggrFunction->functionInfo->resultType.isNullable = true;
                }
             }
+            //TODO move to analyzer
+            if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
+               aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
+               aggrFunction->functionInfo->resultType.isNullable = true;
+            }
+
             expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
          }
          attrDef.getColumn().type = expr.getType();
