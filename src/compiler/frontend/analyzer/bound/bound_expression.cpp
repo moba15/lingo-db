@@ -12,9 +12,8 @@ std::string BoundColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator
 /*
  * BoundComparisonExpression
 */
-BoundComparisonExpression::BoundComparisonExpression(ExpressionType type, std::string alias) : BoundExpression(TYPE, type, alias), left(nullptr), right(nullptr) {
-}
-BoundComparisonExpression::BoundComparisonExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right) : BoundExpression(TYPE, type, catalog::Type::boolean(), alias), left(std::move(left)), right(std::move(right)) {
+
+BoundComparisonExpression::BoundComparisonExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::vector<std::shared_ptr<BoundExpression>> rightChildren) : BoundExpression(TYPE, type, catalog::Type::boolean(), alias), left(std::move(left)), rightChildren(std::move(rightChildren)) {
 }
 std::string BoundComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
@@ -108,7 +107,7 @@ std::string BoundBetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& 
 /*
  * BoundSubqueryExpression
  */
-BoundSubqueryExpression::BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope,  std::shared_ptr<TableProducer> subquery) : BoundExpression(TYPE, ExpressionType::SUBQUERY, resultType, alias), sqlScope(sqlScope), subquery(std::move(subquery)) {
+BoundSubqueryExpression::BoundSubqueryExpression(SubqueryType subqueryType, catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope,  std::shared_ptr<TableProducer> subquery,  std::shared_ptr<BoundExpression> testExpr) : BoundExpression(TYPE, ExpressionType::SUBQUERY, resultType, alias), subqueryType(subqueryType), sqlScope(sqlScope), subquery(std::move(subquery)), testExpr(testExpr) {
    this->namedResult = namedResult;
 }
 std::string BoundSubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {

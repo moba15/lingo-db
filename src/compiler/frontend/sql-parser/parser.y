@@ -222,12 +222,17 @@
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens
 %type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list extract_list
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list extract_list expr_list
+
+/*
+* in_expr either returns a SubQuery or a list of expressions
+*/
+%type<std::variant<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>, std::shared_ptr<lingodb::ast::SubqueryExpression>>> in_expr
 
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
-                                                        func_arg_expr select_limit_value
+                                                        func_arg_expr select_limit_value 
 
 %type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr func_expr_common_subexpr
 
@@ -249,7 +254,7 @@
 
 %type<std::vector<std::string>> name_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst Fconst
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst Fconst 
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
@@ -961,6 +966,39 @@ a_expr:
     {
         $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_NOT_LIKE, $1, $4);
     }
+    | a_expr IN_P in_expr
+    {
+        /*
+        * in_expr either returns a SubQuery or a list of expressions
+        */
+        if(std::holds_alternative<std::shared_ptr<lingodb::ast::SubqueryExpression>>($in_expr)) {
+            auto subQuery = std::get<std::shared_ptr<lingodb::ast::SubqueryExpression>>($in_expr);  
+            subQuery->testExpr = $1;
+            $$ = subQuery;
+            
+        } else {
+            auto exprList = std::get<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>>($in_expr);
+            auto node = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_IN, $1, exprList);
+            $$ = node;
+        }
+    }
+    | a_expr NOT IN_P in_expr
+    {
+        /*
+        * in_expr either returns a SubQuery or a list of expressions
+        */
+        if(std::holds_alternative<std::shared_ptr<lingodb::ast::SubqueryExpression>>($in_expr)) {
+            auto subQuery = std::get<std::shared_ptr<lingodb::ast::SubqueryExpression>>($in_expr);  
+            subQuery->subQueryType = lingodb::ast::SubqueryType::NOT_ANY;
+            subQuery->testExpr = $1;
+            $$ = subQuery;
+            
+        } else {
+            auto exprList = std::get<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>>($in_expr);
+            auto node = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_NOT_IN, $1, exprList);
+            $$ = node;
+        }
+    }
     | a_expr[input] BETWEEN opt_asymmetric b_expr[lower] AND a_expr[upper] //%prec BETWEEN
     {
         auto node = mkNode<lingodb::ast::BetweenExpression>(@$, lingodb::ast::ExpressionType::COMPARE_BETWEEN, $input, $lower, $upper);
@@ -1001,7 +1039,7 @@ c_expr:
     | func_expr {$$=$1;}
     | select_with_parens %prec UMINUS
     {
-        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, $select_with_parens);
+        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, lingodb::ast::SubqueryType::SCALAR, $select_with_parens);
         $$ = subquery;
     }
     //TODO | select_with_parens indirection 
@@ -1013,6 +1051,18 @@ c_expr:
     //TODO | GROUPING LP expr_list RP
     ;
 //TODO Alias -> opt_alias_clause
+in_expr: 
+    select_with_parens
+    {
+        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, lingodb::ast::SubqueryType::ANY, $select_with_parens);
+        $$ = subquery;
+
+    }
+    | LP expr_list RP
+    {
+        $$ = $expr_list;
+    }
+
 func_application:
     func_name LP RP 
     {
@@ -1111,8 +1161,17 @@ func_arg_list:
     }
     ;
 expr_list: 
-    a_expr {}
-    | expr_list COMMA a_expr
+    a_expr 
+    {
+        auto list = mkListShared<lingodb::ast::ParsedExpression>();
+        list.emplace_back($a_expr);
+        $$ = list;
+    }
+    | expr_list[list] COMMA a_expr 
+    {
+        $list.emplace_back($a_expr);
+        $$ = $list;
+    }
     ;
 //TODO Allow for param_name
 func_arg_expr: 

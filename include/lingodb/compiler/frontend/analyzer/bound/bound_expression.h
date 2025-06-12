@@ -53,11 +53,11 @@ class BoundComparisonExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_COMPARISON;
 
-   explicit BoundComparisonExpression(ExpressionType type, std::string alias);
-   BoundComparisonExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+
+   BoundComparisonExpression(ExpressionType type, std::string alias, std::shared_ptr<BoundExpression> left, std::vector<std::shared_ptr<BoundExpression>> rightChildren);
 
    std::shared_ptr<BoundExpression> left;
-   std::shared_ptr<BoundExpression> right;
+   std::vector<std::shared_ptr<BoundExpression>> rightChildren;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
@@ -164,11 +164,14 @@ class BoundSubqueryExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_SUBQUERY;
 
-   BoundSubqueryExpression(catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subquery);
+   BoundSubqueryExpression(SubqueryType subqueryType, catalog::NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResult, std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subquery,  std::shared_ptr<BoundExpression> testExpr);
 
+   SubqueryType subqueryType = SubqueryType::INVALID;
    //! The subquery expression
    std::shared_ptr<TableProducer> subquery;
    std::shared_ptr<analyzer::SQLScope> sqlScope;
+
+   std::shared_ptr<BoundExpression> testExpr;
 
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;

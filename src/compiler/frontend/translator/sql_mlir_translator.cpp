@@ -268,7 +268,29 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
       case ast::ExpressionClass::BOUND_COMPARISON: {
          auto comparisonExpr = std::static_pointer_cast<ast::BoundComparisonExpression>(expression);
          auto left = translateExpression(builder, comparisonExpr->left, context);
-         auto right = translateExpression(builder, comparisonExpr->right, context);
+         //Handle in
+         if (comparisonExpr->type == ast::ExpressionType::COMPARE_IN || comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_IN) {
+            std::vector<mlir::Value> values;
+            values.push_back(left);
+            for (auto& rightChild : comparisonExpr->rightChildren) {
+               auto right = translateExpression(builder, rightChild, context);
+               values.push_back(right);
+            }
+
+
+            auto oneOf = builder.create<db::OneOfOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, values));
+            if (comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_IN) {
+               return builder.create<db::NotOp>(builder.getUnknownLoc(), oneOf);
+            }
+            return oneOf;
+
+
+
+         }
+         //Not IN
+         assert(comparisonExpr->rightChildren.size() == 1);
+
+         auto right = translateExpression(builder, comparisonExpr->rightChildren[0], context);
          if (comparisonExpr->type == ast::ExpressionType::COMPARE_LIKE || comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE) {
             auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right});
             auto isNullable = mlir::isa<db::NullableType>(left.getType()) || mlir::isa<db::NullableType>(right.getType());
@@ -394,15 +416,61 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          context->pushNewScope(subquery->sqlScope);
          auto translatedSubquery = translateTableProducer(builder, subquery->subquery, context);
          context->popCurrentScope();
-         mlir::Type resType = subquery->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
-         assert(subquery->namedResult.has_value());
-         if (subquery->namedResult.value()->resultType.isNullable) {
-            resType = db::NullableType::get(builder.getContext(), resType);
+         switch (subquery->subqueryType) {
+            case ast::SubqueryType::SCALAR: {
+               mlir::Type resType = subquery->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
+               assert(subquery->namedResult.has_value());
+               if (subquery->namedResult.value()->resultType.isNullable) {
+                  resType = db::NullableType::get(builder.getContext(), resType);
+               }
+               assert(subquery->namedResult.has_value());
+               //TODO use zero instead of null
+               mlir::Value scalarValue = builder.create<relalg::GetScalarOp>(builder.getUnknownLoc(), resType, subquery->namedResult.value()->createRef(attrManager), translatedSubquery);
+               return scalarValue;
+            }
+            case ast::SubqueryType::ANY:
+            case ast::SubqueryType::NOT_ANY: {
+               auto* block = new mlir::Block;
+               mlir::OpBuilder predBuilder(builder.getContext());
+               block->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+               auto tupleScope = translationContext->createTupleScope();
+               translationContext->setCurrentTuple(block->getArgument(0));
+
+
+               predBuilder.setInsertionPointToStart(block);
+               mlir::Value expr = translateExpression(predBuilder, subquery->testExpr, context);
+
+
+               auto mlirType = subquery->namedResult.value()->resultType.type.getMLIRTypeCreator()->createType(builder.getContext());
+               if (subquery->namedResult.value()->mlirType.has_value()) {
+                  mlirType = subquery->namedResult.value()->mlirType.value();
+               } else if (subquery->namedResult.value()->resultType.isNullable) {
+                  mlirType = db::NullableType::get(builder.getContext(), mlirType);
+               }
+               mlir::Value colVal = predBuilder.create<tuples::GetColumnOp>(predBuilder.getUnknownLoc(), mlirType, subquery->namedResult.value()->createRef(attrManager), block->getArgument(0));
+
+
+
+
+
+               auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {colVal, expr});
+               //TODO extract and remove hardcoded
+               db::DBCmpPredicate dbCmpPred =  db::DBCmpPredicate::eq;
+               mlir::Value pred = predBuilder.create<db::CmpOp>(predBuilder.getUnknownLoc(), dbCmpPred, ct[0], ct[1]);;
+               predBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), pred);
+
+               auto sel = builder.create<relalg::SelectionOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), translatedSubquery);
+               sel.getPredicate().push_back(block);
+               translatedSubquery = sel.getResult();
+               auto existsOp = builder.create<relalg::ExistsOp>(builder.getUnknownLoc(), builder.getI1Type(), translatedSubquery);
+               if (subquery->subqueryType == ast::SubqueryType::NOT_ANY) {
+                  return builder.create<db::NotOp>(builder.getUnknownLoc(), existsOp);
+               }
+               return existsOp;
+            }
+            default: error("Subquery type not implemented", expression->loc);
          }
-         assert(subquery->namedResult.has_value());
-         //TODO use zero instead of null
-         mlir::Value scalarValue = builder.create<relalg::GetScalarOp>(builder.getUnknownLoc(), resType, subquery->namedResult.value()->createRef(attrManager), translatedSubquery);
-         return scalarValue;
+
 
 
 

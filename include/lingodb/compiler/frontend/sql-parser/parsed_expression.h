@@ -285,9 +285,11 @@ class ComparisonExpression : public ParsedExpression {
 
    explicit ComparisonExpression(ExpressionType type);
    ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
+   ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::vector<std::shared_ptr<ParsedExpression>> rightChildren);
 
    std::shared_ptr<ParsedExpression> left;
-   std::shared_ptr<ParsedExpression> right;
+   ///Multiple right children, e.g. for IN expressions IN (1, 2, 3)
+   std::vector<std::shared_ptr<ParsedExpression>> rightChildren;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
@@ -466,14 +468,27 @@ class BetweenExpression : public ParsedExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
+   enum class SubqueryType : uint8_t {
+   INVALID = 0,
+   SCALAR = 1,     // Regular scalar subquery
+   EXISTS = 2,     // EXISTS (SELECT...)
+   NOT_EXISTS = 3, // NOT EXISTS(SELECT...)
+   ANY = 4,        // x = ANY(SELECT...) OR x IN (SELECT...)
+   NOT_ANY = 5,   // x != ANY(SELECT...) OR x NOT IN (SELECT...)
+};
+
 class SubqueryExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::SUBQUERY;
 
-   SubqueryExpression(std::shared_ptr<TableProducer> subquery);
+   SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery);
 
+   //! The type of the subquery, e.g. scalar, exists, not exists, any
+   SubqueryType subQueryType;
    //! The subquery expression
    std::shared_ptr<TableProducer> subquery;
+
+   std::shared_ptr<ParsedExpression> testExpr; // For EXISTS/NOT EXISTS/ANY/NOT ANY, the expression to test against
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
