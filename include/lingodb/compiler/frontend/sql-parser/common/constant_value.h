@@ -49,6 +49,7 @@ class IntervalValue : public Value {
    std::string toString() override;
 };
 
+
 enum class ConstantType : uint8_t {
    INT = 1,
    FLOAT = 2,

@@ -224,9 +224,10 @@ std::shared_ptr<ast::ParsedExpression> SQLQueryAnalyzer::transformParsedExpressi
          if (comparisonExpr->left) {
             comparisonExpr->left = transformParsedExpression(comparisonExpr->left, context);
          }
-         if (comparisonExpr->right) {
-            comparisonExpr->right = transformParsedExpression(comparisonExpr->right, context);
-         }
+         std::ranges::transform(comparisonExpr->rightChildren, comparisonExpr->rightChildren.begin(), [&](auto& child) {
+            return transformParsedExpression(child, context);
+         });
+
          return comparisonExpr;
       }
       case ast::ExpressionClass::FUNCTION: {
@@ -638,17 +639,35 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
       }
       case ast::ExpressionClass::COMPARISON: {
          auto comparison = std::static_pointer_cast<ast::ComparisonExpression>(rootNode);
+         if (comparison->type != ast::ExpressionType::COMPARE_IN && comparison->type != ast::ExpressionType::COMPARE_NOT_IN) {
+            if (comparison->rightChildren.size() != 1) {
+               error("ComparisonExpression expects exactly one right child for type: " <<  std::to_string(static_cast<int>(comparison->type)), comparison->loc)
+            }
+
+         } else {
+            if (std::find_if(comparison->rightChildren.begin(), comparison->rightChildren.end(), [](auto const &child) {
+               return child->exprClass != ast::ExpressionClass::CONSTANT;
+            }) != comparison->rightChildren.end()) {
+               error("Not implemented: IN (..,..,..) with non constant values", comparison->loc);
+            }
+         }
+
          auto left = analyzeExpression(comparison->left, context, resolverScope);
-         auto right = analyzeExpression(comparison->right, context, resolverScope);
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundRightChildren{};
+         std::ranges::transform(comparison->rightChildren, std::back_inserter(boundRightChildren), [&](auto& child) {
+            return analyzeExpression(child, context, resolverScope);
+         });
          if (!left->resultType.has_value()) {
             error("Left side of comparison is not a valid expression", comparison->left->loc);
          }
-         if (!right->resultType.has_value()) {
-            error("Right side of comparison is not a valid expression", comparison->right->loc);
-         }
-         getCommonType(left->resultType.value().type, right->resultType.value().type);
+         std::vector<catalog::Type> types{};
+         std::ranges::transform(boundRightChildren, std::back_inserter(types), [](auto& child) {
+            return child->resultType.value().type;
+         });
+         types.push_back(left->resultType.value().type);
+         getCommonBaseType(types);
 
-         auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, comparison->alias, left, right);
+         auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, comparison->alias, left, boundRightChildren);
          return boundComparison;
       }
       case ast::ExpressionClass::CONJUNCTION: {
@@ -856,6 +875,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
       }
       case ast::ExpressionClass::SUBQUERY: {
          auto subqueryExpr = std::static_pointer_cast<ast::SubqueryExpression>(rootNode);
+         if (subqueryExpr->subQueryType == ast::SubqueryType::INVALID) {
+            error("Should not happen, subquery type is invalid", subqueryExpr->loc);
+         }
          std::shared_ptr<ast::TableProducer> boundSubquery;
          std::shared_ptr<SQLScope> subqueryScope;
          ast::TargetInfo subqueryTargetInfo;
@@ -873,9 +895,17 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             error("subquery expressions must produce a single value", subqueryExpr->loc);
          }
          auto namedResult = subqueryTargetInfo.targetColumns[0];
+         auto resultType = namedResult->resultType;
 
+         if (subqueryExpr->subQueryType != ast::SubqueryType::SCALAR) {
+            resultType = catalog::Type::boolean();
+         }
+         std::shared_ptr<ast::BoundExpression> boundToTestExpr = nullptr;
+         if (subqueryExpr->testExpr) {
+            boundToTestExpr = analyzeExpression(subqueryExpr->testExpr, context, resolverScope);
+         }
 
-         return drv.nf.node<ast::BoundSubqueryExpression>(subqueryExpr->loc, namedResult->resultType, subqueryExpr->alias, namedResult, subqueryScope, boundSubquery);
+         return drv.nf.node<ast::BoundSubqueryExpression>(subqueryExpr->loc, subqueryExpr->subQueryType, resultType, subqueryExpr->alias, namedResult, subqueryScope, boundSubquery, boundToTestExpr);
 
       }
       default: error("Not implemented", rootNode->loc);

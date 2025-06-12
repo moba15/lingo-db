@@ -53,7 +53,10 @@ std::string ColumnRefExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idG
 /// ComparisonExpression
 ComparisonExpression::ComparisonExpression(ExpressionType type) : ParsedExpression(type, TYPE) {
 }
-ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), right(std::move(right)) {
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), rightChildren({std::move(right)}) {
+}
+
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::vector<std::shared_ptr<ParsedExpression>> rightChildren) : ParsedExpression(type, TYPE), left(std::move(left)), rightChildren(rightChildren) {
 }
 
 std::string ComparisonExpression::typeToAscii(ExpressionType type) const {
@@ -73,40 +76,25 @@ std::string ComparisonExpression::toDotGraph(uint32_t depth, NodeIdGenerator& id
    std::string dot{};
 
    // Create node identifier for the comparison expression
-   std::string nodeId;
-   nodeId.append("node");
-   nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this))));
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
 
    // Create the node with operator label
-   dot.append(nodeId);
-   dot.append(" [label=\"σ\n");
-   dot.append(typeToAscii(type));
-   dot.append("\"];\n");
+   dot += nodeId + " [label=\"σ\\n" + typeToAscii(type) + "\"];\n";
 
    // Handle left operand
    if (left) {
-      std::string leftId;
-      leftId.append("node");
-      leftId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(left.get()))));
-
-      dot.append(nodeId);
-      dot.append(" -> ");
-      dot.append(leftId);
-      dot.append(" [label=\"left\"];\n");
-      dot.append(left->toDotGraph(depth + 1, idGen));
+      std::string leftId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(left.get())));
+      dot += nodeId + " -> " + leftId + " [label=\"left\"];\n";
+      dot += left->toDotGraph(depth + 1, idGen);
    }
 
-   // Handle right operand
-   if (right) {
-      std::string rightId;
-      rightId.append("node");
-      rightId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(right.get()))));
-
-      dot.append(nodeId);
-      dot.append(" -> ");
-      dot.append(rightId);
-      dot.append(" [label=\"right\"];\n");
-      dot.append(right->toDotGraph(depth + 1, idGen));
+   // Handle all right children
+   for (size_t i = 0; i < rightChildren.size(); ++i) {
+      if (rightChildren[i]) {
+         std::string rightId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(rightChildren[i].get())));
+         dot += nodeId + " -> " + rightId + " [label=\"right " + std::to_string(i + 1) + "\"];\n";
+         dot += rightChildren[i]->toDotGraph(depth + 1, idGen);
+      }
    }
 
    return dot;
@@ -513,7 +501,7 @@ std::string BetweenExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen
    return dot;
 }
 
-SubqueryExpression::SubqueryExpression(std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY,TYPE), subquery(subquery) {
+SubqueryExpression::SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY,TYPE), subQueryType(subQueryType),  subquery(subquery) {
 }
 std::string SubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot;
