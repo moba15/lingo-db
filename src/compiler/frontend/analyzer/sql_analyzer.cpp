@@ -1026,19 +1026,17 @@ catalog::Type SQLQueryAnalyzer::getCommonTypeAfterOperation(catalog::Type type1,
 }
 
 catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types) {
-   auto commonType = types.back();
-   types.pop_back();
-   for (auto type : types) {
-      commonType = getCommonType(commonType, type);
+   auto commonType = types.front();
+   for (size_t i = 1; i < types.size(); ++i) {
+      commonType = getCommonType(commonType, types[i]);
    }
    return commonType;
 }
 
 catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types, ast::ExpressionType operationType) {
-   auto commonType = types.back();
-   types.pop_back();
-   for (auto type : types) {
-      commonType = getCommonTypeAfterOperation(commonType, type, operationType);
+   auto commonType = types.front();
+   for (size_t i = 1; i < types.size(); ++i) {
+      commonType = getCommonTypeAfterOperation(commonType, types[i], operationType);
    }
    return commonType;
 }
