@@ -43,6 +43,11 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::BoundColumnRefExpression> analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context);
 
    catalog::Type getCommonType(catalog::Type type1, catalog::Type type2);
+   [[nodiscard]]
+   std::pair<unsigned long, unsigned long> getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s);
+   catalog::Type getCommonTypeAfterOperation(catalog::Type type1, catalog::Type type2, ast::ExpressionType operationType);
+   catalog::Type getCommonBaseType(std::vector<catalog::Type> types, ast::ExpressionType operationType);
+
    catalog::Type getCommonBaseType(std::vector<catalog::Type> types);
    std::string createTmpScope() {
       static size_t tmpScopeCounter = 0;
@@ -57,6 +62,8 @@ class SQLQueryAnalyzer {
       mapName.append(std::to_string(mapCounter++));
       return mapName;
    }
+
+
 };
 
 } // namespace lingodb::analyzer

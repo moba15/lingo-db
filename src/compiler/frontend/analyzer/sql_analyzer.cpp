@@ -19,7 +19,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeAndTransform(std::s
              << std::endl;
    std::cout << "digraph ast {" << std::endl;
    std::cout << transformed->toDotGraph(1, idGen) << std::endl;
-
+   std::cout << "}" << std::endl;
    context->pushNewScope();
    auto scope = context->createResolverScope();
   transformed = analyze(transformed, context, scope);
@@ -707,7 +707,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          std::ranges::transform(boundChildren, std::back_inserter(types), [](auto c) {
             return c->resultType.value().type;
          });
-         auto commonType = getCommonBaseType(types);
+         auto commonType = getCommonBaseType(types, operatorExpr->type);
 
          return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, operatorExpr->alias, boundChildren);
       }
@@ -741,15 +741,26 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                }
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
+               //Find correct resultType
+               auto resultType = boundArguments[0]->resultType.value().type;
+               if (function->functionName == "avg") {
+                  //TODO type
+                  if (resultType.getTypeId() == catalog::LogicalTypeId::INT) {
+                     resultType = getCommonTypeAfterOperation(catalog::Type::decimal(19,0), catalog::Type::decimal(19,0), ast::ExpressionType::OPERATOR_DIVIDE);
+                  } else if (resultType.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+                     resultType = getCommonTypeAfterOperation(resultType, catalog::Type::decimal(19,0), ast::ExpressionType::OPERATOR_DIVIDE);
+                  }
+                  //else keep type
+
+               }
+               auto p = resultType.getInfo<catalog::DecimalTypeInfo>()->getPrecision();
                //TODO here the information gets lost which mlir type the argument and therefore the function has
-               auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, boundArguments[0]->resultType.value());
-               //TODO better
+               auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-
-               //auto e = context->currentScope->addFunctionEntry(fName, ast::FunctionInfo);
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, fName, boundArguments, fInfo);
             }
+            //TODO better and cleaner!
             if (function->functionName == "count") {
                //TODO parse agrguments if not star!!
                if (function->arguments.size() > 1) {
@@ -960,11 +971,75 @@ catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type
 
    throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
 }
+
+std::pair<unsigned long, unsigned long> SQLQueryAnalyzer::getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s) {
+   auto beforeComma = p - s;
+
+   if (beforeComma > 32 && s > 6) {
+      p = 38;
+      s = 6;
+   } else if (beforeComma > 32 && s <= 6) {
+      p = 28;
+   } else {
+      p = std::min<unsigned long>(p, 38);
+      s = std::min<unsigned long>(s, 38 - beforeComma);
+   }
+   return  {p,s};
+}
+catalog::Type SQLQueryAnalyzer::getCommonTypeAfterOperation(catalog::Type type1, catalog::Type type2, ast::ExpressionType operationType) {
+   //TODO type
+   auto commonType = getCommonType(type1, type2);
+   //Maybe the other way arround
+   switch (operationType) {
+      case ast::ExpressionType::OPERATOR_DIVIDE: {
+         if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+            auto type1Info = type1.getInfo<catalog::DecimalTypeInfo>();
+            auto type2Info = type2.getInfo<catalog::DecimalTypeInfo>();
+
+
+
+            auto [p , s] = getAdaptedDecimalPAndSAfterMulDiv(type1Info->getPrecision() - type1Info->getScale() + type2Info->getScale() + std::max<unsigned long>(6, type1Info->getScale() + type2Info->getPrecision()), std::max<unsigned long>(6, type1Info->getScale() + type2Info->getPrecision()));
+
+
+
+            return catalog::Type::decimal(p,s);
+         }
+
+         return commonType;
+
+      }
+      case ast::ExpressionType::OPERATOR_TIMES: {
+         if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+            auto type1Info = type1.getInfo<catalog::DecimalTypeInfo>();
+            auto type2Info = type2.getInfo<catalog::DecimalTypeInfo>();
+            auto [p,s] = getAdaptedDecimalPAndSAfterMulDiv(type1Info->getPrecision() + type2Info->getPrecision(), type1Info->getScale() + type2Info->getScale());
+            return catalog::Type::decimal(p, s);
+         }
+
+         return commonType;
+
+
+
+
+      }
+      default: return commonType;
+   }
+}
+
 catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types) {
    auto commonType = types.back();
    types.pop_back();
    for (auto type : types) {
       commonType = getCommonType(commonType, type);
+   }
+   return commonType;
+}
+
+catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types, ast::ExpressionType operationType) {
+   auto commonType = types.back();
+   types.pop_back();
+   for (auto type : types) {
+      commonType = getCommonTypeAfterOperation(commonType, type, operationType);
    }
    return commonType;
 }
