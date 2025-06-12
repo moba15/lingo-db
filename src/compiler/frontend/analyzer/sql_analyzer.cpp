@@ -758,7 +758,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, fName, boundArguments, fInfo);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
             }
             //TODO better and cleaner!
             if (function->functionName == "count") {
@@ -777,7 +777,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                //TODO better
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, boundArguments, fInfo);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
             } else {
                error("Not implemented", rootNode->loc);
             }
@@ -796,7 +796,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto resultType = catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
                //TODO  context->currentScope->functionsEntry.emplace(fName, std::make_shared<ast::FunctionInfo>(scope, fName, resultType));
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, std::vector{arg}, nullptr);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg}, nullptr);
             }
             if (function->functionName == "count") {
                if (function->arguments.size() != 1 && !function->star) {
@@ -808,17 +808,16 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, boundArguments[0]->resultType.value());
-               //TODO better
+
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-               //context->currentScope->addFunctionEntry(fName, ast::FunctionInfo());
-               //auto e = context->currentScope->addFunctionEntry(fName, fInfo);
+               auto resultType = catalog::Type::int64();
                if (function->star) {
-                  return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, catalog::Type::int64(), function->functionName, "", function->alias, std::vector<std::shared_ptr<ast::BoundExpression>>{}, fInfo);
+                  return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType , function->functionName + "*", "", function->alias, function->distinct, std::vector<std::shared_ptr<ast::BoundExpression>>{}, fInfo);
                }
                auto arg = analyzeExpression(function->arguments[0], context, resolverScope);
 
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, catalog::Type::int64(), function->functionName, "", function->alias, std::vector{arg}, fInfo);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg}, fInfo);
             }
             if (function->functionName == "EXTRACT") {
                if (function->arguments.size() != 2) {
@@ -837,7 +836,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
 
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, std::vector{arg1, arg2}, fInfo);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1, arg2}, fInfo);
 
             }
             throw std::runtime_error("FunctionType Not implemented");
