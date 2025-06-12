@@ -58,11 +58,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                names.push_back(builder.getStringAttr(functionInfo->name));
                auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
                colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               if (functionInfo->mlirType.has_value()) {
-                  colTypes.push_back(mlir::TypeAttr::get(functionInfo->mlirType.value()));
-               } else {
-                  colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
-               }
+               colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.toMlirType(builder.getContext())));
                auto attrDef = functionInfo->createRef(attrManager);
                attrs.push_back(attrDef);
                break;
@@ -71,11 +67,8 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                names.push_back(builder.getStringAttr(named->displayName));
                auto colMemberName = memberManager.getUniqueMember(named->name);
                colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               if (named->mlirType.has_value()) {
-                  colTypes.push_back(mlir::TypeAttr::get(named->mlirType.value()));
-               } else {
-                  colTypes.push_back(mlir::TypeAttr::get(named->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
-               }
+               colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
+
                colTypes.push_back(mlir::TypeAttr::get(named->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
 
                auto attrDef = named->createRef(attrManager);
@@ -225,12 +218,8 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(expression);
          auto nameResult = columnRef->namedResult;
 
-         mlir::Type type = nameResult->resultType.type.getMLIRTypeCreator()->createType(builder.getContext());
-         if (nameResult->mlirType.has_value()) {
-                type = nameResult->mlirType.value();
-         } else if (nameResult->resultType.isNullable) {
-            type = db::NullableType::get(builder.getContext(), type);
-         }
+         mlir::Type type = nameResult->resultType.toMlirType(builder.getContext());
+
          if (nameResult->type == ast::NamedResultType::Column) {
             type = createTypeForColumn(builder.getContext(), std::static_pointer_cast<ast::ColumnInfo>(nameResult)->column);
          }
@@ -441,12 +430,8 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                mlir::Value expr = translateExpression(predBuilder, subquery->testExpr, context);
 
 
-               auto mlirType = subquery->namedResult.value()->resultType.type.getMLIRTypeCreator()->createType(builder.getContext());
-               if (subquery->namedResult.value()->mlirType.has_value()) {
-                  mlirType = subquery->namedResult.value()->mlirType.value();
-               } else if (subquery->namedResult.value()->resultType.isNullable) {
-                  mlirType = db::NullableType::get(builder.getContext(), mlirType);
-               }
+               auto mlirType = subquery->namedResult.value()->resultType.toMlirType(builder.getContext());
+
                mlir::Value colVal = predBuilder.create<tuples::GetColumnOp>(predBuilder.getUnknownLoc(), mlirType, subquery->namedResult.value()->createRef(attrManager), block->getArgument(0));
 
 
@@ -718,17 +703,14 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                aggrResultType = builder.getI64Type();
             } else {
                assert(aggrFunction->resultType.has_value());
-               if (aggrFunction->namedResult.has_value() && aggrFunction->namedResult.value()->mlirType.has_value()) {
-                  aggrResultType = aggrFunction->namedResult.value()->mlirType.value();
-               } else {
-                  aggrResultType = aggrFunction->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
-               }
+               aggrResultType = aggrFunction->resultType->toMlirType(builder.getContext());
+
 
 
                if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
                   //TODO better, over context!!
-                  assert(aggrFunction->arguments[0]->namedResult.has_value() && aggrFunction->arguments[0]->namedResult.value()->mlirType.has_value());
-                  aggrResultType = aggrFunction->arguments[0]->namedResult.value()->mlirType.value();
+                  assert(aggrFunction->arguments[0]->namedResult.has_value());
+                  aggrResultType = aggrFunction->arguments[0]->namedResult.value()->resultType.toMlirType(builder.getContext());
                }
                //TODO define type
                if (relalgAggrFunc == relalg::AggrFunc::avg) {
@@ -765,9 +747,6 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
          }
          attrDef.getColumn().type = expr.getType();
-         aggrFunction->functionInfo->mlirType = expr.getType();
-
-         aggrFunction->namedResult.value()->mlirType = expr.getType();
 
          //TODO mapping.insert({12, "&attrDef.getColumn()"});
          createdCols.push_back(attrDef);
@@ -806,7 +785,6 @@ mlir::Value SQLMlirTranslator::createMap(mlir::OpBuilder& builder, std::string m
       if (p->namedResult.has_value()) {
          p->namedResult.value()->scope = mapName;
          attrDef = p->namedResult.value()->createDef(attrManager);
-         p->namedResult.value()->mlirType = expr.getType();
       }
 
       attrDef.getColumn().type = expr.getType();

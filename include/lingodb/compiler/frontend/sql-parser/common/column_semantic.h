@@ -19,7 +19,6 @@ struct NamedResult {
    std::string name;
    //TODO find better name
    std::string displayName{};
-   std::optional<mlir::Type> mlirType;
    NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType, std::string name) : type(type), scope(scope), resultType(resultType), name(name) {}
 
     virtual  compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) {

@@ -75,7 +75,14 @@ std::shared_ptr<TypeInfo> TypeInfo::deserialize(utility::Deserializer& deseriali
 }
 NullableType::NullableType(Type type) : type(type), isNullable(false){
 }
-NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(isNullable){
+NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(isNullable) {
+}
+mlir::Type NullableType::toMlirType(mlir::MLIRContext* context) const {
+   auto t = type.getMLIRTypeCreator()->createType(context);
+   if (isNullable) {
+
+   }
+   return t;
 }
 void IntTypeInfo::serializeConcrete(utility::Serializer& serializer) const {
    serializer.writeProperty(0, isSigned);

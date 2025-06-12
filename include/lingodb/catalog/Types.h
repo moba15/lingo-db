@@ -2,8 +2,11 @@
 #define LINGODB_CATALOG_TYPES_H
 
 #include <memory>
+#include <mlir/Dialect/Func/Transforms/Passes.h.inc>
 #include <optional>
 #include <string>
+#include <mlir/IR/MLIRContext.h>
+#include <mlir/IR/Types.h>
 namespace lingodb::utility {
 class Serializer;
 class Deserializer;
@@ -82,6 +85,7 @@ class NullableType {
    NullableType(Type type, bool isNullable);
    Type type;
    bool isNullable;
+   mlir::Type toMlirType(mlir::MLIRContext* context) const;
 };
 class IntTypeInfo : public TypeInfo {
    bool isSigned;
