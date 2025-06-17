@@ -1,6 +1,5 @@
 include_directories(lingo-db-analyzer  ${GEN_OUTPUT_DIR})
 add_library(lingo-db-analyzer
-        sql_scope.cpp
         sql_analyzer.cpp
         sql_context.cpp
 
