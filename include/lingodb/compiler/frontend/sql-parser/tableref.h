@@ -3,7 +3,6 @@
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "query_node.h"
 #include "table_producer.h"
-#include "tableref/tabledescription.h"
 
 #include <cstdint>
 #include <string>
@@ -36,7 +35,16 @@ enum class TableReferenceType : uint8_t {
    COLUMN_DATA = 11, // column data collection
    DELIM_GET = 12 // Delim get ref
 };
+class TableDescription {
+   public:
+   TableDescription(std::string database, std::string schema, std::string table) : database(database), schema(schema), table(table) {};
 
+   std::string database;
+   std::string schema;
+   std::string table;
+   bool readonly = true;
+   //TODO column definitions
+};
 class BaseTableRef : public TableRef {
    public:
    static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;

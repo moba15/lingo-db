@@ -6,7 +6,7 @@
 #include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
 #include "lingodb/compiler/frontend/analyzer/sql_context.h"
 #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
-#include "lingodb/compiler/frontend/sql-parser/query_node/select_node.h"
+#include "lingodb/compiler/frontend/sql-parser/select_node.h"
 #include "lingodb/compiler/frontend/translator/context/translation_context.h"
 
 #include <memory>

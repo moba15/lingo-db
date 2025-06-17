@@ -27,8 +27,9 @@ enum class QueryNodeType : uint8_t {
 };
 class QueryNode : public TableProducer {
    public:
-   virtual ~QueryNode();
-   explicit QueryNode(QueryNodeType type) : TableProducer(NodeType::QUERY_NODE), type(type) {};
+   virtual ~QueryNode() override = default;
+
+   explicit QueryNode(QueryNodeType type) : TableProducer(NodeType::QUERY_NODE), type(type){};
 
    //! The type of the query node, either SetOperation or Select
    QueryNodeType type;
