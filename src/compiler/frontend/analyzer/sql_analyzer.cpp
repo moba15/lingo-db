@@ -1,10 +1,10 @@
 #include "lingodb/compiler/frontend/analyzer/sql_analyzer.h"
 
 
-#include "lingodb/compiler/frontend/analyzer/bound/bound_aggregation.h"
-#include "lingodb/compiler/frontend/analyzer/bound/bound_extend_node.h"
-#include "lingodb/compiler/frontend/analyzer/bound/bound_groupby.h"
-#include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_groupby.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/runtime/RecordBatchInfo.h"
 
 #include <ranges>

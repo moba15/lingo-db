@@ -8,18 +8,15 @@ ADD_FLEX_BISON_DEPENDENCY(lexer parser)
 add_library(lingo-db-parser
         driver.cpp
 
-        parsed_expression.cpp
-        tableref.cpp
-        group_by_node.cpp
-        pipe_operator.cpp
-        aggregation_node.cpp
-        result_modifier.cpp
-        extend_node.cpp
+        ../ast/parsed_expression.cpp
+        ../ast/tableref.cpp
+        ../ast/group_by_node.cpp
+        ../ast/pipe_operator.cpp
+        ../ast/aggregation_node.cpp
+        ../ast/result_modifier.cpp
+        ../ast/extend_node.cpp
 
-        query_node/select_node.cpp
-
-        common/node_id_generator.cpp
-        common/constant_value.cpp
+        ../ast/select_node.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}

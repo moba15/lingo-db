@@ -1,8 +1,8 @@
 #pragma once
 
 #include "lingodb/compiler/frontend/analyzer/sql_scope.h"
-#include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
-#include "lingodb/compiler/frontend/sql-parser/extend_node.h"
+#include "lingodb/compiler/frontend/ast/aggregation_node.h"
+#include "lingodb/compiler/frontend/ast/extend_node.h"
 
 #include <llvm/ADT/ScopedHashTable.h>
 
