@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
       return 1;
    }
 
-   auto session = lingodb::runtime::Session::createSession(std::string(argv[1]), true);
+   auto session = lingodb::runtime::Session::createSession(std::string(argv[1]), false);
    driver drv;
    if (!drv.parse(argv[2])) {
       if (!drv.result) {
