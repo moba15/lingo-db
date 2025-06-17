@@ -1,1 +1,0 @@
-#include "lingodb/compiler/frontend/analyzer/sql_scope.h"

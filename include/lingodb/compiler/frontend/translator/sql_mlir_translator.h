@@ -1,6 +1,6 @@
 #pragma once
 #include "lingodb/compiler/Dialect/TupleStream/ColumnManager.h"
-#include "lingodb/compiler/frontend/SQL/Parser.h"
+//#include "lingodb/compiler/frontend/SQL/Parser.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"

@@ -8,11 +8,13 @@
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
-#include "lingodb/compiler/frontend/SQL/Parser.h"
+#include "lingodb/compiler/frontend/ast/aggregation_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
-#include "lingodb/compiler/frontend/ast/aggregation_node.h"
 #include "lingodb/utility/Serialization.h"
+
+//todo: remove
+#include "lingodb/compiler/old-frontend/SQL/Parser.h"
 
 #include <mlir-c/IR.h>
 namespace lingodb::translator {
@@ -161,8 +163,6 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          return sel.getResult();
       }
       case ast::PipeOperatorType::AGGREGATE: {
-
-
          assert(pipeOperator->node->nodeType == ast::NodeType::BOUND_AGGREGATION);
          auto aggregationNode = std::static_pointer_cast<ast::BoundAggregationNode>(pipeOperator->node);
          //TODO logic here
@@ -223,7 +223,6 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             type = createTypeForColumn(builder.getContext(), std::static_pointer_cast<ast::ColumnInfo>(nameResult)->column);
          }
 
-
          auto attrDef = nameResult->createRef(attrManager);
          return builder.create<tuples::GetColumnOp>(
             builder.getUnknownLoc(),
@@ -265,15 +264,11 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                values.push_back(right);
             }
 
-
             auto oneOf = builder.create<db::OneOfOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, values));
             if (comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_IN) {
                return builder.create<db::NotOp>(builder.getUnknownLoc(), oneOf);
             }
             return oneOf;
-
-
-
          }
          //Not IN
          assert(comparisonExpr->rightChildren.size() == 1);
@@ -424,23 +419,18 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                auto tupleScope = translationContext->createTupleScope();
                translationContext->setCurrentTuple(block->getArgument(0));
 
-
                predBuilder.setInsertionPointToStart(block);
                mlir::Value expr = translateExpression(predBuilder, subquery->testExpr, context);
-
 
                auto mlirType = subquery->namedResult.value()->resultType.toMlirType(builder.getContext());
 
                mlir::Value colVal = predBuilder.create<tuples::GetColumnOp>(predBuilder.getUnknownLoc(), mlirType, subquery->namedResult.value()->createRef(attrManager), block->getArgument(0));
 
-
-
-
-
                auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {colVal, expr});
                //TODO extract and remove hardcoded
-               db::DBCmpPredicate dbCmpPred =  db::DBCmpPredicate::eq;
-               mlir::Value pred = predBuilder.create<db::CmpOp>(predBuilder.getUnknownLoc(), dbCmpPred, ct[0], ct[1]);;
+               db::DBCmpPredicate dbCmpPred = db::DBCmpPredicate::eq;
+               mlir::Value pred = predBuilder.create<db::CmpOp>(predBuilder.getUnknownLoc(), dbCmpPred, ct[0], ct[1]);
+               ;
                predBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), pred);
 
                auto sel = builder.create<relalg::SelectionOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), translatedSubquery);
@@ -454,11 +444,6 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             }
             default: error("Subquery type not implemented", expression->loc);
          }
-
-
-
-
-
       }
 
       default: error("Not implemented", expression->loc);
@@ -527,7 +512,6 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             case ast::JoinType::INNER: {
                switch (boundJoin->refType) {
                   case ast::JoinCondType::CROSS: {
-
                   }
                   default: error("Not implemented", tableRef->loc);
                }
@@ -543,7 +527,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             }
 
             case ast::JoinType::LEFT: {
-               mlir::Value left,right;
+               mlir::Value left, right;
                left = translateTableProducer(builder, boundJoin->left, context);
                right = translateTableProducer(builder, boundJoin->right, context);
                mlir::Block* pred;
@@ -552,7 +536,6 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                }
                auto* block = new mlir::Block;
                {
-
                   mlir::OpBuilder predBuilder(builder.getContext());
                   block->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
 
@@ -560,7 +543,6 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                   mlir::Value expr = translateExpression(predBuilder, std::get<std::shared_ptr<ast::BoundExpression>>(boundJoin->condition), context);
                   predBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), expr);
                }
-
 
                std::vector<mlir::Attribute> outerJoinMapping{};
                std::ranges::transform(boundJoin->outerJoinMapping, std::back_inserter(outerJoinMapping), [&](std::shared_ptr<ast::NamedResult> namedResult) {
@@ -729,7 +711,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                   div.getDefiningOp()->erase();
                   x.getDefiningOp()->erase();
                }
-               if (mlir::isa<db::NullableType>(refAttr.getColumn().type) ) {
+               if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
                }
             }
