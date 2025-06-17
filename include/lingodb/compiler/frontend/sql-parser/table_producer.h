@@ -5,8 +5,8 @@
 namespace lingodb::ast {
 class TableProducer : public AstNode {
    public:
-   TableProducer(NodeType type);
-   TableProducer(NodeType type, std::string alias);
+   TableProducer(NodeType type) : AstNode(type) {}
+   TableProducer(NodeType type, std::string alias): AstNode(type), alias(std::move(alias)) {}
 
    std::string alias;
 };

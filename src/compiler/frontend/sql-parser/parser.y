@@ -18,12 +18,11 @@
 
   #include "lingodb/compiler/frontend/sql-parser/node_factory.h"
   #include "lingodb/compiler/frontend/sql-parser/table_producer.h"
-  #include "lingodb/compiler/frontend/sql-parser/query_node/list.h"
+  #include "lingodb/compiler/frontend/sql-parser/select_node.h"
   #include "lingodb/compiler/frontend/sql-parser/tableref.h"
   #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
   #include "lingodb/compiler/frontend/sql-parser/result_modifier.h"
   #include "lingodb/compiler/frontend/sql-parser/parsed_expression.h"
-  #include "lingodb/compiler/frontend/sql-parser/tableref/tabledescription.h"
   #include "lingodb/compiler/frontend/sql-parser/common/binding_alias.h"
   #include "lingodb/compiler/frontend/sql-parser/common/constant_value.h"
   class driver;
