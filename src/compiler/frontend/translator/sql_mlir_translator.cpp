@@ -12,7 +12,6 @@
 #include "lingodb/compiler/frontend/analyzer/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/analyzer/bound/bound_tableref.h"
 #include "lingodb/compiler/frontend/sql-parser/aggregation_node.h"
-#include "lingodb/compiler/runtime/ExecutionContext.h"
 #include "lingodb/utility/Serialization.h"
 
 #include <mlir-c/IR.h>
