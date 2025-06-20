@@ -1,4 +1,4 @@
-#include "lingodb/compiler/frontend/sql-parser/driver.h"
+#include "lingodb/compiler/frontend/driver.h"
 
 driver::driver()
    : trace_parsing(false), trace_scanning(false) {}

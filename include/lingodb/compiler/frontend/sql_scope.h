@@ -2,7 +2,7 @@
 
 #include "lingodb/catalog/Defs.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
-#include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
+#include "lingodb/compiler/frontend/column_semantic.h"
 
 #include <map>
 #include <memory>

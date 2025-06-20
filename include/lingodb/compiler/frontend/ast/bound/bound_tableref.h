@@ -1,5 +1,5 @@
 #pragma once
-#include "lingodb/compiler/frontend/analyzer/sql_scope.h"
+#include "lingodb/compiler/frontend/sql_scope.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 #include "lingodb/compiler/frontend/ast/tableref.h"
 namespace lingodb::ast {

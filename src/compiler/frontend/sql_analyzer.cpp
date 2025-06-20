@@ -1,4 +1,4 @@
-#include "lingodb/compiler/frontend/analyzer/sql_analyzer.h"
+#include "lingodb/compiler/frontend/sql_analyzer.h"
 
 
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"

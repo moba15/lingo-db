@@ -1,7 +1,7 @@
 #pragma once
-#include "lingodb/compiler/frontend/analyzer/sql_scope.h"
+#include "lingodb/compiler/frontend/sql_scope.h"
 #include "lingodb/compiler/frontend/ast/ast_node.h"
-#include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
+#include "lingodb/compiler/frontend/column_semantic.h"
 #include "lingodb/compiler/frontend/ast/parsed_expression.h"
 
 #include <mlir/Dialect/MLProgram/Transforms/Passes.h.inc>

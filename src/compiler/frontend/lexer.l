@@ -4,7 +4,7 @@
 # include <cstdlib>
 # include <cstring> // strerror
 # include <string>
-# include "lingodb/compiler/frontend/sql-parser/driver.h"
+# include "lingodb/compiler/frontend/driver.h"
 # include "parser.hpp"
 # include <algorithm>
 #include <lingodb/compiler/frontend/sql-parser/gen/location.hh>

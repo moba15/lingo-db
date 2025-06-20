@@ -4,10 +4,10 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
-#include "lingodb/compiler/frontend/analyzer/sql_context.h"
+#include "lingodb/compiler/frontend/sql_context.h"
 #include "lingodb/compiler/frontend/ast/parsed_expression.h"
 #include "lingodb/compiler/frontend/ast/select_node.h"
-#include "lingodb/compiler/frontend/translator/context/translation_context.h"
+#include "lingodb/compiler/frontend/translation_context.h"
 
 #include <memory>
 
