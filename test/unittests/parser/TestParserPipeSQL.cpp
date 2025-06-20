@@ -1,4 +1,4 @@
-#include "lingodb/compiler/frontend/sql-parser/driver.h"
+#include "lingodb/compiler/frontend/driver.h"
 #include "lingodb/runtime/LingoDBHashIndex.h"
 
 #include <catch2/catch_test_macros.hpp>

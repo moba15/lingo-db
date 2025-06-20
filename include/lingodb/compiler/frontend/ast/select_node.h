@@ -5,7 +5,7 @@
 #include "lingodb/compiler/frontend/ast/query_node.h"
 #include "lingodb/compiler/frontend/ast/tableref.h"
 
-#include "lingodb/compiler/frontend/sql-parser/common/column_semantic.h"
+#include "lingodb/compiler/frontend/column_semantic.h"
 #include <memory>
 #include <vector>
 namespace lingodb::ast {

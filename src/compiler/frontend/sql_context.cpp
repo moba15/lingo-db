@@ -1,4 +1,4 @@
-#include "lingodb/compiler/frontend/analyzer/sql_context.h"
+#include "lingodb/compiler/frontend/sql_context.h"
 
 #include "lingodb/runtime/RecordBatchInfo.h"
 

@@ -1,20 +1,20 @@
-#include "../../../include/lingodb/compiler/frontend/translator/sql_mlir_translator.h"
+#include "lingodb/compiler/frontend/sql_mlir_translator.h"
 
-#include "../../../include/lingodb/catalog/Defs.h"
-#include "../../../include/lingodb/catalog/MLIRTypes.h"
-#include "../../../include/lingodb/catalog/TableCatalogEntry.h"
-#include "../../../include/lingodb/compiler/Dialect/RelAlg/Transforms/queryopt/QueryGraph.h"
-#include "../../../include/lingodb/compiler/Dialect/SubOperator/SubOperatorDialect.h"
-#include "../../../include/lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
-#include "../../../include/lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
-#include "../../../include/lingodb/compiler/Dialect/util/UtilDialect.h"
-#include "../../../include/lingodb/compiler/frontend/ast/aggregation_node.h"
-#include "../../../include/lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
-#include "../../../include/lingodb/compiler/frontend/ast/bound/bound_tableref.h"
-#include "../../../include/lingodb/utility/Serialization.h"
+#include "lingodb/catalog/Defs.h"
+#include "lingodb/catalog/MLIRTypes.h"
+#include "lingodb/catalog/TableCatalogEntry.h"
+#include "lingodb/compiler/Dialect/RelAlg/Transforms/queryopt/QueryGraph.h"
+#include "lingodb/compiler/Dialect/SubOperator/SubOperatorDialect.h"
+#include "lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
+#include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
+#include "lingodb/compiler/Dialect/util/UtilDialect.h"
+#include "lingodb/compiler/frontend/ast/aggregation_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
+#include "lingodb/utility/Serialization.h"
 
 //todo: remove
-#include "../../../include/lingodb/compiler/old-frontend/SQL/Parser.h"
+#include "lingodb/compiler/old-frontend/SQL/Parser.h"
 
 #include <mlir-c/IR.h>
 namespace lingodb::translator {

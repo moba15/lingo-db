@@ -38,8 +38,8 @@
 %code {
   #include <iostream>
   #include <memory>
-  #include "lingodb/compiler/frontend/sql-parser/driver.h"
-  #include "lingodb/compiler/frontend/sql-parser/node_factory.h"
+  #include "lingodb/compiler/frontend/driver.h"
+  #include "lingodb/compiler/frontend/node_factory.h"
 
   #define mkNode drv.nf.node
   #define mkListShared drv.nf.listShared

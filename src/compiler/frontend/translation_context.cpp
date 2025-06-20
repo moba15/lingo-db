@@ -1,4 +1,4 @@
-#include "../../../include/lingodb/compiler/frontend/translator/context/translation_context.h"
+#include "lingodb/compiler/frontend/translation_context.h"
 namespace lingodb::translator {
 
 TupleScope::TupleScope(TranslationContext* context) : context(context) {

@@ -1,7 +1,7 @@
 #pragma once
 #include "lingodb/compiler/frontend/ast/bound/bound_expression.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
-#include "lingodb/compiler/frontend/sql-parser/driver.h"
+#include "lingodb/compiler/frontend/driver.h"
 #include "lingodb/compiler/frontend/ast/query_node.h"
 #include "sql_context.h"
 
