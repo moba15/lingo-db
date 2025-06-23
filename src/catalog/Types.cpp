@@ -81,9 +81,82 @@ NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(
 mlir::Type NullableType::toMlirType(mlir::MLIRContext* context) const {
    mlir::Type t = type.getMLIRTypeCreator()->createType(context);
    if (isNullable) {
-      return  compiler::dialect::db::NullableType::get(context, t);
+      return compiler::dialect::db::NullableType::get(context, t);
    }
    return t;
+}
+mlir::Value NullableType::castValueToThisType(mlir::OpBuilder& builder, mlir::Value valueToCast, bool valueNullable) const {
+   auto type = toMlirType(builder.getContext());
+   if (!isNullable && valueNullable) {
+      //If type is not nullable but value is
+      type = compiler::dialect::db::NullableType::get(builder.getContext(), type);
+   }
+
+   bool onlyTargetIsNullable = !valueNullable && isNullable;
+   if (valueToCast.getType() == type) { return valueToCast; }
+
+   if (auto* defOp = valueToCast.getDefiningOp()) {
+      if (auto constOp = mlir::dyn_cast_or_null<compiler::dialect::db::ConstantOp>(defOp)) {
+         if (!mlir::isa<compiler::dialect::db::NullableType>(type)) {
+            constOp.getResult().setType(type);
+            return constOp;
+         }
+      }
+      if (auto nullOp = mlir::dyn_cast_or_null<compiler::dialect::db::NullOp>(defOp)) {
+         auto t2 = mlir::cast<compiler::dialect::db::NullableType>(type);
+         nullOp.getResult().setType(t2);
+         return nullOp;
+      }
+   }
+
+   if (valueToCast.getType() == getBaseType(type)) {
+      return builder.create<compiler::dialect::db::AsNullableOp>(builder.getUnknownLoc(), type, valueToCast);
+   }
+
+   if (onlyTargetIsNullable) {
+      mlir::Value casted = builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), getBaseType(type), valueToCast);
+      return builder.create<compiler::dialect::db::AsNullableOp>(builder.getUnknownLoc(), type, casted);
+   } else {
+      return builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), type, valueToCast);
+   }
+}
+mlir::Value NullableType::castValue(mlir::OpBuilder& builder, mlir::Value valueToCast) const {
+   if (castType == nullptr) {
+      return valueToCast;
+   }
+   auto type = castType->toMlirType(builder.getContext());
+   if (!castType->isNullable && isNullable ) {
+      //If type is not nullable but value is
+      type = compiler::dialect::db::NullableType::get(builder.getContext(), type);
+   }
+
+   bool onlyTargetIsNullable = !isNullable && castType->isNullable;
+   if (valueToCast.getType() == type) { return valueToCast; }
+
+   if (auto* defOp = valueToCast.getDefiningOp()) {
+      if (auto constOp = mlir::dyn_cast_or_null<compiler::dialect::db::ConstantOp>(defOp)) {
+         if (!mlir::isa<compiler::dialect::db::NullableType>(type)) {
+            constOp.getResult().setType(type);
+            return constOp;
+         }
+      }
+      if (auto nullOp = mlir::dyn_cast_or_null<compiler::dialect::db::NullOp>(defOp)) {
+         auto t2 = mlir::cast<compiler::dialect::db::NullableType>(type);
+         nullOp.getResult().setType(t2);
+         return nullOp;
+      }
+   }
+
+   if (valueToCast.getType() == getBaseType(type)) {
+      return builder.create<compiler::dialect::db::AsNullableOp>(builder.getUnknownLoc(), type, valueToCast);
+   }
+
+   if (onlyTargetIsNullable) {
+      mlir::Value casted = builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), getBaseType(type), valueToCast);
+      return builder.create<compiler::dialect::db::AsNullableOp>(builder.getUnknownLoc(), type, casted);
+   } else {
+      return builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), type, valueToCast);
+   }
 }
 void IntTypeInfo::serializeConcrete(utility::Serializer& serializer) const {
    serializer.writeProperty(0, isSigned);
