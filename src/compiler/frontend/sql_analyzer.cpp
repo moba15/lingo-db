@@ -341,9 +341,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             });
          }
 
-         std::vector<std::shared_ptr<ast::BoundFunctionExpression>> transFormedAggregationExpressions{};
+         std::vector<std::shared_ptr<ast::BoundFunctionExpression>> boundAggregationExpressions{};
 
-         std::ranges::transform(aggregationNode->aggregations, std::back_inserter(transFormedAggregationExpressions), [&](auto expr) {
+         std::ranges::transform(aggregationNode->aggregations, std::back_inserter(boundAggregationExpressions), [&](auto expr) {
             auto boundExpr = analyzeExpression(expr, context, resolverScope);
             assert(boundExpr->exprClass == ast::ExpressionClass::BOUND_FUNCTION);
             //boundExpr->namedResult = std::make_shared<ast::FunctionInfo>("boundExpr->scope", "boundExpr->alias", boundExpr->resultType.value());
@@ -352,7 +352,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          auto mapName = createMapName();
          auto boundGroupByNode = drv.nf.node<ast::BoundGroupByNode>(aggregationNode->groupByNode ? aggregationNode->groupByNode->loc : aggregationNode->loc, transFormedGroupExpressions);
          std::vector<std::shared_ptr<ast::BoundExpression>> toMap{};
-         for (auto& aggr : transFormedAggregationExpressions) {
+         for (auto& aggr : boundAggregationExpressions) {
             if (aggr->arguments.empty() || aggr->arguments[0]->type == ast::ExpressionType::BOUND_COLUMN_REF) {
                continue;
             }
@@ -362,11 +362,16 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          }
          //ADD to TargetInfo, see Google PIPE sql paper!
          //Maybe Not the best way!
-         for (auto& aggr : transFormedAggregationExpressions) {
+         for (auto& aggr : boundAggregationExpressions) {
             assert(aggr->resultType.has_value());
             //TODO context->currentScope->targetInfo.map(aggr->scope, std::make_shared<ast::FunctionInfo>(aggr->scope, aggr->aliasOrUniqueIdentifier, aggr->resultType.value()));
          }
-         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc,boundGroupByNode, transFormedAggregationExpressions, toMap, mapName );
+         if (!aggregationNode->groupByNode || aggregationNode->groupByNode->group_expressions.empty()) {
+            for (auto boundAggr : boundAggregationExpressions) {
+               boundAggr->resultType->isNullable = true;
+            }
+         }
+         boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc,boundGroupByNode, boundAggregationExpressions, toMap, mapName );
 
          break;
       }
@@ -633,18 +638,30 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          std::vector<catalog::Catalog> catalogs;
          std::string relationName = star->relationName;
          std::vector<std::pair<std::string, catalog::Column>> columns{};
-         auto topDefinedColumns = context->getTopDefinedColumns();
-         auto boundStar = drv.nf.node<ast::BoundStarExpression>(star->loc, relationName, topDefinedColumns);
+         auto topDefinedColumnsAll = context->getTopDefinedColumns();
+         std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> topDefinedColumnsWithoutDuplicates;
+         //TODO better solution!!!!
+         for (auto [scope, namedResult] : topDefinedColumnsAll) {
+            if (std::find_if(topDefinedColumnsWithoutDuplicates.begin(), topDefinedColumnsWithoutDuplicates.end(), [&](std::pair<std::string, std::shared_ptr<ast::NamedResult>> p) {
+               return (p.first == scope || star->relationName.empty()) && p.second->name == namedResult->name;
+            }) == topDefinedColumnsWithoutDuplicates.end()) {
+               topDefinedColumnsWithoutDuplicates.emplace_back(std::pair{scope, namedResult});
+            }
+         }
+
+         auto boundStar = drv.nf.node<ast::BoundStarExpression>(star->loc, relationName, topDefinedColumnsWithoutDuplicates);
          return boundStar;
       }
       case ast::ExpressionClass::COMPARISON: {
          auto comparison = std::static_pointer_cast<ast::ComparisonExpression>(rootNode);
+
          if (comparison->type != ast::ExpressionType::COMPARE_IN && comparison->type != ast::ExpressionType::COMPARE_NOT_IN) {
             if (comparison->rightChildren.size() != 1) {
                error("ComparisonExpression expects exactly one right child for type: " <<  std::to_string(static_cast<int>(comparison->type)), comparison->loc)
             }
 
          } else {
+
             if (std::find_if(comparison->rightChildren.begin(), comparison->rightChildren.end(), [](auto const &child) {
                return child->exprClass != ast::ExpressionClass::CONSTANT;
             }) != comparison->rightChildren.end()) {
@@ -660,12 +677,20 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          if (!left->resultType.has_value()) {
             error("Left side of comparison is not a valid expression", comparison->left->loc);
          }
-         std::vector<catalog::Type> types{};
+         std::vector<catalog::NullableType> types{};
+         types.push_back(left->resultType.value());
          std::ranges::transform(boundRightChildren, std::back_inserter(types), [](auto& child) {
-            return child->resultType.value().type;
+            return child->resultType.value();
          });
-         types.push_back(left->resultType.value().type);
-         getCommonBaseType(types);
+
+         auto commonTypes = toCommonTypes(types);
+         left->resultType = commonTypes[0];
+         size_t x = 1;
+         for (auto boundChild : boundRightChildren) {
+            boundChild->resultType = commonTypes[x];
+            x++;
+         }
+
 
          auto boundComparison = drv.nf.node<ast::BoundComparisonExpression>(comparison->loc, comparison->type, comparison->alias, left, boundRightChildren);
          return boundComparison;
@@ -703,13 +728,19 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          //Get common type
          //TODO BETTER, maybe create directly mlir::TYPE
 
-         std::vector<catalog::Type> types{};
+         std::vector<catalog::NullableType> types{};
          std::ranges::transform(boundChildren, std::back_inserter(types), [](auto c) {
-            return c->resultType.value().type;
+            return c->resultType.value();
          });
          auto commonType = getCommonBaseType(types, operatorExpr->type);
-
-         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, operatorExpr->alias, boundChildren);
+         auto commonNumbers = toCommonNumber(types);
+         size_t t = 0;
+         for (auto boundChild : boundChildren) {
+            boundChild->resultType = commonNumbers[t];
+            t++;
+         }
+         //TODO base
+         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType.type, operatorExpr->alias, boundChildren);
       }
       case ast::ExpressionClass::FUNCTION: {
          auto function = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
@@ -742,32 +773,39 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                //Find correct resultType
-               auto resultType = boundArguments[0]->resultType.value().type;
+               auto resultType = boundArguments[0]->resultType.value();
                if (function->functionName == "avg") {
                   //TODO type
-                  if (resultType.getTypeId() == catalog::LogicalTypeId::INT) {
+                  if (resultType.type.getTypeId() == catalog::LogicalTypeId::INT) {
                      resultType = getCommonTypeAfterOperation(catalog::Type::decimal(19,0), catalog::Type::decimal(19,0), ast::ExpressionType::OPERATOR_DIVIDE);
-                  } else if (resultType.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+                  } else if (resultType.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
                      resultType = getCommonTypeAfterOperation(resultType, catalog::Type::decimal(19,0), ast::ExpressionType::OPERATOR_DIVIDE);
                   }
+                  resultType.isNullable = boundArguments[0]->resultType->isNullable;
                   //else keep type
 
                }
-               auto p = resultType.getInfo<catalog::DecimalTypeInfo>()->getPrecision();
+               resultType.isNullable = true;
+
+               auto p = resultType.type.getInfo<catalog::DecimalTypeInfo>()->getPrecision();
                //TODO here the information gets lost which mlir type the argument and therefore the function has
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, boundArguments[0]->resultType.value().type, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
             }
             //TODO better and cleaner!
             if (function->functionName == "count") {
                //TODO parse agrguments if not star!!
+
                if (function->arguments.size() > 1) {
                   error("Aggregation with more than one argument not supported", function->loc);
                }
                if (function->arguments.size() == 0 && !function->star) {
                   error("Argument of aggregation function is not a valid expression", boundArguments[0]->loc);
+               }
+               if (function->star) {
+                  function->functionName = function->functionName+"*";
                }
 
                auto scope = createTmpScope();
@@ -880,7 +918,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             error("Between expression has no valid type", rootNode->loc);
          }
          //Check for correct Types
-         auto commonType = getCommonBaseType(std::vector{boundInput->resultType.value().type, boundLower->resultType.value().type, boundUpper->resultType.value().type});
+         auto commonTypes = toCommonTypes({boundInput->resultType.value(), boundLower->resultType.value(), boundUpper->resultType.value()});
+         boundInput->resultType = commonTypes[0];
+         boundLower->resultType = commonTypes[1];
+         boundUpper->resultType = commonTypes[2];
          return drv.nf.node<ast::BoundBetweenExpression>(rootNode->loc, between->type, catalog::Type::boolean(), rootNode->alias, boundInput, boundLower, boundUpper);
       }
       case ast::ExpressionClass::SUBQUERY: {
@@ -945,30 +986,30 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
    return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc,found->scope, found->resultType, found, columnRef->alias);
 }
 
-catalog::Type SQLQueryAnalyzer::getCommonType(catalog::Type type1, catalog::Type type2) {
-   if (type1.getTypeId() == type2.getTypeId()) {
-      return type1;
-   }
+catalog::NullableType SQLQueryAnalyzer::getCommonType(catalog::NullableType nullableType1, catalog::NullableType nullableType2) {
+   auto type1 = nullableType1.type;
+   auto type2 = nullableType2.type;
+   catalog::Type commonType = type1;
    //TODO implement
-   if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::INTERVAL || type1.getTypeId() == catalog::LogicalTypeId::INTERVAL && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
+   if (type1.getTypeId() == type2.getTypeId()) {
+
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::INTERVAL || type1.getTypeId() == catalog::LogicalTypeId::INTERVAL && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
       return catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::INT && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+      commonType = type2;
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::INT) {
+      commonType = type1;
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::CHAR && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
+      commonType = type2;
+   } else if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type1.getTypeId() == catalog::LogicalTypeId::STRING) {
+      commonType = type1;
+   } else {
+      throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
    }
+   //TODO is this correct
+   return catalog::NullableType(commonType, nullableType1.isNullable || nullableType2.isNullable);
 
-   if (type1.getTypeId() == catalog::LogicalTypeId::INT && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
-      return type2;
-   }
-   if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::INT) {
-      return type1;
-   }
-   if (type1.getTypeId() == catalog::LogicalTypeId::CHAR && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
-      return type2;
-   }
 
-   if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type1.getTypeId() == catalog::LogicalTypeId::STRING) {
-      return type1;
-   }
-
-   throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
 }
 
 std::pair<unsigned long, unsigned long> SQLQueryAnalyzer::getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s) {
@@ -985,35 +1026,36 @@ std::pair<unsigned long, unsigned long> SQLQueryAnalyzer::getAdaptedDecimalPAndS
    }
    return  {p,s};
 }
-catalog::Type SQLQueryAnalyzer::getCommonTypeAfterOperation(catalog::Type type1, catalog::Type type2, ast::ExpressionType operationType) {
+catalog::NullableType SQLQueryAnalyzer::getCommonTypeAfterOperation(catalog::NullableType type1, catalog::NullableType type2, ast::ExpressionType operationType) {
    //TODO type
    auto commonType = getCommonType(type1, type2);
+
    //Maybe the other way arround
    switch (operationType) {
       case ast::ExpressionType::OPERATOR_DIVIDE: {
-         if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
-            auto type1Info = type1.getInfo<catalog::DecimalTypeInfo>();
-            auto type2Info = type2.getInfo<catalog::DecimalTypeInfo>();
+         if (type1.type.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+            auto type1Info = type1.type.getInfo<catalog::DecimalTypeInfo>();
+            auto type2Info = type2.type.getInfo<catalog::DecimalTypeInfo>();
 
 
 
             auto [p , s] = getAdaptedDecimalPAndSAfterMulDiv(type1Info->getPrecision() - type1Info->getScale() + type2Info->getScale() + std::max<unsigned long>(6, type1Info->getScale() + type2Info->getPrecision()), std::max<unsigned long>(6, type1Info->getScale() + type2Info->getPrecision()));
 
 
-
-            return catalog::Type::decimal(p,s);
+            return catalog::NullableType(catalog::Type::decimal(p,s), commonType.isNullable );
          }
 
          return commonType;
 
       }
       case ast::ExpressionType::OPERATOR_TIMES: {
-         if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
-            auto type1Info = type1.getInfo<catalog::DecimalTypeInfo>();
-            auto type2Info = type2.getInfo<catalog::DecimalTypeInfo>();
+         if (type1.type.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+            auto type1Info = type1.type.getInfo<catalog::DecimalTypeInfo>();
+            auto type2Info = type2.type.getInfo<catalog::DecimalTypeInfo>();
             auto [p,s] = getAdaptedDecimalPAndSAfterMulDiv(type1Info->getPrecision() + type2Info->getPrecision(), type1Info->getScale() + type2Info->getScale());
-            return catalog::Type::decimal(p, s);
+            return catalog::NullableType(catalog::Type::decimal(p, s), commonType.isNullable);
          }
+
 
          return commonType;
 
@@ -1025,7 +1067,7 @@ catalog::Type SQLQueryAnalyzer::getCommonTypeAfterOperation(catalog::Type type1,
    }
 }
 
-catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types) {
+catalog::NullableType SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::NullableType> types) {
    auto commonType = types.front();
    for (size_t i = 1; i < types.size(); ++i) {
       commonType = getCommonType(commonType, types[i]);
@@ -1033,7 +1075,39 @@ catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> typ
    return commonType;
 }
 
-catalog::Type SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::Type> types, ast::ExpressionType operationType) {
+std::vector<catalog::NullableType> SQLQueryAnalyzer::toCommonNumber(std::vector<catalog::NullableType> types) {
+   auto anyDecimal = llvm::any_of(types, [](catalog::NullableType type) {return type.type.getTypeId() == catalog::LogicalTypeId::DECIMAL;});
+   auto anyFloat = llvm::any_of(types, [](catalog::NullableType type) { return type.type.getTypeId() == catalog::LogicalTypeId::FLOAT; });
+   if (anyDecimal && !anyFloat) {
+      std::vector<catalog::NullableType> res;
+      for (auto type: types) {
+         if (type.type.getTypeId() != catalog::LogicalTypeId::DECIMAL) {
+            type.castType = std::make_shared<catalog::NullableType>(catalog::Type::decimal(19,0));
+            res.push_back(type);
+
+         } else {
+            res.push_back(type);
+         }
+      }
+      return res;
+   }
+
+   return toCommonTypes(types);
+
+}
+
+std::vector<catalog::NullableType> SQLQueryAnalyzer::toCommonTypes(std::vector<catalog::NullableType> types) {
+   auto commonType = getCommonBaseType(types);
+   std::vector<catalog::NullableType> res;
+   for (auto type : types) {
+      type.castType = std::make_shared<catalog::NullableType>(commonType);
+      res.push_back(type);
+   }
+
+   return res;
+}
+
+catalog::NullableType SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::NullableType> types, ast::ExpressionType operationType) {
    auto commonType = types.front();
    for (size_t i = 1; i < types.size(); ++i) {
       commonType = getCommonTypeAfterOperation(commonType, types[i], operationType);

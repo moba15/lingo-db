@@ -258,13 +258,17 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          //Handle in
          if (comparisonExpr->type == ast::ExpressionType::COMPARE_IN || comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_IN) {
             std::vector<mlir::Value> values;
-            values.push_back(left);
+            assert(comparisonExpr->left->resultType.has_value());
+
+            values.push_back(comparisonExpr->left->resultType->castValue(builder,left));
+
             for (auto& rightChild : comparisonExpr->rightChildren) {
                auto right = translateExpression(builder, rightChild, context);
-               values.push_back(right);
+               assert(rightChild->resultType.has_value());
+               values.push_back(rightChild->resultType->castValue(builder,right));
             }
 
-            auto oneOf = builder.create<db::OneOfOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, values));
+            auto oneOf = builder.create<db::OneOfOp>(builder.getUnknownLoc(), values);
             if (comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_IN) {
                return builder.create<db::NotOp>(builder.getUnknownLoc(), oneOf);
             }
@@ -272,13 +276,17 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          }
          //Not IN
          assert(comparisonExpr->rightChildren.size() == 1);
+         assert(comparisonExpr->resultType.has_value() && comparisonExpr->left->resultType.has_value() && comparisonExpr->rightChildren[0]->resultType.has_value());
 
          auto right = translateExpression(builder, comparisonExpr->rightChildren[0], context);
+         auto ctLeft = comparisonExpr->left->resultType->castValue(builder, left);
+         auto ctRight = comparisonExpr->rightChildren[0]->resultType->castValue(builder, right);
          if (comparisonExpr->type == ast::ExpressionType::COMPARE_LIKE || comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE) {
-            auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right});
+
+
             auto isNullable = mlir::isa<db::NullableType>(left.getType()) || mlir::isa<db::NullableType>(right.getType());
             mlir::Type resType = isNullable ? (mlir::Type) db::NullableType::get(builder.getContext(), builder.getI1Type()) : (mlir::Type) builder.getI1Type();
-            auto like = builder.create<db::RuntimeCall>(builder.getUnknownLoc(), resType, "Like", mlir::ValueRange({ct[0], ct[1]})).getRes();
+            auto like = builder.create<db::RuntimeCall>(builder.getUnknownLoc(), resType, "Like", mlir::ValueRange({ctLeft, ctRight})).getRes();
             return comparisonExpr->type == ast::ExpressionType::COMPARE_NOT_LIKE ? builder.create<db::NotOp>(builder.getUnknownLoc(), like) : like;
          }
          db::DBCmpPredicate pred;
@@ -303,8 +311,11 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                break;
             default: throw std::runtime_error("not implemented");
          }
-         auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right});
-         return builder.create<db::CmpOp>(builder.getUnknownLoc(), pred, ct[0], ct[1]);
+         //TODO replace
+         //TODO discuss: move cast into analyzer
+         //std::vector ct = {comparisonExpr->comparisonType.castValueToThisType(builder,left, comparisonExpr->left->resultType->isNullable), comparisonExpr->comparisonType.castValueToThisType(builder,right, comparisonExpr->rightChildren[0]->resultType->isNullable)};
+
+         return builder.create<db::CmpOp>(builder.getUnknownLoc(), pred, ctLeft, ctRight);
       }
       case ast::ExpressionClass::BOUND_CONJUNCTION: {
          auto conjunction = std::static_pointer_cast<ast::BoundConjunctionExpression>(expression);
@@ -381,8 +392,11 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          input = translateExpression(builder, boundBetween->input, context);
          lower = translateExpression(builder, boundBetween->lower, context);
          upper = translateExpression(builder, boundBetween->upper, context);
-         auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {input, lower, upper});
-         mlir::Value between = builder.create<db::BetweenOp>(builder.getUnknownLoc(), ct[0], ct[1], ct[2], true, true);
+         auto ctInput = boundBetween->input->resultType->castValue(builder, input);
+         auto ctLower = boundBetween->lower->resultType->castValue(builder, lower);
+         auto ctUpper = boundBetween->upper->resultType->castValue(builder, upper);
+
+         mlir::Value between = builder.create<db::BetweenOp>(builder.getUnknownLoc(), ctInput, ctLower, ctUpper, true, true);
          return between;
       }
       case ast::ExpressionClass::BOUND_FUNCTION: {
@@ -425,11 +439,12 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                auto mlirType = subquery->namedResult.value()->resultType.toMlirType(builder.getContext());
 
                mlir::Value colVal = predBuilder.create<tuples::GetColumnOp>(predBuilder.getUnknownLoc(), mlirType, subquery->namedResult.value()->createRef(attrManager), block->getArgument(0));
-
-               auto ct = compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {colVal, expr});
+               //TODO remove
+               auto ctCol = subquery->namedResult.value()->resultType.castValue(builder,colVal);
+               auto ctExpr = subquery->testExpr->resultType->castValue(builder, expr);
                //TODO extract and remove hardcoded
                db::DBCmpPredicate dbCmpPred = db::DBCmpPredicate::eq;
-               mlir::Value pred = predBuilder.create<db::CmpOp>(predBuilder.getUnknownLoc(), dbCmpPred, ct[0], ct[1]);
+               mlir::Value pred = predBuilder.create<db::CmpOp>(predBuilder.getUnknownLoc(), dbCmpPred, ctCol, ctExpr);
                ;
                predBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), pred);
 
@@ -452,32 +467,35 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
 
 mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundOperatorExpression> expression, std::shared_ptr<analyzer::SQLContext> context, mlir::Value left, mlir::Value right) {
    auto loc = builder.getUnknownLoc();
+   assert(expression->resultType.has_value() && expression->children.size() == 2 && expression->children[0]->resultType.has_value() && expression->children[1]->resultType.has_value());
+
    switch (expression->type) {
       case ast::ExpressionType::OPERATOR_PLUS: {
          if (mlir::isa<db::DateType>(getBaseType(left.getType())) && mlir::isa<db::IntervalType>(getBaseType(right.getType()))) {
             return builder.create<db::RuntimeCall>(loc, left.getType(), "DateAdd", mlir::ValueRange({left, right})).getRes();
          }
-         //TODO use already found out common type!!!!!!
-         return builder.create<db::AddOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
+         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable),  expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
+         return builder.create<db::AddOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_MINUS: {
          if (mlir::isa<db::DateType>(left.getType()) && mlir::isa<db::IntervalType>(right.getType())) {
             return builder.create<db::RuntimeCall>(loc, left.getType(), "DateSubtract", mlir::ValueRange({left, right})).getRes();
          }
-         //TODO use already found out common type!!!!!!
-         return builder.create<db::SubOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonBaseTypes(builder, {left, right}));
+
+         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable),  expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
+         return builder.create<db::SubOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_TIMES: {
-         //TODO use already found out common type!!!!!!
-         return builder.create<db::MulOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         return builder.create<db::MulOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_DIVIDE: {
-         //TODO use already found out common type!!!!!!
-         return builder.create<db::DivOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         return builder.create<db::DivOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_MOD: {
-         //TODO use already found out common type!!!!!!
-         return builder.create<db::ModOp>(builder.getUnknownLoc(), compiler::frontend::sql::SQLTypeInference::toCommonNumber(builder, {left, right}));
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         return builder.create<db::ModOp>(builder.getUnknownLoc(), ct);
       }
       default: error("Not implemented", expression->loc);
    }
@@ -691,7 +709,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             }
             //TODO define type
             if (relalgAggrFunc == relalg::AggrFunc::avg) {
-               auto baseType = getBaseType(aggrResultType);
+               /*auto baseType = getBaseType(aggrResultType);
                if (baseType.isIntOrFloat() && !baseType.isIntOrIndex()) {
                   //keep aggrResultType
                } else if (mlir::isa<db::DecimalType>(baseType)) {
@@ -713,7 +731,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                }
                if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
-               }
+               }*/
             }
             //TODO move to analyzer
             if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
