@@ -154,6 +154,7 @@ class BoundBetweenExpression : public BoundExpression {
 
    BoundBetweenExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> input, std::shared_ptr<BoundExpression> lower, std::shared_ptr<BoundExpression> upper);
 
+
    std::shared_ptr<BoundExpression> input;
    std::shared_ptr<BoundExpression> lower;
    std::shared_ptr<BoundExpression> upper;
@@ -172,7 +173,7 @@ class BoundSubqueryExpression : public BoundExpression {
    //! The subquery expression
    std::shared_ptr<TableProducer> subquery;
    std::shared_ptr<analyzer::SQLScope> sqlScope;
-
+   //! Expression to test against. The left side expression of an IN expression.
    std::shared_ptr<BoundExpression> testExpr;
 
 
