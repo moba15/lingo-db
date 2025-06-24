@@ -24,8 +24,8 @@ std::string PipeOperator::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
       case PipeOperatorType::AGGREGATE:
          dot += "AGGREGATE";
          break;
-      case PipeOperatorType::ORDER_BY:
-         dot += "ORDER BY";
+      case PipeOperatorType::RESULT_MODIFIER:
+         dot += "RESULT MODIFIER";
          break;
       case PipeOperatorType::WHERE:
          dot += "WHERE";
