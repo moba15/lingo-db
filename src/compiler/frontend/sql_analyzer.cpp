@@ -946,9 +946,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             context->popCurrentScope();
          }
          //TODO check if subquery is a valid expression and has valid type
-         if (subqueryTargetInfo.targetColumns.size() != 1) {
+         if (subqueryTargetInfo.targetColumns.size() != 1 && subqueryExpr->subQueryType != ast::SubqueryType::EXISTS && subqueryExpr->subQueryType != ast::SubqueryType::NOT_EXISTS ) {
             error("subquery expressions must produce a single value", subqueryExpr->loc);
          }
+
          auto namedResult = subqueryTargetInfo.targetColumns[0];
          auto resultType = namedResult->resultType;
 

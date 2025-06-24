@@ -460,6 +460,14 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                }
                return existsOp;
             }
+            case ast::SubqueryType::EXISTS: {
+               return builder.create<relalg::ExistsOp>(builder.getUnknownLoc(), builder.getI1Type(), translatedSubquery);
+            }
+            case ast::SubqueryType::NOT_EXISTS: {
+               auto existsOp = builder.create<relalg::ExistsOp>(builder.getUnknownLoc(), builder.getI1Type(), translatedSubquery);
+               return builder.create<db::NotOp>(builder.getUnknownLoc(), existsOp);
+
+            }
             default: error("Subquery type not implemented", expression->loc);
          }
       }
