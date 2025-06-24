@@ -72,6 +72,15 @@ std::shared_ptr<ast::NamedResult> SQLContext::getNamedResultInfo(std::string nam
    return res;
 }
 
+std::string SQLContext::getUniqueScope(std::string base) {
+   if (scopeUnifier.contains(std::string(base))) {
+      scopeUnifier[std::string(base)] += 1;
+      return std::string(base) + std::string("_u_") + std::to_string(scopeUnifier[std::string(base)]);
+   } else {
+      scopeUnifier[std::string(base)] = 0;
+      return std::string(base);
+   }
+}
 
 /*std::vector<std::pair<size_t, ast::ColumnInfo>> SQLContext::findColumn(const std::string& columnName) const {
    std::vector<std::pair<size_t, ast::ColumnInfo>> columns{};

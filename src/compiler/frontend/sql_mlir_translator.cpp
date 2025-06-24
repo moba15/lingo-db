@@ -415,12 +415,15 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          context->popCurrentScope();
          switch (subquery->subqueryType) {
             case ast::SubqueryType::SCALAR: {
-               mlir::Type resType = subquery->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
-               assert(subquery->namedResult.has_value());
-               if (subquery->namedResult.value()->resultType.isNullable) {
+               assert(subquery->resultType.has_value());
+               mlir::Type resType = subquery->resultType->toMlirType(builder.getContext());
+               if (!subquery->resultType->isNullable) {
                   resType = db::NullableType::get(builder.getContext(), resType);
+                  subquery->resultType->isNullable = true;
                }
                assert(subquery->namedResult.has_value());
+
+
                //TODO use zero instead of null
                mlir::Value scalarValue = builder.create<relalg::GetScalarOp>(builder.getUnknownLoc(), resType, subquery->namedResult.value()->createRef(attrManager), translatedSubquery);
                return scalarValue;
@@ -512,10 +515,11 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             error("Table not found", baseTableRef->loc);
          }
          auto rel = baseTableRef->tableCatalogEntry;
-         std::string scopeName = baseTableRef->alias.empty() ? relation : baseTableRef->alias;
+         std::string uniqueScope = baseTableRef->mlirScope;
+
          std::vector<mlir::NamedAttribute> columns{};
          for (auto& col : rel->getColumns()) {
-            auto attrDef = attrManager.createDef(scopeName, col.getColumnName());
+            auto attrDef = attrManager.createDef(uniqueScope, col.getColumnName());
             attrDef.getColumn().type = createTypeForColumn(builder.getContext(), col);
             columns.push_back(builder.getNamedAttr(col.getColumnName(), attrDef));
          }

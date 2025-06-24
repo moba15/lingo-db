@@ -3,9 +3,8 @@ namespace lingodb::ast {
 /*
  * BoundBase Table
 */
-BoundBaseTableRef::BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) : BoundTableRef(TYPE), tableCatalogEntry(std::move(tableCatalogEntry)) {
-}
-BoundBaseTableRef::BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias) : BoundTableRef(TYPE, std::move(alias)), tableCatalogEntry(std::move(tableCatalogEntry)) {
+
+BoundBaseTableRef::BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias, std::string mlirScope) : BoundTableRef(TYPE, std::move(alias)), tableCatalogEntry(std::move(tableCatalogEntry)), mlirScope(mlirScope) {
 }
 std::string BoundBaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot;

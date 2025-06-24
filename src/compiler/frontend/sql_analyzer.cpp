@@ -399,10 +399,14 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          if (!catalogEntry.has_value()) {
             error("No Catalog found with name " + baseTableRef->tableName, baseTableRef->loc);
          }
-         auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, catalogEntry.value(), baseTableRef->alias);
+
          //Add to current scope
-         auto tableName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
-         context->mapAttribute(resolverScope, tableName, catalogEntry.value());
+         auto sqlScopeName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
+         //Get unique mlirScope
+         auto uniqueScope = context->getUniqueScope(sqlScopeName);
+         context->mapAttribute(resolverScope, uniqueScope, catalogEntry.value());
+
+         auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, catalogEntry.value(), baseTableRef->alias, uniqueScope);
          return boundBaseTableRef;
          break;
       }
@@ -992,6 +996,13 @@ catalog::NullableType SQLQueryAnalyzer::getCommonType(catalog::NullableType null
    catalog::Type commonType = type1;
    //TODO implement
    if (type1.getTypeId() == type2.getTypeId()) {
+      if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+         //Get higher decimal
+         return getHigherDecimalType(nullableType1, nullableType2);
+      }
+
+
+
 
    } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::INTERVAL || type1.getTypeId() == catalog::LogicalTypeId::INTERVAL && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
       return catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
@@ -1113,6 +1124,15 @@ catalog::NullableType SQLQueryAnalyzer::getCommonBaseType(std::vector<catalog::N
       commonType = getCommonTypeAfterOperation(commonType, types[i], operationType);
    }
    return commonType;
+}
+
+catalog::NullableType SQLQueryAnalyzer::getHigherDecimalType(catalog::NullableType left, catalog::NullableType right) {
+   assert(left.type.getTypeId() == catalog::LogicalTypeId::DECIMAL && right.type.getTypeId() == catalog::LogicalTypeId::DECIMAL);
+   auto leftInfo = left.type.getInfo<catalog::DecimalTypeInfo>();
+   auto rightInfo = right.type.getInfo<catalog::DecimalTypeInfo>();
+   int hidig = std::max(leftInfo->getPrecision() - leftInfo->getScale(), rightInfo->getPrecision() - rightInfo->getScale());
+   int maxs = std::max(leftInfo->getScale(), rightInfo->getScale());
+   return catalog::NullableType(catalog::Type::decimal(hidig+maxs, maxs), left.isNullable || right.isNullable);
 }
 
 } // namespace lingodb::analyzer
