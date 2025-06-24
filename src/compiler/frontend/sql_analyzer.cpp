@@ -379,10 +379,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          }
          //ADD to TargetInfo, see Google PIPE sql paper!
          //Maybe Not the best way!
-         for (auto& aggr : boundAggregationExpressions) {
-            assert(aggr->resultType.has_value());
-            //TODO context->currentScope->targetInfo.map(aggr->scope, std::make_shared<ast::FunctionInfo>(aggr->scope, aggr->aliasOrUniqueIdentifier, aggr->resultType.value()));
-         }
          if (!aggregationNode->groupByNode || aggregationNode->groupByNode->group_expressions.empty()) {
             for (auto boundAggr : boundAggregationExpressions) {
                boundAggr->resultType->isNullable = true;
@@ -739,7 +735,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          std::ranges::transform(operatorExpr->children, std::back_inserter(boundChildren), [&](auto c) {
             return analyzeExpression(c, context, resolverScope);
          });
-         //TODO determine common type instead of take one. For exampel int32-int64=>int64
          auto resultType = std::find_if(boundChildren.begin(), boundChildren.end(), [](auto c) {
             return !c->resultType.has_value();
          });
@@ -747,8 +742,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             error("Operator expression has children with different types", boundChildren[0]->loc);
          }
          //Get common type
-         //TODO BETTER, maybe create directly mlir::TYPE
-
          std::vector<catalog::NullableType> types{};
          std::ranges::transform(boundChildren, std::back_inserter(types), [](auto c) {
             return c->resultType.value();
@@ -809,7 +802,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                resultType.isNullable = true;
 
                auto p = resultType.type.getInfo<catalog::DecimalTypeInfo>()->getPrecision();
-               //TODO here the information gets lost which mlir type the argument and therefore the function has
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
@@ -854,7 +846,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto scope = createTmpScope();
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                auto resultType = catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
-               //TODO  context->currentScope->functionsEntry.emplace(fName, std::make_shared<ast::FunctionInfo>(scope, fName, resultType));
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg}, nullptr);
             }
             if (function->functionName == "count") {
@@ -1030,7 +1021,6 @@ catalog::NullableType SQLTypeUtils::getCommonType(catalog::NullableType nullable
    auto type1 = nullableType1.type;
    auto type2 = nullableType2.type;
    catalog::Type commonType = type1;
-   //TODO implement
    if (type1.getTypeId() == type2.getTypeId()) {
       if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
          //Get higher decimal
@@ -1086,7 +1076,6 @@ catalog::NullableType SQLTypeUtils::getCommonBaseType(std::vector<catalog::Nulla
 }
 
 catalog::NullableType SQLTypeUtils::getCommonTypeAfterOperation(catalog::NullableType type1, catalog::NullableType type2, ast::ExpressionType operationType) {
-   //TODO type
    auto commonType = getCommonType(type1, type2);
 
    //Maybe the other way arround
