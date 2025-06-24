@@ -62,6 +62,14 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   context->aggregationNode->groupByNode = std::move(selectNode->groups);
                }
 
+               if (selectNode->having) {
+                  auto pipe = drv.nf.node<ast::PipeOperator>(select_list->loc, ast::PipeOperatorType::WHERE, selectNode->having);
+                  auto transformedHaving = canonicalizeCast<ast::PipeOperator>(pipe, context);
+                  transformedHaving->input = transformed;
+                  transformed = transformedHaving;
+                  selectNode->having = nullptr;
+               }
+
                //Transform modifiers
                for (auto modifier : selectNode->modifiers) {
                   auto transformedModifier = canonicalizeCast<ast::ResultModifier>(modifier, context);
