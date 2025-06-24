@@ -954,7 +954,6 @@ a_expr:
     {
         $$ = mkNode<lingodb::ast::ConjunctionExpression>(@$, lingodb::ast::ExpressionType::CONJUNCTION_OR, $1, $3);
     }
-    | NOT a_expr
     | a_expr LIKE a_expr
     {
         $$ = mkNode<lingodb::ast::ComparisonExpression>(@$, lingodb::ast::ExpressionType::COMPARE_LIKE, $1, $3);
@@ -1040,7 +1039,16 @@ c_expr:
         $$ = subquery;
     }
     //TODO | select_with_parens indirection 
-    //TODO | EXISTS select_with_parens
+    | EXISTS select_with_parens 
+    {
+        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, lingodb::ast::SubqueryType::EXISTS, $select_with_parens);
+        $$ = subquery;
+    }
+    | NOT EXISTS select_with_parens 
+    {
+        auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, lingodb::ast::SubqueryType::NOT_EXISTS, $select_with_parens);
+        $$ = subquery;
+    }
     //TODO | ARRAY select_with_parens
     //TODO | ARRAY array_expr
     //TODO | explicit_row

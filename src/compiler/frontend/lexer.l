@@ -163,6 +163,7 @@ boolean [fF][aA][lL][sS][eE]
 [dD][iI][sS][tT][iI][nN][cC][tT]      { return lingodb::parser::make_DISTINCT(loc); }
 
 [eE][xX][tT][rR][aA][cC][tT]          { return lingodb::parser::make_EXTRACT(loc); }
+[eE][xX][iI][sS][tT][sS]              { return lingodb::parser::make_EXISTS(loc); }
 
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
