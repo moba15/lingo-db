@@ -42,16 +42,6 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::BoundExpression> analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundColumnRefExpression> analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context);
 
-   catalog::NullableType getCommonType(catalog::NullableType nullableType1, catalog::NullableType nullableType2);
-   [[nodiscard]]
-   std::pair<unsigned long, unsigned long> getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s);
-   catalog::NullableType getCommonTypeAfterOperation(catalog::NullableType type1, catalog::NullableType type2, ast::ExpressionType operationType);
-   catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types, ast::ExpressionType operationType);
-   catalog::NullableType getHigherDecimalType(catalog::NullableType left, catalog::NullableType right);
-
-   catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types);
-   std::vector<catalog::NullableType> toCommonNumber(std::vector<catalog::NullableType> types);
-   std::vector<catalog::NullableType> toCommonTypes(std::vector<catalog::NullableType> types);
    std::string createTmpScope() {
       static size_t tmpScopeCounter = 0;
       std::string scope{"tmp_attr"};
@@ -69,4 +59,20 @@ class SQLQueryAnalyzer {
 
 };
 
+struct SQLTypeUtils {
+   static catalog::NullableType getCommonType(catalog::NullableType nullableType1, catalog::NullableType nullableType2);
+   static catalog::NullableType getHigherDecimalType(catalog::NullableType left, catalog::NullableType right);
+
+   static catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types, ast::ExpressionType operationType);
+   static catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types);
+   static catalog::NullableType getCommonTypeAfterOperation(catalog::NullableType type1, catalog::NullableType type2, ast::ExpressionType operationType);
+
+
+   static std::vector<catalog::NullableType> toCommonTypes(std::vector<catalog::NullableType> types);
+   static std::vector<catalog::NullableType> toCommonNumber(std::vector<catalog::NullableType> types);
+
+
+   [[nodiscard]]
+   static std::pair<unsigned long, unsigned long> getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s);
+};
 } // namespace lingodb::analyzer
