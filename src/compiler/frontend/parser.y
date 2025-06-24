@@ -1523,7 +1523,11 @@ pipe_operator:
     }
     | sort_clause 
     {
-        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::ORDER_BY, $sort_clause);
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::RESULT_MODIFIER, $sort_clause);
+    }
+    | limit_clause 
+    {
+        $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::RESULT_MODIFIER, $limit_clause);   
     }
     | join_type JOIN table_ref join_qual
     {
