@@ -10,10 +10,221 @@
 #include <ranges>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
+/*
+ * SQLCanonicalizer
+*/
+std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context) {
+   switch (rootNode->nodeType) {
+      case ast::NodeType::QUERY_NODE: {
+         auto queryNode = std::static_pointer_cast<ast::QueryNode>(rootNode);
+         switch (queryNode->type) {
+            case ast::QueryNodeType::SELECT_NODE: {
+               auto selectNode = std::static_pointer_cast<ast::SelectNode>(queryNode);
+               std::shared_ptr<ast::TableProducer> transformed = nullptr;
+               //Transform from_clause
+               if (selectNode->from_clause) {
+                  auto transformedFrom = canonicalizeCast<ast::TableRef>(selectNode->from_clause, context);
+
+                  selectNode->from_clause = nullptr;
+                  transformed = transformedFrom;
+               }
+
+               auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->extendNode);
+               extendPipeOp->input = transformed;
+               transformed = extendPipeOp;
+               //Transform where_clause
+               if (selectNode->where_clause) {
+                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->where_clause->loc, ast::PipeOperatorType::WHERE, selectNode->where_clause);
+                  auto transFormededWhereClause = canonicalizeCast<ast::PipeOperator>(pipe, context);
+                  transFormededWhereClause->input = transformed;
+                  selectNode->where_clause = nullptr;
+                  transformed = transFormededWhereClause;
+               }
+
+               auto aggPipeNode = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::AGGREGATE, context->aggregationNode);
+               auto transFormedAggregation = canonicalizeCast<ast::PipeOperator>(aggPipeNode, context);
+               transFormedAggregation->input = transformed;
+               transformed = transFormedAggregation;
+
+               //Transform target selection
+               auto select_list = selectNode->select_list;
+               if (select_list) {
+                  auto pipe = drv.nf.node<ast::PipeOperator>(select_list->loc, ast::PipeOperatorType::SELECT, select_list);
+                  auto transformedSelect = canonicalizeCast<ast::PipeOperator>(pipe, context);
+                  transformedSelect->input = transformed;
+                  transformed = transformedSelect;
+                  selectNode->select_list = nullptr;
+               }
+
+               //Transform Group by
+               if (selectNode->groups) {
+                  auto loc = selectNode->groups->loc;
+                  context->aggregationNode->groupByNode = std::move(selectNode->groups);
+               }
+
+               //Transform modifiers
+               for (auto modifier : selectNode->modifiers) {
+                  auto transformedModifier = canonicalizeCast<ast::ResultModifier>(modifier, context);
+                  transformedModifier->input = transformed;
+                  transformed = transformedModifier;
+               }
+               selectNode->modifiers.clear();
+
+               return transformed;
+            }
+            default: return queryNode;
+         }
+      }
+      case ast::NodeType::PIPE_OP: {
+         auto pipeOp = std::static_pointer_cast<ast::PipeOperator>(rootNode);
+         if (pipeOp->input) {
+            pipeOp->input = canonicalize(pipeOp->input, context);
+         }
+
+         switch (pipeOp->pipeOpType) {
+            case ast::PipeOperatorType::SELECT: {
+               auto selectNode = std::static_pointer_cast<ast::TargetsExpression>(pipeOp->node);
+               //Extract AggFunctions
+               std::vector<std::shared_ptr<ast::ParsedExpression>> toRemove{};
+               int i = 0;
+               std::ranges::transform(selectNode->targets, selectNode->targets.begin(), [&](auto& target) {
+                  return canonicalizeParsedExpression(target, context);
+               });
+               for (auto& target : selectNode->targets) {
+
+                  if (target->exprClass == ast::ExpressionClass::FUNCTION) {
+                     auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
+                     if (target->type == ast::ExpressionType::AGGREGATE) {
+                        context->aggregationNode->aggregations.push_back(function);
+                     } else {
+                        context->extendNode->extensions.push_back(function);
+                     }
+                     //TODO better
+                     if (function->alias.empty()) {
+                        //TODO make unique alias
+                        function->alias = function->functionName + "_" + std::to_string(i);
+                     }
+                     toRemove.emplace_back(target);
+                     i++;
+                  }
+               }
+
+               for (auto& target : toRemove) {
+                  std::replace_if(selectNode->targets.begin(), selectNode->targets.end(), [&target](const auto& t) { return t == target; }, drv.nf.node<ast::ColumnRefExpression>(target->loc, target->alias));
+               }
+
+               return pipeOp;
+            }
+            case ast::PipeOperatorType::WHERE: {
+               assert(pipeOp->node->nodeType == ast::NodeType::EXPRESSION);
+               pipeOp->node = canonicalizeParsedExpression(std::static_pointer_cast<ast::ParsedExpression>(pipeOp->node), context);
+               return pipeOp;
+            }
+
+            default: return pipeOp;
+         }
+
+         return pipeOp;
+      }
+      case ast::NodeType::TABLE_REF: {
+         auto tableRef = std::static_pointer_cast<ast::TableRef>(rootNode);
+         switch (tableRef->type) {
+            case ast::TableReferenceType::BASE_TABLE: {
+               return tableRef;
+            }
+            case ast::TableReferenceType::JOIN: {
+               auto joinRef = std::static_pointer_cast<ast::JoinRef>(tableRef);
+               if (joinRef->left) {
+                  joinRef->left = canonicalize(joinRef->left, context);
+               }
+               if (joinRef->right) {
+                  joinRef->right = canonicalize(joinRef->right, context);
+               }
+
+               return tableRef;
+            }
+            case ast::TableReferenceType::SUBQUERY: {
+               auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
+               auto transformedSubSelectNode = canonicalize(subquery->subSelectNode, std::make_shared<ASTTransformContext>());
+
+               subquery->subSelectNode = transformedSubSelectNode;
+               return subquery;
+            }
+            default: return tableRef;
+         }
+      }
+
+      default:
+         return rootNode;
+   }
+}
+
+std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context) {
+   switch (rootNode->exprClass) {
+      case ast::ExpressionClass::SUBQUERY: {
+         auto subqueryExpr = std::static_pointer_cast<ast::SubqueryExpression>(rootNode);
+         subqueryExpr->subquery = canonicalizeCast<ast::TableProducer>(subqueryExpr->subquery, std::make_shared<ASTTransformContext>());
+         return subqueryExpr;
+      }
+      case ast::ExpressionClass::OPERATOR: {
+         auto operatorExpr = std::static_pointer_cast<ast::OperatorExpression>(rootNode);
+         std::ranges::transform(operatorExpr->children, operatorExpr->children.begin(), [&](auto& child) {
+            return canonicalizeParsedExpression(child, context);
+         });
+         return operatorExpr;
+      }
+      case ast::ExpressionClass::CONJUNCTION: {
+         auto conjunctionExpr = std::static_pointer_cast<ast::ConjunctionExpression>(rootNode);
+
+         std::ranges::transform(conjunctionExpr->children, conjunctionExpr->children.begin(), [&](auto& child) {
+            return canonicalizeParsedExpression(child, context);
+         });
+         return conjunctionExpr;
+      }
+      case ast::ExpressionClass::COMPARISON: {
+         auto comparisonExpr = std::static_pointer_cast<ast::ComparisonExpression>(rootNode);
+         if (comparisonExpr->left) {
+            comparisonExpr->left = canonicalizeParsedExpression(comparisonExpr->left, context);
+         }
+         std::ranges::transform(comparisonExpr->rightChildren, comparisonExpr->rightChildren.begin(), [&](auto& child) {
+            return canonicalizeParsedExpression(child, context);
+         });
+
+         return comparisonExpr;
+      }
+      case ast::ExpressionClass::FUNCTION: {
+         auto functionExpr = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
+
+         if (functionExpr->type == ast::ExpressionType::AGGREGATE) {
+            if (functionExpr->alias.empty()) {
+               //TODO make unique alias
+               functionExpr->alias = functionExpr->functionName + "_" + std::to_string(0);
+            }
+            auto columnRef = drv.nf.node<ast::ColumnRefExpression>(functionExpr->loc, functionExpr->alias);
+            context->aggregationNode->aggregations.push_back(functionExpr);
+
+            return columnRef;
+
+         }
+      }
+      default: return rootNode;
+   }
+}
+
+template <class T>
+std::shared_ptr<T> SQLCanonicalizer::canonicalizeCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context) {
+   return std::static_pointer_cast<T>(canonicalize(rootNode, context));
+}
+
+
+
+/*
+ * SQLQueryAnalyzer
+*/
 SQLQueryAnalyzer::SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog) : catalog(std::move(catalog)) {
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeAndTransform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context) {
-   auto transformed = transform(rootNode, std::make_shared<ASTTransformContext>());
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context) {
+   auto transformed = sqlCanonicalizer.canonicalize(rootNode, std::make_shared<ASTTransformContext>());
    ast::NodeIdGenerator idGen{};
    std::cout << std::endl
              << std::endl;
@@ -51,208 +262,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
    }
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::transform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context) {
-   switch (rootNode->nodeType) {
-      case ast::NodeType::QUERY_NODE: {
-         auto queryNode = std::static_pointer_cast<ast::QueryNode>(rootNode);
-         switch (queryNode->type) {
-            case ast::QueryNodeType::SELECT_NODE: {
-               auto selectNode = std::static_pointer_cast<ast::SelectNode>(queryNode);
-               std::shared_ptr<ast::TableProducer> transformed = nullptr;
-               //Transform from_clause
-               if (selectNode->from_clause) {
-                  auto transformedFrom = transformCast<ast::TableRef>(selectNode->from_clause, context);
 
-                  selectNode->from_clause = nullptr;
-                  transformed = transformedFrom;
-               }
-
-               auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->extendNode);
-               extendPipeOp->input = transformed;
-               transformed = extendPipeOp;
-               //Transform where_clause
-               if (selectNode->where_clause) {
-                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->where_clause->loc, ast::PipeOperatorType::WHERE, selectNode->where_clause);
-                  auto transFormededWhereClause = transformCast<ast::PipeOperator>(pipe, context);
-                  transFormededWhereClause->input = transformed;
-                  selectNode->where_clause = nullptr;
-                  transformed = transFormededWhereClause;
-               }
-
-               auto aggPipeNode = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::AGGREGATE, context->aggregationNode);
-               auto transFormedAggregation = transformCast<ast::PipeOperator>(aggPipeNode, context);
-               transFormedAggregation->input = transformed;
-               transformed = transFormedAggregation;
-
-               //Transform target selection
-               auto select_list = selectNode->select_list;
-               if (select_list) {
-                  auto pipe = drv.nf.node<ast::PipeOperator>(select_list->loc, ast::PipeOperatorType::SELECT, select_list);
-                  auto transformedSelect = transformCast<ast::PipeOperator>(pipe, context);
-                  transformedSelect->input = transformed;
-                  transformed = transformedSelect;
-                  selectNode->select_list = nullptr;
-               }
-
-               //Transform Group by
-               if (selectNode->groups) {
-                  auto loc = selectNode->groups->loc;
-                  context->aggregationNode->groupByNode = std::move(selectNode->groups);
-               }
-
-               //Transform modifiers
-               for (auto modifier : selectNode->modifiers) {
-                  auto transformedModifier = transformCast<ast::ResultModifier>(modifier, context);
-                  transformedModifier->input = transformed;
-                  transformed = transformedModifier;
-               }
-               selectNode->modifiers.clear();
-
-               return transformed;
-            }
-            default: return queryNode;
-         }
-      }
-      case ast::NodeType::PIPE_OP: {
-         auto pipeOp = std::static_pointer_cast<ast::PipeOperator>(rootNode);
-         if (pipeOp->input) {
-            pipeOp->input = transform(pipeOp->input, context);
-         }
-
-         switch (pipeOp->pipeOpType) {
-            case ast::PipeOperatorType::SELECT: {
-               auto selectNode = std::static_pointer_cast<ast::TargetsExpression>(pipeOp->node);
-               //Extract AggFunctions
-               std::vector<std::shared_ptr<ast::ParsedExpression>> toRemove{};
-               int i = 0;
-               std::ranges::transform(selectNode->targets, selectNode->targets.begin(), [&](auto& target) {
-                  return transformParsedExpression(target, context);
-               });
-               for (auto& target : selectNode->targets) {
-
-                  if (target->exprClass == ast::ExpressionClass::FUNCTION) {
-                     auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
-                     if (target->type == ast::ExpressionType::AGGREGATE) {
-                        context->aggregationNode->aggregations.push_back(function);
-                     } else {
-                        context->extendNode->extensions.push_back(function);
-                     }
-                     //TODO better
-                     if (function->alias.empty()) {
-                        //TODO make unique alias
-                        function->alias = function->functionName + "_" + std::to_string(i);
-                     }
-                     toRemove.emplace_back(target);
-                     i++;
-                  }
-               }
-
-               for (auto& target : toRemove) {
-                  std::replace_if(selectNode->targets.begin(), selectNode->targets.end(), [&target](const auto& t) { return t == target; }, drv.nf.node<ast::ColumnRefExpression>(target->loc, target->alias));
-               }
-
-               return pipeOp;
-            }
-            case ast::PipeOperatorType::WHERE: {
-               assert(pipeOp->node->nodeType == ast::NodeType::EXPRESSION);
-               pipeOp->node = transformParsedExpression(std::static_pointer_cast<ast::ParsedExpression>(pipeOp->node), context);
-               return pipeOp;
-            }
-
-            default: return pipeOp;
-         }
-
-         return pipeOp;
-      }
-      case ast::NodeType::TABLE_REF: {
-         auto tableRef = std::static_pointer_cast<ast::TableRef>(rootNode);
-         switch (tableRef->type) {
-            case ast::TableReferenceType::BASE_TABLE: {
-               return tableRef;
-            }
-            case ast::TableReferenceType::JOIN: {
-               auto joinRef = std::static_pointer_cast<ast::JoinRef>(tableRef);
-               if (joinRef->left) {
-                  joinRef->left = transform(joinRef->left, context);
-               }
-               if (joinRef->right) {
-                  joinRef->right = transform(joinRef->right, context);
-               }
-
-               return tableRef;
-            }
-            case ast::TableReferenceType::SUBQUERY: {
-               auto subquery = std::static_pointer_cast<ast::SubqueryRef>(tableRef);
-               auto transformedSubSelectNode = transform(subquery->subSelectNode, std::make_shared<ASTTransformContext>());
-
-               subquery->subSelectNode = transformedSubSelectNode;
-               return subquery;
-            }
-            default: return tableRef;
-         }
-      }
-
-      default:
-         return rootNode;
-   }
-}
-
-std::shared_ptr<ast::ParsedExpression> SQLQueryAnalyzer::transformParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context) {
-   switch (rootNode->exprClass) {
-      case ast::ExpressionClass::SUBQUERY: {
-         auto subqueryExpr = std::static_pointer_cast<ast::SubqueryExpression>(rootNode);
-         subqueryExpr->subquery = transformCast<ast::TableProducer>(subqueryExpr->subquery, std::make_shared<ASTTransformContext>());
-         return subqueryExpr;
-      }
-      case ast::ExpressionClass::OPERATOR: {
-         auto operatorExpr = std::static_pointer_cast<ast::OperatorExpression>(rootNode);
-         std::ranges::transform(operatorExpr->children, operatorExpr->children.begin(), [&](auto& child) {
-            return transformParsedExpression(child, context);
-         });
-         return operatorExpr;
-      }
-      case ast::ExpressionClass::CONJUNCTION: {
-         auto conjunctionExpr = std::static_pointer_cast<ast::ConjunctionExpression>(rootNode);
-
-         std::ranges::transform(conjunctionExpr->children, conjunctionExpr->children.begin(), [&](auto& child) {
-            return transformParsedExpression(child, context);
-         });
-         return conjunctionExpr;
-      }
-      case ast::ExpressionClass::COMPARISON: {
-         auto comparisonExpr = std::static_pointer_cast<ast::ComparisonExpression>(rootNode);
-         if (comparisonExpr->left) {
-            comparisonExpr->left = transformParsedExpression(comparisonExpr->left, context);
-         }
-         std::ranges::transform(comparisonExpr->rightChildren, comparisonExpr->rightChildren.begin(), [&](auto& child) {
-            return transformParsedExpression(child, context);
-         });
-
-         return comparisonExpr;
-      }
-      case ast::ExpressionClass::FUNCTION: {
-         auto functionExpr = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
-
-         if (functionExpr->type == ast::ExpressionType::AGGREGATE) {
-            if (functionExpr->alias.empty()) {
-               //TODO make unique alias
-               functionExpr->alias = functionExpr->functionName + "_" + std::to_string(0);
-            }
-            auto columnRef = drv.nf.node<ast::ColumnRefExpression>(functionExpr->loc, functionExpr->alias);
-            context->aggregationNode->aggregations.push_back(functionExpr);
-
-            return columnRef;
-
-         }
-      }
-      default: return rootNode;
-   }
-}
-
-template <class T>
-std::shared_ptr<T> SQLQueryAnalyzer::transformCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context) {
-   return std::static_pointer_cast<T>(transform(rootNode, context));
-}
 
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;

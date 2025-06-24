@@ -16,22 +16,33 @@ using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::Na
    }
 
 class Analyzer;
+class SQLCanonicalizer {
+   public:
+   std::shared_ptr<ast::TableProducer> canonicalize(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
+   std::shared_ptr<ast::ParsedExpression> canonicalizeParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context);
+
+   private:
+   template <class T>
+   std::shared_ptr<T> canonicalizeCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
+
+   driver drv{};
+
+};
 class SQLQueryAnalyzer {
    public:
    SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog);
    std::shared_ptr<SQLContext> context = std::make_shared<SQLContext>();
 
-   std::shared_ptr<ast::TableProducer> analyzeAndTransform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
+   std::shared_ptr<ast::TableProducer> canonicalizeAndAnalyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
    std::shared_ptr<ast::TableProducer> analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> transform(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
-   std::shared_ptr<ast::ParsedExpression> transformParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context);
+
 
    private:
    std::shared_ptr<catalog::Catalog> catalog;
    driver drv{};
+   SQLCanonicalizer sqlCanonicalizer{};
 
-   template <class T>
-   std::shared_ptr<T> transformCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
+
 
    private:
    std::shared_ptr<ast::TableProducer> analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
