@@ -121,6 +121,13 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                return pipeOp;
             }
 
+            case ast::PipeOperatorType::RESULT_MODIFIER: {
+               auto resultModifier = std::static_pointer_cast<ast::ResultModifier>(pipeOp->node);
+               //TODO Support more complex modifiers
+               resultModifier->input = pipeOp->input;
+               return resultModifier;
+            }
+
             default: return pipeOp;
          }
 
