@@ -37,3 +37,9 @@ add_library(sql-frontend-new
         ${FLEX_lexer_OUTPUTS}
 
 )
+
+
+add_executable(translator-main main.cpp)
+target_link_libraries(translator-main sql-frontend-new)
+target_link_libraries(translator-main runner utility runtime mlir-support scheduler)
+set_target_properties(translator-main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
