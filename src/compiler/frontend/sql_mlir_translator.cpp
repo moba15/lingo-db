@@ -606,7 +606,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 }
 
 mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {
-   if (aggregation->groupByNode && aggregation->aggregations.empty()) {
+   if (!aggregation->groupByNode && aggregation->aggregations.empty()) {
       return tree;
    }
    //create map
