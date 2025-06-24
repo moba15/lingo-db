@@ -985,11 +985,11 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
    std::string scope;
    std::shared_ptr<ast::NamedResult> found;
    if (columnRef->column_names.size() == 2) {
-      found = context->getNamedResultInfo(columnRef->column_names[0]+ "." + columnRef->column_names[1]);
+      found = context->getNamedResultInfo(columnRef->loc, columnRef->column_names[0]+ "." + columnRef->column_names[1]);
 
    } else if (columnRef->column_names.size() == 1) {
 
-      found = context->getNamedResultInfo(columnRef->column_names[0]);
+      found = context->getNamedResultInfo(columnRef->loc, columnRef->column_names[0]);
    } else {
       throw std::runtime_error("Not implemented");
    }

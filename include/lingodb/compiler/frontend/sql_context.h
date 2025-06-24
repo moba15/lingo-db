@@ -63,7 +63,7 @@ class SQLContext {
 
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<ast::NamedResult> columnInfo);
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
-   std::shared_ptr<ast::NamedResult> getNamedResultInfo(std::string name);
+   std::shared_ptr<ast::NamedResult> getNamedResultInfo(location loc,std::string name);
 
    std::string getUniqueScope(std::string base);
 
