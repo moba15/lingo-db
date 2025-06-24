@@ -17,13 +17,14 @@ class BoundTableRef : public TableProducer {
 class BoundBaseTableRef : public BoundTableRef {
    public:
    static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;
-   BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
-   BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias);
+
+   BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias, std::string mlirScope);
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    //TODO missing semantic
    std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry;
+   std::string mlirScope;
 };
 using boundJoinCond = std::variant<std::shared_ptr<BoundExpression>, std::vector<std::shared_ptr<ColumnRefExpression>>>;
 class BoundJoinRef : public BoundTableRef {

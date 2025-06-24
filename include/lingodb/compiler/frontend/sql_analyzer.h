@@ -47,6 +47,7 @@ class SQLQueryAnalyzer {
    std::pair<unsigned long, unsigned long> getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s);
    catalog::NullableType getCommonTypeAfterOperation(catalog::NullableType type1, catalog::NullableType type2, ast::ExpressionType operationType);
    catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types, ast::ExpressionType operationType);
+   catalog::NullableType getHigherDecimalType(catalog::NullableType left, catalog::NullableType right);
 
    catalog::NullableType getCommonBaseType(std::vector<catalog::NullableType> types);
    std::vector<catalog::NullableType> toCommonNumber(std::vector<catalog::NullableType> types);

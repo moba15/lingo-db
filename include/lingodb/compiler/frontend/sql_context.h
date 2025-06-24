@@ -49,6 +49,8 @@ class SQLContext {
    llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo> resolver;
    using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
 
+   std::unordered_map<std::string, size_t> scopeUnifier;
+
    void pushNewScope();
    void pushNewScope(std::shared_ptr<SQLScope> newScope);
    void popCurrentScope();
@@ -62,6 +64,8 @@ class SQLContext {
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<ast::NamedResult> columnInfo);
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
    std::shared_ptr<ast::NamedResult> getNamedResultInfo(std::string name);
+
+   std::string getUniqueScope(std::string base);
 
    //std::vector<std::pair<size_t, ast::ColumnInfo>> findColumn(const std::string& columnName) const;
    //std::vector<std::pair<size_t, ast::ColumnInfo>> findColumn(const std::string& columnName, const std::string& alias) const;
