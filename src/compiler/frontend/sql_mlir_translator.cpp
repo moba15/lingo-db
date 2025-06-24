@@ -13,8 +13,6 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/utility/Serialization.h"
 
-//todo: remove
-#include "lingodb/compiler/old-frontend/SQL/Parser.h"
 
 #include <mlir-c/IR.h>
 namespace lingodb::translator {
@@ -212,6 +210,7 @@ mlir::Value SQLMlirTranslator::translateResultModifier(mlir::OpBuilder& builder,
 }
 
 mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundExpression> expression, std::shared_ptr<analyzer::SQLContext> context) {
+   assert(expression->resultType.has_value());
    switch (expression->exprClass) {
       case ast::ExpressionClass::BOUND_COLUMN_REF: {
          auto columnRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(expression);
@@ -383,7 +382,8 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             constOp.getResult().setType(resType);
             return constOp;
          } else {
-            return compiler::frontend::sql::SQLTypeInference::castValueToType(builder, toCast, resType);
+            return castExpr->resultType->castValueToThisType(builder, toCast, castExpr->child->resultType->isNullable);
+
          }
       }
       case ast::ExpressionClass::BOUND_BETWEEN: {
