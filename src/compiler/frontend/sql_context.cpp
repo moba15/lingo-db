@@ -64,9 +64,11 @@ void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::share
    }
 
 }
-std::shared_ptr<ast::NamedResult> SQLContext::getNamedResultInfo(std::string name) {
+std::shared_ptr<ast::NamedResult> SQLContext::getNamedResultInfo(location loc, std::string name) {
    if (!resolver.count(name)) {
-      throw std::runtime_error("could not resolve '" + name + "'");
+      std::stringstream ss;
+      ss << "could not resolve '" << name << "' at "  << loc;
+      throw std::runtime_error( ss.str());
    }
    const auto res = resolver.lookup(name);
    return res;
