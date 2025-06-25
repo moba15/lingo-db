@@ -94,6 +94,27 @@ int main(int argc, char* argv[]) {
       os.flush();
       moduleOp.erase();
       std::cout << output << std::endl;
+
+      if (true) {
+         std::cout << "execute" << std::endl;
+         lingodb::compiler::support::eval::init();
+         lingodb::execution::ExecutionMode runMode = lingodb::execution::getExecutionMode();
+         auto queryExecutionConfig = lingodb::execution::createQueryExecutionConfig(runMode, false);
+         if (const char* numRuns = std::getenv("QUERY_RUNS")) {
+            queryExecutionConfig->executionBackend->setNumRepetitions(std::atoi(numRuns));
+            std::cout << "using " << queryExecutionConfig->executionBackend->getNumRepetitions() << " runs" << std::endl;
+         }
+         if (std::getenv("LINGODB_BACKEND_ONLY")) {
+            queryExecutionConfig->queryOptimizer = {};
+            queryExecutionConfig->loweringSteps.clear();
+         }
+         //queryExecutionConfig->timingProcessor = std::make_unique<execution::TimingPrinter>(inputFileName);
+         auto scheduler = lingodb::scheduler::startScheduler();
+         auto executer = lingodb::execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), *session);
+         executer->fromData(output);
+         lingodb::scheduler::awaitEntryTask(std::make_unique<lingodb::execution::QueryExecutionTask>(std::move(executer)));
+      }
+
    } else {
       return 1;
    }
