@@ -21,12 +21,22 @@ struct NamedResult {
    std::string displayName{};
    NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType, std::string name) : type(type), scope(scope), resultType(resultType), name(name) {}
 
-    virtual  compiler::dialect::tuples::ColumnRefAttr createRef(compiler::dialect::tuples::ColumnManager& attrManager) {
-      return attrManager.createRef(this->scope, name);
+    virtual  compiler::dialect::tuples::ColumnRefAttr createRef(mlir::OpBuilder& builder, compiler::dialect::tuples::ColumnManager& attrManager) {
+      auto ref = attrManager.createRef(this->scope, name);
+      ref.getColumn().type = resultType.toMlirType(builder.getContext());
+      return ref;
    };
 
-   virtual  compiler::dialect::tuples::ColumnDefAttr createDef(compiler::dialect::tuples::ColumnManager& attrManager) {
-      return attrManager.createDef(this->scope, name);
+   virtual  compiler::dialect::tuples::ColumnDefAttr createDef(mlir::OpBuilder& builder,compiler::dialect::tuples::ColumnManager& attrManager) {
+      auto def = attrManager.createDef(this->scope, name);
+      def.getColumn().type = resultType.toMlirType(builder.getContext());
+      return def;
+   };
+   virtual  compiler::dialect::tuples::ColumnDefAttr createDef(mlir::OpBuilder& builder, compiler::dialect::tuples::ColumnManager& attrManager, mlir::Attribute fromExisting) {
+
+      auto def = attrManager.createDef(this->scope, name, fromExisting);
+      def.getColumn().type = resultType.toMlirType(builder.getContext());
+      return def;
    };
 };
 struct FunctionInfo : public NamedResult {
