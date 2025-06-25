@@ -973,7 +973,18 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                }
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
-               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type::intervalDaytime(), castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
+               auto resultType = catalog::Type::intervalDaytime();
+               if (castExpr->typeMods.has_value()) {
+                  switch (castExpr->typeMods.value()) {
+                     case ast::TypeMods::YEARS: {
+                        resultType = catalog::Type::intervalMonths();
+                        break;
+                     }
+                     default: ;
+                  }
+               }
+               catalog::Type::intervalMonths();
+               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
             }
             default: error("Not implemented", rootNode->loc);
          }
