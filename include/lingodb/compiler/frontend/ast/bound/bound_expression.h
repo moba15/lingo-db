@@ -180,4 +180,19 @@ class BoundSubqueryExpression : public BoundExpression {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
+class BoundCaseExpression : public BoundExpression {
+   public:
+   struct BoundCaseCheck {
+      std::shared_ptr<BoundExpression> whenExpr;
+      std::shared_ptr<BoundExpression> thenExpr;
+   };
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CASE;
+
+   BoundCaseExpression( catalog::NullableType resultType, std::string alias, std::vector<BoundCaseCheck> caseChecks, std::shared_ptr<BoundExpression> caseExpr);
+
+   std::vector<BoundCaseCheck> caseChecks;
+   std::shared_ptr<BoundExpression> elseExpr;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
 } // namespace lingodb::ast

@@ -11,6 +11,7 @@
 #include "lingodb/compiler/frontend/ast/aggregation_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
+#include "lingodb/compiler/old-frontend/SQL/Parser.h"
 #include "lingodb/utility/Serialization.h"
 
 
@@ -407,6 +408,12 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             auto arg2 = translateExpression(builder, function->arguments[1], context);
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), wrapNullableType(builder.getContext(), builder.getI64Type(), {part, arg2}), "ExtractFromDate", mlir::ValueRange({part, arg2})).getRes();
          }
+         if (function->functionName == "SUBSTRING") {
+            auto str = translateExpression(builder, function->arguments[0], context);
+            auto from = function->arguments[1] ? translateExpression(builder, function->arguments[1], context) : nullptr;
+            auto to =  function->arguments[2] ? translateExpression(builder, function->arguments[2], context) : nullptr;
+            return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), str.getType(), "Substring", mlir::ValueRange({str, from, to})).getRes();
+         }
       }
       case ast::ExpressionClass::BOUND_SUBQUERY: {
          auto subquery = std::static_pointer_cast<ast::BoundSubqueryExpression>(expression);
@@ -471,6 +478,14 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             default: error("Subquery type not implemented", expression->loc);
          }
       }
+      case ast::ExpressionClass::BOUND_CASE: {
+         auto boundCase = std::static_pointer_cast<ast::BoundCaseExpression>(expression);
+         //TODO translate arg
+
+
+
+         return translateWhenCheks(builder, boundCase, boundCase->caseChecks, boundCase->elseExpr, context);
+      }
 
       default: error("Not implemented", expression->loc);
    }
@@ -485,7 +500,7 @@ mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder
          if (mlir::isa<db::DateType>(getBaseType(left.getType())) && mlir::isa<db::IntervalType>(getBaseType(right.getType()))) {
             return builder.create<db::RuntimeCall>(loc, left.getType(), "DateAdd", mlir::ValueRange({left, right})).getRes();
          }
-         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable),  expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
+         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable), expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
          return builder.create<db::AddOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_MINUS: {
@@ -493,7 +508,7 @@ mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder
             return builder.create<db::RuntimeCall>(loc, left.getType(), "DateSubtract", mlir::ValueRange({left, right})).getRes();
          }
 
-         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable),  expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
+         std::vector ct = {expression->resultType->castValueToThisType(builder, left, expression->children[0]->resultType->isNullable), expression->resultType->castValueToThisType(builder, right, expression->children[1]->resultType->isNullable)};
          return builder.create<db::SubOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_TIMES: {
@@ -510,6 +525,57 @@ mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder
       }
       default: error("Not implemented", expression->loc);
    }
+}
+
+mlir::Value SQLMlirTranslator::translateWhenCheks(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundCaseExpression> boundCase ,std::vector<ast::BoundCaseExpression::BoundCaseCheck> caseChecks, std::shared_ptr<ast::BoundExpression> elseExpr, std::shared_ptr<analyzer::SQLContext> context) {
+   if (caseChecks.empty()) {
+      if (!elseExpr) {
+         return builder.create<db::NullOp>(builder.getUnknownLoc(), db::NullableType::get(builder.getContext(), builder.getNoneType()));
+      }
+      return translateExpression(builder, elseExpr, context);
+   }
+
+   auto check = caseChecks[0];
+   auto hasNextCheck = caseChecks.size() > 1;
+
+   //TOOD arg
+
+   auto condTranslated = translateExpression(builder, check.whenExpr, context);
+
+   auto* whenBlock = new mlir::Block;
+   auto* elseBlock = new mlir::Block;
+   mlir::OpBuilder whenBuilder(builder.getContext());
+   whenBuilder.setInsertionPointToStart(whenBlock);
+   auto thenTranslated = translateExpression(whenBuilder, check.thenExpr, context);
+   mlir::OpBuilder elseBuilder(builder.getContext());
+   elseBuilder.setInsertionPointToStart(elseBlock);
+   mlir::Value elseTranslated;
+   if (hasNextCheck) {
+      std::vector<ast::BoundCaseExpression::BoundCaseCheck> nextChecks{caseChecks.begin() + 1 , caseChecks.end()};
+      elseTranslated = translateWhenCheks(elseBuilder, boundCase, nextChecks, elseExpr, context);
+   } else {
+      elseTranslated = translateExpression(elseBuilder, elseExpr, context);
+   }
+
+   auto commonType = boundCase->resultType->toMlirType(builder.getContext());
+   thenTranslated = boundCase->resultType->castValueToThisType(builder, thenTranslated, check.thenExpr->resultType->isNullable);
+   elseTranslated = boundCase->resultType->castValueToThisType(builder, elseTranslated, elseExpr->resultType->isNullable);
+
+   whenBuilder.create<mlir::scf::YieldOp>(builder.getUnknownLoc(), thenTranslated);
+   elseBuilder.create<mlir::scf::YieldOp>(builder.getUnknownLoc(), elseTranslated);
+   condTranslated = builder.create<db::DeriveTruth>(builder.getUnknownLoc(), condTranslated);
+   auto ifOp = builder.create<mlir::scf::IfOp>(builder.getUnknownLoc(), commonType, condTranslated, true);
+   ifOp.getThenRegion().getBlocks().clear();
+   ifOp.getElseRegion().getBlocks().clear();
+   ifOp.getThenRegion().push_back(whenBlock);
+   ifOp.getElseRegion().push_back(elseBlock);
+
+   return ifOp.getResult(0);
+   throw std::runtime_error("Should never reach here");
+}
+
+mlir::Value SQLMlirTranslator::translateWhenCheck(mlir::OpBuilder& builder, ast::BoundCaseExpression::BoundCaseCheck whenCheck, std::shared_ptr<ast::BoundExpression> elseExpr, std::shared_ptr<analyzer::SQLContext> context) {
+
 }
 
 mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundTableRef> tableRef, std::shared_ptr<analyzer::SQLContext> context) {

@@ -219,7 +219,7 @@
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens
 %type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list extract_list expr_list
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt extract_list expr_list substr_list
 
 /*
 * in_expr either returns a SubQuery or a list of expressions
@@ -229,7 +229,10 @@
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
-                                                        func_arg_expr select_limit_value 
+                                                        func_arg_expr select_limit_value case_expr case_default
+
+%type<std::vector<lingodb::ast::CaseExpression::CaseCheck>> when_clause_list
+%type<lingodb::ast::CaseExpression::CaseCheck> when_clause
 
 %type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr func_expr_common_subexpr
 
@@ -1034,7 +1037,10 @@ c_expr:
     //TODO | PARAM opt_indirection
     //TODO
     | LP a_expr RP {$$=$2;}//opt_indirection
-    //TODO | case_expr
+    | case_expr 
+    {
+        $$ = $1;
+    }
     | func_expr {$$=$1;}
     | select_with_parens %prec UMINUS
     {
@@ -1057,6 +1063,7 @@ c_expr:
     //TODO | explicit_row
     //TODO | implicit_row
     //TODO | GROUPING LP expr_list RP
+   
     ;
 //TODO Alias -> opt_alias_clause
 in_expr: 
@@ -1070,7 +1077,70 @@ in_expr:
     {
         $$ = $expr_list;
     }
+    ;
+case_expr: 
+    CASE case_arg when_clause_list case_default END_P
+    {
+        auto caseExpr = mkNode<lingodb::ast::CaseExpression>(@$, $when_clause_list, $case_default);
+        $$ = caseExpr;
+    }
+    ;
+when_clause_list: 
+    when_clause
+    {
+        auto list = mkList<lingodb::ast::CaseExpression::CaseCheck>();
+        list.emplace_back($when_clause);
+        $$ = list;
 
+    }
+    | when_clause_list[list] when_clause
+    {
+        $list.emplace_back($when_clause);
+        $$ = $list;
+    }
+    ;
+    
+when_clause: 
+    WHEN a_expr THEN a_expr
+    {
+        auto whenCheck = lingodb::ast::CaseExpression::CaseCheck($2,$4);
+        $$ = whenCheck;
+    }
+    ;
+
+case_default: 
+    ELSE a_expr 
+    {
+        $$ = $2;
+    }
+    | %empty
+    ;
+
+case_arg:
+    //TODO a_expr
+    | %empty
+    ;
+
+
+columnref: 
+    ColId {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);}
+    | ColId indirection {
+        auto in = $indirection;
+        if(in->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF) {
+            auto columnref = std::static_pointer_cast<lingodb::ast::ColumnRefExpression>(in);
+            auto newColumnRef = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);
+            newColumnRef->column_names.insert(newColumnRef->column_names.end(), columnref->column_names.begin(), columnref->column_names.end() );
+            $$ = newColumnRef;
+            
+
+        } else if(in->exprClass == lingodb::ast::ExpressionClass::STAR) {
+            auto star = std::static_pointer_cast<lingodb::ast::StarExpression>(in);
+            star->relationName = $ColId;
+            $$ = star;
+        }
+        
+    } //TODO Add table name
+    ;
 func_application:
     func_name LP RP 
     {
@@ -1130,7 +1200,7 @@ func_application:
         funcExpr->arguments = l;
         $$ = funcExpr;
     }
-
+;
 /*
  * func_expr and its cousin func_expr_windowless are split out from c_expr just
  * so that we have classifications for "everything that is a function call or
@@ -1153,7 +1223,16 @@ func_application:
         $$ = $1;
     }
     ;
-
+func_arg_list_opt: 
+    func_arg_list
+    {
+        $$ = $1;
+    }
+    | %empty 
+    {
+        //TODO
+    }
+    ;
 /* function arguments can have names */    
 func_arg_list:
     func_arg_expr 
@@ -1197,7 +1276,18 @@ func_expr_common_subexpr:
      
         $$ = function;
     }
-    
+    | SUBSTRING LP substr_list RP
+    {
+        auto function = mkNode<lingodb::ast::FunctionExpression>(@$, "", "", "SUBSTRING", false, false, false);
+        function->arguments = $substr_list;
+        $$ = function;
+    }
+    | SUBSTRING LP func_arg_list_opt RP
+    {
+        auto function = mkNode<lingodb::ast::FunctionExpression>(@$, "", "", "SUBSTRING", false, false, false);
+        function->arguments = $func_arg_list_opt;
+        $$ = function;
+    }
 ;
 
 extract_list: 
@@ -1229,6 +1319,32 @@ extract_arg:
         $$ = constant;
     }
     ;
+//TODO missing rules
+substr_list: 
+    a_expr FROM a_expr FOR a_expr 
+    {
+        auto list = mkListShared<lingodb::ast::ParsedExpression>();
+        list.emplace_back($1);
+        list.emplace_back($3);
+        list.emplace_back($5);
+        $$ = list;
+
+    }
+    | a_expr FOR a_expr FROM a_expr
+    {
+
+    }
+    | a_expr FROM a_expr
+    {
+
+    }
+    | a_expr FOR a_expr 
+    {
+
+    }
+
+
+    ;
 over_clause:
     OVER window_specification
     | OVER ColId 
@@ -1238,27 +1354,6 @@ window_specification:
     LP opt_sort_clause RP
     ;
 
-
-
-columnref: 
-    ColId {$$ = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);}
-    | ColId indirection {
-        auto in = $indirection;
-        if(in->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF) {
-            auto columnref = std::static_pointer_cast<lingodb::ast::ColumnRefExpression>(in);
-            auto newColumnRef = mkNode<lingodb::ast::ColumnRefExpression>(@$, $ColId);
-            newColumnRef->column_names.insert(newColumnRef->column_names.end(), columnref->column_names.begin(), columnref->column_names.end() );
-            $$ = newColumnRef;
-            
-
-        } else if(in->exprClass == lingodb::ast::ExpressionClass::STAR) {
-            auto star = std::static_pointer_cast<lingodb::ast::StarExpression>(in);
-            star->relationName = $ColId;
-            $$ = star;
-        }
-        
-    } //TODO Add table name
-    ;
 
 //! TODO For what exactly is this here
 indirection:

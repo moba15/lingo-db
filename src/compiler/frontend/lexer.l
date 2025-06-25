@@ -158,13 +158,17 @@ boolean [fF][aA][lL][sS][eE]
 [bB][eE][tT][wW][eE][eE][nN]          { return lingodb::parser::make_BETWEEN(loc);}
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
+[cC][aA][sS][eE]                      { return lingodb::parser::make_CASE(loc); }
+
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
 [dD][iI][sS][tT][iI][nN][cC][tT]      { return lingodb::parser::make_DISTINCT(loc); }
 
+[eE][lL][sS][eE]                      { return lingodb::parser::make_ELSE(loc); }
 [eE][xX][tT][rR][aA][cC][tT]          { return lingodb::parser::make_EXTRACT(loc); }
 [eE][xX][iI][sS][tT][sS]              { return lingodb::parser::make_EXISTS(loc); }
-
+[eE][nN][dD]                          { return lingodb::parser::make_END_P(loc); }
+[fF][oO][rR]                          { return lingodb::parser::make_FOR(loc); }
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
 
@@ -182,7 +186,10 @@ inner                                 { return lingodb::parser::make_INNER_P(loc
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
 [nN][oO][tT]                          { return lingodb::parser::make_NOT(loc); }
 
+[tT][hH][eE][nN]                      { return lingodb::parser::make_THEN(loc); }
+
 [wW][hH][eE][rR][eE]                  { return lingodb::parser::make_WHERE(loc); }
+[wW][hH][eE][nN]                      { return lingodb::parser::make_WHEN(loc); }
 
 [jJ][oO][iI][nN]                      { return lingodb::parser::make_JOIN(loc); }
 
@@ -195,6 +202,7 @@ outer                                 { return lingodb::parser::make_OUTER_P(loc
 [oO][vV][eE][rR]                      { return lingodb::parser::make_OVER(loc); }
 
 [sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
+[sS][uU][bB][sS][tT][rR][iI][nN][gG]  { return lingodb::parser::make_SUBSTRING(loc); }
 
 [yY][eE][aA][rR]                      { return lingodb::parser::make_YEAR_P(loc); }
 
