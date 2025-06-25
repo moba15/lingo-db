@@ -360,7 +360,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          //auto resType = createType(typeName, getTypeModList(castNode->type_name_->typmods_)).getMLIRTypeCreator()->createType(builder.getContext());
 
          assert(castExpr->resultType.has_value());
-         auto resType = castExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext());
+         auto resType = castExpr->resultType->toMlirType(builder.getContext());
          if (auto constOp = mlir::dyn_cast_or_null<db::ConstantOp>(toCast.getDefiningOp())) {
             if (auto intervalType = mlir::dyn_cast<db::IntervalType>(resType)) {
                //TODO maybe create stringRepresentation at analyzer Level?
@@ -375,9 +375,21 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                      }
                 */
                //TODO maybe create stringRepresentation at analyzer Level?
-               if (intervalType.getUnit() == db::IntervalUnitAttr::daytime && !stringRepresentation.ends_with("days")) {
-                  stringRepresentation += "days";
+
+               switch (castExpr->typeMods.value()) {
+                  case ast::TypeMods::DAYS: {
+                     if (!stringRepresentation.ends_with("days")) {
+                        stringRepresentation += "days";
+                     }
+                     break;
+                  }
+                  case ast::TypeMods::YEARS: {
+                     stringRepresentation = std::to_string(std::stol(stringRepresentation) * 12);
+                     break;
+                  }
+                  default: error("Not implemented", castExpr->loc);
                }
+
                constOp->setAttr("value", builder.getStringAttr(stringRepresentation));
             }
             constOp.getResult().setType(resType);

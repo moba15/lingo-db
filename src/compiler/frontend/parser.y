@@ -1603,6 +1603,10 @@ opt_interval:
      {
         $$ = lingodb::ast::TypeMods::DAYS;
      }
+     | YEAR_P 
+     {
+        $$ = lingodb::ast::TypeMods::YEARS;
+     }
     ;
 
 /*
