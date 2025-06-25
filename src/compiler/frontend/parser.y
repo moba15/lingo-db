@@ -245,7 +245,7 @@
 
 %type<std::shared_ptr<lingodb::ast::TableRef>> from_clause opt_from_clause table_ref from_list joined_table
 
-%type<std::string>  ColId ColLabel attr_name 
+%type<std::string>  ColId ColLabel BareColLabel attr_name 
                     qualified_name relation_expr alias_clause opt_alias_clause 
                     name type_function_name func_name
 
@@ -1292,7 +1292,7 @@ target_list:
     ;
 target_el:
     a_expr AS ColLabel {  $a_expr->alias = $ColLabel; $$ = $a_expr;}
-    | a_expr BareColLabel {}
+    | a_expr BareColLabel {$a_expr->alias = $BareColLabel; $$ = $a_expr;}
     | a_expr { $$=$a_expr;}
     | STAR {  $$ =mkNode<lingodb::ast::StarExpression>(@$,"");  }
     ;
