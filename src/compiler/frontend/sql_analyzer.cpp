@@ -392,6 +392,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                boundAggr->resultType->isNullable = true;
             }
          }
+
+
          boundAstNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc,boundGroupByNode, boundAggregationExpressions, toMap, mapName );
 
          break;
@@ -469,6 +471,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                return drv.nf.node<ast::BoundJoinRef>(join->loc, join->type, join->refType, left, right, nullptr);
 
             }
+            case ast::JoinType::RIGHT: {
+               std::swap(join->left, join->right);
+               join->type = ast::JoinType::LEFT;
+            }
             case ast::JoinType::LEFT: {
                std::shared_ptr<ast::TableProducer> left, right;
                std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> mapping{};
@@ -491,26 +497,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                   boundCondition = analyzeExpression(std::get<std::shared_ptr<ast::ParsedExpression>>(join->condition), context, resolverScope);
                }
                //TODO
-              /* static size_t id = 0;
-               std::vector<mlir::Attribute> outerJoinMapping;
-               std::string outerjoinName;
-               if (!mapping.empty()) {
-                  outerjoinName = "oj" + std::to_string(id++);
-                  std::unordered_map<const tuples::Column*, const tuples::Column*> remapped;
-                  for (auto x : mapping) {
-                     if (!remapped.contains(x.second)) {
-                        auto [scopename, name] = attrManager.getName(x.second);
 
-                        auto attrDef = attrManager.createDef(outerjoinName, name, builder.getArrayAttr({attrManager.createRef(x.second)}));
-                        attrDef.getColumn().type = mlir::isa<db::NullableType>(x.second->type) ? x.second->type : db::NullableType::get(builder.getContext(), x.second->type);
-                        outerJoinMapping.push_back(attrDef);
-                        remapped.insert({x.second, &attrDef.getColumn()});
-                     }
-                     context.mapAttribute(scope, x.first, remapped[x.second]);
-                     context.removeFromDefinedColumns(x.second);
-                  }
-               }*/
-               std::vector<std::shared_ptr<ast::NamedResult>> outerJoinMapping;
+               std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> outerJoinMapping;
                std::string outerjoinName;
                static size_t id = 0;
                if (!mapping.empty()) {
@@ -521,7 +509,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                         auto scope = x.second->scope;
                         auto name = x.second->name;
                         auto namedResult = std::make_shared<ast::NamedResult>(x.second->type, outerjoinName, x.second->resultType, name);
-                        outerJoinMapping.push_back(namedResult);
+
+                        //Make mapping output nullable
+                        namedResult->resultType.isNullable = true;
+                        outerJoinMapping.push_back({scope, namedResult});
                         remapped.insert({x.second, namedResult});
                      }
                   }
@@ -535,7 +526,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                return boundJoin;
 
             }
-               default: error("Not implemented", join->loc);
+
+               default: error("Join type not implemented", join->loc);
+
          }
          break;
       }

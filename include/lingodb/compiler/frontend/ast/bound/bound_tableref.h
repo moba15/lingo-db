@@ -47,7 +47,7 @@ class BoundJoinRef : public BoundTableRef {
    //! Join condition type
    JoinCondType refType;
 
-   std::vector<std::shared_ptr<NamedResult>> outerJoinMapping;
+   std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> outerJoinMapping;
 
    //! The set of USING columns (if any)
    //std::vector<std::string> usingColumns;

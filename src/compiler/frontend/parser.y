@@ -724,7 +724,7 @@ join_type:
     | FULL OUTER_P
     | LEFT OUTER_P 
     {
-
+        $$ = lingodb::ast::JoinType::LEFT;
     }
     | LEFT 
     {
@@ -735,6 +735,9 @@ join_type:
         $$ = lingodb::ast::JoinType::RIGHT; 
     }
     | RIGHT OUTER_P 
+    {
+        $$ = lingodb::ast::JoinType::RIGHT;
+    }
     | INNER_P 
     {
         $$ = lingodb::ast::JoinType::INNER;
@@ -1391,7 +1394,7 @@ ColLabel:
  * This classification is orthogonal to the other keyword categories.
  */
 BareColLabel:
-    IDENTIFIER								{  }
+    IDENTIFIER								{ $$=$1; }
 	//TODO | bare_label_keyword					{  }
 	;
 

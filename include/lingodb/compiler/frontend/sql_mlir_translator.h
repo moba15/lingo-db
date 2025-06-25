@@ -50,6 +50,8 @@ class SQLMlirTranslator {
     * Utility
    */
 
+   mlir::Block* translatePredicate(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundExpression> expression, std::shared_ptr<analyzer::SQLContext> context);
+
    public:
    /*
    * Helper functions
