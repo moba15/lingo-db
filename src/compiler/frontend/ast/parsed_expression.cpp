@@ -522,4 +522,40 @@ std::string SubqueryExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGe
    return dot;
 }
 
+CaseExpression::CaseExpression(std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, TYPE), caseChecks(std::move(caseChecks)), elseExpr(std::move(elseExpr)) {
+}
+
+std::string CaseExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot;
+
+   // Node for the CASE expression
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
+   dot += nodeId + " [label=\"CASE\"];\n";
+
+   // Add all case checks (WHEN/THEN pairs)
+   for (size_t i = 0; i < caseChecks.size(); ++i) {
+      // WHEN
+      if (caseChecks[i].whenExpr) {
+         std::string whenId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(caseChecks[i].whenExpr.get())));
+         dot += nodeId + " -> " + whenId + " [label=\"when " + std::to_string(i + 1) + "\"];\n";
+         dot += caseChecks[i].whenExpr->toDotGraph(depth + 1, idGen);
+      }
+      // THEN
+      if (caseChecks[i].thenExpr) {
+         std::string thenId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(caseChecks[i].thenExpr.get())));
+         dot += nodeId + " -> " + thenId + " [label=\"then " + std::to_string(i + 1) + "\"];\n";
+         dot += caseChecks[i].thenExpr->toDotGraph(depth + 1, idGen);
+      }
+   }
+
+   // Add ELSE expression if present
+   if (elseExpr) {
+      std::string elseId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(elseExpr.get())));
+      dot += nodeId + " -> " + elseId + " [label=\"else\"];\n";
+      dot += elseExpr->toDotGraph(depth + 1, idGen);
+   }
+
+   return dot;
+}
+
 } // namespace lingodb::ast

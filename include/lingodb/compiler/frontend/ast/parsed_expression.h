@@ -19,6 +19,7 @@ enum LogicalType : uint8_t {
 
 enum class TypeMods : uint8_t {
    DAYS = 1,
+   YEARS = 2,
    //TODO other
 };
 
@@ -492,4 +493,25 @@ class SubqueryExpression : public ParsedExpression {
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
+
+class CaseExpression : public ParsedExpression {
+   public:
+   struct CaseCheck {
+      std::shared_ptr<ParsedExpression> whenExpr;
+      std::shared_ptr<ParsedExpression> thenExpr;
+   };
+
+   static constexpr const ExpressionClass TYPE = ExpressionClass::CASE;
+
+   CaseExpression(std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr);
+
+   std::vector<CaseCheck> caseChecks;
+   std::shared_ptr<ParsedExpression> elseExpr;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
+
+
+};
+
 } // namespace lingodb::ast

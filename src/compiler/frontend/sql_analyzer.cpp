@@ -222,6 +222,16 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
 
          }
       }
+      case ast::ExpressionClass::CASE: {
+         auto caseExpr = std::static_pointer_cast<ast::CaseExpression>(rootNode);
+         for (auto& caseCheck : caseExpr->caseChecks) {
+            caseCheck.thenExpr = canonicalizeParsedExpression(caseCheck.thenExpr, context);
+            caseCheck.whenExpr =canonicalizeParsedExpression(caseCheck.whenExpr, context);
+         }
+         caseExpr->elseExpr = canonicalizeParsedExpression(caseExpr->elseExpr, context);
+         return caseExpr;
+
+      }
       default: return rootNode;
    }
 }
@@ -327,16 +337,29 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                }
                case ast::ExpressionClass::BOUND_OPERATOR: {
                   auto operatorExpr = std::static_pointer_cast<ast::BoundOperatorExpression>(parsedExpression);
-
+                  assert(operatorExpr->resultType.has_value());
                   auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, operatorExpr->alias, operatorExpr->resultType.value(), createTmpScope());
                   n->displayName = operatorExpr->alias.empty() ? "" : operatorExpr->alias;
-                  assert(operatorExpr->resultType.has_value());
+
                   context->mapAttribute(resolverScope, operatorExpr->alias.empty() ? n->name : operatorExpr->alias, n);
                   targetColumns.emplace_back(n);
                   context->currentScope->targetInfo.add(n);
                   context->currentScope->evalBeforeAggr.emplace_back(operatorExpr);
                   operatorExpr->namedResult = n;
 
+                  break;
+               }
+               case ast::ExpressionClass::BOUND_CASE: {
+                  auto boundCase = std::static_pointer_cast<ast::BoundCaseExpression>(parsedExpression);
+                  assert(boundCase->resultType.has_value());
+                  auto scope = boundCase->alias.empty() ? boundCase->alias : createTmpScope();
+                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, boundCase->resultType.value(), createTmpScope());
+                  n->displayName = boundCase->alias.empty() ? "" : boundCase->alias;
+                  context->mapAttribute(resolverScope, boundCase->alias.empty() ? n->name : boundCase->alias, n);
+                  targetColumns.emplace_back(n);
+                  context->currentScope->targetInfo.add(n);
+                  context->currentScope->evalBeforeAggr.emplace_back(boundCase);
+                  boundCase->namedResult = n;
                   break;
                }
                default: error("Not implemented", target->loc);
@@ -802,7 +825,6 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                }
                resultType.isNullable = true;
 
-               auto p = resultType.type.getInfo<catalog::DecimalTypeInfo>()->getPrecision();
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
@@ -886,8 +908,42 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
-
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1, arg2}, fInfo);
+
+            }
+            if (function->functionName == "SUBSTRING") {
+               if (function->arguments.size() < 1 && function->arguments.size() >= 4) {
+                  error("Function extract needs one,two or three arguments", function->loc);
+               }
+               auto stringArg = analyzeExpression(function->arguments[0], context, resolverScope);
+               auto fromArg = function->arguments[1] ? analyzeExpression(function->arguments[1], context, resolverScope) : nullptr;
+               auto forArg = function->arguments[2] ? analyzeExpression(function->arguments[2], context, resolverScope) : nullptr;
+
+               if (!stringArg->resultType.has_value() || stringArg->resultType->type.getTypeId() != catalog::LogicalTypeId::STRING) {
+                  error("The first argument of the SUBSTRING function must have a result type of STRING", stringArg->loc);
+               }
+               if (!fromArg->resultType.has_value() || fromArg->resultType->type.getTypeId() != catalog::LogicalTypeId::INT) {
+                  error("The second argument of the SUBSTRING function must have a result type of INT", fromArg->loc);
+               }
+               if (!forArg->resultType.has_value() || forArg->resultType->type.getTypeId() != catalog::LogicalTypeId::INT) {
+                  error("The second argument of the SUBSTRING function must have a result type of INT", forArg->loc);
+               }
+
+               auto scope = createTmpScope();
+               auto fName = function->alias.empty() ? function->functionName : function->alias;
+               auto resultType = catalog::Type::stringType();
+
+               auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+               fInfo->displayName = function->alias;
+               context->mapAttribute(resolverScope, fName, fInfo);
+               auto boundArgs = std::vector{stringArg};
+               if (fromArg) {
+                  boundArgs.emplace_back(fromArg);
+               }
+               if (forArg) {
+                  boundArgs.emplace_back(forArg);
+               }
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs, fInfo);
 
             }
             throw std::runtime_error("FunctionType Not implemented");
@@ -973,7 +1029,41 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          return drv.nf.node<ast::BoundSubqueryExpression>(subqueryExpr->loc, subqueryExpr->subQueryType, resultType, subqueryExpr->alias, namedResult, subqueryScope, boundSubquery, boundToTestExpr);
 
       }
-      default: error("Not implemented", rootNode->loc);
+      case ast::ExpressionClass::CASE: {
+         auto caseExpr = std::static_pointer_cast<lingodb::ast::CaseExpression>(rootNode);
+         if (!caseExpr->elseExpr) {
+            error("Case expr must have else clause", caseExpr->loc);
+         }
+         if (caseExpr->caseChecks.empty()) {
+            error("Case expression does not have any case checks", caseExpr->loc);
+         }
+         std::vector<ast::BoundCaseExpression::BoundCaseCheck> boundCaseChecks;
+         std::vector<catalog::NullableType> thenTypes{};
+         std::ranges::transform(caseExpr->caseChecks, std::back_inserter(boundCaseChecks), [&](ast::CaseExpression::CaseCheck& caseCheck) {
+            if (!caseCheck.thenExpr || !caseCheck.whenExpr) {
+               error("Should not happen", caseExpr->loc);
+            }
+
+            ast::BoundCaseExpression::BoundCaseCheck boundCheck{analyzeExpression(caseCheck.whenExpr, context, resolverScope), analyzeExpression(caseCheck.thenExpr, context, resolverScope)};
+            //TODO check correct type of when clause
+            if (!boundCheck.thenExpr->resultType.has_value()) {
+               error("Then expression has invalid type", boundCheck.thenExpr->loc);
+            }
+            thenTypes.emplace_back(boundCheck.thenExpr->resultType.value());
+            return boundCheck;
+         });
+         std::shared_ptr<ast::BoundExpression> boundElse = analyzeExpression(caseExpr->elseExpr, context, resolverScope);
+         if (!boundElse->resultType.has_value()) {
+            error("Else has invalid type", boundElse->loc);
+         }
+         thenTypes.emplace_back(boundElse->resultType.value());
+         //Find common then type
+         auto commonType = SQLTypeUtils::toCommonTypes(thenTypes);
+         auto resultType = SQLTypeUtils::getCommonBaseType(thenTypes);
+
+         return drv.nf.node<ast::BoundCaseExpression>(caseExpr->loc,resultType, caseExpr->alias, boundCaseChecks, boundElse );
+      }
+      default: error("Expression type not implemented", rootNode->loc);
    }
 }
 
