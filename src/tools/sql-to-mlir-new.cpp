@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
       auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
       sqlContext->catalog = session->getCatalog();
       lingodb::analyzer::SQLQueryAnalyzer analyzer{session->getCatalog()};
-      drv.result = analyzer.analyzeAndTransform(drv.result, sqlContext);
+      drv.result = analyzer.canonicalizeAndAnalyze(drv.result, sqlContext);
       std::cout << std::endl
                 << std::endl;
       std::cout << "After" << std::endl;
