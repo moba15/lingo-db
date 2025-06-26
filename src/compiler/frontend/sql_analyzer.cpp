@@ -782,7 +782,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             return c;
 
          });
-         auto commonType = SQLTypeUtils::getCommonBaseType(types, operatorExpr->type);
+         auto commonType = SQLTypeUtils::getCommonBaseType(castValues, operatorExpr->type);
          size_t t = 0;
          for (auto boundChild : boundChildren) {
             boundChild->resultType = commonNumbers[t];
