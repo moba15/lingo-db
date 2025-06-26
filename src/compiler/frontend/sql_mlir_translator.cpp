@@ -69,7 +69,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
                colMemberNames.push_back(builder.getStringAttr(colMemberName));
                colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
 
-               colTypes.push_back(mlir::TypeAttr::get(named->resultType.type.getMLIRTypeCreator()->createType(builder.getContext())));
+
 
                auto attrDef = named->createRef(builder, attrManager);
                attrs.push_back(attrDef);
@@ -524,15 +524,15 @@ mlir::Value SQLMlirTranslator::translateBinaryOperatorExpression(mlir::OpBuilder
          return builder.create<db::SubOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_TIMES: {
-         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[1]->resultType->castValue(builder, right)};
          return builder.create<db::MulOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_DIVIDE: {
-         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[1]->resultType->castValue(builder, right)};
          return builder.create<db::DivOp>(builder.getUnknownLoc(), ct);
       }
       case ast::ExpressionType::OPERATOR_MOD: {
-         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[0]->resultType->castValue(builder, right)};
+         auto ct = {expression->children[0]->resultType->castValue(builder, left), expression->children[1]->resultType->castValue(builder, right)};
          return builder.create<db::ModOp>(builder.getUnknownLoc(), ct);
       }
       default: error("Not implemented", expression->loc);
@@ -669,8 +669,10 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
       }
       case ast::TableReferenceType::SUBQUERY: {
          auto subquery = std::static_pointer_cast<ast::BoundSubqueryRef>(tableRef);
+         context->pushNewScope(subquery->sqlScope);
          mlir::Value subQuery;
          auto translated = translateTableProducer(builder, subquery->subSelect, context);
+         context->popCurrentScope();
 
          return translated;
       }

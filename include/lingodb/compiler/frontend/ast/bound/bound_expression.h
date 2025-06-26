@@ -131,8 +131,8 @@ class BoundStarExpression : public BoundExpression {
 class BoundOperatorExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_OPERATOR;
-   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children);
-   BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
+   BoundOperatorExpression(ExpressionType type, catalog::NullableType resultType, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children);
+   BoundOperatorExpression(ExpressionType type, catalog::NullableType resultType, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right);
 
    std::vector<std::shared_ptr<BoundExpression>> children;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
