@@ -209,11 +209,12 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
       }
       case ast::ExpressionClass::FUNCTION: {
          auto functionExpr = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
-
+         static int i = 0;
          if (functionExpr->type == ast::ExpressionType::AGGREGATE) {
             if (functionExpr->alias.empty()) {
                //TODO make unique alias
-               functionExpr->alias = functionExpr->functionName + "_" + std::to_string(0);
+               functionExpr->alias = functionExpr->functionName + "_" + std::to_string(i);
+               i++;
             }
             auto columnRef = drv.nf.node<ast::ColumnRefExpression>(functionExpr->loc, functionExpr->alias);
             context->aggregationNode->aggregations.push_back(functionExpr);
@@ -221,6 +222,7 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
             return columnRef;
 
          }
+         return functionExpr;
       }
       case ast::ExpressionClass::CASE: {
          auto caseExpr = std::static_pointer_cast<ast::CaseExpression>(rootNode);
@@ -573,7 +575,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
 
 
          }
-         context->currentScope->evalBeforeAggr.insert(context->currentScope->evalBeforeAggr.end(), evalBefore.begin(), evalBefore.end());
+
 
          for (auto target : targetInfo.targetColumns) {
             assert(!subquery->alias.empty());
@@ -770,15 +772,24 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          std::ranges::transform(boundChildren, std::back_inserter(types), [](auto c) {
             return c->resultType.value();
          });
-         auto commonType = SQLTypeUtils::getCommonBaseType(types, operatorExpr->type);
+
          auto commonNumbers = SQLTypeUtils::toCommonNumber(types);
+         std::vector<catalog::NullableType> castValues{};
+         std::ranges::transform(commonNumbers, std::back_inserter(castValues), [](auto c) {
+            if (c.castType) {
+               return *c.castType;
+            }
+            return c;
+
+         });
+         auto commonType = SQLTypeUtils::getCommonBaseType(types, operatorExpr->type);
          size_t t = 0;
          for (auto boundChild : boundChildren) {
             boundChild->resultType = commonNumbers[t];
             t++;
          }
          //TODO base
-         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType.type, operatorExpr->alias, boundChildren);
+         return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, operatorExpr->alias, boundChildren);
       }
       case ast::ExpressionClass::FUNCTION: {
          auto function = std::static_pointer_cast<ast::FunctionExpression>(rootNode);
@@ -1257,7 +1268,7 @@ std::pair<unsigned long, unsigned long> SQLTypeUtils::getAdaptedDecimalPAndSAfte
       p = 38;
       s = 6;
    } else if (beforeComma > 32 && s <= 6) {
-      p = 28;
+      p = 38;
    } else {
       p = std::min<unsigned long>(p, 38);
       s = std::min<unsigned long>(s, 38 - beforeComma);

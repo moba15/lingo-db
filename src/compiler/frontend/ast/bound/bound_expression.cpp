@@ -78,9 +78,9 @@ std::string BoundStarExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idG
 /*
  * BoundComparisonExpression
 */
-BoundOperatorExpression::BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children) : BoundExpression(TYPE, type, resultType, alias), children(children) {
+BoundOperatorExpression::BoundOperatorExpression(ExpressionType type, catalog::NullableType resultType, std::string alias, std::vector<std::shared_ptr<BoundExpression>> children) : BoundExpression(TYPE, type, resultType, alias), children(children) {
 }
-BoundOperatorExpression::BoundOperatorExpression(ExpressionType type, catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right) : BoundExpression(TYPE, type, resultType, alias), children({left, right}) {
+BoundOperatorExpression::BoundOperatorExpression(ExpressionType type, catalog::NullableType resultType, std::string alias, std::shared_ptr<BoundExpression> left, std::shared_ptr<BoundExpression> right) : BoundExpression(TYPE, type, resultType, alias), children({left, right}) {
 }
 std::string BoundOperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
