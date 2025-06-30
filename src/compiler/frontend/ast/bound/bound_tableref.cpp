@@ -4,7 +4,7 @@ namespace lingodb::ast {
  * BoundBase Table
 */
 
-BoundBaseTableRef::BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias, std::string mlirScope) : BoundTableRef(TYPE, std::move(alias)), tableCatalogEntry(std::move(tableCatalogEntry)), mlirScope(mlirScope) {
+BoundBaseTableRef::BoundBaseTableRef(std::vector<std::shared_ptr<NamedResult>> namedResultsEntries, std::string alias, std::string relationName, std::string mlirScope) : BoundTableRef(TYPE, std::move(alias)), namedResultsEntries(std::move(namedResultsEntries)), mlirScope(mlirScope), relationName(relationName) {
 }
 std::string BoundBaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot;
@@ -13,8 +13,7 @@ std::string BoundBaseTableRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen
    std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
 
    // Create label with table information
-   std::string label = "BoundBaseTable\\n table: " + tableCatalogEntry->getName() + "\\n" +
-      "tableCategoryEntry" + tableCatalogEntry->getName();
+   std::string label = "BoundBaseTable\\n table:  tableCatalogEntry->getName() \\n tableCategoryEntry";
 
    //TODO
    // Add alias if it's not empty

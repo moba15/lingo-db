@@ -5,7 +5,8 @@
 #include <iostream>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
-ASTTransformContext::ASTTransformContext() : aggregationNode(std::make_shared<ast::AggregationNode>()), extendNode(std::make_shared<ast::ExtendNode>()){
+ASTTransformContext::ASTTransformContext() : currentScope(std::make_shared<ASTTransformScope>()){
+   scopeStack.push(currentScope);
 }
 
 DefineScope::DefineScope(SQLContext& sqlContext) : sqlContext(sqlContext) {
@@ -52,13 +53,29 @@ void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::share
    resolver.insertIntoScope(&scope, name, columnInfo);
 }
 
-void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) {
+std::vector<std::shared_ptr<ast::NamedResult>> SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) {
+   std::vector<std::shared_ptr<ast::NamedResult>> result;
    for (auto c : tableCatalogEntry->getColumns()) {
       auto columnInfo = std::make_shared<ast::ColumnInfo>(name, c);
 
       mapAttribute(scope, name + "." + c.getColumnName(), columnInfo);
 
       mapAttribute(scope, c.getColumnName(), columnInfo);
+      result.push_back(columnInfo);
+
+   }
+   return result;
+
+}
+
+void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::vector<std::shared_ptr<ast::NamedResult>> targetInfos) {
+   for (auto c : targetInfos) {
+      //Better
+      std::string cName = c->displayName.empty() ? c->name : c->displayName;
+
+      mapAttribute(scope, name + "." +  cName, c);
+
+      mapAttribute(scope, cName, c);
 
 
    }

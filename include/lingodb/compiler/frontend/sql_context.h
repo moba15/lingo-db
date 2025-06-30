@@ -1,27 +1,48 @@
 #pragma once
 
-#include "lingodb/compiler/frontend/sql_scope.h"
+
 #include "lingodb/compiler/frontend/ast/aggregation_node.h"
 #include "lingodb/compiler/frontend/ast/extend_node.h"
+#include "lingodb/compiler/frontend/sql_scope.h"
 
 #include <llvm/ADT/ScopedHashTable.h>
 
 #include <memory>
-#include <vector>
 #include <stack>
+#include <vector>
+namespace lingodb::ast {
+class CTENode;
+}
 namespace lingodb::analyzer {
+
 struct StringInfo {
    static bool isEqual(std::string a, std::string b) { return a == b; }
    static std::string getEmptyKey() { return ""; }
    static std::string getTombstoneKey() { return "-"; }
    static size_t getHashValue(std::string str) { return std::hash<std::string>{}(str); }
 };
-
+class ASTTransformScope {
+   public:
+   ASTTransformScope() : aggregationNode(std::make_shared<ast::AggregationNode>()), extendNode(std::make_shared<ast::ExtendNode>()) {}
+   std::shared_ptr<ast::AggregationNode> aggregationNode;
+   std::shared_ptr<ast::ExtendNode> extendNode;
+};
 class ASTTransformContext {
    public:
    ASTTransformContext();
-   std::shared_ptr<ast::AggregationNode> aggregationNode;
-   std::shared_ptr<ast::ExtendNode> extendNode;
+   std::stack<std::shared_ptr<ASTTransformScope>> scopeStack{};
+   std::shared_ptr<ASTTransformScope> currentScope;
+   void pushNewScope() {
+      currentScope = std::make_shared<ASTTransformScope>();
+        scopeStack.push(currentScope);
+   }
+
+   void popScope() {
+      currentScope = scopeStack.top();
+      scopeStack.pop();
+   }
+
+
 };
 class SQLContext;
 class DefineScope {
@@ -45,6 +66,10 @@ class SQLContext {
    std::shared_ptr<SQLScope> currentScope;
 
    std::stack<std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>>> definedAttributes;
+   using renameCte = std::vector<std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>>>;
+   //std::unordered_map<std::string, std::pair<ast::TargetInfo, renameCte>> ctes;
+   std::unordered_map<std::string, std::pair<ast::TargetInfo, std::shared_ptr<ast::CTENode>>> ctes;
+
 
    llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo> resolver;
    using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
@@ -62,7 +87,8 @@ class SQLContext {
    std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> getTopDefinedColumns();
 
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<ast::NamedResult> columnInfo);
-   void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
+   std::vector<std::shared_ptr<ast::NamedResult>> mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
+   void mapAttribute(ResolverScope& scope, std::string name, std::vector<std::shared_ptr<ast::NamedResult>> targetInfos);
    std::shared_ptr<ast::NamedResult> getNamedResultInfo(location loc,std::string name);
 
    std::string getUniqueScope(std::string base);
