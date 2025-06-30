@@ -58,7 +58,7 @@ class SQLMlirTranslator {
    /*
    * Helper functions
    */
-   mlir::Type createTypeForColumn(mlir::MLIRContext* context, const catalog::Column& colDef);
+
    mlir::Type createBaseTypeFromColumnType(mlir::MLIRContext* context, const catalog::Type& t);
 };
 } // namespace lingodb::translator

@@ -245,10 +245,6 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
 
          mlir::Type type = nameResult->resultType.toMlirType(builder.getContext());
 
-         /*if (nameResult->type == ast::NamedResultType::Column) {
-            type = createTypeForColumn(builder.getContext(), std::static_pointer_cast<ast::ColumnInfo>(nameResult)->column);
-         }*/
-
          auto attrDef = nameResult->createRef(builder, attrManager);
          return builder.create<tuples::GetColumnOp>(
             builder.getUnknownLoc(),
@@ -950,10 +946,7 @@ mlir::Block* SQLMlirTranslator::translatePredicate(mlir::OpBuilder& builder, std
  * Helper functions
  */
 
-mlir::Type SQLMlirTranslator::createTypeForColumn(mlir::MLIRContext* context, const catalog::Column& colDef) {
-   mlir::Type baseType = createBaseTypeFromColumnType(context, colDef.getLogicalType());
-   return colDef.getIsNullable() ? db::NullableType::get(context, baseType) : baseType;
-}
+
 
 mlir::Type SQLMlirTranslator::createBaseTypeFromColumnType(mlir::MLIRContext* context, const catalog::Type& t) {
    return t.getMLIRTypeCreator()->createType(context);
