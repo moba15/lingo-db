@@ -23,6 +23,7 @@
   #include "lingodb/compiler/frontend/ast/result_modifier.h"
   #include "lingodb/compiler/frontend/ast/parsed_expression.h"
   #include "lingodb/compiler/frontend/ast/constant_value.h"
+  #include "lingodb/compiler/frontend/ast/cte_node.h"
   class driver;
 }
 
@@ -216,8 +217,10 @@
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
 
-%type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens
-%type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select
+%type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens PreparableStmt common_table_expr cte_list with_clause
+%type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select 
+
+
 
 %type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt extract_list expr_list substr_list
 
@@ -252,7 +255,7 @@
                     qualified_name relation_expr alias_clause opt_alias_clause 
                     name type_function_name func_name
 
-%type<std::vector<std::string>> name_list
+%type<std::vector<std::string>> name_list opt_name_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst Fconst 
 
@@ -391,8 +394,14 @@ select_no_parens:
         $$ = $select_clause;
     }
     //TODO | select_clause opt_sort_clause select_limit opt_for_locking_clause
-    //TODO | with_clause select_clause
-    //TODO | with_clause select_clause sort_clause
+    | with_clause select_clause opt_sort_clause
+    {
+        if ($opt_sort_clause.has_value()) {
+            $select_clause->modifiers.emplace_back($opt_sort_clause.value());
+        }
+        std::static_pointer_cast<lingodb::ast::CTENode>($with_clause)->child = $select_clause;
+        $$ = $with_clause;
+    }
     //TODO | with_clause select_clause opt_sort_clause for_locking_clause opt_select_limit
     //TODO | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
     //PIPE:
@@ -435,6 +444,15 @@ select_clause:
     simple_select {$$ = $1;}
     | select_with_parens 
     ;
+
+
+
+PreparableStmt:
+    SelectStmt
+    {
+        $$ = $1;
+    }
+
 
 /*
  * This rule parses SELECT statements that can appear within set operations,
@@ -486,8 +504,46 @@ simple_select:
     //TODO | select_clause INTERSECT set_quantifier select_clause
     //TODO | select_clause EXCEPT set_quantifier select_clause
     ;
+//TODO Add missing rules
+with_clause:
+    WITH cte_list 
+    {
+        $$ = $cte_list;
 
+    }
+    | WITH_LA cte_list
+    {
 
+    }
+    ;
+cte_list: 
+    common_table_expr 
+    {
+        $$ = $common_table_expr;
+    }
+    | cte_list[list] COMMA common_table_expr 
+    {
+        std::static_pointer_cast<lingodb::ast::CTENode>($list)->child = $common_table_expr;
+        $$ = $list;
+        
+    }
+    ;
+//TODO more complex rules
+common_table_expr: 
+    name opt_name_list AS opt_materialized LP PreparableStmt RP
+    {
+        auto cteNode = mkNode<lingodb::ast::CTENode>(@$);
+        cteNode->alias = $name;
+        cteNode->query = $PreparableStmt;
+        $$ = cteNode;
+
+    }
+;
+
+//TODO Add missing rules
+opt_materialized:
+    | %empty							{}
+    ;
 /*****************************************************************************
  *
  *	clauses common to all Optimizable Stmts:
@@ -1529,6 +1585,17 @@ qualified_name:
     ColId { $$=$1;}
     | ColId indirection
     ;
+opt_name_list: 
+    LP name_list RP
+    {
+        $$ = $name_list;
+    }
+    | %empty
+    {
+        $$ = std::vector<std::string>{};
+    }
+    ;
+
 name_list:
     name { auto t = mkList<std::string>(); t.emplace_back($name); $$=t;}
     | name_list[list] COMMA name {$list.emplace_back($name); $$=$list;}

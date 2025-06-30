@@ -18,12 +18,13 @@ class BoundBaseTableRef : public BoundTableRef {
    public:
    static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;
 
-   BoundBaseTableRef(std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry, std::string alias, std::string mlirScope);
+   BoundBaseTableRef(std::vector<std::shared_ptr<NamedResult>> namedResultsEntries, std::string alias, std::string relationName, std::string mlirScope);
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 
    //TODO missing semantic
-   std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry;
+   std::vector<std::shared_ptr<NamedResult>> namedResultsEntries;
+   std::string relationName;
    std::string mlirScope;
 };
 using boundJoinCond = std::variant<std::shared_ptr<BoundExpression>, std::vector<std::shared_ptr<ColumnRefExpression>>>;

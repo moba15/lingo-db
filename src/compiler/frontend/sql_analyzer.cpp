@@ -29,7 +29,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   transformed = transformedFrom;
                }
 
-               auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->extendNode);
+               auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->currentScope->extendNode);
                extendPipeOp->input = transformed;
                transformed = extendPipeOp;
                //Transform where_clause
@@ -41,7 +41,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   transformed = transFormededWhereClause;
                }
 
-               auto aggPipeNode = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::AGGREGATE, context->aggregationNode);
+               auto aggPipeNode = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::AGGREGATE, context->currentScope->aggregationNode);
                auto transFormedAggregation = canonicalizeCast<ast::PipeOperator>(aggPipeNode, context);
                transFormedAggregation->input = transformed;
                transformed = transFormedAggregation;
@@ -59,7 +59,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                //Transform Group by
                if (selectNode->groups) {
                   auto loc = selectNode->groups->loc;
-                  context->aggregationNode->groupByNode = std::move(selectNode->groups);
+                  context->currentScope->aggregationNode->groupByNode = std::move(selectNode->groups);
                }
 
                if (selectNode->having) {
@@ -78,9 +78,25 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                }
                selectNode->modifiers.clear();
 
+
                return transformed;
             }
-            default: return queryNode;
+            case ast::QueryNodeType::CTE_NODE: {
+               auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
+               if (cteNode->query) {
+
+                  cteNode->query = canonicalizeCast<ast::TableProducer>(cteNode->query, context);
+
+               }
+               if (cteNode->child) {
+                  context->pushNewScope();
+                  cteNode->child = canonicalizeCast<ast::TableProducer>(cteNode->child, context);
+                  context->popScope();
+               }
+               return cteNode;
+
+            }
+            default: error("Not implemented", queryNode->loc);
          }
       }
       case ast::NodeType::PIPE_OP: {
@@ -103,9 +119,9 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   if (target->exprClass == ast::ExpressionClass::FUNCTION) {
                      auto function = std::static_pointer_cast<ast::FunctionExpression>(target);
                      if (target->type == ast::ExpressionType::AGGREGATE) {
-                        context->aggregationNode->aggregations.push_back(function);
+                        context->currentScope->aggregationNode->aggregations.push_back(function);
                      } else {
-                        context->extendNode->extensions.push_back(function);
+                        context->currentScope->extendNode->extensions.push_back(function);
                      }
                      //TODO better
                      if (function->alias.empty()) {
@@ -135,6 +151,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                resultModifier->input = pipeOp->input;
                return resultModifier;
             }
+
 
             default: return pipeOp;
          }
@@ -217,7 +234,7 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
                i++;
             }
             auto columnRef = drv.nf.node<ast::ColumnRefExpression>(functionExpr->loc, functionExpr->alias);
-            context->aggregationNode->aggregations.push_back(functionExpr);
+            context->currentScope->aggregationNode->aggregations.push_back(functionExpr);
 
             return columnRef;
 
@@ -283,6 +300,53 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
             resultModifier->input = analyze(resultModifier->input, context, resolverScope);
          }
          return analyzeResultModifier(resultModifier, context);
+      }
+      case ast::NodeType::QUERY_NODE: {
+         auto queryNode = std::static_pointer_cast<ast::QueryNode>(rootNode);
+         switch (queryNode->type) {
+            case ast::QueryNodeType::CTE_NODE: {
+               auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
+
+               if (cteNode->query) {
+                  ast::TargetInfo targetInfo{};
+                  {
+                     auto subQueryResolverScope = context->createResolverScope();
+                     auto defineScope = context->createDefineScope();
+                     context->pushNewScope();
+                     auto subQueryScope = context->currentScope;
+                     cteNode->query = analyze(cteNode->query, context, subQueryResolverScope);
+                     targetInfo = context->currentScope->targetInfo;
+                     auto evalBefore = context->currentScope->evalBeforeAggr;
+                     context->popCurrentScope();
+
+                     cteNode->subQueryScope = subQueryScope;
+                     std::vector<std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>>> renamedResults;
+                     for (auto targetColumns : targetInfo.targetColumns) {
+                        auto from = targetColumns;
+                        auto to = std::make_shared<ast::NamedResult>(from->type, cteNode->alias, from->resultType, from->name);
+                        to->displayName = from->displayName;
+                        renamedResults.emplace_back(std::pair{from, to});
+                     }
+                     cteNode->renamedResults = std::move(renamedResults);
+
+
+
+                     context->ctes.insert({cteNode->alias, {targetInfo, cteNode}});
+
+
+
+                  }
+
+
+
+               }
+               if (cteNode->child) {
+                  cteNode->child = analyze(cteNode->child, context, resolverScope);
+               }
+               return cteNode;
+            }
+            default: throw std::runtime_error("Not implemented");
+         }
       }
 
       default: throw std::runtime_error("Not implemented");
@@ -444,18 +508,43 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
       case ast::TableReferenceType::BASE_TABLE: {
          auto baseTableRef = std::static_pointer_cast<ast::BaseTableRef>(tableRef);
          auto catalogEntry = catalog->getTypedEntry<catalog::TableCatalogEntry>(baseTableRef->tableName);
-         if (!catalogEntry.has_value()) {
-            error("No Catalog found with name " + baseTableRef->tableName, baseTableRef->loc);
-         }
-
          //Add to current scope
          auto sqlScopeName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
          //Get unique mlirScope
          auto uniqueScope = context->getUniqueScope(sqlScopeName);
-         context->mapAttribute(resolverScope, uniqueScope, catalogEntry.value());
+         if (!catalogEntry.has_value()) {
 
-         auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, catalogEntry.value(), baseTableRef->alias, uniqueScope);
-         return boundBaseTableRef;
+            //Check for cte
+            if (context->ctes.contains(baseTableRef->tableName)) {
+               auto [cteInfo, cteNode] = context->ctes.at(baseTableRef->tableName);
+
+
+               std::vector<std::shared_ptr<ast::NamedResult>> namedResults{};
+
+               std::ranges::transform(cteNode->renamedResults, std::back_inserter(namedResults), [&](auto& pair) {
+                  return pair.second;
+               });
+
+               context->mapAttribute(resolverScope, uniqueScope, namedResults);
+
+               auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, namedResults, baseTableRef->alias, baseTableRef->tableName, uniqueScope);
+               return boundBaseTableRef;
+            } else {
+               error("No Catalog found with name " + baseTableRef->tableName, baseTableRef->loc);
+            }
+
+
+         } else {
+
+            auto namedResults = context->mapAttribute(resolverScope, uniqueScope, catalogEntry.value());
+
+            auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, namedResults, baseTableRef->alias, catalogEntry.value()->getName(),uniqueScope);
+            return boundBaseTableRef;
+         }
+
+
+
+
          break;
       }
       case ast::TableReferenceType::JOIN: {

@@ -32,6 +32,7 @@ add_library(sql-frontend-new
         ast/result_modifier.cpp
         ast/extend_node.cpp
         ast/select_node.cpp
+        ast/cte_node.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}

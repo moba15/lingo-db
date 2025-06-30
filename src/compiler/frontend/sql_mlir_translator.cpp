@@ -10,6 +10,7 @@
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
+#include "lingodb/compiler/frontend/ast/cte_node.h"
 
 #include "lingodb/utility/Serialization.h"
 
@@ -51,11 +52,11 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
             case ast::NamedResultType::Column: {
                auto colMemberName = memberManager.getUniqueMember(named->displayName);
                names.push_back(builder.getStringAttr(named->displayName));
-               auto columnInfo = std::static_pointer_cast<ast::ColumnInfo>(named);
-               auto type = createTypeForColumn(builder.getContext(), columnInfo->column);
-               colTypes.push_back(mlir::TypeAttr::get(type));
+
+
+               colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
                colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               auto attrDef = columnInfo->createRef(builder, attrManager);
+               auto attrDef = named->createRef(builder, attrManager);
                attrs.push_back(attrDef);
                break;
             }
@@ -137,6 +138,25 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
          }
          tree = translateResultModifier(builder, resultModifier, context, tree);
          break;
+      }
+      case ast::NodeType::QUERY_NODE: {
+         auto queryNode = std::static_pointer_cast<ast::QueryNode>(tableProducer);
+         switch (queryNode->type) {
+            case ast::QueryNodeType::CTE_NODE: {
+               auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
+
+
+
+               if (cteNode->child) {
+                  tree = translateTableProducer(builder, cteNode->child, context);
+               }
+
+               return tree;
+
+
+            }
+            default: error("Not implemented", tableProducer->loc);
+         }
       }
       default: error("Not implemented", tableProducer->loc);
    }
@@ -225,9 +245,9 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
 
          mlir::Type type = nameResult->resultType.toMlirType(builder.getContext());
 
-         if (nameResult->type == ast::NamedResultType::Column) {
+         /*if (nameResult->type == ast::NamedResultType::Column) {
             type = createTypeForColumn(builder.getContext(), std::static_pointer_cast<ast::ColumnInfo>(nameResult)->column);
-         }
+         }*/
 
          auto attrDef = nameResult->createRef(builder, attrManager);
          return builder.create<tuples::GetColumnOp>(
@@ -601,19 +621,38 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
    switch (tableRef->type) {
       case ast::TableReferenceType::BASE_TABLE: {
          auto baseTableRef = std::static_pointer_cast<ast::BoundBaseTableRef>(tableRef);
-         std::string relation = baseTableRef->tableCatalogEntry->getName();
+         std::string relation = baseTableRef->relationName;
          //std::string alias = relation;
-         if (!baseTableRef->tableCatalogEntry) {
-            error("Table not found", baseTableRef->loc);
+         if (context->ctes.contains(relation)) {
+            auto [cteInfo, cteNode] = context->ctes.at(relation);
+
+            if (cteNode->query) {
+               assert(cteNode->subQueryScope);
+               context->pushNewScope(cteNode->subQueryScope);
+               auto _tree = translateTableProducer(builder, cteNode->query, context);
+               context->popCurrentScope();
+               std::vector<mlir::Attribute> renamingDefsAsAttr;
+               std::ranges::transform(context->ctes.at(cteNode->alias).second->renamedResults, std::back_inserter(renamingDefsAsAttr), [&](std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>> r) {
+                  return r.second->createDef(builder, attrManager, builder.getArrayAttr(r.first->createRef(builder, attrManager)));
+               });
+               return builder.create<relalg::RenamingOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), _tree, builder.getArrayAttr(renamingDefsAsAttr));
+            }
+
+
+
+
          }
-         auto rel = baseTableRef->tableCatalogEntry;
+         if (baseTableRef->namedResultsEntries.empty()) {
+            error("Table " << baseTableRef->relationName << " not found", baseTableRef->loc);
+         }
+         auto rel = baseTableRef->namedResultsEntries;
          std::string uniqueScope = baseTableRef->mlirScope;
 
          std::vector<mlir::NamedAttribute> columns{};
-         for (auto& col : rel->getColumns()) {
-            auto attrDef = attrManager.createDef(uniqueScope, col.getColumnName());
-            attrDef.getColumn().type = createTypeForColumn(builder.getContext(), col);
-            columns.push_back(builder.getNamedAttr(col.getColumnName(), attrDef));
+         for (auto& info : rel) {
+            auto attrDef = attrManager.createDef(uniqueScope, info->name);
+            attrDef.getColumn().type = info->resultType.toMlirType(builder.getContext());
+            columns.push_back(builder.getNamedAttr(info->name, attrDef));
          }
          return builder.create<relalg::BaseTableOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), relation, builder.getDictionaryAttr(columns));
       }

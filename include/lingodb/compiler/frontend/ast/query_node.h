@@ -37,6 +37,8 @@ class QueryNode : public TableProducer {
    /// The set of result modifiers associated with this query node
    std::vector<std::shared_ptr<ResultModifier>> modifiers{};
 
+   std::shared_ptr<TableProducer> input;
+
    virtual std::string toString(uint32_t depth) = 0;
 
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
