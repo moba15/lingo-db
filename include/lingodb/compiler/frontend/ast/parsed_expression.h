@@ -20,6 +20,7 @@ enum LogicalType : uint8_t {
    BIGINT = 6,
    SMALLINT = 7,
    BOOLEAN = 8,
+   STRING = 9,
    //TODO other
 };
 
