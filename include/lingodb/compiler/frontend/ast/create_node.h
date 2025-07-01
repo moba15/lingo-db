@@ -95,10 +95,10 @@ class TableElement {
 
 class ColumnElement : public TableElement {
    public:
-   ColumnElement(std::string name, TypeMods typeMods)
-         : TableElement(TableElementType::COLUMN), name(std::move(name)), typeMods(typeMods) {}
+   ColumnElement(std::string name, LogicalType typeMods)
+         : TableElement(TableElementType::COLUMN), name(std::move(name)), logicalType(typeMods) {}
 
-   TypeMods typeMods;
+   LogicalType logicalType;
    std::string name;
    std::vector<std::shared_ptr<Constraint>> constraints; //Optional constraints for the column
 };

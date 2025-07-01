@@ -281,14 +281,14 @@
 
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
-%type<std::optional<lingodb::ast::TypeMods>> opt_interval
+%type<std::optional<lingodb::ast::LogicalType>> opt_interval
 %type<bool> opt_asymmetric 
 
 
 
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt
 %type<bool> OptTemp
-%type<lingodb::ast::TypeMods> Numeric SimpleType Type
+%type<lingodb::ast::LogicalType> Numeric SimpleType Type
 %type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
 %type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem
@@ -1786,15 +1786,15 @@ Numeric:
     INT_P 
     | INTEGER
     {
-        $$ = lingodb::ast::TypeMods::INT;
+        $$ = lingodb::ast::LogicalType::INT;
     }
     | SMALLINT
     {
-        $$ = lingodb::ast::TypeMods::SMALLINT;
+        $$ = lingodb::ast::LogicalType::SMALLINT;
     }
     | BIGINT
     {
-        $$ = lingodb::ast::TypeMods::BIGINT;
+        $$ = lingodb::ast::LogicalType::BIGINT;
     }
     | REAL
     | FLOAT_P //TODO opt_float
@@ -1804,7 +1804,7 @@ Numeric:
     | NUMERIC //TODO opt_type_modifiers
     | BOOLEAN_P
     {
-        $$ = lingodb::ast::TypeMods::BOOLEAN;
+        $$ = lingodb::ast::LogicalType::BOOLEAN;
     }
     ;
 Character:
@@ -1851,7 +1851,7 @@ AexprConst:
     {
         //TODO
         auto interval = mkNode<lingodb::ast::CastExpression>(@$, lingodb::ast::LogicalType::INTERVAL, $Sconst);
-        interval->typeMods = $opt_interval;
+        interval->logicalType = $opt_interval;
         $$ = interval;
     }
 ;
@@ -1876,11 +1876,11 @@ ConstInterval:
 opt_interval: 
     DAY_P 
      {
-        $$ = lingodb::ast::TypeMods::DAYS;
+        $$ = lingodb::ast::LogicalType::DAYS;
      }
      | YEAR_P 
      {
-        $$ = lingodb::ast::TypeMods::YEARS;
+        $$ = lingodb::ast::LogicalType::YEARS;
      }
     ;
 

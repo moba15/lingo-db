@@ -14,18 +14,15 @@ enum class ExpressionClass : uint8_t;
 enum LogicalType : uint8_t {
    DATE = 1,
    INTERVAL = 2,
+   DAYS = 3,
+   YEARS = 4,
+   INT = 5,
+   BIGINT = 6,
+   SMALLINT = 7,
+   BOOLEAN = 8,
    //TODO other
 };
-//TODO maybe merge with both together
-enum class TypeMods : uint8_t {
-   DAYS = 1,
-   YEARS = 2,
-   INT = 3,
-   BIGINT = 4,
-   SMALLINT = 5,
-   BOOLEAN = 6,
-   //TODO other
-};
+
 
 class BaseExpression : public AstNode {
    public:
@@ -419,8 +416,7 @@ class CastExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::CAST;
    CastExpression(LogicalType logicalType, std::shared_ptr<ParsedExpression> child);
-   LogicalType logicalType;
-   std::optional<TypeMods> typeMods;
+   std::optional<LogicalType> logicalType;
    std::shared_ptr<ParsedExpression> child;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
