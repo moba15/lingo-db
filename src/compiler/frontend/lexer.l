@@ -204,6 +204,8 @@ right                                 { return lingodb::parser::make_RIGHT(loc);
 
 [tT][hH][eE][nN]                      { return lingodb::parser::make_THEN(loc); }
 
+[vV][aA][rR][cC][hH][aA][rR]          { return lingodb::parser::make_VARCHAR(loc); }
+
 [wW][hH][eE][rR][eE]                  { return lingodb::parser::make_WHERE(loc); }
 [wW][hH][eE][nN]                      { return lingodb::parser::make_WHEN(loc); }
 [wW][iI][tT][hH]                      { return lingodb::parser::make_WITH(loc); }

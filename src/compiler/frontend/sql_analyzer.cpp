@@ -1447,6 +1447,9 @@ catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logic
       case ast::LogicalType::BOOLEAN: {
          return catalog::Type::boolean();
       }
+      case ast::LogicalType::STRING: {
+         return catalog::Type::stringType();
+      }
       default: throw std::runtime_error("Not implemented typeMods");
    }
 }

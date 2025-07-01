@@ -288,7 +288,7 @@
 
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt
 %type<bool> OptTemp
-%type<lingodb::ast::LogicalType> Numeric SimpleType Type
+%type<lingodb::ast::LogicalType> Numeric SimpleType Type CharacterWithoutLength character Bit Character
 %type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
 %type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem
@@ -1810,16 +1810,28 @@ Numeric:
 Character:
     CharacterWithLength
     | CharacterWithoutLength
+    {
+        $$ =$1;
+    }
     ;
 CharacterWithLength:
     character LP Iconst RP
+    {
+        error(@$, "Character with length is not supported yet!");
+    }
     ;
 CharacterWithoutLength:
     character
+    {
+        $$ = $1;
+    }
     ;
 //TODO Add missing rules
 character:
-    VARCHAR
+    VARCHAR 
+    {
+        $$ = lingodb::ast::LogicalType::STRING;
+    }
     ;
     
 
