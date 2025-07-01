@@ -33,8 +33,10 @@ class SQLQueryAnalyzer {
    SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog);
    std::shared_ptr<SQLContext> context = std::make_shared<SQLContext>();
 
-   std::shared_ptr<ast::TableProducer> canonicalizeAndAnalyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context);
-   std::shared_ptr<ast::TableProducer> analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::AstNode> canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context);
+   std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+
+   std::shared_ptr<ast::CreateNode> analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
 
 
    private:
@@ -81,6 +83,8 @@ struct SQLTypeUtils {
 
    static std::vector<catalog::NullableType> toCommonTypes(std::vector<catalog::NullableType> types);
    static std::vector<catalog::NullableType> toCommonNumber(std::vector<catalog::NullableType> types);
+
+   static catalog::NullableType typemodsToCatalogType(ast::TypeMods typeMods, std::vector<std::variant<size_t, std::string>>& typeModifiers);
 
 
    [[nodiscard]]

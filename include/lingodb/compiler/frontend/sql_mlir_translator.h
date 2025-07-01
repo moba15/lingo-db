@@ -1,4 +1,5 @@
 #pragma once
+#include "ast/create_node.h"
 #include "lingodb/compiler/Dialect/TupleStream/ColumnManager.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
@@ -11,6 +12,8 @@
 #include <memory>
 
 #include "mlir/IR/BuiltinOps.h"
+
+#include <lingodb/compiler/Dialect/util/UtilOps.h>
 
 namespace lingodb::translator {
 #define error(message, loc)                                         \
@@ -25,13 +28,18 @@ class SQLMlirTranslator {
    mlir::ModuleOp moduleOp;
    compiler::dialect::tuples::ColumnManager& attrManager;
 
-   std::optional<mlir::Value> translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context);
+   std::optional<mlir::Value> translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::AstNode> astNode, std::shared_ptr<analyzer::SQLContext> context);
+
+
 
    private:
    std::shared_ptr<TranslationContext> translationContext;
    std::shared_ptr<catalog::Catalog> catalog;
 
    mlir::Value translateTableProducer(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context);
+
+   void translateCreateNode(mlir::OpBuilder& builder, std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<analyzer::SQLContext> context);
+   catalog::CreateTableDef translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext>  context);
 
    mlir::Value translatePipeOperator(mlir::OpBuilder& builder, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
 
@@ -53,6 +61,10 @@ class SQLMlirTranslator {
    */
 
    mlir::Block* translatePredicate(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundExpression> expression, std::shared_ptr<analyzer::SQLContext> context);
+
+   mlir::Value createStringValue(mlir::OpBuilder& builder, std::string str) {
+      return builder.create<compiler::dialect::util::CreateConstVarLen>(builder.getUnknownLoc(), compiler::dialect::util::VarLen32Type::get(builder.getContext()), builder.getStringAttr(str));
+   }
 
    public:
    /*

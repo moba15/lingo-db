@@ -13,7 +13,7 @@ class driver {
    ~driver() { //TODO cleanUP
    };
    //TODO result
-   std::shared_ptr<lingodb::ast::TableProducer> result;
+   std::shared_ptr<lingodb::ast::AstNode> result;
    int parse(const std::string& f);
    void scan_begin();
    void scan_end();
