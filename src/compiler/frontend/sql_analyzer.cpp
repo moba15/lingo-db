@@ -2,6 +2,7 @@
 
 
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_groupby.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
@@ -267,26 +268,47 @@ std::shared_ptr<T> SQLCanonicalizer::canonicalizeCast(std::shared_ptr<ast::Table
 */
 SQLQueryAnalyzer::SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog) : catalog(std::move(catalog)) {
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context) {
-   auto transformed = sqlCanonicalizer.canonicalize(rootNode, std::make_shared<ASTTransformContext>());
-   ast::NodeIdGenerator idGen{};
-   std::cout << std::endl
-             << std::endl;
-   std::cout << "digraph ast {" << std::endl;
-   std::cout << transformed->toDotGraph(1, idGen) << std::endl;
-   std::cout << "}" << std::endl;
-   context->pushNewScope();
-   auto scope = context->createResolverScope();
-  transformed = analyze(transformed, context, scope);
-   return transformed;
-}
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> astRootNode, std::shared_ptr<SQLContext> context) {
 
+   auto rootNode = std::dynamic_pointer_cast<ast::TableProducer>(astRootNode);
+   if (!rootNode) {
+      //RootNode is not a TableProducer
+      switch (astRootNode->nodeType) {
+         case ast::NodeType::CREATE_NODE: {
+            auto createNode = std::static_pointer_cast<ast::CreateNode>(astRootNode);
+            auto scope = context->createResolverScope();
+            analyzeCreateNode(createNode, context, scope);
+            return createNode;
+
+         }
+         default: throw std::runtime_error("Invalid root node type");
+      }
+
+
+
+
+
+   } else {
+      //rootNode is a TableProducer
+      auto transformed = sqlCanonicalizer.canonicalize(rootNode, std::make_shared<ASTTransformContext>());
+      ast::NodeIdGenerator idGen{};
+      std::cout << std::endl
+                << std::endl;
+      std::cout << "digraph ast {" << std::endl;
+      std::cout << transformed->toDotGraph(1, idGen) << std::endl;
+      std::cout << "}" << std::endl;
+      context->pushNewScope();
+      auto scope = context->createResolverScope();
+      transformed = analyzeTableProducer(transformed, context, scope);
+      return transformed;
+   }
+}
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
    switch (rootNode->nodeType) {
       case ast::NodeType::PIPE_OP: {
          auto pipeOp = std::static_pointer_cast<ast::PipeOperator>(rootNode);
          if (pipeOp->input) {
-            pipeOp->input = analyze(pipeOp->input, context, resolverScope);
+            pipeOp->input = analyzeTableProducer(pipeOp->input, context, resolverScope);
          }
          return analyzePipeOperator(pipeOp, context, resolverScope);
       }
@@ -297,7 +319,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
       case ast::NodeType::RESULT_MODIFIER: {
          auto resultModifier = std::static_pointer_cast<ast::ResultModifier>(rootNode);
          if (resultModifier->input) {
-            resultModifier->input = analyze(resultModifier->input, context, resolverScope);
+            resultModifier->input = analyzeTableProducer(resultModifier->input, context, resolverScope);
          }
          return analyzeResultModifier(resultModifier, context);
       }
@@ -314,7 +336,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
                      auto defineScope = context->createDefineScope();
                      context->pushNewScope();
                      auto subQueryScope = context->currentScope;
-                     cteNode->query = analyze(cteNode->query, context, subQueryResolverScope);
+                     cteNode->query = analyzeTableProducer(cteNode->query, context, subQueryResolverScope);
                      targetInfo = context->currentScope->targetInfo;
                      auto evalBefore = context->currentScope->evalBeforeAggr;
                      context->popCurrentScope();
@@ -329,19 +351,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
                      }
                      cteNode->renamedResults = std::move(renamedResults);
 
-
-
                      context->ctes.insert({cteNode->alias, {targetInfo, cteNode}});
-
-
-
                   }
-
-
-
                }
                if (cteNode->child) {
-                  cteNode->child = analyze(cteNode->child, context, resolverScope);
+                  cteNode->child = analyzeTableProducer(cteNode->child, context, resolverScope);
                }
                return cteNode;
             }
@@ -353,7 +367,58 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyze(std::shared_ptr<as
    }
 }
 
+std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+   switch (createNode->createInfo->type) {
+      case ast::CatalogType::TABLE_ENTRY: {
+         auto createTableInfo = std::static_pointer_cast<ast::CreateTableInfo>(createNode->createInfo);
+         //TODO check
+         if (catalog->getEntry(createTableInfo->tableName).has_value()) {
+            error("Table " + createTableInfo->tableName + " already exists", createNode->loc);
+         }
+         //TODO maybe rewrite parser so that this could not happen
+         auto foundInvalidTableEntry = std::ranges::find_if(createTableInfo->tableElements, [](auto& tableElement) {
+            return tableElement->type != ast::TableElementType::COLUMN;
+         });
+         if (foundInvalidTableEntry != createTableInfo->tableElements.end()) {
+            error("Invalid table element type in create table statement", createNode->loc);
+         }
+         std::vector<std::shared_ptr<ast::TableElement>> boundTableElements{};
 
+         for (auto & tableElement : createTableInfo->tableElements) {
+            auto columnElement = std::static_pointer_cast<ast::ColumnElement>(tableElement);
+            if (columnElement->name.empty()) {
+               error("Column name cannot be empty", columnElement->loc);
+            }
+            std::vector<std::variant<size_t, std::string>> typeModifiers;
+            catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->typeMods, typeModifiers);
+            nullableType.isNullable = true;
+
+            //TODO constraints
+            for (auto& constraint: columnElement->constraints) {
+               switch (constraint->type) {
+                  case ast::ConstraintType::NOT_NULL: {
+                     nullableType.isNullable = false;
+                     break;
+                  }
+                     default: error("Constraint type not implemented", constraint->loc);
+               }
+            }
+
+            auto boundColumnElement = std::make_shared<ast::BoundColumnElement>(columnElement->name, nullableType);
+            boundTableElements.emplace_back(boundColumnElement);
+
+
+         }
+
+         createTableInfo->tableElements = std::move(boundTableElements);
+
+         //TODO check for catalog and shema
+         return createNode;
+      }
+         default: error("Not implemented", createNode->loc);
+   }
+
+}
 
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;
@@ -557,7 +622,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                if (join->left) {
                   auto leftResolverScope = context->createResolverScope();
                   auto defineScope = context->createDefineScope();
-                  left = analyze(join->left, context, leftResolverScope);
+                  left = analyzeTableProducer(join->left, context, leftResolverScope);
                   auto localMapping = context->getTopDefinedColumns();
                   for (auto& [name, column] : localMapping) {
                      mapping.push_back({name, column});
@@ -569,7 +634,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
 
                   auto rightResolverScope = context->createResolverScope();
                   auto defineScope = context->createDefineScope();
-                  right = analyze(join->right, context, rightResolverScope);
+                  right = analyzeTableProducer(join->right, context, rightResolverScope);
                   auto localMapping = context->getTopDefinedColumns();
                   for (auto& [name, column] : localMapping) {
                      mapping.push_back({name, column});
@@ -593,10 +658,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                std::shared_ptr<ast::TableProducer> left, right;
                std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> mapping{};
 
-               left = analyze(join->left, context, resolverScope);
+               left = analyzeTableProducer(join->left, context, resolverScope);
                auto rightContext = std::make_shared<SQLContext>();
                auto rightResolverScope = rightContext->createResolverScope();
-               right = analyze(join->right, rightContext, rightResolverScope);
+               right = analyzeTableProducer(join->right, rightContext, rightResolverScope);
                mapping = rightContext->getTopDefinedColumns();
 
                for (auto x : mapping) {
@@ -657,7 +722,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
             auto defineScope = context->createDefineScope();
             context->pushNewScope();
             subQueryScope = context->currentScope;
-            t = analyze(subquery->subSelectNode, context, subQueryResolverScope);
+            t = analyzeTableProducer(subquery->subSelectNode, context, subQueryResolverScope);
             targetInfo = context->currentScope->targetInfo;
             evalBefore = context->currentScope->evalBeforeAggr;
             context->popCurrentScope();
@@ -1117,7 +1182,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             auto subqueryDefineScope = context->createDefineScope();
             context->pushNewScope();
             subqueryScope = context->currentScope;
-            boundSubquery = analyze(subqueryExpr->subquery, context, subqueryResolver);
+            boundSubquery = analyzeTableProducer(subqueryExpr->subquery, context, subqueryResolver);
             subqueryTargetInfo = context->currentScope->targetInfo;
             context->popCurrentScope();
          }
@@ -1362,8 +1427,25 @@ std::pair<unsigned long, unsigned long> SQLTypeUtils::getAdaptedDecimalPAndSAfte
       p = std::min<unsigned long>(p, 38);
       s = std::min<unsigned long>(s, 38 - beforeComma);
    }
-   return  {p,s};
+   return {p, s};
 }
 
+catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::TypeMods typeMods, std::vector<std::variant<size_t, std::string>>& typeModifiers) {
+   switch (typeMods) {
+      case ast::TypeMods::INT: {
+         return catalog::Type::int32();
+      }
+      case ast::TypeMods::BIGINT: {
+         return catalog::Type::int64();
+      }
+      case ast::TypeMods::SMALLINT: {
+         return catalog::Type::int8();
+      }
+      case ast::TypeMods::BOOLEAN: {
+         return catalog::Type::boolean();
+      }
+      default: throw std::runtime_error("Not implemented typeMods");
+   }
+}
 
 } // namespace lingodb::analyzer

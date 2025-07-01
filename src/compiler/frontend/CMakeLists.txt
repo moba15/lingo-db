@@ -33,6 +33,8 @@ add_library(sql-frontend-new
         ast/extend_node.cpp
         ast/select_node.cpp
         ast/cte_node.cpp
+        ast/create_node.cpp
+        ast/constraint.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}

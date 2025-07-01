@@ -8,8 +8,10 @@
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
+#include "lingodb/compiler/frontend/ast/create_node.h"
 #include "lingodb/compiler/frontend/ast/cte_node.h"
 
 #include "lingodb/utility/Serialization.h"
@@ -22,6 +24,9 @@
 #include "mlir/Dialect/SCF/IR/SCF.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/BuiltinOps.h"
+
+#include <lingodb/compiler/Dialect/util/UtilOps.h.inc>
+#include <lingodb/compiler/runtime/RelationHelper.h>
 #include <mlir-c/IR.h>
 namespace lingodb::translator {
 using namespace lingodb::compiler::dialect;
@@ -31,86 +36,109 @@ SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, std::shared_ptr<ca
 {
    moduleOp.getContext()->getLoadedDialect<util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
 }
-std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context) {
-   mlir::Block* block = new mlir::Block();
-   mlir::Type localTableType;
-   {
-      mlir::OpBuilder::InsertionGuard guard(builder);
-      builder.setInsertionPointToStart(block);
-
-      auto tree = translateTableProducer(builder, tableProducer, context);
-
-      context->currentScope->evalBeforeAggr.clear();
-      std::vector<mlir::Attribute> attrs;
-      std::vector<mlir::Attribute> names;
-      std::vector<mlir::Attribute> colMemberNames;
-      std::vector<mlir::Attribute> colTypes;
-      auto& memberManager = builder.getContext()->getLoadedDialect<subop::SubOperatorDialect>()->getMemberManager();
-
-      for (auto& named : context->currentScope->targetInfo.targetColumns) {
-         switch (named->type) {
-            case ast::NamedResultType::Column: {
-               auto colMemberName = memberManager.getUniqueMember(named->displayName);
-               names.push_back(builder.getStringAttr(named->displayName));
-
-
-               colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
-               colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               auto attrDef = named->createRef(builder, attrManager);
-               attrs.push_back(attrDef);
-               break;
-            }
-            case ast::NamedResultType::Function: {
-               auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named);
-               names.push_back(builder.getStringAttr(functionInfo->name));
-               auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
-               colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.toMlirType(builder.getContext())));
-               auto attrDef = functionInfo->createRef(builder, attrManager);
-               attrs.push_back(attrDef);
-               break;
-            }
-            case ast::NamedResultType::EXPRESSION: {
-               names.push_back(builder.getStringAttr(named->displayName));
-               auto colMemberName = memberManager.getUniqueMember(named->name);
-               colMemberNames.push_back(builder.getStringAttr(colMemberName));
-               colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
+std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::AstNode> astNode, std::shared_ptr<analyzer::SQLContext> context) {
+   auto tableProducer = std::dynamic_pointer_cast<ast::TableProducer>(astNode);
+   if (!tableProducer) {
+      //Root node is not a TableProducer
+        switch (astNode->nodeType) {
+           case ast::NodeType::CREATE_NODE: {
+              auto createNode = std::static_pointer_cast<ast::CreateNode>(astNode);
+               translateCreateNode(builder, createNode, context);
+              return std::nullopt;
+           }
+           default: error("Invalid root node type", astNode->loc);
+        }
 
 
 
-               auto attrDef = named->createRef(builder, attrManager);
-               attrs.push_back(attrDef);
-               break;
-            }
-            default: {
-               error("Not implemented", tableProducer->loc);
+   } else {
+      //Root node is a TableProducer
+      mlir::Block* block = new mlir::Block();
+      mlir::Type localTableType;
+      {
+         mlir::OpBuilder::InsertionGuard guard(builder);
+         builder.setInsertionPointToStart(block);
+
+         auto tree = translateTableProducer(builder, tableProducer, context);
+
+         context->currentScope->evalBeforeAggr.clear();
+         std::vector<mlir::Attribute> attrs;
+         std::vector<mlir::Attribute> names;
+         std::vector<mlir::Attribute> colMemberNames;
+         std::vector<mlir::Attribute> colTypes;
+         auto& memberManager = builder.getContext()->getLoadedDialect<subop::SubOperatorDialect>()->getMemberManager();
+
+         for (auto& named : context->currentScope->targetInfo.targetColumns) {
+            switch (named->type) {
+               case ast::NamedResultType::Column: {
+                  auto colMemberName = memberManager.getUniqueMember(named->displayName);
+                  names.push_back(builder.getStringAttr(named->displayName));
+
+
+                  colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
+                  colMemberNames.push_back(builder.getStringAttr(colMemberName));
+                  auto attrDef = named->createRef(builder, attrManager);
+                  attrs.push_back(attrDef);
+                  break;
+               }
+               case ast::NamedResultType::Function: {
+                  auto functionInfo = std::static_pointer_cast<ast::FunctionInfo>(named);
+                  names.push_back(builder.getStringAttr(functionInfo->name));
+                  auto colMemberName = memberManager.getUniqueMember(functionInfo->name);
+                  colMemberNames.push_back(builder.getStringAttr(colMemberName));
+                  colTypes.push_back(mlir::TypeAttr::get(functionInfo->resultType.toMlirType(builder.getContext())));
+                  auto attrDef = functionInfo->createRef(builder, attrManager);
+                  attrs.push_back(attrDef);
+                  break;
+               }
+               case ast::NamedResultType::EXPRESSION: {
+                  names.push_back(builder.getStringAttr(named->displayName));
+                  auto colMemberName = memberManager.getUniqueMember(named->name);
+                  colMemberNames.push_back(builder.getStringAttr(colMemberName));
+                  colTypes.push_back(mlir::TypeAttr::get(named->resultType.toMlirType(builder.getContext())));
+
+
+
+                  auto attrDef = named->createRef(builder, attrManager);
+                  attrs.push_back(attrDef);
+                  break;
+               }
+               default: {
+                  error("Not implemented", tableProducer->loc);
+               }
             }
          }
-      }
 
-      localTableType = subop::LocalTableType::get(
-         builder.getContext(),
-         subop::StateMembersAttr::get(
+         localTableType = subop::LocalTableType::get(
             builder.getContext(),
-            builder.getArrayAttr(colMemberNames),
-            builder.getArrayAttr(colTypes)),
-         builder.getArrayAttr(names));
+            subop::StateMembersAttr::get(
+               builder.getContext(),
+               builder.getArrayAttr(colMemberNames),
+               builder.getArrayAttr(colTypes)),
+            builder.getArrayAttr(names));
 
-      mlir::Value result = builder.create<relalg::MaterializeOp>(
-         builder.getUnknownLoc(),
-         localTableType,
-         tree,
-         builder.getArrayAttr(attrs),
-         builder.getArrayAttr(names));
+         mlir::Value result = builder.create<relalg::MaterializeOp>(
+            builder.getUnknownLoc(),
+            localTableType,
+            tree,
+            builder.getArrayAttr(attrs),
+            builder.getArrayAttr(names));
 
-      // Use the materialized result in the QueryReturnOp instead of the input tree
-      builder.create<relalg::QueryReturnOp>(builder.getUnknownLoc(), result);
+         // Use the materialized result in the QueryReturnOp instead of the input tree
+         builder.create<relalg::QueryReturnOp>(builder.getUnknownLoc(), result);
+      }
+      relalg::QueryOp queryOp = builder.create<relalg::QueryOp>(builder.getUnknownLoc(), mlir::TypeRange{localTableType}, mlir::ValueRange{});
+      queryOp.getQueryOps().getBlocks().clear();
+      queryOp.getQueryOps().push_back(block);
+      return queryOp.getResults()[0];
+
+
+
    }
-   relalg::QueryOp queryOp = builder.create<relalg::QueryOp>(builder.getUnknownLoc(), mlir::TypeRange{localTableType}, mlir::ValueRange{});
-   queryOp.getQueryOps().getBlocks().clear();
-   queryOp.getQueryOps().push_back(block);
-   return queryOp.getResults()[0];
+
+
 }
+
 
 mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context) {
    mlir::Value tree;
@@ -145,15 +173,11 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
             case ast::QueryNodeType::CTE_NODE: {
                auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
 
-
-
                if (cteNode->child) {
                   tree = translateTableProducer(builder, cteNode->child, context);
                }
 
                return tree;
-
-
             }
             default: error("Not implemented", tableProducer->loc);
          }
@@ -162,6 +186,42 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
    }
 
    return tree;
+}
+
+void SQLMlirTranslator::translateCreateNode(mlir::OpBuilder& builder, std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<analyzer::SQLContext> context) {
+   switch (createNode->createInfo->type) {
+      case ast::CatalogType::TABLE_ENTRY: {
+         auto createTableInfo = std::static_pointer_cast<ast::CreateTableInfo>(createNode->createInfo);
+         auto tableName = createTableInfo->tableName;
+         auto tableDef = translateTableElements(builder,createTableInfo->tableElements, context);
+         tableDef.name = tableName;
+         auto descriptionValue = createStringValue(builder, utility::serializeToHexString(tableDef));
+         compiler::runtime::RelationHelper::createTable(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
+         break;
+
+
+
+
+      }
+      default: error("CreateInfo type not implemented", createNode->loc);
+   }
+}
+catalog::CreateTableDef SQLMlirTranslator::translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext> context) {
+   catalog::CreateTableDef tableDef{};
+   for (auto tableElement: tableElements) {
+      switch (tableElement->type) {
+         case ast::TableElementType::COLUMN: {
+            auto columnElement = std::static_pointer_cast<ast::BoundColumnElement>(tableElement);
+            catalog::Column c{columnElement->name, columnElement->datatype.type, columnElement->datatype.isNullable};
+             tableDef.columns.emplace_back(c);
+            break;
+
+         }
+            default: error("TableElement type not implemented", tableElement->loc);
+      }
+   }
+   return tableDef;
+
 }
 
 mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {

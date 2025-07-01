@@ -12,6 +12,7 @@ enum class NodeType : uint8_t {
    AGGREGATION = 6,
    RESULT_MODIFIER = 7,
    EXTEND_NODE=8,
+   CREATE_NODE = 9,
 
    //Bound
    BOUND_TABLE_REF = 20,

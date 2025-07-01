@@ -154,10 +154,11 @@ boolean [fF][aA][lL][sS][eE]
 [aA][sS]                              { return lingodb::parser::make_AS(loc);}
 [aA][sS][cC]                          { return lingodb::parser::make_ASC(loc); }
 
-
+[bB][iI][gG][iI][nN][tT]              { return lingodb::parser::make_BIGINT(loc); }
 [bB][eE][tT][wW][eE][eE][nN]          { return lingodb::parser::make_BETWEEN(loc);}
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
+[cC][rR][eE][aA][tT][eE]              { return lingodb::parser::make_CREATE(loc); }
 [cC][aA][sS][eE]                      { return lingodb::parser::make_CASE(loc); }
 
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
@@ -172,7 +173,6 @@ boolean [fF][aA][lL][sS][eE]
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
 
-
 [gG][rR][oO][uU][pP]                  { return lingodb::parser::make_GROUP_P(loc);}
 
 having                                { return lingodb::parser::make_HAVING(loc);}
@@ -185,6 +185,7 @@ inner                                 { return lingodb::parser::make_INNER_P(loc
 [lL][iI][mM][iI][tT]                  { return lingodb::parser::make_LIMIT(loc); }
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
 [nN][oO][tT]                          { return lingodb::parser::make_NOT(loc); }
+[nN][uU][lL][lL]                      { return lingodb::parser::make_NULL_P(loc); }
 
 [oO][nN]                              { return lingodb::parser::make_ON(loc); }
 [oO][rR]                              { return lingodb::parser::make_OR(loc); }
@@ -198,6 +199,8 @@ right                                 { return lingodb::parser::make_RIGHT(loc);
 
 [sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
 [sS][uU][bB][sS][tT][rR][iI][nN][gG]  { return lingodb::parser::make_SUBSTRING(loc); }
+
+[tT][aA][bB][lL][eE]                  { return lingodb::parser::make_TABLE(loc); }
 
 [tT][hH][eE][nN]                      { return lingodb::parser::make_THEN(loc); }
 

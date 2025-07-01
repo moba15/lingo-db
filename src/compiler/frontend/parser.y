@@ -18,12 +18,14 @@
 
   #include "lingodb/compiler/frontend/ast/table_producer.h"
   #include "lingodb/compiler/frontend/ast/select_node.h"
+  #include "lingodb/compiler/frontend/ast/create_node.h"
   #include "lingodb/compiler/frontend/ast/tableref.h"
   #include "lingodb/compiler/frontend/ast/aggregation_node.h"
   #include "lingodb/compiler/frontend/ast/result_modifier.h"
   #include "lingodb/compiler/frontend/ast/parsed_expression.h"
   #include "lingodb/compiler/frontend/ast/constant_value.h"
   #include "lingodb/compiler/frontend/ast/cte_node.h"
+  #include "lingodb/compiler/frontend/ast/constraint.h"
   class driver;
 }
 
@@ -216,11 +218,9 @@
  * LALR(1).
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
-
-%type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt stmt toplevel_stmt stmtmulti select_with_parens PreparableStmt common_table_expr cte_list with_clause
+%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmtmulti stmt
+%type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt  select_with_parens PreparableStmt common_table_expr cte_list with_clause
 %type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select 
-
-
 
 %type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt extract_list expr_list substr_list
 
@@ -282,7 +282,17 @@
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
 %type<std::optional<lingodb::ast::TypeMods>> opt_interval
-%type<bool> opt_asymmetric
+%type<bool> opt_asymmetric 
+
+
+
+%type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt
+%type<bool> OptTemp
+%type<lingodb::ast::TypeMods> Numeric SimpleType Type
+%type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement
+%type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
+%type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem
+%type<std::vector<std::shared_ptr<lingodb::ast::Constraint>>> ColQualList
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -365,6 +375,7 @@ toplevel_stmt:
 */
 stmt: 
  SelectStmt {$$=$1;}
+ | CreateStmt {$$=$1;}
  ;
 
  SelectStmt: 
@@ -957,7 +968,7 @@ TODO
 */
 a_expr: 
     c_expr { $$ = $c_expr;}
-   //TODO | a_expr TYPECAST Typename
+   //TODO | a_expr TYPECAST Type
     //TODO | a-expr COLLATE any_name
     //TODO | a_expr AT TIME ZONE a_expr
     //TODO | a_expr AT LOCAL
@@ -1618,6 +1629,203 @@ func_name:
 
 param_name: type_function_name
     ;
+
+
+
+
+/*****************************************************************************
+ *
+ *		QUERY :
+ *				CREATE TABLE relname
+ *
+ *****************************************************************************/
+ //TODO Add missing rules
+ CreateStmt: 
+    CREATE OptTemp TABLE qualified_name LP OptTableElementList RP
+    {   
+        auto createTableInfo = std::make_shared<lingodb::ast::CreateTableInfo>("", "", $OptTemp);
+        createTableInfo->tableName = $qualified_name;
+        createTableInfo->tableElements = $OptTableElementList;
+
+
+
+        auto createTable = mkNode<lingodb::ast::CreateNode>(@$, createTableInfo);
+
+        $$ = createTable;
+    }
+    ;
+
+
+//TODO Add missing rules
+OptTemp: 
+    TEMP {$$=true;}
+    | TEMPORARY {$$=true;}
+    | %empty {$$=false;}
+    ;
+
+OptTableElementList:
+    TableElementList
+    {
+        $$ = $1;
+    }
+    | %empty 
+    {
+        $$ = std::vector<std::shared_ptr<lingodb::ast::TableElement>>();
+    }
+    ;
+
+TableElementList: 
+    TableElement 
+    {
+        auto list = mkListShared<lingodb::ast::TableElement>();
+        list.emplace_back($TableElement);
+        $$ = list;
+    }
+    | TableElementList[list] COMMA TableElement
+    {
+        $list.emplace_back($TableElement);
+        $$ = $list;
+    }
+    ;
+
+//TODO Add missing rules
+TableElement:
+    columnElement {$$=$columnElement;}
+    ;
+
+columnElement:
+    ColId Type opt_column_storage opt_column_compression create_generic_options ColQualList
+    {
+        auto columnDef = mkNode<lingodb::ast::ColumnElement>(@$, $ColId, $Type);
+        columnDef->constraints = $ColQualList;
+        $$ = columnDef;
+    }
+    ;
+
+create_generic_options:
+    //TODO Add missing rules
+     %empty
+    ;
+ColQualList:
+    ColQualList[list] ColConstraint 
+    {
+        $list.emplace_back($ColConstraint);
+        $$ = $list;
+    }
+    | %empty {$$ = std::vector<std::shared_ptr<lingodb::ast::Constraint>>();}
+    ;
+//TODO add missing rules
+ColConstraint: 
+     ColConstraintElem {$$=$1;}
+    ;
+
+
+
+/* DEFAULT NULL is already the default for Postgres.
+ * But define it here and carry it forward into the system
+ * to make it explicit.
+ * - thomas 1998-09-13
+ *
+ * WITH NULL and NULL are not SQL-standard syntax elements,
+ * so leave them out. Use DEFAULT NULL to explicitly indicate
+ * that a column may have that value. WITH NULL leads to
+ * shift/reduce conflicts with WITH TIME ZONE anyway.
+ * - thomas 1999-01-08
+ *
+ * DEFAULT expression must be b_expr not a_expr to prevent shift/reduce
+ * conflict on NOT (since NOT might start a subsequent NOT NULL constraint,
+ * or be part of a_expr NOT LIKE or similar constructs).
+ */
+//TODO Add missing rules
+ColConstraintElem:
+    NOT NULL_P //opt_no_inherit 
+    {
+        $$ = mkNode<lingodb::ast::Constraint>(@$, lingodb::ast::ConstraintType::NOT_NULL);
+    }
+    | NULL_P
+    {
+        $$ = mkNode<lingodb::ast::Constraint>(@$, lingodb::ast::ConstraintType::NULLABLE);
+    }
+
+
+//TODO Add missing rules
+opt_column_compression:
+    //column_compression
+     %empty
+    ;
+
+
+
+
+
+//TODO Add missing rules
+opt_column_storage:
+    
+     %empty
+    ;
+
+//TODO add missing rules
+Type:
+    SimpleType //opt_array_bounds
+    {
+        $$ = $SimpleType;
+    }
+    ;
+SimpleType: 
+     //GenericType
+    Numeric {$$ = $Numeric;}
+   //TODO | Bit
+    | Character
+    //TODO | ConstDatetime
+    //TODO | ConstInterval
+    //TODO | JsonType
+    ;
+
+
+Numeric:
+    INT_P 
+    | INTEGER
+    {
+        $$ = lingodb::ast::TypeMods::INT;
+    }
+    | SMALLINT
+    {
+        $$ = lingodb::ast::TypeMods::SMALLINT;
+    }
+    | BIGINT
+    {
+        $$ = lingodb::ast::TypeMods::BIGINT;
+    }
+    | REAL
+    | FLOAT_P //TODO opt_float
+    | DOUBLE_P PRECISION
+    | DECIMAL_P //TODO opt_type_modifiers
+    | DEC //TODO opt_type_modifiers
+    | NUMERIC //TODO opt_type_modifiers
+    | BOOLEAN_P
+    {
+        $$ = lingodb::ast::TypeMods::BOOLEAN;
+    }
+    ;
+Character:
+    CharacterWithLength
+    | CharacterWithoutLength
+    ;
+CharacterWithLength:
+    character LP Iconst RP
+    ;
+CharacterWithoutLength:
+    character
+    ;
+//TODO Add missing rules
+character:
+    VARCHAR
+    ;
+    
+
+
+
+
 
 
 /*

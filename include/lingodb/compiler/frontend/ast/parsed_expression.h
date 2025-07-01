@@ -16,10 +16,14 @@ enum LogicalType : uint8_t {
    INTERVAL = 2,
    //TODO other
 };
-
+//TODO maybe merge with both together
 enum class TypeMods : uint8_t {
    DAYS = 1,
    YEARS = 2,
+   INT = 3,
+   BIGINT = 4,
+   SMALLINT = 5,
+   BOOLEAN = 6,
    //TODO other
 };
 
