@@ -390,7 +390,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
                error("Column name cannot be empty", columnElement->loc);
             }
             std::vector<std::variant<size_t, std::string>> typeModifiers;
-            catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->typeMods, typeModifiers);
+            catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalType, typeModifiers);
             nullableType.isNullable = true;
 
             //TODO constraints
@@ -1118,7 +1118,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
       case ast::ExpressionClass::CAST: {
          auto castExpr = std::static_pointer_cast<ast::CastExpression>(rootNode);
          auto boundChild = analyzeExpression(castExpr->child, context, resolverScope);
-         switch (castExpr->logicalType) {
+         if (!castExpr->logicalType.has_value()) {
+            error("Cast expression must have logicalType", castExpr->loc);
+         }
+         switch (castExpr->logicalType.value()) {
             case ast::DATE: {
                switch (boundChild->type) {
                   case ast::ExpressionType::VALUE_CONSTANT: {
@@ -1126,7 +1129,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                      if (constExpr->value->type != ast::ConstantType::STRING) {
                         error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
                      }
-                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
+                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType);
                   }
                   default: error("Not implemented", rootNode->loc);
                }
@@ -1139,9 +1142,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
                auto resultType = catalog::Type::intervalDaytime();
-               if (castExpr->typeMods.has_value()) {
-                  switch (castExpr->typeMods.value()) {
-                     case ast::TypeMods::YEARS: {
+               if (castExpr->logicalType.has_value()) {
+                  switch (castExpr->logicalType.value()) {
+                     case ast::LogicalType::YEARS: {
                         resultType = catalog::Type::intervalMonths();
                         break;
                      }
@@ -1149,7 +1152,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   }
                }
                catalog::Type::intervalMonths();
-               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType, castExpr->typeMods);
+               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType);
             }
             default: error("Not implemented", rootNode->loc);
          }
@@ -1430,18 +1433,18 @@ std::pair<unsigned long, unsigned long> SQLTypeUtils::getAdaptedDecimalPAndSAfte
    return {p, s};
 }
 
-catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::TypeMods typeMods, std::vector<std::variant<size_t, std::string>>& typeModifiers) {
-   switch (typeMods) {
-      case ast::TypeMods::INT: {
+catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logicalType, std::vector<std::variant<size_t, std::string>>& typeModifiers) {
+   switch (logicalType) {
+      case ast::LogicalType::INT: {
          return catalog::Type::int32();
       }
-      case ast::TypeMods::BIGINT: {
+      case ast::LogicalType::BIGINT: {
          return catalog::Type::int64();
       }
-      case ast::TypeMods::SMALLINT: {
+      case ast::LogicalType::SMALLINT: {
          return catalog::Type::int8();
       }
-      case ast::TypeMods::BOOLEAN: {
+      case ast::LogicalType::BOOLEAN: {
          return catalog::Type::boolean();
       }
       default: throw std::runtime_error("Not implemented typeMods");

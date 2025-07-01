@@ -458,14 +458,14 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                 */
                //TODO maybe create stringRepresentation at analyzer Level?
 
-               switch (castExpr->typeMods.value()) {
-                  case ast::TypeMods::DAYS: {
+               switch (castExpr->logicalType.value()) {
+                  case ast::LogicalType::DAYS: {
                      if (!stringRepresentation.ends_with("days")) {
                         stringRepresentation += "days";
                      }
                      break;
                   }
-                  case ast::TypeMods::YEARS: {
+                  case ast::LogicalType::YEARS: {
                      stringRepresentation = std::to_string(std::stol(stringRepresentation) * 12);
                      break;
                   }

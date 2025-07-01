@@ -410,14 +410,16 @@ std::string CastExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
 
    // Create the label with cast information
    std::string label = "Cast\\nType: ";
-   switch (logicalType) {
-      case LogicalType::DATE:
-         label += "DATE";
-         break;
-         // TODO: Add other logical types as needed
-      default:
-         label += "Unknown";
-         break;
+   if (logicalType.has_value()) {
+      switch (logicalType.value()) {
+         case LogicalType::DATE:
+            label += "DATE";
+            break;
+            // TODO: Add other logical types as needed
+         default:
+            label += "Unknown";
+            break;
+      }
    }
 
    // Create the node

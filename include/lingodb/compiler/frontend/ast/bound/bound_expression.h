@@ -141,10 +141,10 @@ class BoundOperatorExpression : public BoundExpression {
 class BoundCastExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CAST;
-   BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods);
-   std::optional<TypeMods> typeMods;
+   BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, std::optional<LogicalType> logicalType);
+   std::optional<LogicalType> logicalType;
    std::shared_ptr<BoundExpression> child;
-   LogicalType logicalType;
+   //LogicalType logicalType;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 

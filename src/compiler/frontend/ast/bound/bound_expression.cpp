@@ -89,7 +89,8 @@ std::string BoundOperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator&
 /*
  * BoundCastExpression
 */
-BoundCastExpression::BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, LogicalType logicalType, std::optional<TypeMods> typeMods) : BoundExpression(TYPE, ExpressionType::CAST, resultType, alias), child(std::move(child)), logicalType(logicalType), typeMods(typeMods) {
+BoundCastExpression::BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, std::optional<LogicalType> logicalType) : BoundExpression(TYPE, ExpressionType::CAST, resultType, alias), child(std::move(child)), logicalType(logicalType)//, logicalType(logicalType)
+{
 }
 std::string BoundCastExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
