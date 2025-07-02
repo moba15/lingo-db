@@ -158,8 +158,9 @@ boolean [fF][aA][lL][sS][eE]
 [bB][eE][tT][wW][eE][eE][nN]          { return lingodb::parser::make_BETWEEN(loc);}
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
 
-[cC][rR][eE][aA][tT][eE]              { return lingodb::parser::make_CREATE(loc); }
 [cC][aA][sS][eE]                      { return lingodb::parser::make_CASE(loc); }
+[cC][hH][aA][rR]                      { return lingodb::parser::make_CHAR_P(loc); }
+[cC][rR][eE][aA][tT][eE]              { return lingodb::parser::make_CREATE(loc); }
 
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
@@ -180,9 +181,15 @@ having                                { return lingodb::parser::make_HAVING(loc)
 inner                                 { return lingodb::parser::make_INNER_P(loc); }
 [Ii][nN]                              { return lingodb::parser::make_IN_P(loc); }
 [iI][nN][tT][eE][rR][vV][aA][lL]      { return lingodb::parser::make_INTERVAL(loc); }
+
+[jJ][oO][iI][nN]                      { return lingodb::parser::make_JOIN(loc); }
+
+[kK][eE][yY]                          { return lingodb::parser::make_KEY(loc); }
+
 [lL][eE][fF][tT]                      { return lingodb::parser::make_LEFT(loc); }
-[lL][iI][kK][eE]                       { return lingodb::parser::make_LIKE(loc); }
+[lL][iI][kK][eE]                      { return lingodb::parser::make_LIKE(loc); }
 [lL][iI][mM][iI][tT]                  { return lingodb::parser::make_LIMIT(loc); }
+
 [nN][aA][tT][uU][rR][aA][lL]          { return lingodb::parser::make_NATURAL(loc); }
 [nN][oO][tT]                          { return lingodb::parser::make_NOT(loc); }
 [nN][uU][lL][lL]                      { return lingodb::parser::make_NULL_P(loc); }
@@ -193,7 +200,7 @@ inner                                 { return lingodb::parser::make_INNER_P(loc
 [oO][uU][tT][eE][rR]                  { return lingodb::parser::make_OUTER_P(loc); }
 [oO][vV][eE][rR]                      { return lingodb::parser::make_OVER(loc); }
 
-[jJ][oO][iI][nN]                      { return lingodb::parser::make_JOIN(loc); }
+[pP][rR][iI][mM][aA][rR][yY]          { return lingodb::parser::make_PRIMARY(loc); }
 
 right                                 { return lingodb::parser::make_RIGHT(loc); }
 

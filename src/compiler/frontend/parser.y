@@ -288,11 +288,11 @@
 
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt
 %type<bool> OptTemp
-%type<lingodb::ast::LogicalType> Numeric SimpleType Type CharacterWithoutLength character Bit Character
-%type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement
+%type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type CharacterWithoutLength character Bit Character CharacterWithLength
+%type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement TableConstraint
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
-%type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem
-%type<std::vector<std::shared_ptr<lingodb::ast::Constraint>>> ColQualList
+%type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem ConstraintElem
+%type<std::vector<std::shared_ptr<lingodb::ast::Constraint>>> ColQualList 
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -1691,6 +1691,15 @@ TableElementList:
 //TODO Add missing rules
 TableElement:
     columnElement {$$=$columnElement;}
+    | TableConstraint {$$=$1;}
+    ;
+
+//TODO Add missing rules
+TableConstraint: 
+    ConstraintElem
+    {
+        $$ = mkNode<lingodb::ast::TableConstraintElement>(@$, $ConstraintElem);
+    }
     ;
 
 columnElement:
@@ -1746,7 +1755,23 @@ ColConstraintElem:
     {
         $$ = mkNode<lingodb::ast::Constraint>(@$, lingodb::ast::ConstraintType::NULLABLE);
     }
+    ;
+//TODO Add missing rules
+ConstraintElem: 
+    PRIMARY KEY LP name_list opt_without_overlaps RP //TODO opt_c_include opt_definition OptConsTableSpace
+    {
+        $$ = mkNode<lingodb::ast::UniqueConstraint>(@$, $name_list, true);
+    }
+;
 
+opt_without_overlaps:
+    WITHOUT OVERLAPS
+    {
+        //TODO
+        error(@$, "WITHOUT OVERLAPS is not supported yet!");
+    }
+    | %empty
+    ;
 
 //TODO Add missing rules
 opt_column_compression:
@@ -1786,15 +1811,15 @@ Numeric:
     INT_P 
     | INTEGER
     {
-        $$ = lingodb::ast::LogicalType::INT;
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::INT);
     }
     | SMALLINT
     {
-        $$ = lingodb::ast::LogicalType::SMALLINT;
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::SMALLINT);
     }
     | BIGINT
     {
-        $$ = lingodb::ast::LogicalType::BIGINT;
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::BIGINT);
     }
     | REAL
     | FLOAT_P //TODO opt_float
@@ -1804,20 +1829,25 @@ Numeric:
     | NUMERIC //TODO opt_type_modifiers
     | BOOLEAN_P
     {
-        $$ = lingodb::ast::LogicalType::BOOLEAN;
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::BOOLEAN);
     }
     ;
 Character:
     CharacterWithLength
+    {
+        $$ =$1;
+    }
     | CharacterWithoutLength
     {
         $$ =$1;
     }
     ;
 CharacterWithLength:
-    character LP Iconst RP
+    character LP ICONST RP
     {
-        error(@$, "Character with length is not supported yet!");
+        //Change Iconst rule to unsigned long and use it here
+        $character.typeModifiers.emplace_back((size_t)$ICONST);
+        $$ = $character;
     }
     ;
 CharacterWithoutLength:
@@ -1830,7 +1860,11 @@ CharacterWithoutLength:
 character:
     VARCHAR 
     {
-        $$ = lingodb::ast::LogicalType::STRING;
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::STRING);
+    }
+    | CHAR_P 
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::CHAR);
     }
     ;
     
@@ -1867,6 +1901,8 @@ AexprConst:
         $$ = interval;
     }
 ;
+//TODO Set Iconst to unsigned long
+//TODO create rule SignedIconst to handle signed integers!
 Iconst:	
     ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntValue>($1); $$=t;  };
 
@@ -1878,7 +1914,7 @@ Sconst:
     STRING_VALUE { auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::StringValue>($1); $$=t; };
 
 Bconst: 
-    BCONST {};
+    BCONST {error(@$, "Boolean constants are not supported yet!");};
 
 ConstInterval:
     | INTERVAL

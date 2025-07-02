@@ -375,37 +375,46 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
          if (catalog->getEntry(createTableInfo->tableName).has_value()) {
             error("Table " + createTableInfo->tableName + " already exists", createNode->loc);
          }
-         //TODO maybe rewrite parser so that this could not happen
-         auto foundInvalidTableEntry = std::ranges::find_if(createTableInfo->tableElements, [](auto& tableElement) {
-            return tableElement->type != ast::TableElementType::COLUMN;
-         });
-         if (foundInvalidTableEntry != createTableInfo->tableElements.end()) {
-            error("Invalid table element type in create table statement", createNode->loc);
-         }
+
          std::vector<std::shared_ptr<ast::TableElement>> boundTableElements{};
-
          for (auto & tableElement : createTableInfo->tableElements) {
-            auto columnElement = std::static_pointer_cast<ast::ColumnElement>(tableElement);
-            if (columnElement->name.empty()) {
-               error("Column name cannot be empty", columnElement->loc);
-            }
-            std::vector<std::variant<size_t, std::string>> typeModifiers;
-            catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalType, typeModifiers);
-            nullableType.isNullable = true;
-
-            //TODO constraints
-            for (auto& constraint: columnElement->constraints) {
-               switch (constraint->type) {
-                  case ast::ConstraintType::NOT_NULL: {
-                     nullableType.isNullable = false;
-                     break;
+            switch (tableElement->type) {
+               case ast::TableElementType::COLUMN: {
+                  auto columnElement = std::static_pointer_cast<ast::ColumnElement>(tableElement);
+                  if (columnElement->name.empty()) {
+                     error("Column name cannot be empty", columnElement->loc);
                   }
-                     default: error("Constraint type not implemented", constraint->loc);
+                  std::vector<std::variant<size_t, std::string>> typeModifiers;
+                  catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalTypeWithMods.logicalType, columnElement->logicalTypeWithMods.typeModifiers);
+                  nullableType.isNullable = true;
+                  //TODO constraints
+                  for (auto& constraint: columnElement->constraints) {
+                     switch (constraint->type) {
+                        case ast::ConstraintType::NOT_NULL: {
+                           nullableType.isNullable = false;
+                           break;
+                        }
+                        default: error("Constraint type not implemented", constraint->loc);
+                     }
+                  }
+
+                  auto boundColumnElement = std::make_shared<ast::BoundColumnElement>(columnElement->name, nullableType);
+                  boundTableElements.emplace_back(boundColumnElement);
+                  break;
+
                }
+               case ast::TableElementType::CONSTRAINT: {
+                  auto tableConstraintElement = std::static_pointer_cast<ast::TableConstraintElement>(tableElement);
+                  if (tableConstraintElement->constraint->type != ast::ConstraintType::UNIQUE || !std::static_pointer_cast<ast::UniqueConstraint>(tableConstraintElement->constraint)->isPrimaryKey) {
+                     error("Unsupported TableConstraint constraint type", tableConstraintElement->loc);
+                  }
+                  boundTableElements.emplace_back(tableConstraintElement);
+                  break;
+
+               }
+                  default: error("TableElementType here not supported", tableElement->loc);
             }
 
-            auto boundColumnElement = std::make_shared<ast::BoundColumnElement>(columnElement->name, nullableType);
-            boundTableElements.emplace_back(boundColumnElement);
 
 
          }
@@ -1448,6 +1457,16 @@ catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logic
          return catalog::Type::boolean();
       }
       case ast::LogicalType::STRING: {
+         return catalog::Type::stringType();
+      }
+      case ast::LogicalType::CHAR: {
+         if (typeModifiers.size() != 1) {
+            return catalog::Type::charType(1);
+         }
+         auto l = std::get<size_t>(typeModifiers[0]);
+         if (l <= 8) {
+            return catalog::Type::charType(l);
+         }
          return catalog::Type::stringType();
       }
       default: throw std::runtime_error("Not implemented typeMods");

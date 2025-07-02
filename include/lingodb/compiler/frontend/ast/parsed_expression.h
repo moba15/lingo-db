@@ -6,24 +6,36 @@
 #include "table_producer.h"
 
 #include <string>
+#include <variant>
 #include <vector>
 namespace lingodb::ast {
 class OrderByModifier;
 enum class ExpressionType : uint8_t;
 enum class ExpressionClass : uint8_t;
 enum LogicalType : uint8_t {
-   DATE = 1,
-   INTERVAL = 2,
-   DAYS = 3,
-   YEARS = 4,
-   INT = 5,
-   BIGINT = 6,
-   SMALLINT = 7,
-   BOOLEAN = 8,
-   STRING = 9,
+   INVALID = 0,
+   BOOLEAN = 1,
+   CHAR = 2,
+   STRING = 3,
+   DATE = 4,
+   INTERVAL = 5,
+   DAYS = 6,
+   YEARS = 7,
+   SMALLINT = 8,
+   INT = 9,
+   BIGINT = 10,
    //TODO other
 };
-
+class LogicalTypeWithMods {
+   public:
+   LogicalTypeWithMods() : LogicalTypeWithMods(LogicalType::INVALID) {}
+   LogicalTypeWithMods(LogicalType logicalType)
+                : logicalType(logicalType), typeModifiers({}) {}
+        LogicalTypeWithMods(LogicalType logicalType, std::vector<std::variant<size_t, std::string>> typeModifiers)
+                : logicalType(logicalType), typeModifiers(std::move(typeModifiers)) {}
+   LogicalType logicalType;
+   std::vector<std::variant<size_t, std::string>> typeModifiers;
+};
 
 class BaseExpression : public AstNode {
    public:

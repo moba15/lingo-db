@@ -217,6 +217,22 @@ catalog::CreateTableDef SQLMlirTranslator::translateTableElements(mlir::OpBuilde
             break;
 
          }
+         case ast::TableElementType::CONSTRAINT: {
+            auto tableConstraintElement = std::static_pointer_cast<ast::TableConstraintElement>(tableElement);
+            switch (tableConstraintElement->constraint->type) {
+               case ast::ConstraintType::UNIQUE: {
+                  auto uniqueConstraint = std::static_pointer_cast<ast::UniqueConstraint>(tableConstraintElement->constraint);
+                  if (uniqueConstraint->isPrimaryKey) {
+                     std::ranges::copy(uniqueConstraint->columnNames, std::back_inserter(tableDef.primaryKey));
+                  }
+
+                  break;
+
+               }
+               default: error("TableElement constraint type not implemented", tableElement->loc);
+            }
+            break;
+         }
             default: error("TableElement type not implemented", tableElement->loc);
       }
    }
