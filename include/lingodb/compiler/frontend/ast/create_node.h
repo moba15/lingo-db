@@ -43,9 +43,18 @@ enum class CatalogType : uint8_t {
 enum class TableElementType : uint8_t {
    INVALID = 0,
    COLUMN = 1,
-
+   CONSTRAINT = 2,
 };
 class TableElement;
+class CreateInfo;
+class CreateNode : public AstNode {
+   public:
+   explicit  CreateNode(std::shared_ptr<CreateInfo>  createInfo);
+   std::shared_ptr<CreateInfo> createInfo;
+
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
 class CreateInfo {
    public:
    CreateInfo(CatalogType type, std::string catalog, std::string schema, bool temporary)
@@ -95,24 +104,24 @@ class TableElement {
 
 class ColumnElement : public TableElement {
    public:
-   ColumnElement(std::string name, LogicalType typeMods)
-         : TableElement(TableElementType::COLUMN), name(std::move(name)), logicalType(typeMods) {}
+   ColumnElement(std::string name, LogicalTypeWithMods typeMods)
+         : TableElement(TableElementType::COLUMN), name(std::move(name)), logicalTypeWithMods(typeMods) {}
 
-   LogicalType logicalType;
+   LogicalTypeWithMods logicalTypeWithMods;
    std::string name;
    std::vector<std::shared_ptr<Constraint>> constraints; //Optional constraints for the column
 };
 
-
-class CreateNode : public AstNode {
+class TableConstraintElement : public TableElement {
    public:
-   explicit  CreateNode(std::shared_ptr<CreateInfo>  createInfo);
-   std::shared_ptr<CreateInfo> createInfo;
+   TableConstraintElement(std::shared_ptr<Constraint> constraint)
+         : TableElement(TableElementType::CONSTRAINT), constraint(std::move(constraint)) {}
+
+   std::shared_ptr<Constraint> constraint;
 
 
-   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
+
+
 };
-
-
-
 }
