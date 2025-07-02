@@ -349,7 +349,7 @@
 %left		JOIN CROSS LEFT FULL RIGHT INNER_P NATURAL
 
 
-%printer { std::cout << ""; } <*>;
+%printer {  } <*>;
 
 %%
 %start parse_toplevel;
