@@ -84,7 +84,7 @@ struct SQLTypeUtils {
    static std::vector<catalog::NullableType> toCommonTypes(std::vector<catalog::NullableType> types);
    static std::vector<catalog::NullableType> toCommonNumber(std::vector<catalog::NullableType> types);
 
-   static catalog::NullableType typemodsToCatalogType(ast::LogicalType logicalType, std::vector<std::variant<size_t, std::string>>& typeModifiers);
+   static catalog::NullableType typemodsToCatalogType(ast::LogicalType logicalType, std::vector<std::shared_ptr<ast::Value>>& typeModifiers);
 
 
    [[nodiscard]]
