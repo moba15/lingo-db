@@ -1483,6 +1483,18 @@ catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logic
          return catalog::Type::decimal(p,s);
 
       }
+      case ast::LogicalType::DATE: {
+         return catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
+      }
+      case ast::LogicalType::TIMESTAMP: {
+         return catalog::Type::timestamp();
+      }
+      case ast::LogicalType::FLOAT4: {
+         return catalog::Type::f32();
+      }
+      case ast::LogicalType::FLOAT8: {
+         return catalog::Type::f64();
+      }
       default: throw std::runtime_error("Not implemented typeMods");
    }
 }
