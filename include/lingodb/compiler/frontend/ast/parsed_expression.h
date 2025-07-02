@@ -25,6 +25,9 @@ enum LogicalType : uint8_t {
    INT = 9,
    BIGINT = 10,
    DECIMAL= 11,
+   TIMESTAMP = 12,
+   FLOAT4 = 13,
+   FLOAT8 = 14,
    //TODO other
 };
 class LogicalTypeWithMods {

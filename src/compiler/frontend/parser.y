@@ -123,7 +123,7 @@
 	CURRENT_CATALOG CURRENT_DATE CURRENT_ROLE CURRENT_SCHEMA
 	CURRENT_TIME CURRENT_TIMESTAMP CURRENT_USER CURSOR CYCLE
 
-	DATA_P DATABASE DAY_P DEALLOCATE DEC DECIMAL_P DECLARE DEFAULT DEFAULTS
+	DATA_P DATABASE DAY_P DEALLOCATE DEC DECIMAL_P DECLARE DEFAULT DEFAULTS DATE_P
 	DEFERRABLE DEFERRED DEFINER DELETE_P DELIMITER DELIMITERS DEPENDS DEPTH DESC
 	DETACH DICTIONARY DISABLE_P DISCARD DISTINCT DO DOCUMENT_P DOMAIN_P
 	DOUBLE_P DROP
@@ -288,8 +288,8 @@
 
 
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt
-%type<bool> OptTemp
-%type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type CharacterWithoutLength character Bit Character CharacterWithLength
+%type<bool> OptTemp opt_varying
+%type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type CharacterWithoutLength character Bit Character CharacterWithLength ConstDatetime
 %type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement TableConstraint
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
 %type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem ConstraintElem
@@ -1820,7 +1820,13 @@ SimpleType:
     Numeric {$$ = $Numeric;}
    //TODO | Bit
     | Character
-    //TODO | ConstDatetime
+    {
+        $$ = $Character;
+    }
+    | ConstDatetime 
+    {
+        $$ = $ConstDatetime;
+    }
     //TODO | ConstInterval
     //TODO | JsonType
     ;
@@ -1859,7 +1865,10 @@ type_modifier:
     
 
 Numeric:
-    INT_P 
+    INT_P
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::INT);
+    } 
     | INTEGER
     {
         $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::INT);
@@ -1874,7 +1883,13 @@ Numeric:
     }
     | REAL
     | FLOAT_P //TODO opt_float
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::FLOAT8);
+    }
     | DOUBLE_P PRECISION
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::FLOAT8);
+    }
     | DECIMAL_P opt_type_modifiers
     {
         lingodb::ast::LogicalTypeWithMods type{lingodb::ast::LogicalType::DECIMAL};
@@ -1883,7 +1898,12 @@ Numeric:
         
     }
     | DEC //TODO opt_type_modifiers
-    | NUMERIC //TODO opt_type_modifiers
+    | NUMERIC  opt_type_modifiers 
+    {
+        lingodb::ast::LogicalTypeWithMods type{lingodb::ast::LogicalType::DECIMAL};
+        type.typeModifiers = $opt_type_modifiers;
+        $$ = type;
+    }
     | BOOLEAN_P
     {
         $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::BOOLEAN);
@@ -1915,7 +1935,15 @@ CharacterWithoutLength:
     ;
 //TODO Add missing rules
 character:
-    VARCHAR 
+    CHARACTER opt_varying 
+    {
+        if($opt_varying) {
+            $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::STRING);
+        } else {
+            $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::CHAR);
+        }
+    }
+    | VARCHAR 
     {
         $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::STRING);
     }
@@ -1923,8 +1951,34 @@ character:
     {
         $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::CHAR);
     }
+    | TEXT_P
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::STRING);
+    }
     ;
-    
+opt_varying:
+    VARYING
+    {
+        $$ = true;
+    }
+    | %empty
+    {
+        $$ = false;
+    }
+    ;
+//TODO add missing rules
+ConstDatetime: 
+    TIMESTAMP //TODO opt_timezone
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::TIMESTAMP);
+    }
+
+    | DATE_P
+    {
+        $$ = lingodb::ast::LogicalTypeWithMods(lingodb::ast::LogicalType::DATE);
+    }
+    ;
+
 
 
 

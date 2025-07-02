@@ -160,8 +160,10 @@ boolean [fF][aA][lL][sS][eE]
 
 [cC][aA][sS][eE]                      { return lingodb::parser::make_CASE(loc); }
 [cC][hH][aA][rR]                      { return lingodb::parser::make_CHAR_P(loc); }
+[cC][hH][aA][rR][aA][cC][tT][eE][rR]  { return lingodb::parser::make_CHARACTER(loc); }
 [cC][rR][eE][aA][tT][eE]              { return lingodb::parser::make_CREATE(loc); }
 
+[dD][aA][tT][eE]                      { return lingodb::parser::make_DATE_P(loc); }
 [dD][aA][yY]                          { return lingodb::parser::make_DAY_P(loc); }
 [dD][eE][cC][iI][mM][aA][lL]          { return lingodb::parser::make_DECIMAL_P(loc); }
 [dD][eE][sS][cC]                      { return lingodb::parser::make_DESC(loc); }
@@ -171,17 +173,20 @@ boolean [fF][aA][lL][sS][eE]
 [eE][xX][tT][rR][aA][cC][tT]          { return lingodb::parser::make_EXTRACT(loc); }
 [eE][xX][iI][sS][tT][sS]              { return lingodb::parser::make_EXISTS(loc); }
 [eE][nN][dD]                          { return lingodb::parser::make_END_P(loc); }
+[fF][lL][oO][aA][tT]                  { return lingodb::parser::make_FLOAT_P(loc); }
 [fF][oO][rR]                          { return lingodb::parser::make_FOR(loc); }
 [fF][rR][oO][mM]                      { return lingodb::parser::make_FROM(loc); }
 [fF][uU][lL][lL]                      { return lingodb::parser::make_FULL(loc); }
 
 [gG][rR][oO][uU][pP]                  { return lingodb::parser::make_GROUP_P(loc);}
+[hH][aA][vV][iI][nN][gG]              { return lingodb::parser::make_HAVING(loc);}
 
-having                                { return lingodb::parser::make_HAVING(loc);}
-
-inner                                 { return lingodb::parser::make_INNER_P(loc); }
-[Ii][nN]                              { return lingodb::parser::make_IN_P(loc); }
+[iI][nN][tT]                          { return lingodb::parser::make_INT_P(loc); }
+[iI][nN][tT][eE][gG][eE][rR]          { return lingodb::parser::make_INTEGER(loc); }
+[iI][nN][nN][eE][rR]                  { return lingodb::parser::make_INNER_P(loc); }
+[iI][nN]                              { return lingodb::parser::make_IN_P(loc); }
 [iI][nN][tT][eE][rR][vV][aA][lL]      { return lingodb::parser::make_INTERVAL(loc); }
+[nN][uU][mM][eE][rR][iI][cC]          { return lingodb::parser::make_NUMERIC(loc); }
 
 [jJ][oO][iI][nN]                      { return lingodb::parser::make_JOIN(loc); }
 
@@ -203,16 +208,18 @@ inner                                 { return lingodb::parser::make_INNER_P(loc
 
 [pP][rR][iI][mM][aA][rR][yY]          { return lingodb::parser::make_PRIMARY(loc); }
 
-right                                 { return lingodb::parser::make_RIGHT(loc); }
+[rR][iI][gG][hH][tT]                  { return lingodb::parser::make_RIGHT(loc); }
 
 [sS][eE][lL][eE][cC][tT]              { return lingodb::parser::make_SELECT(loc); }
 [sS][uU][bB][sS][tT][rR][iI][nN][gG]  { return lingodb::parser::make_SUBSTRING(loc); }
 
 [tT][aA][bB][lL][eE]                  { return lingodb::parser::make_TABLE(loc); }
-
+[tT][eE][xX][tT]                      { return lingodb::parser::make_TEXT_P(loc); }
+[tT][iI][mM][eE][sS][tT][aA][mM][pP]  { return lingodb::parser::make_TIMESTAMP(loc); }
 [tT][hH][eE][nN]                      { return lingodb::parser::make_THEN(loc); }
 
 [vV][aA][rR][cC][hH][aA][rR]          { return lingodb::parser::make_VARCHAR(loc); }
+[vV][aA][rR][yY][iI][nN][gG]          { return lingodb::parser::make_VARYING(loc); }
 
 [wW][hH][eE][rR][eE]                  { return lingodb::parser::make_WHERE(loc); }
 [wW][hH][eE][nN]                      { return lingodb::parser::make_WHEN(loc); }
