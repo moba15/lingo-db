@@ -218,7 +218,8 @@
  * LALR(1).
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
-%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmtmulti stmt
+%type <std::vector<std::shared_ptr<lingodb::ast::AstNode>>> stmtmulti
+%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmt
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt  select_with_parens PreparableStmt common_table_expr cte_list with_clause
 %type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select 
 
@@ -257,7 +258,7 @@
 
 %type<std::vector<std::string>> name_list opt_name_list
 
-%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst AexprConst  Sconst Bconst Fconst 
+%type<std::shared_ptr<lingodb::ast::ParsedExpression>> Iconst SignedIconst AexprConst  Sconst Bconst Fconst 
 
 %type<std::shared_ptr<lingodb::ast::GroupByNode>> group_clause
 
@@ -293,6 +294,8 @@
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
 %type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem ConstraintElem
 %type<std::vector<std::shared_ptr<lingodb::ast::Constraint>>> ColQualList 
+%type<std::vector<std::shared_ptr<lingodb::ast::Value>>> opt_type_modifiers type_modifiers
+%type<std::shared_ptr<lingodb::ast::Value>> type_modifier
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -362,12 +365,28 @@ parse_toplevel:
  */
  //TODO Allow multiple
 stmtmulti: 
-    stmtmulti SEMICOLON toplevel_stmt {}
-    | toplevel_stmt {$$=$1;}
+    toplevel_stmt 
+    {
+        auto list = mkListShared<lingodb::ast::AstNode>();
+        list.emplace_back($1);
+        $$ = list;
+    }
+    
+    | stmtmulti[list] SEMICOLON toplevel_stmt 
+    {
+        if($toplevel_stmt != nullptr) {
+            $list.emplace_back($toplevel_stmt);
+        }
+        $$ = $list;
+        
+    }
+    
+    
     ;
 
 toplevel_stmt:
     stmt {$$=$1;}
+    | %empty
   //TODO Add Later  | TransactionStmtLegacy 
   ;
 /*
@@ -1805,7 +1824,39 @@ SimpleType:
     //TODO | ConstInterval
     //TODO | JsonType
     ;
+opt_type_modifiers: 
+    LP type_modifiers RP
+    {
+        $$ = $type_modifiers;
+    }
+    | %empty
+    {
+        $$ = std::vector<std::shared_ptr<lingodb::ast::Value>>();
+    }
+    ;
+//TODO Postgres here uses aexprs, but lingodbs parser currently does not support aexprs as type modifiers. So I changed it to a list of ConstValues
+type_modifiers: 
+    type_modifier
+    {
+        auto list = mkListShared<lingodb::ast::Value>();
+        list.emplace_back($type_modifier);
+        $$ = list;
+    }
+    | type_modifiers[list] COMMA type_modifier
+    {
+        $list.emplace_back($type_modifier);
+        $$ = $list;
+    }
+    ;
+type_modifier:
+    ICONST
+    {
+        auto value = std::make_shared<lingodb::ast::UnsignedIntValue>($ICONST);
 
+        $$ = value;
+    }
+    ;
+    
 
 Numeric:
     INT_P 
@@ -1824,7 +1875,13 @@ Numeric:
     | REAL
     | FLOAT_P //TODO opt_float
     | DOUBLE_P PRECISION
-    | DECIMAL_P //TODO opt_type_modifiers
+    | DECIMAL_P opt_type_modifiers
+    {
+        lingodb::ast::LogicalTypeWithMods type{lingodb::ast::LogicalType::DECIMAL};
+        type.typeModifiers = $opt_type_modifiers;
+        $$ = type;
+        
+    }
     | DEC //TODO opt_type_modifiers
     | NUMERIC //TODO opt_type_modifiers
     | BOOLEAN_P
@@ -1843,10 +1900,10 @@ Character:
     }
     ;
 CharacterWithLength:
-    character LP ICONST RP
+    character LP type_modifier RP
     {
         //Change Iconst rule to unsigned long and use it here
-        $character.typeModifiers.emplace_back((size_t)$ICONST);
+        $character.typeModifiers.emplace_back($type_modifier);
         $$ = $character;
     }
     ;
@@ -1905,6 +1962,18 @@ AexprConst:
 //TODO create rule SignedIconst to handle signed integers!
 Iconst:	
     ICONST	{ auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::IntValue>($1); $$=t;  };
+
+SignedIconst:
+    PLUS Iconst
+    {
+    
+        $$=$Iconst;
+    }
+    | MINUS Iconst
+    {
+        $Iconst->iVal = -$Iconst->iVal;
+        $$=$Iconst;
+    }
 
 Fconst:
     FCONST  {auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::FloatValue>($1); $$=t; }

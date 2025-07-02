@@ -24,6 +24,7 @@ enum LogicalType : uint8_t {
    SMALLINT = 8,
    INT = 9,
    BIGINT = 10,
+   DECIMAL= 11,
    //TODO other
 };
 class LogicalTypeWithMods {
@@ -31,10 +32,10 @@ class LogicalTypeWithMods {
    LogicalTypeWithMods() : LogicalTypeWithMods(LogicalType::INVALID) {}
    LogicalTypeWithMods(LogicalType logicalType)
                 : logicalType(logicalType), typeModifiers({}) {}
-        LogicalTypeWithMods(LogicalType logicalType, std::vector<std::variant<size_t, std::string>> typeModifiers)
+        LogicalTypeWithMods(LogicalType logicalType, std::vector<std::shared_ptr<Value>> typeModifiers)
                 : logicalType(logicalType), typeModifiers(std::move(typeModifiers)) {}
    LogicalType logicalType;
-   std::vector<std::variant<size_t, std::string>> typeModifiers;
+   std::vector<std::shared_ptr<Value>> typeModifiers;
 };
 
 class BaseExpression : public AstNode {

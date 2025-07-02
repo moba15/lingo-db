@@ -5,9 +5,11 @@
 namespace lingodb::ast {
 enum class ConstantType : uint8_t {
    INT = 1,
-   FLOAT = 2,
-   STRING = 3,
-   INTERVAL = 4,
+
+   UINT = 2,
+   FLOAT = 3,
+   STRING = 4,
+   INTERVAL = 5,
 
    INVALID = 99,
 
@@ -19,6 +21,15 @@ class Value {
    ConstantType type;
 
    virtual std::string toString() = 0;
+};
+
+class UnsignedIntValue : public Value {
+   public:
+   explicit UnsignedIntValue(size_t iVal) : Value(ConstantType::UINT), iVal(iVal) {}
+   size_t iVal;
+   std::string toString() override {
+      return "uint:" + std::to_string(iVal);
+   }
 };
 
 class IntValue : public Value {

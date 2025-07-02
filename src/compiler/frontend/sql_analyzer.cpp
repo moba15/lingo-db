@@ -1442,7 +1442,7 @@ std::pair<unsigned long, unsigned long> SQLTypeUtils::getAdaptedDecimalPAndSAfte
    return {p, s};
 }
 
-catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logicalType, std::vector<std::variant<size_t, std::string>>& typeModifiers) {
+catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logicalType, std::vector<std::shared_ptr<ast::Value>>& typeModifiers) {
    switch (logicalType) {
       case ast::LogicalType::INT: {
          return catalog::Type::int32();
@@ -1460,14 +1460,28 @@ catalog::NullableType SQLTypeUtils::typemodsToCatalogType(ast::LogicalType logic
          return catalog::Type::stringType();
       }
       case ast::LogicalType::CHAR: {
-         if (typeModifiers.size() != 1) {
+         if (typeModifiers.size() == 0) {
             return catalog::Type::charType(1);
          }
-         auto l = std::get<size_t>(typeModifiers[0]);
+         if (typeModifiers.size()> 1 || typeModifiers[0]->type != ast::ConstantType::UINT) {
+            throw std::runtime_error("Invalid Typemodfiers for type: char");
+         }
+         size_t l = std::reinterpret_pointer_cast<ast::UnsignedIntValue>(typeModifiers[0])->iVal;
          if (l <= 8) {
             return catalog::Type::charType(l);
          }
          return catalog::Type::stringType();
+      }
+      case ast::LogicalType::DECIMAL: {
+
+         if (typeModifiers.size() != 2 || typeModifiers[0]->type != ast::ConstantType::UINT || typeModifiers[1]->type != ast::ConstantType::UINT) {
+            throw std::runtime_error("Invalid Typemodfiers for type: descimal");
+         }
+         size_t p = std::reinterpret_pointer_cast<ast::UnsignedIntValue>(typeModifiers[0])->iVal;
+         size_t s = std::reinterpret_pointer_cast<ast::UnsignedIntValue>(typeModifiers[1])->iVal;
+
+         return catalog::Type::decimal(p,s);
+
       }
       default: throw std::runtime_error("Not implemented typeMods");
    }
