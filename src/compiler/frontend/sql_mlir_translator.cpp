@@ -344,6 +344,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             case ast::ConstantType::FLOAT: {
                auto value = std::static_pointer_cast<ast::FloatValue>(constExpr->value);
                assert(constExpr->resultType.has_value());
+               //TODO support only decimal, without the need for string, see old parser
                return builder.create<db::ConstantOp>(builder.getUnknownLoc(), constExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext()), builder.getStringAttr(value->fVal));
             }
 
@@ -791,6 +792,51 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          auto translated = translateTableProducer(builder, subquery->subSelect, context);
          context->popCurrentScope();
 
+         return translated;
+      }
+      case ast::TableReferenceType::EXPRESSION_LIST: {
+         auto expressionList = std::static_pointer_cast<ast::BoundExpressionListRef>(tableRef);
+         std::vector<mlir::Attribute> rows;
+         for (auto row: expressionList->values) {
+            std::vector<mlir::Attribute> values;
+            std::vector<mlir::Type> types;
+            for (auto constExpr: row) {
+               mlir::Attribute value;
+               switch (constExpr->value->type) {
+                  case ast::ConstantType::INT: {
+                     auto iValue = std::static_pointer_cast<ast::IntValue>(constExpr->value);
+                     value = builder.getI32IntegerAttr(iValue->iVal);
+                     break;
+                  }
+                  case ast::ConstantType::STRING: {
+                     auto sValue = std::static_pointer_cast<ast::StringValue>(constExpr->value);
+                     value = builder.getStringAttr(sValue->sVal);
+                     break;
+                  }
+                  case ast::ConstantType::FLOAT: {
+                     auto fValue = std::static_pointer_cast<ast::FloatValue>(constExpr->value);
+                     //TODO support only decimal
+                     value =  builder.getStringAttr(fValue->fVal);
+                     assert(constExpr->resultType.has_value());
+                     break;
+                  }
+
+                  default: error("Not implemented", constExpr->loc);
+               }
+               values.emplace_back(value);
+               types.emplace_back(constExpr->resultType.value().toMlirType(builder.getContext()));
+            }
+            rows.push_back(builder.getArrayAttr(values));
+         }
+
+         std::vector<mlir::Attribute> attributes;
+         for (auto namedResult : expressionList->namedResultsEntries) {
+            auto attrDef = namedResult->createDef(builder, attrManager);
+            attributes.push_back(attrDef);
+         }
+
+
+         auto translated = builder.create<relalg::ConstRelationOp>(builder.getUnknownLoc(), builder.getArrayAttr(attributes), builder.getArrayAttr(rows));
          return translated;
       }
       default:

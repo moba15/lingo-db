@@ -36,4 +36,10 @@ BoundSubqueryRef::BoundSubqueryRef(std::shared_ptr<analyzer::SQLScope> sqlScope,
 std::string BoundSubqueryRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";
 }
+
+BoundExpressionListRef::BoundExpressionListRef(std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values, std::vector<std::shared_ptr<NamedResult>> namedResultsEntries) : BoundTableRef(TYPE), values(std::move(values)), namedResultsEntries(std::move(namedResultsEntries)) {
+}
+std::string BoundExpressionListRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   return "";
+}
 } // namespace lingodb::ast

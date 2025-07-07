@@ -219,9 +219,9 @@
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
 %type <std::vector<std::shared_ptr<lingodb::ast::AstNode>>> stmtmulti
-%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmt
+%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmt InsertStmt
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt  select_with_parens PreparableStmt common_table_expr cte_list with_clause
-%type <std::shared_ptr<lingodb::ast::QueryNode>>   select_clause   simple_select 
+%type <std::shared_ptr<lingodb::ast::QueryNode>> simple_select select_clause  
 
 %type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt extract_list expr_list substr_list
 
@@ -250,7 +250,7 @@
 */
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>> columnref indirection indirection_el
 
-%type<std::shared_ptr<lingodb::ast::TableRef>> from_clause opt_from_clause table_ref from_list joined_table
+%type<std::shared_ptr<lingodb::ast::TableRef>> from_clause opt_from_clause table_ref from_list joined_table values_clause
 
 %type<std::string>  ColId ColLabel BareColLabel attr_name 
                     qualified_name relation_expr alias_clause opt_alias_clause 
@@ -395,6 +395,7 @@ toplevel_stmt:
 stmt: 
  SelectStmt {$$=$1;}
  | CreateStmt {$$=$1;}
+ | InsertStmt {$$=$1;}
  ;
 
  SelectStmt: 
@@ -405,7 +406,9 @@ select_with_parens:
     LP select_no_parens RP {$$=$select_no_parens;}
     | LP select_with_parens RP {$$=$2;}
     ;
-
+/*
+* Difference to postgres the values clause is located in the select_no_parens rule so that it can be used as a standalone table producer.
+*/
 select_no_parens: 
     simple_select {$$=$1;}
     | select_clause sort_clause 
@@ -432,6 +435,7 @@ select_no_parens:
         std::static_pointer_cast<lingodb::ast::CTENode>($with_clause)->child = $select_clause;
         $$ = $with_clause;
     }
+    | values_clause	{ $$ = $1; }
     //TODO | with_clause select_clause opt_sort_clause for_locking_clause opt_select_limit
     //TODO | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
     //PIPE:
@@ -511,8 +515,8 @@ PreparableStmt:
  *
  *NOTE: only the leftmost component SelectStmt should have INTO.
  * !However, this is not checked by the grammar; parse analysis must check it.
+ * !Difference to postgres the values clause is located in the select_no_parens rule so that it can be used as a standalone table producer.
  */
- //! Check for what the different options are!
 simple_select: 
     SELECT opt_all_clause opt_target_list 
     //TODO into_clause 
@@ -528,7 +532,6 @@ simple_select:
         $$ = t;
     }
     //TODO | SELECT distinct_clause target_list into_clause from_clause where_clause group_clause having_clause window_clause
-    //TODO | values_clause
     //TODO | TABLE relation_expr
     //TODO | select_clause UNION set_quantifier select_clause
     //TODO | select_clause INTERSECT set_quantifier select_clause
@@ -945,6 +948,29 @@ select_offset_value:
     a_expr
     ;
 
+/*
+ * We should allow ROW '(' expr_list ')' too, but that seems to require
+ * making VALUES a fully reserved word, which will probably break more apps
+ * than allowing the noise-word is worth.
+ */
+ values_clause:
+    VALUES LP expr_list RP
+    {
+        //ExpressionListRef is a TableRef and therefore a TableProducer and therefore can be used stand alone
+        auto exprListList = mkList<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>>();
+        exprListList.emplace_back($expr_list);
+        auto exprListRef = mkNode<lingodb::ast::ExpressionListRef>(@$, exprListList);
+        $$ = exprListRef;
+
+    }
+    | values_clause[clause] COMMA LP expr_list RP
+    {
+        std::static_pointer_cast<lingodb::ast::ExpressionListRef>($clause)->values.emplace_back($expr_list);
+        $$ = $clause;
+    }
+    ;
+   
+    ;
 
 
 /*****************************************************************************
@@ -1981,9 +2007,48 @@ ConstDatetime:
 
 
 
+/*****************************************************************************
+ *
+ *		QUERY:
+ *				INSERT STATEMENTS
+ *
+ *****************************************************************************/
+//TODO add and complete missing rules
+InsertStmt:
+    INSERT INTO insert_target insert_rest
+    {
+
+    }
+    ;
+    
+
+/*
+ * Can't easily make AS optional here, because VALUES in insert_rest would
+ * have a shift/reduce conflict with VALUES as an optional alias.  We could
+ * easily allow unreserved_keywords as optional aliases, but that'd be an odd
+ * divergence from other places.  So just require AS for now.
+ */
+insert_target:
+    qualified_name
+       
+    | qualified_name AS ColId
+       
+;
+//TODO Add missing rules
+insert_rest:
+    SelectStmt
+    | LP insert_column_list RP SelectStmt
+    ;
 
 
-
+insert_column_list:
+    insert_column_item
+    | insert_column_list COMMA insert_column_item
+    ;
+//TODO add missing rules
+insert_column_item:
+    ColId //TODO opt_indirection
+    ;
 
 /*
  * Constants

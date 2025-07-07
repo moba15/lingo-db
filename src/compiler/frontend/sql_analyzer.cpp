@@ -183,6 +183,15 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                subquery->subSelectNode = transformedSubSelectNode;
                return subquery;
             }
+            case ast::TableReferenceType::EXPRESSION_LIST: {
+               auto expressionListRef = std::static_pointer_cast<ast::ExpressionListRef>(tableRef);
+               for (auto exprList : expressionListRef->values) {
+                  std::ranges::transform(exprList, exprList.begin(), [&](auto& value) {
+                     return canonicalizeParsedExpression(value, context);
+                  });
+               }
+               return expressionListRef;
+            }
             default: return tableRef;
          }
       }
@@ -758,6 +767,54 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          return drv.nf.node<ast::BoundSubqueryRef>(subquery->loc, subQueryScope, t);
 
          break;
+      }
+      case ast::TableReferenceType::EXPRESSION_LIST: {
+         auto expressionListRef = std::static_pointer_cast<ast::ExpressionListRef>(tableRef);
+         if (expressionListRef->values.empty() || expressionListRef->values[0].empty()) {
+            error("Expression list is empty", expressionListRef->loc);
+         }
+
+         std::vector<std::vector<std::shared_ptr<ast::BoundConstantExpression>>> boundValues{};
+         size_t sizePerExprList = expressionListRef->values[0].size();
+         std::vector<std::vector<catalog::NullableType>> types{sizePerExprList};
+
+         for (auto exprList : expressionListRef->values) {
+            if (exprList.size() != sizePerExprList) {
+               error("All expression lists must have the same size", expressionListRef->loc);
+            }
+            std::vector<std::shared_ptr<ast::BoundConstantExpression>> boundExprList{};
+            for (size_t i = 0; i< sizePerExprList; i++) {
+               std::shared_ptr<ast::BoundExpression> boundExpr = analyzeExpression(exprList.at(i), context, resolverScope);
+               if (boundExpr->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
+                  error("Expression list must only contain constant expressions", exprList.at(i)->loc);
+               }
+               assert(boundExpr->resultType.has_value());
+               types.at(i).push_back(boundExpr->resultType.value());
+               boundExprList.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(boundExpr));
+            }
+            boundValues.emplace_back(boundExprList);
+
+         }
+         std::vector<catalog::NullableType> commonTypes{};
+         std::ranges::transform(types, std::back_inserter(commonTypes), [&](auto& typeList) {
+            auto t =  SQLTypeUtils::getCommonBaseType(typeList);
+            SQLTypeUtils::toCommonTypes(typeList);
+
+            return t;
+         });
+         std::vector<std::shared_ptr<ast::NamedResult>> namedResults{};
+         auto scope = createTmpScope();
+         for (size_t i = 0; i < commonTypes.size(); i++) {
+            auto name = "const_" + std::to_string(i);
+            auto namedResult = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, commonTypes[i], name);
+            namedResults.push_back(namedResult);
+            context->currentScope->targetInfo.add(namedResult);
+
+         }
+         //TODO move to upper for loop
+         context->mapAttribute(resolverScope, scope, namedResults);
+
+         return drv.nf.node<ast::BoundExpressionListRef>(expressionListRef->loc, boundValues, namedResults);
       }
 
       default: error("Not implemented", tableRef->loc);
