@@ -13,6 +13,7 @@ enum class NodeType : uint8_t {
    RESULT_MODIFIER = 7,
    EXTEND_NODE=8,
    CREATE_NODE = 9,
+   INSERT_NODE = 10,
 
    //Bound
    BOUND_TABLE_REF = 20,
@@ -21,6 +22,7 @@ enum class NodeType : uint8_t {
    BOUND_AGGREGATION = 26,
    BOUND_RESULT_MODIFIER = 27,
    BOUND_EXTEND_NODE = 28,
+   BOUND_INSERT_NODE = 30,
 };
 //used for getting unique ids when printing the AST for debugging purposes as Dot graph
 class NodeIdGenerator {

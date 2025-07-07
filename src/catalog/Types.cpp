@@ -125,7 +125,7 @@ mlir::Value NullableType::castValue(mlir::OpBuilder& builder, mlir::Value valueT
       return valueToCast;
    }
    auto type = castType->toMlirType(builder.getContext());
-   if (!castType->isNullable && isNullable ) {
+   if (!castType->isNullable && isNullable) {
       //If type is not nullable but value is
       type = compiler::dialect::db::NullableType::get(builder.getContext(), type);
    }
@@ -158,6 +158,24 @@ mlir::Value NullableType::castValue(mlir::OpBuilder& builder, mlir::Value valueT
       return builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), type, valueToCast);
    }
 }
+bool NullableType::operator==( NullableType& other)  {
+   return this->type.getTypeId() == other.type.getTypeId() && this->isNullable == other.isNullable;
+}
+bool NullableType::operator!=( NullableType& other)  {
+   if (this->isNullable != other.isNullable || this->type.getTypeId() != other.type.getTypeId()) {
+       return true;
+   }
+   switch (this->type.getTypeId()) {
+      case LogicalTypeId::INT: {
+         auto info = this->type.getInfo<IntTypeInfo>();
+         auto info2 =other.type.getInfo<IntTypeInfo>();
+         return info->getBitWidth() != info2->getBitWidth() || info->getIsSigned() != info2->getIsSigned();
+      }
+      default: return false;
+   }
+
+}
+
 void IntTypeInfo::serializeConcrete(utility::Serializer& serializer) const {
    serializer.writeProperty(0, isSigned);
    serializer.writeProperty(1, bitWidth);

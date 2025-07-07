@@ -19,6 +19,7 @@
   #include "lingodb/compiler/frontend/ast/table_producer.h"
   #include "lingodb/compiler/frontend/ast/select_node.h"
   #include "lingodb/compiler/frontend/ast/create_node.h"
+  #include "lingodb/compiler/frontend/ast/insert_node.h"
   #include "lingodb/compiler/frontend/ast/tableref.h"
   #include "lingodb/compiler/frontend/ast/aggregation_node.h"
   #include "lingodb/compiler/frontend/ast/result_modifier.h"
@@ -219,7 +220,7 @@
  */
 %token		FORMAT_LA NOT_LA NULLS_LA WITH_LA WITHOUT_LA
 %type <std::vector<std::shared_ptr<lingodb::ast::AstNode>>> stmtmulti
-%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmt InsertStmt
+%type <std::shared_ptr<lingodb::ast::AstNode>> toplevel_stmt stmt 
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt  select_with_parens PreparableStmt common_table_expr cte_list with_clause
 %type <std::shared_ptr<lingodb::ast::QueryNode>> simple_select select_clause  
 
@@ -296,6 +297,10 @@
 %type<std::vector<std::shared_ptr<lingodb::ast::Constraint>>> ColQualList 
 %type<std::vector<std::shared_ptr<lingodb::ast::Value>>> opt_type_modifiers type_modifiers
 %type<std::shared_ptr<lingodb::ast::Value>> type_modifier
+
+%type<std::shared_ptr<lingodb::ast::InsertNode>> InsertStmt insert_rest
+%type<std::string> insert_target insert_column_item
+%type<std::vector<std::string>> insert_column_list
 
 /*%type <nodes::RelExpression>		simple_select
 %type <std::shared_ptr<nodes::Query>> select_no_parens
@@ -1800,6 +1805,10 @@ ColConstraintElem:
     {
         $$ = mkNode<lingodb::ast::Constraint>(@$, lingodb::ast::ConstraintType::NULLABLE);
     }
+    | PRIMARY KEY
+    {
+        $$ = mkNode<lingodb::ast::UniqueConstraint>(@$, std::vector<std::string>(), true);
+    }
     ;
 //TODO Add missing rules
 ConstraintElem: 
@@ -2017,7 +2026,9 @@ ConstDatetime:
 InsertStmt:
     INSERT INTO insert_target insert_rest
     {
-
+        $insert_rest->tableName = $insert_target;
+        $$ = $insert_rest;
+    
     }
     ;
     
@@ -2030,24 +2041,47 @@ InsertStmt:
  */
 insert_target:
     qualified_name
+    {
+        $$ = $qualified_name;
+    }
        
-    | qualified_name AS ColId
+   // | qualified_name AS ColId
        
 ;
 //TODO Add missing rules
 insert_rest:
     SelectStmt
+    {
+        $$ = mkNode<lingodb::ast::InsertNode>(@$, "", "", $SelectStmt);
+    }
     | LP insert_column_list RP SelectStmt
+    {
+        auto insertNode = mkNode<lingodb::ast::InsertNode>(@$, "", "", $SelectStmt);
+        insertNode->columns = $insert_column_list;
+        $$ = insertNode;
+    }
     ;
 
 
 insert_column_list:
-    insert_column_item
-    | insert_column_list COMMA insert_column_item
+    insert_column_item 
+    {
+        auto list = mkList<std::string>();
+        list.emplace_back($insert_column_item);
+        $$ = list;
+    }
+    | insert_column_list[list] COMMA insert_column_item 
+    {
+        $list.emplace_back($insert_column_item);
+        $$ = $list;
+    }
     ;
 //TODO add missing rules
 insert_column_item:
     ColId //TODO opt_indirection
+    {
+        $$ = $ColId;
+    }
     ;
 
 /*

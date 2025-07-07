@@ -1,8 +1,9 @@
 #pragma once
+#include "ast/bound/bound_insert_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_expression.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
-#include "lingodb/compiler/frontend/driver.h"
 #include "lingodb/compiler/frontend/ast/query_node.h"
+#include "lingodb/compiler/frontend/driver.h"
 #include "sql_context.h"
 
 #include <functional>
@@ -33,10 +34,11 @@ class SQLQueryAnalyzer {
    SQLQueryAnalyzer(std::shared_ptr<catalog::Catalog> catalog);
    std::shared_ptr<SQLContext> context = std::make_shared<SQLContext>();
 
+
    std::shared_ptr<ast::AstNode> canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context);
    std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
-
    std::shared_ptr<ast::CreateNode> analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundInsertNode> analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
 
 
    private:

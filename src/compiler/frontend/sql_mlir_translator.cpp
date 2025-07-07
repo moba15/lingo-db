@@ -10,9 +10,11 @@
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_insert_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/compiler/frontend/ast/create_node.h"
 #include "lingodb/compiler/frontend/ast/cte_node.h"
+#include "lingodb/compiler/frontend/ast/insert_node.h"
 
 #include "lingodb/utility/Serialization.h"
 
@@ -26,6 +28,7 @@
 #include "mlir/IR/BuiltinOps.h"
 
 #include <lingodb/compiler/Dialect/util/UtilOps.h.inc>
+#include <lingodb/compiler/runtime/ExecutionContext.h>
 #include <lingodb/compiler/runtime/RelationHelper.h>
 #include <mlir-c/IR.h>
 namespace lingodb::translator {
@@ -43,7 +46,12 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
         switch (astNode->nodeType) {
            case ast::NodeType::CREATE_NODE: {
               auto createNode = std::static_pointer_cast<ast::CreateNode>(astNode);
-               translateCreateNode(builder, createNode, context);
+              translateCreateNode(builder, createNode, context);
+              return std::nullopt;
+           }
+           case ast::NodeType::BOUND_INSERT_NODE: {
+              auto insertNode = std::static_pointer_cast<ast::BoundInsertNode>(astNode);
+              translateInsertNode(builder, insertNode, context);
               return std::nullopt;
            }
            default: error("Invalid root node type", astNode->loc);
@@ -193,19 +201,106 @@ void SQLMlirTranslator::translateCreateNode(mlir::OpBuilder& builder, std::share
       case ast::CatalogType::TABLE_ENTRY: {
          auto createTableInfo = std::static_pointer_cast<ast::CreateTableInfo>(createNode->createInfo);
          auto tableName = createTableInfo->tableName;
-         auto tableDef = translateTableElements(builder,createTableInfo->tableElements, context);
+         auto tableDef = translateTableElements(builder, createTableInfo->tableElements, context);
          tableDef.name = tableName;
          auto descriptionValue = createStringValue(builder, utility::serializeToHexString(tableDef));
          compiler::runtime::RelationHelper::createTable(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
          break;
-
-
-
-
       }
       default: error("CreateInfo type not implemented", createNode->loc);
    }
 }
+
+void SQLMlirTranslator::translateInsertNode(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundInsertNode> insertNode, std::shared_ptr<analyzer::SQLContext> context) {
+
+   mlir::Block* block = new mlir::Block;
+   mlir::Type localTableType;
+   {
+      mlir::OpBuilder::InsertionGuard guard(builder);
+      builder.setInsertionPointToStart(block);
+      auto tree = translateTableProducer(builder, insertNode->producer, context);
+      auto rel  = context->catalog->getTypedEntry<catalog::TableCatalogEntry>(insertNode->tableName).value();
+
+
+      std::vector<mlir::Value> createdValues;
+      std::unordered_map<std::string, mlir::Value> columnNameToCreatedValue;
+
+      //Build map
+      mlir::Block* block = new mlir::Block;
+      mlir::OpBuilder mapBuilder(builder.getContext());
+      block->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+      auto tupleScope = translationContext->createTupleScope();
+      mlir::Value tuple = block->getArgument(0);
+      translationContext->setCurrentTuple(tuple);
+
+      mapBuilder.setInsertionPointToStart(block);
+
+      std::unordered_map<std::string, mlir::Attribute> insertedCols;
+
+      std::vector<mlir::Attribute> createdCols;
+      auto mapName = attrManager.getUniqueScope("map");
+      for (size_t i = 0; i<insertNode->columnsToInsert.size(); i++) {
+         auto attrRef = context->currentScope->targetInfo.targetColumns[i]->createRef(builder, attrManager);
+         auto currentType =  context->currentScope->targetInfo.targetColumns[i]->resultType;
+         auto tableType = insertNode->allColumnsAndTypes.at(insertNode->columnsToInsert[i]);
+         mlir::Value expr = mapBuilder.create<tuples::GetColumnOp>(mapBuilder.getUnknownLoc(), attrRef.getColumn().type, attrRef, tuple);
+         if (currentType != tableType) {
+            auto attrDef = attrManager.createDef(mapName, std::string("inserted") + std::to_string(i));
+            attrDef.getColumn().type = tableType.toMlirType(builder.getContext());
+
+            createdCols.push_back(attrDef);
+            mlir::Value casted =  tableType.castValueToThisType(mapBuilder, expr, context->currentScope->targetInfo.targetColumns[i]->resultType.isNullable); // SQLTypeInference::castValueToType(mapBuilder, expr, tableType);
+
+            createdValues.push_back(casted);
+            columnNameToCreatedValue[insertNode->columnsToInsert[i]] = casted;
+            insertedCols[insertNode->columnsToInsert[i]] = attrManager.createRef(&attrDef.getColumn());
+
+         } else {
+            columnNameToCreatedValue[insertNode->columnsToInsert[i]] = expr;
+            insertedCols[insertNode->columnsToInsert[i]] = attrRef;
+         }
+
+
+
+      }
+
+      auto mapOp = builder.create<relalg::MapOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), tree, builder.getArrayAttr(createdCols));
+      mapOp.getPredicate().push_back(block);
+      mapBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), createdValues);
+
+      std::vector<mlir::Attribute> colMemberNames;
+      std::vector<mlir::Attribute> orderedColNamesAttrs;
+      std::vector<mlir::Attribute> orderedColAttrs;
+      std::vector<mlir::Attribute> colTypes;
+      auto& memberManager = builder.getContext()->getLoadedDialect<subop::SubOperatorDialect>()->getMemberManager();
+
+      for (auto x : rel->getColumnNames()) {
+         colMemberNames.push_back(builder.getStringAttr(memberManager.getUniqueMember(x)));
+         orderedColNamesAttrs.push_back(builder.getStringAttr(x));
+         orderedColAttrs.push_back(insertedCols.at(x));
+         colTypes.push_back(mlir::TypeAttr::get(mlir::cast<tuples::ColumnRefAttr>(insertedCols.at(x)).getColumn().type));
+      }
+
+      localTableType = subop::LocalTableType::get(builder.getContext(), subop::StateMembersAttr::get(builder.getContext(), builder.getArrayAttr(colMemberNames), builder.getArrayAttr(colTypes)), builder.getArrayAttr(orderedColNamesAttrs));
+      mlir::Value newRows = builder.create<relalg::MaterializeOp>(builder.getUnknownLoc(), localTableType, mapOp.getResult(), builder.getArrayAttr(orderedColAttrs), builder.getArrayAttr(orderedColNamesAttrs));
+      builder.create<relalg::QueryReturnOp>(builder.getUnknownLoc(), newRows);
+   }
+
+   relalg::QueryOp queryOp = builder.create<relalg::QueryOp>(builder.getUnknownLoc(), mlir::TypeRange{localTableType}, mlir::ValueRange{});
+   queryOp.getQueryOps().getBlocks().clear();
+   queryOp.getQueryOps().push_back(block);
+   auto tableNameValue = createStringValue(builder, insertNode->tableName);
+   auto resultIdValue = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 0, builder.getI32Type());
+   builder.create<subop::SetResultOp>(builder.getUnknownLoc(), 0, queryOp.getResults()[0]);
+
+   compiler::runtime::RelationHelper::appendTableFromResult(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, resultIdValue});
+   compiler::runtime::ExecutionContext::clearResult(builder, builder.getUnknownLoc())({resultIdValue});
+
+
+
+
+}
+
 catalog::CreateTableDef SQLMlirTranslator::translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext> context) {
    catalog::CreateTableDef tableDef{};
    for (auto tableElement: tableElements) {
@@ -213,7 +308,9 @@ catalog::CreateTableDef SQLMlirTranslator::translateTableElements(mlir::OpBuilde
          case ast::TableElementType::COLUMN: {
             auto columnElement = std::static_pointer_cast<ast::BoundColumnElement>(tableElement);
             catalog::Column c{columnElement->name, columnElement->datatype.type, columnElement->datatype.isNullable};
-             tableDef.columns.emplace_back(c);
+            tableDef.columns.emplace_back(c);
+
+
             break;
 
          }
@@ -957,7 +1054,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
             if (aggrFunction->arguments[0]->type != ast::ExpressionType::BOUND_COLUMN_REF) {
                //TODO better, over context!!
                assert(aggrFunction->arguments[0]->namedResult.has_value());
-               aggrResultType = aggrFunction->arguments[0]->namedResult.value()->resultType.toMlirType(builder.getContext());
+
+               //aggrResultType = aggrFunction->arguments[0]->namedResult.value()->resultType.toMlirType(builder.getContext());
             }
             //TODO define type
             if (relalgAggrFunc == relalg::AggrFunc::avg) {
