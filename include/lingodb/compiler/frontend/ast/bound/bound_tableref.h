@@ -1,7 +1,8 @@
 #pragma once
-#include "lingodb/compiler/frontend/sql_scope.h"
+#include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 #include "lingodb/compiler/frontend/ast/tableref.h"
+#include "lingodb/compiler/frontend/sql_scope.h"
 namespace lingodb::ast {
 class BoundTableRef : public TableProducer {
    public:
@@ -67,6 +68,20 @@ class BoundSubqueryRef : public BoundTableRef {
    //! The subquery
    //TODO correct Type?
    std::shared_ptr<TableProducer> subSelect;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
+class BoundExpressionListRef : public BoundTableRef {
+
+
+   public:
+   static constexpr TableReferenceType TYPE = TableReferenceType::EXPRESSION_LIST;
+   BoundExpressionListRef(std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values, std::vector<std::shared_ptr<NamedResult>> namedResultsEntries);
+
+   //! The expressions in the list
+   std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values;
+   std::vector<std::shared_ptr<NamedResult>> namedResultsEntries;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

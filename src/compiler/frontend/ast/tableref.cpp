@@ -118,4 +118,31 @@ std::string SubqueryRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return dot;
 }
 
+/// ExpressionListRef
+ExpressionListRef::ExpressionListRef(std::vector<std::vector<std::shared_ptr<ParsedExpression>>> values) : TableRef(TYPE), values(std::move(values)) {
+
+}
+std::string ExpressionListRef::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
+   std::string dot;
+
+   // Create node identifier for the expression list
+   std::string nodeId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(this)));
+
+   // Create label for the expression list node
+   dot += nodeId + " [label=\"ExpressionList\"];\n";
+
+   // Add edges to each expression in the 2D list
+   for (size_t row = 0; row < values.size(); ++row) {
+      const auto& rowVec = values[row];
+      for (size_t col = 0; col < rowVec.size(); ++col) {
+         if (rowVec[col]) {
+            std::string exprId = "node" + std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(rowVec[col].get())));
+            dot += nodeId + " -> " + exprId + " [label=\"expr[" + std::to_string(row) + "][" + std::to_string(col) + "]\"];\n";
+            dot += rowVec[col]->toDotGraph(depth + 1, idGen);
+         }
+      }
+   }
+
+   return dot;
+}
 } // namespace lingodb::ast
