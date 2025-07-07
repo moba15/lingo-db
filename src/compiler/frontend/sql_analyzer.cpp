@@ -5,6 +5,7 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_groupby.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_insert_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/runtime/RecordBatchInfo.h"
 
@@ -286,9 +287,19 @@ std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shar
          case ast::NodeType::CREATE_NODE: {
             auto createNode = std::static_pointer_cast<ast::CreateNode>(astRootNode);
             auto scope = context->createResolverScope();
-            analyzeCreateNode(createNode, context, scope);
-            return createNode;
 
+            return analyzeCreateNode(createNode, context, scope);;
+
+         }
+         case ast::NodeType::INSERT_NODE: {
+            auto insertNode = std::static_pointer_cast<ast::InsertNode>(astRootNode);
+
+            context->pushNewScope();
+            auto scope = context->createResolverScope();
+            insertNode->producer = sqlCanonicalizer.canonicalize(insertNode->producer, std::make_shared<ASTTransformContext>());
+            auto i = analyzeInsertNode(insertNode, context, scope);
+            //context->popCurrentScope();
+            return i;
          }
          default: throw std::runtime_error("Invalid root node type");
       }
@@ -386,7 +397,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
          }
 
          std::vector<std::shared_ptr<ast::TableElement>> boundTableElements{};
-         for (auto & tableElement : createTableInfo->tableElements) {
+         for (auto& tableElement : createTableInfo->tableElements) {
             switch (tableElement->type) {
                case ast::TableElementType::COLUMN: {
                   auto columnElement = std::static_pointer_cast<ast::ColumnElement>(tableElement);
@@ -396,21 +407,25 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
                   std::vector<std::variant<size_t, std::string>> typeModifiers;
                   catalog::NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalTypeWithMods.logicalType, columnElement->logicalTypeWithMods.typeModifiers);
                   nullableType.isNullable = true;
+                  bool primary = false;
                   //TODO constraints
-                  for (auto& constraint: columnElement->constraints) {
+                  for (auto& constraint : columnElement->constraints) {
                      switch (constraint->type) {
                         case ast::ConstraintType::NOT_NULL: {
                            nullableType.isNullable = false;
+                           break;
+                        }
+                        case ast::ConstraintType::UNIQUE: {
+                           primary = true;
                            break;
                         }
                         default: error("Constraint type not implemented", constraint->loc);
                      }
                   }
 
-                  auto boundColumnElement = std::make_shared<ast::BoundColumnElement>(columnElement->name, nullableType);
+                  auto boundColumnElement = std::make_shared<ast::BoundColumnElement>(columnElement->name, nullableType, primary);
                   boundTableElements.emplace_back(boundColumnElement);
                   break;
-
                }
                case ast::TableElementType::CONSTRAINT: {
                   auto tableConstraintElement = std::static_pointer_cast<ast::TableConstraintElement>(tableElement);
@@ -419,13 +434,9 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
                   }
                   boundTableElements.emplace_back(tableConstraintElement);
                   break;
-
                }
-                  default: error("TableElementType here not supported", tableElement->loc);
+               default: error("TableElementType here not supported", tableElement->loc);
             }
-
-
-
          }
 
          createTableInfo->tableElements = std::move(boundTableElements);
@@ -433,11 +444,39 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
          //TODO check for catalog and shema
          return createNode;
       }
-         default: error("Not implemented", createNode->loc);
+      default: error("Not implemented", createNode->loc);
    }
-
 }
 
+std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
+   auto maybeRel =context->catalog->getTypedEntry<catalog::TableCatalogEntry>(insertNode->tableName);
+   if (!maybeRel.has_value()) {
+      error("Table " << insertNode->tableName << " does not exist", insertNode->loc);
+   }
+   auto boundTableProducer = analyzeTableProducer(insertNode->producer, context, resolverScope);
+   //TODO Maybe add BoundTableProducer which has a produced columns and their type
+   if (boundTableProducer->nodeType != ast::NodeType::BOUND_TABLE_REF || std::static_pointer_cast<ast::BoundTableRef>(boundTableProducer)->type != ast::TableReferenceType::EXPRESSION_LIST) {
+      error("Table producer type for insert node not yet supported", boundTableProducer->loc);
+   }
+
+   auto exprListTableRef = std::static_pointer_cast<ast::BoundExpressionListRef>(boundTableProducer);
+   auto rel = maybeRel.value();
+   std::unordered_map<std::string, catalog::NullableType>  allCollumnTypes;
+   //Check for correct Type
+   for (auto c: rel->getColumns()) {
+     allCollumnTypes.emplace(c.getColumnName(), catalog::NullableType(c.getLogicalType(), c.getIsNullable()));
+   }
+   //TODO move loop up
+   if (insertNode->columns.empty()) {
+      for (auto c : rel->getColumns()) {
+         insertNode->columns.emplace_back(c.getColumnName());
+      }
+   }
+
+
+   return drv.nf.node<ast::BoundInsertNode>(insertNode->loc, insertNode->schema, insertNode->tableName,exprListTableRef, insertNode->columns,allCollumnTypes);
+
+}
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;
    switch (pipeOperator->pipeOpType) {
@@ -1054,7 +1093,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   //else keep type
 
                }
-               resultType.isNullable = true;
+               //TODO check if this line is needed
+               //resultType.isNullable = true;
 
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;

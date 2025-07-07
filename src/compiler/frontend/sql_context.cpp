@@ -31,7 +31,7 @@ void SQLContext::pushNewScope(std::shared_ptr<SQLScope> newScope) {
 }
 void SQLContext::popCurrentScope() {
    if (!currentScope->parent) {
-      std::cerr << "Cannot pop root scope" << std::endl;
+      throw std::runtime_error("Cannot pop current scope");
       return;
    }
    currentScope = currentScope->parent;

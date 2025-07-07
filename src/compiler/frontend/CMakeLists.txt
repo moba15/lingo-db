@@ -17,6 +17,7 @@ add_library(sql-frontend-new
         ast/bound/bound_groupby.cpp
         ast/bound/bound_aggregation.cpp
         ast/bound/bound_extend_node.cpp
+        ast/bound/bound_insert_node.cpp
         #translator
         sql_mlir_translator.cpp
 
@@ -35,6 +36,7 @@ add_library(sql-frontend-new
         ast/cte_node.cpp
         ast/create_node.cpp
         ast/constraint.cpp
+        ast/insert_node.cpp
 
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}

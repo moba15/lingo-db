@@ -1,5 +1,7 @@
 #pragma once
+#include "ast/bound/bound_insert_node.h"
 #include "ast/create_node.h"
+#include "ast/insert_node.h"
 #include "lingodb/compiler/Dialect/TupleStream/ColumnManager.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
@@ -28,6 +30,7 @@ class SQLMlirTranslator {
    mlir::ModuleOp moduleOp;
    compiler::dialect::tuples::ColumnManager& attrManager;
 
+
    std::optional<mlir::Value> translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::AstNode> astNode, std::shared_ptr<analyzer::SQLContext> context);
 
 
@@ -39,6 +42,7 @@ class SQLMlirTranslator {
    mlir::Value translateTableProducer(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context);
 
    void translateCreateNode(mlir::OpBuilder& builder, std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<analyzer::SQLContext> context);
+   void translateInsertNode(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundInsertNode> insertNode, std::shared_ptr<analyzer::SQLContext> context);
    catalog::CreateTableDef translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext>  context);
 
    mlir::Value translatePipeOperator(mlir::OpBuilder& builder, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
