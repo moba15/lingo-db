@@ -1,5 +1,6 @@
 #pragma once
 #include "ast/bound/bound_insert_node.h"
+#include "ast/bound/bound_pipe_operator.h"
 #include "ast/create_node.h"
 #include "ast/insert_node.h"
 #include "lingodb/compiler/Dialect/TupleStream/ColumnManager.h"
@@ -17,6 +18,9 @@
 
 #include <lingodb/compiler/Dialect/util/UtilOps.h>
 
+namespace lingodb::ast {
+class BoundSetOperationNode;
+}
 namespace lingodb::translator {
 #define error(message, loc)                                         \
    {                                                                \
@@ -43,7 +47,8 @@ class SQLMlirTranslator {
 
    void translateCreateNode(mlir::OpBuilder& builder, std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<analyzer::SQLContext> context);
    void translateInsertNode(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundInsertNode> insertNode, std::shared_ptr<analyzer::SQLContext> context);
-   catalog::CreateTableDef translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext>  context);
+   catalog::CreateTableDef translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext> context);
+
 
    mlir::Value translatePipeOperator(mlir::OpBuilder& builder, std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
 
@@ -56,6 +61,8 @@ class SQLMlirTranslator {
    mlir::Value translateWhenCheck(mlir::OpBuilder& builder, ast::BoundCaseExpression::BoundCaseCheck whenCheck, std::shared_ptr<ast::BoundExpression> elseExpr, std::shared_ptr<analyzer::SQLContext> context);
 
    mlir::Value translateTableRef(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundTableRef> tableRef, std::shared_ptr<analyzer::SQLContext> context);
+
+   mlir::Value translateSetOperation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundSetOperationNode> boundSetOp, std::shared_ptr<analyzer::SQLContext> context);
 
    mlir::Value translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
    mlir::Value createMap(mlir::OpBuilder& builder, std::string mapName, std::vector<std::shared_ptr<ast::BoundExpression>> toMap, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);

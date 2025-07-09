@@ -61,6 +61,9 @@ class SQLContext {
    SQLContext() : definedAttributes(), resolver() {
       definedAttributes.push({});
    };
+
+
+
    std::shared_ptr<catalog::Catalog> catalog;
    std::vector<std::shared_ptr<SQLScope>> scopes;
    std::shared_ptr<SQLScope> currentScope;

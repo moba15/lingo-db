@@ -284,7 +284,7 @@
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
 %type<std::optional<lingodb::ast::LogicalType>> opt_interval
-%type<bool> opt_asymmetric 
+%type<bool> opt_asymmetric set_quantifier
 
 
 
@@ -441,7 +441,18 @@ select_no_parens:
         $$ = $with_clause;
     }
     | values_clause	{ $$ = $1; }
-    //TODO | with_clause select_clause opt_sort_clause for_locking_clause opt_select_limit
+    | with_clause select_clause opt_sort_clause  opt_select_limit
+    {
+        if ($opt_sort_clause.has_value()) {
+            $select_clause->modifiers.emplace_back($opt_sort_clause.value());
+        }
+        if($opt_select_limit.has_value()) {
+            $select_clause->modifiers.emplace_back($opt_select_limit.value());
+        }
+
+        std::static_pointer_cast<lingodb::ast::CTENode>($with_clause)->child = $select_clause;
+        $$ = $with_clause;
+    }
     //TODO | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
     //PIPE:
     | from_clause 
@@ -481,7 +492,7 @@ pipe_start:
     ;
 select_clause: 
     simple_select {$$ = $1;}
-    | select_with_parens 
+    | select_with_parens {}
     ;
 
 
@@ -538,7 +549,13 @@ simple_select:
     }
     //TODO | SELECT distinct_clause target_list into_clause from_clause where_clause group_clause having_clause window_clause
     //TODO | TABLE relation_expr
-    //TODO | select_clause UNION set_quantifier select_clause
+    | select_clause[clause1] UNION set_quantifier select_clause[clause2] 
+    {
+        auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(@$, lingodb::ast::SetOperationType::UNION, $clause1, $clause2);
+        setOpNode->setOpAll = $set_quantifier;
+        $$ = setOpNode;
+
+    }
     //TODO | select_clause INTERSECT set_quantifier select_clause
     //TODO | select_clause EXCEPT set_quantifier select_clause
     ;
@@ -642,8 +659,14 @@ table_ref:
 
 set_quantifier: 
     ALL
+    {
+        $$ = true;
+    }
     | DISTINCT
     | %empty
+    {
+        $$ = false;
+    }
     ;
 
 /* Postgres

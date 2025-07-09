@@ -12,11 +12,12 @@ enum class PipeOperatorType : uint8_t {
    GROUP_BY = 4,
    RESULT_MODIFIER = 5,
    UNION = 7,
-   INTERSECT = 8,
-   EXCEPT = 9,
-   FROM = 10,
-   AGGREGATE = 11,
-   EXTEND = 12,
+   UNION_ALL = 8,
+   INTERSECT = 9,
+   EXCEPT = 10,
+   FROM = 11,
+   AGGREGATE = 12,
+   EXTEND = 13,
 
 };
 class PipeOperator : public TableProducer {
