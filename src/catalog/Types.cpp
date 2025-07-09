@@ -171,6 +171,11 @@ bool NullableType::operator!=( NullableType& other)  {
          auto info2 =other.type.getInfo<IntTypeInfo>();
          return info->getBitWidth() != info2->getBitWidth() || info->getIsSigned() != info2->getIsSigned();
       }
+      case LogicalTypeId::DECIMAL: {
+         auto info = this->type.getInfo<DecimalTypeInfo>();
+         auto info2 =other.type.getInfo<DecimalTypeInfo>();
+         return info->getPrecision() != info2->getPrecision() || info->getScale() != info2->getScale();
+      }
       default: return false;
    }
 

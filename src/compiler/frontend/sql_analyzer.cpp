@@ -6,6 +6,8 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_groupby.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_insert_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_pipe_operator.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_query_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/runtime/RecordBatchInfo.h"
 
@@ -98,6 +100,24 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                return cteNode;
 
             }
+            case ast::QueryNodeType::SET_OPERATION_NODE: {
+               std::shared_ptr<ast::TableProducer> transformed = nullptr;
+               auto setOperationNode = std::static_pointer_cast<ast::SetOperationNode>(queryNode);
+               context->pushNewScope();
+               setOperationNode->left = canonicalize(setOperationNode->left, context);
+               context->popScope();
+               context->pushNewScope();
+               setOperationNode->right = canonicalize(setOperationNode->right, context);
+               context->popScope();
+               transformed = setOperationNode;
+               for (auto modifier : setOperationNode->modifiers) {
+                  auto transformedModifier = canonicalizeCast<ast::ResultModifier>(modifier, context);
+                  transformedModifier->input = transformed;
+                  transformed = transformedModifier;
+               }
+               setOperationNode->modifiers.clear();
+               return transformed;
+            }
             default: error("Not implemented", queryNode->loc);
          }
       }
@@ -152,6 +172,10 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                //TODO Support more complex modifiers
                resultModifier->input = pipeOp->input;
                return resultModifier;
+            }
+            case ast::PipeOperatorType::UNION:
+            case ast::PipeOperatorType::UNION_ALL: {
+               throw std::runtime_error("Not yet impleted. Transform into SetOperationNode");
             }
 
 
@@ -379,6 +403,90 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
                }
                return cteNode;
             }
+            case ast::QueryNodeType::SET_OPERATION_NODE: {
+               auto setOperationNode = std::static_pointer_cast<ast::SetOperationNode>(rootNode);
+               std::shared_ptr<ast::TableProducer> boundLeft = nullptr;
+               std::shared_ptr<ast::TableProducer> boundRight = nullptr;
+               std::shared_ptr<SQLScope> leftScope, rightScope;
+               {
+                  auto subqueryResScope = context->createResolverScope();
+                  auto defineScope = context->createDefineScope();
+                  context->pushNewScope();
+                  boundLeft = analyzeTableProducer(setOperationNode->left, context, subqueryResScope);
+                  leftScope = context->currentScope;
+                  context->popCurrentScope();
+               }
+               {
+                  auto subqueryResScope = context->createResolverScope();
+                  auto defineScope = context->createDefineScope();
+                  context->pushNewScope();
+                  boundRight = analyzeTableProducer(setOperationNode->right, context, subqueryResScope);
+                  rightScope = context->currentScope;
+                  context->popCurrentScope();
+               }
+               if (leftScope->targetInfo.targetColumns.size() != rightScope->targetInfo.targetColumns.size()) {
+                  error("Left and right side must have the same number of columns" , rootNode->loc);
+               }
+
+               auto newScopeName = context->getUniqueScope("setop");
+               std::vector<std::shared_ptr<ast::NamedResult>> newTargetInfos;
+               for (size_t i = 0; i<leftScope->targetInfo.targetColumns.size(); i++) {
+                  auto leftColumn = leftScope->targetInfo.targetColumns[i];
+                  auto rightColumn = rightScope->targetInfo.targetColumns[i];
+                  auto commonTypes = SQLTypeUtils::toCommonTypes(std::vector{leftColumn->resultType, rightColumn->resultType});
+                  leftColumn->resultType = commonTypes[0];
+                  rightColumn->resultType = commonTypes[1];
+                  auto commonType = SQLTypeUtils::getCommonType(leftColumn->resultType, rightColumn->resultType);
+                  auto newNamedResult = std::make_shared<ast::NamedResult>(leftColumn->type, newScopeName, commonType, leftColumn->name);
+
+
+                  newNamedResult->displayName = leftColumn->displayName;
+                  newTargetInfos.emplace_back(newNamedResult);
+
+               }
+
+               context->mapAttribute(resolverScope, setOperationNode->alias.empty() ? context->getUniqueScope("union") : setOperationNode->alias, newTargetInfos);
+               context->currentScope->targetInfo.targetColumns = newTargetInfos;
+               auto boundSetOperationNode = drv.nf.node<ast::BoundSetOperationNode>(setOperationNode->loc, setOperationNode->alias, setOperationNode->setType, setOperationNode->setOpAll, boundLeft, boundRight, leftScope, rightScope);
+               return boundSetOperationNode;
+
+              /* auto t = std::dynamic_pointer_cast<ast::TableProducer>(pipeOperator->node);
+               if (t == nullptr) {
+                  error("Pipe operator node for union is not a table producer", pipeOperator->loc);
+               }
+               auto unionContext = std::make_shared<SQLContext>();
+               unionContext->catalog = context->catalog;
+               unionContext->pushNewScope();
+               auto scope = unionContext->createResolverScope();
+               boundAstNode = analyzeTableProducer(t, unionContext, scope);
+               auto rightTargetInfo = unionContext->currentScope->targetInfo;
+               auto leftTargetInfo = context->currentScope->targetInfo;
+               if (rightTargetInfo.targetColumns.size() != leftTargetInfo.targetColumns.size()) {
+                  error("Right and left child of union must have same amount of columns", pipeOperator->loc);
+               }
+               auto newScope = context->getUniqueScope("setop");
+               auto boundSetPipeOp = drv.nf.node<ast::BoundSetPipeOperator>(pipeOperator->loc, pipeOperator->pipeOpType, t, pipeOperator->input);
+               boundSetPipeOp->rightScope = unionContext->currentScope;
+               boundSetPipeOp->leftScope = context->currentScope;
+
+               std::vector<std::shared_ptr<ast::NamedResult>> newTargetInfos;
+               for (auto n : context->currentScope->targetInfo.targetColumns) {
+                  auto newNamedResult = std::make_shared<ast::NamedResult>(n->type, newScope, n->resultType, n->name );
+                  newNamedResult->displayName = n->displayName;
+                  newTargetInfos.emplace_back(newNamedResult);
+               }
+
+               context->mapAttribute(resolverScope, pipeOperator->alias.empty() ? context->getUniqueScope("union") : pipeOperator->alias, newTargetInfos);
+               context->currentScope->targetInfo.targetColumns = newTargetInfos;
+               pipeOperator = boundSetPipeOp;*/
+
+
+
+
+
+            }
+
+
             default: throw std::runtime_error("Not implemented");
          }
       }
@@ -477,7 +585,7 @@ std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::s
    return drv.nf.node<ast::BoundInsertNode>(insertNode->loc, insertNode->schema, insertNode->tableName,exprListTableRef, insertNode->columns,allCollumnTypes);
 
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;
    switch (pipeOperator->pipeOpType) {
       case ast::PipeOperatorType::SELECT: {
@@ -522,6 +630,20 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   assert(function->functionInfo && function->namedResult.has_value());
                   context->currentScope->targetInfo.add(function->functionInfo);
                   break;
+               }
+               case ast::ExpressionClass::BOUND_CONSTANT: {
+                  auto constantExpr = std::static_pointer_cast<ast::BoundConstantExpression>(parsedExpression);
+                  assert(constantExpr->resultType.has_value());
+                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, constantExpr->alias, constantExpr->resultType.value(), createTmpScope());
+                  n->displayName = constantExpr->alias.empty() ? "" : constantExpr->alias;
+
+                  context->mapAttribute(resolverScope, constantExpr->alias.empty() ? n->name : constantExpr->alias, n);
+                  targetColumns.emplace_back(n);
+                  context->currentScope->targetInfo.add(n);
+                  context->currentScope->evalBeforeAggr.emplace_back(constantExpr);
+                  constantExpr->namedResult = n;
+                  break;
+
                }
                case ast::ExpressionClass::BOUND_OPERATOR: {
                   auto operatorExpr = std::static_pointer_cast<ast::BoundOperatorExpression>(parsedExpression);
@@ -618,6 +740,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
          });
          boundAstNode =  drv.nf.node<ast::BoundExtendNode>(extendNode->loc, createMapName(), std::move(boundExtensions));
          break;
+      }
+      case ast::PipeOperatorType::UNION_ALL:
+      case ast::PipeOperatorType::UNION: {
+        error("Should not happen", pipeOperator->loc);
+
       }
       default: error("Not implemented", pipeOperator->loc);
    }
@@ -904,11 +1031,18 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          catalog::Type type = catalog::Type::int64();
          switch (constExpr->value->type) {
             case ast::ConstantType::INT:
-               type = catalog::Type::int64();
+               type = catalog::Type::int32();
                break;
-            case ast::ConstantType::STRING:
-               type = catalog::Type::stringType();
+            case ast::ConstantType::STRING: {
+               auto strValue = std::static_pointer_cast<ast::StringValue>(constExpr->value)->sVal;
+               if (strValue.length() <= 8) {
+                  type = catalog::Type::charType(strValue.length());
+               } else {
+                  type = catalog::Type::stringType();
+               }
                break;
+            }
+
             case ast::ConstantType::INTERVAL:
                //TODO hardcoded
                type = catalog::Type::intervalDaytime();

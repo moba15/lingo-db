@@ -108,7 +108,7 @@ decinteger		{decdigit}+
 numeric         ({decinteger}\.{decinteger}?)|(\.{decinteger})
 op_chars		    [\~\!\@\#\^\&\|\`\?\+\-\*\/\%\<\>\=]
 ident_start     [a-zA-Z]
-ident_cont      [a-zA-Z0-9_%\-]
+ident_cont      [a-zA-Z0-9_%]
 identifier      {ident_start}{ident_cont}*
 squote			\'
 dquote			\"
@@ -221,6 +221,8 @@ boolean [fF][aA][lL][sS][eE]
 [tT][eE][xX][tT]                      { return lingodb::parser::make_TEXT_P(loc); }
 [tT][hH][eE][nN]                      { return lingodb::parser::make_THEN(loc); }
 [tT][iI][mM][eE][sS][tT][aA][mM][pP]  { return lingodb::parser::make_TIMESTAMP(loc); }
+
+[uU][nN][iI][oO][nN]                  { return lingodb::parser::make_UNION(loc); }
 
 [vV][aA][lL][uU][eE][sS]              { return lingodb::parser::make_VALUES(loc); }
 [vV][aA][rR][cC][hH][aA][rR]          { return lingodb::parser::make_VARCHAR(loc); }

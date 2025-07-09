@@ -11,10 +11,12 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_insert_node.h"
+#include "lingodb/compiler/frontend/ast/bound/bound_query_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
 #include "lingodb/compiler/frontend/ast/create_node.h"
 #include "lingodb/compiler/frontend/ast/cte_node.h"
 #include "lingodb/compiler/frontend/ast/insert_node.h"
+#include "lingodb/compiler/old-frontend/SQL/Parser.h"
 
 #include "lingodb/utility/Serialization.h"
 
@@ -186,6 +188,10 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
                }
 
                return tree;
+            }
+            case ast::QueryNodeType::BOUND_SET_OPERATION_NODE: {
+
+               return translateSetOperation(builder, std::static_pointer_cast<ast::BoundSetOperationNode>(tableProducer), context);
             }
             default: error("Not implemented", tableProducer->loc);
          }
@@ -365,7 +371,7 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          auto aggregationNode = std::static_pointer_cast<ast::BoundAggregationNode>(pipeOperator->node);
          //TODO logic here
          tree = translateAggregation(builder, aggregationNode, context, tree);
-         tree = createMap(builder, "map", context->currentScope->evalBeforeAggr, context, tree);
+         tree = createMap(builder, attrManager.getUniqueScope("map2"), context->currentScope->evalBeforeAggr, context, tree);
          context->currentScope->evalBeforeAggr.clear();
          return tree;
       }
@@ -373,6 +379,11 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          auto extendNode = std::static_pointer_cast<ast::BoundExtendNode>(pipeOperator->node);
          tree = createMap(builder, extendNode->mapName, extendNode->extensions, context, tree);
          return tree;
+      }
+      case ast::PipeOperatorType::UNION_ALL:
+      case ast::PipeOperatorType::UNION: {
+         error("Should not happen", pipeOperator->loc);
+
       }
       default: error("Not implememted", pipeOperator->loc);
    }
@@ -807,10 +818,6 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                });
                return builder.create<relalg::RenamingOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), _tree, builder.getArrayAttr(renamingDefsAsAttr));
             }
-
-
-
-
          }
          if (baseTableRef->namedResultsEntries.empty()) {
             error("Table " << baseTableRef->relationName << " not found", baseTableRef->loc);
@@ -856,9 +863,8 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 
                pred = translatePredicate(builder, std::get<std::shared_ptr<ast::BoundExpression>>(boundJoin->condition), context);
 
-
                std::vector<mlir::Attribute> outerJoinMapping{};
-               static  size_t i = 0;
+               static size_t i = 0;
                std::ranges::transform(boundJoin->outerJoinMapping, std::back_inserter(outerJoinMapping), [&](std::pair<std::string, std::shared_ptr<ast::NamedResult>> scopeAndNamedResult) {
                   i++;
                   std::cout << "Add to mapping: " << scopeAndNamedResult.second->scope << "," << scopeAndNamedResult.second->name << "from existing: " << scopeAndNamedResult.first << "," << scopeAndNamedResult.second->name << std::endl;
@@ -894,10 +900,10 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
       case ast::TableReferenceType::EXPRESSION_LIST: {
          auto expressionList = std::static_pointer_cast<ast::BoundExpressionListRef>(tableRef);
          std::vector<mlir::Attribute> rows;
-         for (auto row: expressionList->values) {
+         for (auto row : expressionList->values) {
             std::vector<mlir::Attribute> values;
             std::vector<mlir::Type> types;
-            for (auto constExpr: row) {
+            for (auto constExpr : row) {
                mlir::Attribute value;
                switch (constExpr->value->type) {
                   case ast::ConstantType::INT: {
@@ -913,7 +919,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                   case ast::ConstantType::FLOAT: {
                      auto fValue = std::static_pointer_cast<ast::FloatValue>(constExpr->value);
                      //TODO support only decimal
-                     value =  builder.getStringAttr(fValue->fVal);
+                     value = builder.getStringAttr(fValue->fVal);
                      assert(constExpr->resultType.has_value());
                      break;
                   }
@@ -932,13 +938,112 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
             attributes.push_back(attrDef);
          }
 
-
          auto translated = builder.create<relalg::ConstRelationOp>(builder.getUnknownLoc(), builder.getArrayAttr(attributes), builder.getArrayAttr(rows));
          return translated;
       }
       default:
          error("Not implemented", tableRef->loc);
    }
+}
+
+mlir::Value SQLMlirTranslator::translateSetOperation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundSetOperationNode> boundSetOp, std::shared_ptr<analyzer::SQLContext> context) {
+   auto setSemantic =  boundSetOp->setOpAll ? relalg::SetSemantic::all : relalg::SetSemantic::distinct;
+   context->pushNewScope(boundSetOp->leftScope);
+   auto leftTree = translateTableProducer(builder, std::static_pointer_cast<ast::TableProducer>(boundSetOp->boundLeft), context);
+   context->popCurrentScope();
+   context->pushNewScope(boundSetOp->rightScope);
+   auto rightTree = translateTableProducer(builder, std::static_pointer_cast<ast::TableProducer>(boundSetOp->boundRight), context);
+   context->popCurrentScope();
+
+
+   std::vector<mlir::Attribute> attributes;
+
+
+   mlir::Block* leftMapBlock = new mlir::Block;
+   mlir::Block* rightMapBlock = new mlir::Block;
+   mlir::OpBuilder leftMapBuilder(builder.getContext());
+   mlir::OpBuilder rightMapBuilder(builder.getContext());
+   leftMapBuilder.setInsertionPointToStart(leftMapBlock);
+   rightMapBuilder.setInsertionPointToStart(rightMapBlock);
+   leftMapBlock->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+   rightMapBlock->addArgument(tuples::TupleType::get(builder.getContext()), builder.getUnknownLoc());
+   auto leftMapScope = attrManager.getUniqueScope("map");
+   auto rightMapScope = attrManager.getUniqueScope("map");
+   std::vector<mlir::Attribute> createdColsLeft;
+   std::vector<mlir::Attribute> createdColsRight;
+   mlir::Value leftTuple = leftMapBlock->getArgument(0);
+   mlir::Value rightTuple = rightMapBlock->getArgument(0);
+   std::vector<mlir::Value> leftMapResults;
+   std::vector<mlir::Value> rightMapResults;
+   //TODO Move most logic to analyzer
+   for (size_t i = 0; i <  boundSetOp->leftScope->targetInfo.targetColumns.size(); i++) {
+      auto leftResult =  boundSetOp->leftScope->targetInfo.targetColumns[i];
+      auto rightResult =  boundSetOp->rightScope->targetInfo.targetColumns[i];
+      auto commonType = context->currentScope->targetInfo.targetColumns[i]->resultType;
+      //TODO what todo if left.type != right.type != context.result.type
+      if (rightResult->resultType!=commonType) {
+         auto attrDef = attrManager.createDef(rightMapScope, std::string("set_op") + std::to_string(i));
+         auto attrRef = rightResult->createRef(builder, attrManager);
+
+         createdColsRight.push_back(attrDef);
+         mlir::Value expr = rightMapBuilder.create<tuples::GetColumnOp>(rightMapBuilder.getUnknownLoc(), attrRef.getColumn().type, attrRef, rightTuple);
+         rightMapResults.push_back(rightResult->resultType.castValue(rightMapBuilder,expr));
+         rightResult->resultType = commonType;
+         rightResult->scope = rightMapScope;
+         rightResult->name = "set_op" + std::to_string(i);
+
+      }
+      if (leftResult->resultType!=commonType) {
+         auto attrDef = attrManager.createDef(leftMapScope, std::string("set_op") + std::to_string(i));
+         auto attrRef = leftResult->createRef(builder, attrManager);
+
+         createdColsLeft.push_back(attrDef);
+         mlir::Value expr = leftMapBuilder.create<tuples::GetColumnOp>(leftMapBuilder.getUnknownLoc(), attrRef.getColumn().type, attrRef, leftTuple);
+         leftMapResults.push_back(leftResult->resultType.castValue(leftMapBuilder,expr));
+         leftResult->resultType = commonType;
+         leftResult->scope = leftMapScope;
+         leftResult->name = "set_op" + std::to_string(i);
+
+      }
+
+
+
+      auto newType = commonType.toMlirType(builder.getContext());
+      auto newColName =leftResult->name;
+      auto newColDef = context->currentScope->targetInfo.targetColumns[i]->createDef(builder, attrManager, builder.getArrayAttr({leftResult->createRef(builder, attrManager), rightResult->createRef(builder, attrManager)}));
+      auto* newCol = &newColDef.getColumn();
+      newCol->type = newType;
+      attributes.push_back(newColDef);
+
+   }
+
+
+
+   if (!leftMapResults.empty()) {
+      auto mapOp = builder.create<relalg::MapOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), leftTree, builder.getArrayAttr(createdColsLeft));
+      mapOp.getPredicate().push_back(leftMapBlock);
+      leftMapBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), leftMapResults);
+      leftTree = mapOp.getResult();
+   } else {
+      delete leftMapBlock;
+   }
+   if (!rightMapResults.empty()) {
+      auto mapOp = builder.create<relalg::MapOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), rightTree, builder.getArrayAttr(createdColsRight));
+      mapOp.getPredicate().push_back(rightMapBlock);
+      rightMapBuilder.create<tuples::ReturnOp>(builder.getUnknownLoc(), rightMapResults);
+      rightTree = mapOp.getResult();
+
+   } else {
+      delete rightMapBlock;
+   }
+
+
+
+   auto tree = builder.create<relalg::UnionOp>(builder.getUnknownLoc(), lingodb::compiler::dialect::relalg::SetSemanticAttr::get(builder.getContext(), setSemantic), leftTree, rightTree, builder.getArrayAttr(attributes));
+
+   return tree;
+
+
 }
 
 mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundAggregationNode> aggregation, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree) {
