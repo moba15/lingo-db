@@ -776,7 +776,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                   return namedResult;
                });
 
-               context->mapAttribute(resolverScope, uniqueScope, namedResults);
+               context->mapAttribute(resolverScope, sqlScopeName, namedResults);
 
                auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, namedResults, baseTableRef->alias, baseTableRef->tableName, uniqueScope);
                return boundBaseTableRef;
@@ -787,7 +787,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
 
          } else {
 
-            auto namedResults = context->mapAttribute(resolverScope, uniqueScope, catalogEntry.value());
+            auto namedResults = context->mapAttribute(resolverScope, sqlScopeName, uniqueScope, catalogEntry.value());
 
             auto boundBaseTableRef = drv.nf.node<ast::BoundBaseTableRef>(baseTableRef->loc, namedResults, baseTableRef->alias, catalogEntry.value()->getName(),uniqueScope);
             return boundBaseTableRef;

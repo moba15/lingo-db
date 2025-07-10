@@ -53,12 +53,12 @@ void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::share
    resolver.insertIntoScope(&scope, name, columnInfo);
 }
 
-std::vector<std::shared_ptr<ast::NamedResult>> SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) {
+std::vector<std::shared_ptr<ast::NamedResult>> SQLContext::mapAttribute(ResolverScope& scope, std::string sqlScopeName, std::string uniqueScope, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) {
    std::vector<std::shared_ptr<ast::NamedResult>> result;
    for (auto c : tableCatalogEntry->getColumns()) {
-      auto columnInfo = std::make_shared<ast::ColumnInfo>(name, c);
+      auto columnInfo = std::make_shared<ast::ColumnInfo>(uniqueScope, c);
 
-      mapAttribute(scope, name + "." + c.getColumnName(), columnInfo);
+      mapAttribute(scope, sqlScopeName + "." + c.getColumnName(), columnInfo);
 
       mapAttribute(scope, c.getColumnName(), columnInfo);
       result.push_back(columnInfo);
