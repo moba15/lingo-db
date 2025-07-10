@@ -12,6 +12,7 @@
 #include "lingodb/runtime/RecordBatchInfo.h"
 
 #include <ranges>
+#include <cctype>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
 /*
@@ -1301,7 +1302,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
 
          } else {
             //TODO hardcoded
-            if (function->functionName == "date") {
+            std::ranges::transform(function->functionName, function->functionName.begin(), ::toupper);
+            if (function->functionName == "DATE") {
                if (function->arguments.size() != 1) {
                   error("Function date needs exactly one argument", function->loc);
                }
@@ -1314,7 +1316,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto resultType = catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg}, nullptr);
             }
-            if (function->functionName == "count") {
+            if (function->functionName == "COUNT") {
                if (function->arguments.size() != 1 && !function->star) {
                   error("Function count needs exactly one argument", function->loc);
                }
@@ -1354,7 +1356,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1, arg2}, fInfo);
 
             }
-            if (function->functionName == "SUBSTRING") {
+            if (function->functionName == "SUBSTRING" || function->functionName == "SUBSTR") {
                if (function->arguments.size() < 1 && function->arguments.size() >= 4) {
                   error("Function extract needs one,two or three arguments", function->loc);
                }
@@ -1389,7 +1391,33 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs, fInfo);
 
             }
-            throw std::runtime_error("FunctionType Not implemented");
+            if (function->functionName == "ROUND") {
+               if (function->arguments.size() != 2) {
+                  error("Function extract needs two arguments", function->loc);
+               }
+               auto numberArg = analyzeExpression(function->arguments[0], context, resolverScope);
+               auto decimalsArg = analyzeExpression(function->arguments[1], context, resolverScope);
+               if (decimalsArg->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
+                  error("The second argument of the round function must be a constant", decimalsArg->loc);
+               }
+               if (decimalsArg->resultType.has_value() && decimalsArg->resultType->type.getTypeId() != catalog::LogicalTypeId::INT) {
+                  error("The second argument of the round function must have a result type of INT", decimalsArg->loc);
+               }
+               if (!numberArg->resultType.has_value() || !numberArg->resultType->isNumeric() ) {
+                  error("The first argument of the round function must have a numeric type" , numberArg->loc);
+               }
+               auto scope = createTmpScope();
+               auto fName = function->alias.empty() ? function->functionName : function->alias;
+               //Get resultType after round
+               catalog::NullableType resultType = numberArg->resultType.value();
+               resultType.isNullable = true;
+               auto fInfo =  std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+               fInfo->displayName = function->alias;
+               context->mapAttribute(resolverScope, fName, fInfo);
+               auto boundArgs = std::vector{numberArg, decimalsArg};
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs, fInfo);
+            }
+            error("Function '" << function->functionName << "' not implemented", function->loc);
          }
          break;
       }

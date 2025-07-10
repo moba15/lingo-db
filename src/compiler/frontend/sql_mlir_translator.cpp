@@ -637,9 +637,16 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             auto to =  function->arguments[2] ? translateExpression(builder, function->arguments[2], context) : nullptr;
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), str.getType(), "Substring", mlir::ValueRange({str, from, to})).getRes();
          }
+         if (function->functionName == "round") {
+            auto val = translateExpression(builder, function->arguments[0], context);
+            auto scale = translateExpression(builder, function->arguments[1], context);
+            return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), val.getType(), getBaseType(val.getType()).isIntOrIndex() ? "RoundInt" + std::to_string(getBaseType(val.getType()).getIntOrFloatBitWidth()) : "RoundDecimal", mlir::ValueRange{val, scale}).getRes();
+         }
+         error("Function '" << function->functionName << "' not implemented", expression->loc);
       }
       case ast::ExpressionClass::BOUND_SUBQUERY: {
          auto subquery = std::static_pointer_cast<ast::BoundSubqueryExpression>(expression);
+         assert(subquery->sqlScope);
          context->pushNewScope(subquery->sqlScope);
          auto translatedSubquery = translateTableProducer(builder, subquery->subquery, context);
          context->popCurrentScope();
