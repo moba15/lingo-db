@@ -182,7 +182,6 @@ mlir::Value SQLMlirTranslator::translateTableProducer(mlir::OpBuilder& builder, 
          switch (queryNode->type) {
             case ast::QueryNodeType::CTE_NODE: {
                auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
-
                if (cteNode->child) {
                   tree = translateTableProducer(builder, cteNode->child, context);
                }
@@ -583,7 +582,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                 */
                //TODO maybe create stringRepresentation at analyzer Level?
 
-               switch (castExpr->logicalType.value()) {
+               switch (castExpr->optInterval.value()) {
                   case ast::LogicalType::DAYS: {
                      if (!stringRepresentation.ends_with("days")) {
                         stringRepresentation += "days";
@@ -806,16 +805,25 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          //std::string alias = relation;
          if (context->ctes.contains(relation)) {
             auto [cteInfo, cteNode] = context->ctes.at(relation);
-
             if (cteNode->query) {
-               assert(cteNode->subQueryScope);
-               context->pushNewScope(cteNode->subQueryScope);
-               auto _tree = translateTableProducer(builder, cteNode->query, context);
-               context->popCurrentScope();
+               mlir::Value _tree;
+               if (context->translatedCtes.contains(relation)) {
+                  //Already translated
+                  _tree = context->translatedCtes.at(relation);
+               } else {
+                  context->pushNewScope(std::make_shared<analyzer::SQLScope>(cteNode->subQueryScope));
+                  _tree = translateTableProducer(builder, cteNode->query, context);
+                  context->popCurrentScope();
+                  context->translatedCtes.insert({relation, _tree});
+               }
                std::vector<mlir::Attribute> renamingDefsAsAttr;
-               std::ranges::transform(context->ctes.at(cteNode->alias).second->renamedResults, std::back_inserter(renamingDefsAsAttr), [&](std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>> r) {
-                  return r.second->createDef(builder, attrManager, builder.getArrayAttr(r.first->createRef(builder, attrManager)));
-               });
+               assert(context->ctes.at(cteNode->alias).second->renamedResults.size() == baseTableRef->namedResultsEntries.size());
+               for (size_t i = 0; i<context->ctes.at(cteNode->alias).second->renamedResults.size() ; i++) {
+                  auto [from ,to] = context->ctes.at(cteNode->alias).second->renamedResults[i];
+                  renamingDefsAsAttr.emplace_back(baseTableRef->namedResultsEntries[i]->createDef(builder, attrManager, builder.getArrayAttr(from->createRef(builder, attrManager))));
+
+               }
+
                return builder.create<relalg::RenamingOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), _tree, builder.getArrayAttr(renamingDefsAsAttr));
             }
          }
@@ -836,8 +844,14 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
       case ast::TableReferenceType::JOIN: {
          auto boundJoin = std::static_pointer_cast<ast::BoundJoinRef>(tableRef);
          mlir::Value left, right;
+         assert(boundJoin->leftScope && boundJoin->rightScope);
+         context->pushNewScope(boundJoin->leftScope);
          left = translateTableProducer(builder, boundJoin->left, context);
+         context->popCurrentScope();
+         //Here the evalbefore gets lost!
+         context->pushNewScope(boundJoin->rightScope);
          right = translateTableProducer(builder, boundJoin->right, context);
+         context->popCurrentScope();
          switch (boundJoin->type) {
             case ast::JoinType::INNER: {
                switch (boundJoin->refType) {
@@ -1187,10 +1201,14 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
                }*/
+               aggrFunction->functionInfo->resultType.isNullable = true;
             }
             //TODO move to analyzer
             if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty())) {
                aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
+
+            }
+            if (mlir::isa<db::NullableType>(aggrResultType)) {
                aggrFunction->functionInfo->resultType.isNullable = true;
             }
 

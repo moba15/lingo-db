@@ -385,11 +385,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
                      auto evalBefore = context->currentScope->evalBeforeAggr;
                      context->popCurrentScope();
 
-                     cteNode->subQueryScope = subQueryScope;
+                     cteNode->subQueryScope = *subQueryScope;
                      std::vector<std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>>> renamedResults;
                      for (auto targetColumns : targetInfo.targetColumns) {
                         auto from = targetColumns;
-                        auto to = std::make_shared<ast::NamedResult>(from->type, cteNode->alias, from->resultType, from->name);
+                        auto to = std::make_shared<ast::NamedResult>(from->type, context->getUniqueScope(cteNode->alias), from->resultType, from->name);
                         to->displayName = from->displayName;
                         renamedResults.emplace_back(std::pair{from, to});
                      }
@@ -771,7 +771,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                std::vector<std::shared_ptr<ast::NamedResult>> namedResults{};
 
                std::ranges::transform(cteNode->renamedResults, std::back_inserter(namedResults), [&](auto& pair) {
-                  return pair.second;
+                  auto namedResult = std::make_shared<ast::NamedResult>(pair.second->type, context->getUniqueScope(baseTableRef->tableName), pair.second->resultType, pair.second->name );
+                  namedResult->displayName = pair.second->displayName;
+                  return namedResult;
                });
 
                context->mapAttribute(resolverScope, uniqueScope, namedResults);
@@ -802,8 +804,12 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
          switch (join->type) {
             case ast::JoinType::CROSS: {
                std::shared_ptr<ast::TableProducer> left, right;
+               std::shared_ptr<SQLScope> leftScope, rightScope;
+
+
                std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> mapping{};
                if (join->left) {
+                  context->pushNewScope();
                   auto leftResolverScope = context->createResolverScope();
                   auto defineScope = context->createDefineScope();
                   left = analyzeTableProducer(join->left, context, leftResolverScope);
@@ -811,11 +817,13 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                   for (auto& [name, column] : localMapping) {
                      mapping.push_back({name, column});
                   }
+                  leftScope = context->currentScope;
+                  context->popCurrentScope();
                } else {
                   error("Left side of join is empty", join->loc);
                }
                if (join->right) {
-
+                  context->pushNewScope();
                   auto rightResolverScope = context->createResolverScope();
                   auto defineScope = context->createDefineScope();
                   right = analyzeTableProducer(join->right, context, rightResolverScope);
@@ -823,6 +831,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                   for (auto& [name, column] : localMapping) {
                      mapping.push_back({name, column});
                   }
+                  rightScope = context->currentScope;
+                  context->popCurrentScope();
                } else {
                   error("Right side of join is empty", join->loc);
                }
@@ -830,23 +840,35 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                for (auto& [name, column] : mapping) {
                   context->mapAttribute(resolverScope, name, column);
                }
-
-               return drv.nf.node<ast::BoundJoinRef>(join->loc, join->type, join->refType, left, right, nullptr);
+               auto boundJoin = drv.nf.node<ast::BoundJoinRef>(join->loc, join->type, join->refType, left, right, nullptr);
+               boundJoin->leftScope = leftScope;
+               boundJoin->rightScope = rightScope;
+               return boundJoin;
 
             }
             case ast::JoinType::RIGHT: {
-               std::swap(join->left, join->right);
-               join->type = ast::JoinType::LEFT;
+               throw std::runtime_error("Should not happen");
             }
             case ast::JoinType::LEFT: {
                std::shared_ptr<ast::TableProducer> left, right;
                std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> mapping{};
-
-               left = analyzeTableProducer(join->left, context, resolverScope);
-               auto rightContext = std::make_shared<SQLContext>();
-               auto rightResolverScope = rightContext->createResolverScope();
-               right = analyzeTableProducer(join->right, rightContext, rightResolverScope);
-               mapping = rightContext->getTopDefinedColumns();
+               std::shared_ptr<SQLScope> leftScope, rightScope;
+               {
+                  context->pushNewScope();
+                  left = analyzeTableProducer(join->left, context, resolverScope);
+                  leftScope = context->currentScope;
+                  context->popCurrentScope();
+               }
+               {
+                  auto rightContext = std::make_shared<SQLContext>();
+                  //Create new context
+                  rightContext->pushNewScope();
+                  rightContext->ctes = context->ctes;
+                  auto rightResolverScope = rightContext->createResolverScope();
+                  right = analyzeTableProducer(join->right, rightContext, rightResolverScope);
+                  rightScope = rightContext->currentScope;
+                  mapping = rightContext->getTopDefinedColumns();
+               }
 
                for (auto x : mapping) {
                   context->mapAttribute(resolverScope, x.first, x.second);
@@ -873,12 +895,18 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
                         auto name = x.second->name;
                         auto namedResult = std::make_shared<ast::NamedResult>(x.second->type, outerjoinName, x.second->resultType, name);
 
+
                         //Make mapping output nullable
                         namedResult->resultType.isNullable = true;
                         outerJoinMapping.push_back({scope, namedResult});
                         remapped.insert({x.second, namedResult});
+                        context->mapAttribute(resolverScope, x.first, namedResult);
                      }
+
                   }
+
+
+
 
 
                }
@@ -886,6 +914,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
 
                auto boundJoin = drv.nf.node<ast::BoundJoinRef>(join->loc, join->type, join->refType, left, right, boundCondition);
                boundJoin->outerJoinMapping = outerJoinMapping;
+               boundJoin->leftScope = leftScope;
+               boundJoin->rightScope = rightScope;
                return boundJoin;
 
             }
@@ -1182,6 +1212,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             t++;
          }
          //TODO base
+         //TODO hardcode
+
          return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, commonType, operatorExpr->alias, boundChildren);
       }
       case ast::ExpressionClass::FUNCTION: {
@@ -1223,12 +1255,12 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   } else if (resultType.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
                      resultType = SQLTypeUtils::getCommonTypeAfterOperation(resultType, catalog::Type::decimal(19,0), ast::ExpressionType::OPERATOR_DIVIDE);
                   }
-                  resultType.isNullable = boundArguments[0]->resultType->isNullable;
+                  resultType.isNullable = true;
                   //else keep type
 
                }
                //TODO check if this line is needed
-               //resultType.isNullable = true;
+               resultType.isNullable = true;
 
                auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
                fInfo->displayName = function->alias;
@@ -1382,8 +1414,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
                auto resultType = catalog::Type::intervalDaytime();
-               if (castExpr->logicalType.has_value()) {
-                  switch (castExpr->logicalType.value()) {
+               if (castExpr->optInterval.has_value()) {
+                  switch (castExpr->optInterval.value()) {
                      case ast::LogicalType::YEARS: {
                         resultType = catalog::Type::intervalMonths();
                         break;
@@ -1392,7 +1424,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   }
                }
                catalog::Type::intervalMonths();
-               return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType);
+               auto boundCast = drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType);
+               boundCast->optInterval = castExpr->optInterval;
+               return boundCast;
             }
             default: error("Not implemented", rootNode->loc);
          }

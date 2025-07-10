@@ -143,6 +143,8 @@ class BoundCastExpression : public BoundExpression {
    static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_CAST;
    BoundCastExpression(catalog::Type resultType, std::string alias, std::shared_ptr<BoundExpression> child, std::optional<LogicalType> logicalType);
    std::optional<LogicalType> logicalType;
+   //TODO better
+   std::optional<LogicalType> optInterval;
    std::shared_ptr<BoundExpression> child;
    //LogicalType logicalType;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;

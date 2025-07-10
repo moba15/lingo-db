@@ -437,7 +437,14 @@ select_no_parens:
         if ($opt_sort_clause.has_value()) {
             $select_clause->modifiers.emplace_back($opt_sort_clause.value());
         }
-        std::static_pointer_cast<lingodb::ast::CTENode>($with_clause)->child = $select_clause;
+        auto current = std::static_pointer_cast<lingodb::ast::CTENode>($with_clause);
+        while(current->child != nullptr) {
+            current = std::dynamic_pointer_cast<lingodb::ast::CTENode>(current->child);
+            if(!current) {
+                error(@$, "Should not happen");
+            }
+        }
+        current->child = $select_clause;
         $$ = $with_clause;
     }
     | values_clause	{ $$ = $1; }
@@ -450,7 +457,14 @@ select_no_parens:
             $select_clause->modifiers.emplace_back($opt_select_limit.value());
         }
 
-        std::static_pointer_cast<lingodb::ast::CTENode>($with_clause)->child = $select_clause;
+        auto current = std::static_pointer_cast<lingodb::ast::CTENode>($with_clause);
+        while(current->child != nullptr) {
+            current = std::dynamic_pointer_cast<lingodb::ast::CTENode>(current->child);
+            if(!current) {
+                error(@$, "Should not happen");
+            }
+        }
+        current->child = $select_clause;
         $$ = $with_clause;
     }
     //TODO | with_clause select_clause opt_sort_clause select_limit opt_for_locking_clause
@@ -578,7 +592,14 @@ cte_list:
     }
     | cte_list[list] COMMA common_table_expr 
     {
-        std::static_pointer_cast<lingodb::ast::CTENode>($list)->child = $common_table_expr;
+        auto current = std::static_pointer_cast<lingodb::ast::CTENode>($list);
+        while(current->child != nullptr) {
+            current = std::dynamic_pointer_cast<lingodb::ast::CTENode>(current->child);
+            if(!current) {
+                error(@$, "should not happen");
+            }
+        }
+        current->child = $common_table_expr;
         $$ = $list;
         
     }
@@ -1587,6 +1608,7 @@ type_function_name:
     IDENTIFIER {$$=$1;}
     //TODO | unreserved_keyword
     | type_func_name_keyword 
+    | DATE_P {$$="date";}
 
 type_func_name_keyword:
 			  AUTHORIZATION
@@ -2130,7 +2152,7 @@ AexprConst:
     {
         //TODO
         auto interval = mkNode<lingodb::ast::CastExpression>(@$, lingodb::ast::LogicalType::INTERVAL, $Sconst);
-        interval->logicalType = $opt_interval;
+        interval->optInterval = $opt_interval;
         $$ = interval;
     }
 ;

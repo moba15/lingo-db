@@ -51,6 +51,10 @@ class BoundJoinRef : public BoundTableRef {
 
    std::vector<std::pair<std::string, std::shared_ptr<ast::NamedResult>>> outerJoinMapping;
 
+   //TODO check if needed for every type of JOIN
+   std::shared_ptr<analyzer::SQLScope> leftScope;
+   std::shared_ptr<analyzer::SQLScope> rightScope;
+
    //! The set of USING columns (if any)
    //std::vector<std::string> usingColumns;
    /*//! Duplicate eliminated columns (if any)
