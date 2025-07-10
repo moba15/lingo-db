@@ -159,6 +159,10 @@ mlir::Value NullableType::castValue(mlir::OpBuilder& builder, mlir::Value valueT
       return builder.create<compiler::dialect::db::CastOp>(builder.getUnknownLoc(), type, valueToCast);
    }
 }
+//TODO more
+bool NullableType::isNumeric() const {
+   return type.getTypeId() == LogicalTypeId::DOUBLE || type.getTypeId() == LogicalTypeId::DECIMAL || type.getTypeId() == LogicalTypeId::INT;
+}
 bool NullableType::operator==( NullableType& other)  {
    return this->type.getTypeId() == other.type.getTypeId() && this->isNullable == other.isNullable;
 }
