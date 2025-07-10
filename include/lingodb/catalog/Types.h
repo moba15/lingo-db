@@ -95,6 +95,7 @@ class NullableType {
    mlir::Type toMlirType(mlir::MLIRContext* context) const ;
    mlir::Value castValueToThisType(mlir::OpBuilder& builder, mlir::Value valueToCast, bool valueNullable) const;
    mlir::Value castValue(mlir::OpBuilder& builder, mlir::Value valueToCast) const;
+   bool isNumeric() const;
 
    bool operator==( NullableType&) ;
    bool operator!=( NullableType&) ;
