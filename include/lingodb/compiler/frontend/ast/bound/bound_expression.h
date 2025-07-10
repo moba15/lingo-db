@@ -79,7 +79,7 @@ class BoundConjunctionExpression : public BoundExpression {
 class BoundConstantExpression : public BoundExpression {
    public:
    static constexpr ExpressionClass TYPE = ExpressionClass::BOUND_CONSTANT;
-   BoundConstantExpression(catalog::Type resultType, std::shared_ptr<Value> value, std::string alias);
+   BoundConstantExpression(catalog::NullableType resultType, std::shared_ptr<Value> value, std::string alias);
 
    std::shared_ptr<Value> value;
 

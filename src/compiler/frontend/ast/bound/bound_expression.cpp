@@ -36,7 +36,7 @@ std::string BoundConjunctionExpression::toDotGraph(uint32_t depth, NodeIdGenerat
 /*
  * BoundConstantExpression
 */
-BoundConstantExpression::BoundConstantExpression(catalog::Type resultType, std::shared_ptr<Value> value, std::string alias) : BoundExpression(TYPE, ExpressionType::VALUE_CONSTANT, resultType, alias), value(std::move(value)) {
+BoundConstantExpression::BoundConstantExpression(catalog::NullableType resultType, std::shared_ptr<Value> value, std::string alias) : BoundExpression(TYPE, ExpressionType::VALUE_CONSTANT, resultType, alias), value(std::move(value)) {
 }
 std::string BoundConstantExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    return "";

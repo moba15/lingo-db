@@ -29,6 +29,7 @@ enum class LogicalTypeId : uint8_t {
    INTERVAL = 9,
    CHAR = 10,
    STRING = 11,
+   NONE = 12,
 };
 class TypeInfo {
    protected:
@@ -60,7 +61,7 @@ class Type {
    public:
    Type(LogicalTypeId id, std::shared_ptr<TypeInfo> info);
    std::string toString() const;
-   LogicalTypeId getTypeId() { return id; }
+   LogicalTypeId getTypeId() const { return id; }
    template <class T>
    std::shared_ptr<T> getInfo() {
       return std::dynamic_pointer_cast<T>(info);
@@ -82,6 +83,7 @@ class Type {
    static Type timestamp();
    static Type intervalDaytime();
    static Type intervalMonths();
+   static Type noneType();
 };
 class NullableType {
    public:
@@ -90,7 +92,7 @@ class NullableType {
    Type type;
    std::shared_ptr<NullableType> castType = nullptr;
    bool isNullable;
-   mlir::Type toMlirType(mlir::MLIRContext* context) const;
+   mlir::Type toMlirType(mlir::MLIRContext* context) const ;
    mlir::Value castValueToThisType(mlir::OpBuilder& builder, mlir::Value valueToCast, bool valueNullable) const;
    mlir::Value castValue(mlir::OpBuilder& builder, mlir::Value valueToCast) const;
 
