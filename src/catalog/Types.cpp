@@ -80,6 +80,7 @@ NullableType::NullableType(Type type, bool isNullable) : type(type), isNullable(
 }
 mlir::Type NullableType::toMlirType(mlir::MLIRContext* context) const {
    mlir::Type t = type.getMLIRTypeCreator()->createType(context);
+   assert((this->type.getTypeId() == LogicalTypeId::NONE && isNullable) || this->type.getTypeId() != LogicalTypeId::NONE  );
    if (isNullable) {
       return compiler::dialect::db::NullableType::get(context, t);
    }
@@ -243,6 +244,8 @@ std::string Type::toString() const {
          return std::dynamic_pointer_cast<CharTypeInfo>(info)->toString();
       case LogicalTypeId::STRING:
          return std::dynamic_pointer_cast<StringTypeInfo>(info)->toString();
+      case LogicalTypeId::NONE:
+            return "none";
    }
 }
 std::string IntTypeInfo::toString() {
@@ -357,5 +360,8 @@ Type Type::intervalDaytime() {
 }
 Type Type::intervalMonths() {
    return Type(LogicalTypeId::INTERVAL, std::make_shared<IntervalTypeInfo>(IntervalTypeInfo::IntervalUnit::MONTH));
+}
+Type Type::noneType() {
+   return Type(LogicalTypeId::NONE, nullptr);
 }
 } //end namespace lingodb::catalog

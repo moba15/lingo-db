@@ -10,6 +10,7 @@ enum class ConstantType : uint8_t {
    FLOAT = 3,
    STRING = 4,
    INTERVAL = 5,
+   NULL_P = 6,
 
    INVALID = 99,
 
@@ -57,6 +58,14 @@ class StringValue : public Value {
    std::string sVal;
    std::string toString() override{
       return "string: " + sVal;
+   }
+};
+
+class NullValue : public Value {
+   public:
+   explicit NullValue() : Value(ConstantType::NULL_P) {}
+   std::string toString() override{
+      return "NULL";
    }
 };
 

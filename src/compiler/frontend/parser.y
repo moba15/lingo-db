@@ -2155,6 +2155,10 @@ AexprConst:
         interval->optInterval = $opt_interval;
         $$ = interval;
     }
+    | NULL_P {
+        auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::NullValue>(); $$=t; 
+
+    }
 ;
 //TODO Set Iconst to unsigned long
 //TODO create rule SignedIconst to handle signed integers!

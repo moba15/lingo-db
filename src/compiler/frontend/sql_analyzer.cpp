@@ -1058,7 +1058,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          if (!constExpr->value) {
             throw std::runtime_error("Value of constExpr is empty");
          }
-         catalog::Type type = catalog::Type::int64();
+         catalog::NullableType type = catalog::Type::int64();
          switch (constExpr->value->type) {
             case ast::ConstantType::INT:
                type = catalog::Type::int32();
@@ -1089,6 +1089,12 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                   type = catalog::Type::decimal(p, s);
                }
                break;
+            }
+            case ast::ConstantType::NULL_P: {
+               type = catalog::Type::noneType();
+               type.isNullable = true;
+               break;
+
             }
             default:
                error("Not implemented", constExpr->loc);
@@ -1584,6 +1590,10 @@ catalog::NullableType SQLTypeUtils::getCommonType(catalog::NullableType nullable
       commonType = type2;
    } else if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type1.getTypeId() == catalog::LogicalTypeId::STRING) {
       commonType = type1;
+   } else if (type2.getTypeId() == catalog::LogicalTypeId::NONE ) {
+      commonType = type1;
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::NONE ) {
+      commonType = type2;
    } else {
       throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
    }

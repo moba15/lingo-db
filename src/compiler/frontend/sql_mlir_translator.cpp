@@ -454,6 +454,11 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                //TODO support only decimal, without the need for string, see old parser
                return builder.create<db::ConstantOp>(builder.getUnknownLoc(), constExpr->resultType.value().type.getMLIRTypeCreator()->createType(builder.getContext()), builder.getStringAttr(value->fVal));
             }
+            case ast::ConstantType::NULL_P: {
+
+               assert(constExpr->resultType.has_value());
+               return builder.create<db::NullOp>(builder.getUnknownLoc(), db::NullableType::get(builder.getContext(), builder.getNoneType()));
+            }
 
             default: error("Not implemented", expression->loc);
          }
