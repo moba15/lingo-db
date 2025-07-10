@@ -434,6 +434,8 @@ class CastExpression : public ParsedExpression {
    static constexpr const ExpressionClass TYPE = ExpressionClass::CAST;
    CastExpression(LogicalType logicalType, std::shared_ptr<ParsedExpression> child);
    std::optional<LogicalType> logicalType;
+   //TODO better
+   std::optional<LogicalType> optInterval;
    std::shared_ptr<ParsedExpression> child;
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };

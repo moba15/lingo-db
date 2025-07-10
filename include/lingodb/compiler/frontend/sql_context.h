@@ -73,6 +73,8 @@ class SQLContext {
    //std::unordered_map<std::string, std::pair<ast::TargetInfo, renameCte>> ctes;
    std::unordered_map<std::string, std::pair<ast::TargetInfo, std::shared_ptr<ast::CTENode>>> ctes;
 
+   std::unordered_map<std::string, mlir::Value> translatedCtes;
+
 
    llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo> resolver;
    using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
