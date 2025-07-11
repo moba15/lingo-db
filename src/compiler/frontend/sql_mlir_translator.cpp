@@ -631,7 +631,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             auto arg2 = translateExpression(builder, function->arguments[1], context);
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), wrapNullableType(builder.getContext(), builder.getI64Type(), {part, arg2}), "ExtractFromDate", mlir::ValueRange({part, arg2})).getRes();
          }
-         if (function->functionName == "SUBSTRING") {
+         if (function->functionName == "SUBSTRING" || function->functionName == "SUBSTR") {
             auto str = translateExpression(builder, function->arguments[0], context);
             auto from = function->arguments[1] ? translateExpression(builder, function->arguments[1], context) : nullptr;
             auto to =  function->arguments[2] ? translateExpression(builder, function->arguments[2], context) : nullptr;
