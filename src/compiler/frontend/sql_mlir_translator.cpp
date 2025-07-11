@@ -642,6 +642,10 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             auto scale = translateExpression(builder, function->arguments[1], context);
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), val.getType(), getBaseType(val.getType()).isIntOrIndex() ? "RoundInt" + std::to_string(getBaseType(val.getType()).getIntOrFloatBitWidth()) : "RoundDecimal", mlir::ValueRange{val, scale}).getRes();
          }
+         if (function->functionName == "UPPER") {
+            auto val = translateExpression(builder, function->arguments[0], context);
+            return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), val.getType(), "ToUpper", val).getRes();
+         }
          error("Function '" << function->functionName << "' not implemented", expression->loc);
       }
       case ast::ExpressionClass::BOUND_SUBQUERY: {

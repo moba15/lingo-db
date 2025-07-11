@@ -1451,6 +1451,28 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto boundArgs = std::vector{numberArg, decimalsArg};
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs, fInfo);
             }
+            if (function->functionName == "UPPER") {
+
+               if (function->arguments.size() != 1) {
+                  error("Function with more than one argument not supported", function->loc);
+               }
+               auto arg1 = analyzeExpression(function->arguments[0], context, resolverScope);
+               //TODO check for string
+               if (!arg1->resultType.has_value()) {
+                  error("Argument of aggregation function has not a valid return type", arg1->loc);
+               }
+               catalog::NullableType resultType = arg1->resultType.value();
+
+               auto scope = createTmpScope();
+               auto fName = function->alias.empty() ? function->functionName : function->alias;
+               auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+
+               fInfo->displayName = function->alias;
+               context->mapAttribute(resolverScope, fName, fInfo);
+
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1}, fInfo);
+
+            }
             error("Function '" << function->functionName << "' not implemented", function->loc);
          }
          break;
