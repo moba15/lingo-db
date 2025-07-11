@@ -637,7 +637,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             auto to =  function->arguments[2] ? translateExpression(builder, function->arguments[2], context) : nullptr;
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), str.getType(), "Substring", mlir::ValueRange({str, from, to})).getRes();
          }
-         if (function->functionName == "round") {
+         if (function->functionName == "ROUND") {
             auto val = translateExpression(builder, function->arguments[0], context);
             auto scale = translateExpression(builder, function->arguments[1], context);
             return builder.create<db::RuntimeCall>(builder.getUnknownLoc(), val.getType(), getBaseType(val.getType()).isIntOrIndex() ? "RoundInt" + std::to_string(getBaseType(val.getType()).getIntOrFloatBitWidth()) : "RoundDecimal", mlir::ValueRange{val, scale}).getRes();
