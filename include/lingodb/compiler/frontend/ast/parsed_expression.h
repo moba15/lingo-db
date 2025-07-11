@@ -374,7 +374,7 @@ static std::vector<std::string> aggregationFunctions{
    "min",
    "max",
    "avg",
-   "sum", "count"};
+   "sum", "count", "stddev_samp"};
 
 class StarExpression : public ParsedExpression {
    public:

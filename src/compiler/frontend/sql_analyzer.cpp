@@ -1306,6 +1306,32 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                context->mapAttribute(resolverScope, fName, fInfo);
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
             }
+
+            /*
+             * STDDEV_SAMP
+             */
+            if (function->functionName == "stddev_samp") {
+               catalog::NullableType resultType = catalog::Type::f64();
+               if (boundArguments.size() != 1) {
+                  error("Aggregation with more than one argument not supported", function->loc);
+               }
+               if (!boundArguments[0]->resultType.has_value() || !boundArguments[0]->resultType->isNumeric()) {
+                  error("Argument of aggregation function has not a valid return type", boundArguments[0]->loc);
+               }
+               resultType.isNullable = boundArguments[0]->resultType->isNullable;
+
+               auto scope = createTmpScope();
+               auto fName = function->alias.empty() ? function->functionName : function->alias;
+               auto fInfo = std::make_shared<ast::FunctionInfo>(scope, fName, resultType);
+
+               fInfo->displayName = function->alias;
+               context->mapAttribute(resolverScope, fName, fInfo);
+
+               return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
+
+
+
+            }
             error("Not implemented", rootNode->loc);
 
          } else {
