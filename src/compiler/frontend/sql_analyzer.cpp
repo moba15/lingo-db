@@ -1238,6 +1238,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
 
             }
             //TODO Check for correct value
+            /**
+             * SUM, AVG, MIN, MAX
+             */
             if (function->functionName == "sum" || function->functionName == "avg" || function->functionName == "min" || function->functionName == "max") {
                if (function->arguments.size() > 1) {
                   error("Aggregation with more than one argument not supported", function->loc);
@@ -1255,6 +1258,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                auto fName = function->alias.empty() ? function->functionName : function->alias;
                //Find correct resultType
                auto resultType = boundArguments[0]->resultType.value();
+               /**
+                * AVG
+               */
                if (function->functionName == "avg") {
                   //TODO type
                   if (resultType.type.getTypeId() == catalog::LogicalTypeId::INT) {
@@ -1275,6 +1281,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
             }
             //TODO better and cleaner!
+            /*
+             * COUNT
+            */
             if (function->functionName == "count") {
                //TODO parse agrguments if not star!!
 
@@ -1296,9 +1305,8 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                fInfo->displayName = function->alias;
                context->mapAttribute(resolverScope, fName, fInfo);
                return drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments, fInfo);
-            } else {
-               error("Not implemented", rootNode->loc);
             }
+            error("Not implemented", rootNode->loc);
 
          } else {
             //TODO hardcoded
