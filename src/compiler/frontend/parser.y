@@ -2134,7 +2134,8 @@ insert_column_item:
  */
  //TODO Add missing AexprConst rules
 AexprConst: 
-    Iconst { $$=$1;}
+
+    SignedIconst {$$=$1;}
     | Fconst { $$=$1;}
     | Sconst {$$=$1;}
     | Bconst {$$=$1;}
@@ -2173,8 +2174,13 @@ SignedIconst:
     }
     | MINUS Iconst
     {
-        $Iconst->iVal = -$Iconst->iVal;
+        std::static_pointer_cast<lingodb::ast::IntValue>(std::static_pointer_cast<lingodb::ast::ConstantExpression>($Iconst)->value)->iVal = -std::static_pointer_cast<lingodb::ast::IntValue>(std::static_pointer_cast<lingodb::ast::ConstantExpression>($Iconst)->value)->iVal;
         $$=$Iconst;
+       
+    }
+    | Iconst 
+    {
+        $$=$1;
     }
 
 Fconst:
