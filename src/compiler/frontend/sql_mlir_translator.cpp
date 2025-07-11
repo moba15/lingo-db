@@ -792,8 +792,8 @@ mlir::Value SQLMlirTranslator::translateWhenCheks(mlir::OpBuilder& builder, std:
    }
 
    auto commonType = boundCase->resultType->toMlirType(builder.getContext());
-   thenTranslated = boundCase->resultType->castValueToThisType(builder, thenTranslated, check.thenExpr->resultType->isNullable);
-   elseTranslated = boundCase->resultType->castValueToThisType(builder, elseTranslated, elseExpr->resultType->isNullable);
+   thenTranslated = boundCase->resultType->castValueToThisType(whenBuilder, thenTranslated, check.thenExpr->resultType->isNullable);
+   elseTranslated = boundCase->resultType->castValueToThisType(elseBuilder, elseTranslated, elseExpr->resultType->isNullable);
 
    whenBuilder.create<mlir::scf::YieldOp>(builder.getUnknownLoc(), thenTranslated);
    elseBuilder.create<mlir::scf::YieldOp>(builder.getUnknownLoc(), elseTranslated);
