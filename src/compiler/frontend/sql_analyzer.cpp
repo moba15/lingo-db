@@ -1509,6 +1509,16 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                      stringRep += "days";
                      return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalTypeWithMods, stringRep);
                   }
+                  case ast::ExpressionType::BOUND_COLUMN_REF: {
+                     auto boundColRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(boundChild);
+                     assert(boundColRef->resultType.has_value());
+                     if (boundColRef->resultType.value().type.getTypeId() == catalog::LogicalTypeId::DATE) {
+                        return boundColRef;
+                     }
+                     if (boundColRef->resultType.value().type.getTypeId() != catalog::LogicalTypeId::STRING) {
+                        error("Cannot cast " + boundColRef->alias + " to date", boundColRef->loc);
+                     }
+                  }
                   default: error("Cast not implemented", rootNode->loc);
                }
             }
