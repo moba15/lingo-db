@@ -158,7 +158,7 @@ boolean [fF][aA][lL][sS][eE]
 [bB][eE][tT][wW][eE][eE][nN]          { return lingodb::parser::make_BETWEEN(loc);}
 [bB][iI][gG][iI][nN][tT]              { return lingodb::parser::make_BIGINT(loc); }
 [bB][yY]                              { return lingodb::parser::make_BY(loc);}
-
+[cC][aA][sS][tT]                      { return lingodb::parser::make_CAST(loc);}
 [cC][aA][sS][eE]                      { return lingodb::parser::make_CASE(loc); }
 [cC][hH][aA][rR]                      { return lingodb::parser::make_CHAR_P(loc); }
 [cC][hH][aA][rR][aA][cC][tT][eE][rR]  { return lingodb::parser::make_CHARACTER(loc); }

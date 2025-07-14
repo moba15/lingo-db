@@ -673,6 +673,19 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   boundCase->namedResult = n;
                   break;
                }
+               case ast::ExpressionClass::BOUND_CAST: {
+                  auto boundCast = std::static_pointer_cast<ast::BoundCastExpression>(parsedExpression);
+                  assert(boundCast->resultType.has_value());
+                  auto scope = boundCast->alias.empty() ? boundCast->alias : createTmpScope();
+                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, boundCast->resultType.value(), createTmpScope());
+                  n->displayName = boundCast->alias.empty() ? "" : boundCast->alias;
+                  context->mapAttribute(resolverScope, boundCast->alias.empty() ? n->name : boundCast->alias, n);
+                  targetColumns.emplace_back(n);
+                  context->currentScope->targetInfo.add(n);
+                  context->currentScope->evalBeforeAggr.emplace_back(boundCast);
+                  boundCast->namedResult = n;
+                  break;
+               }
                default: error("Not implemented", target->loc);
             }
          }
@@ -1493,7 +1506,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                      }
                      return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType);
                   }
-                  default: error("Not implemented", rootNode->loc);
+                  default: error("Cast not implemented", rootNode->loc);
                }
             }
             case ast::LogicalType::INTERVAL: {
@@ -1518,7 +1531,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                boundCast->optInterval = castExpr->optInterval;
                return boundCast;
             }
-            default: error("Not implemented", rootNode->loc);
+            default: error("Cast not implemented", rootNode->loc);
          }
       }
       case ast::ExpressionClass::BETWEEN: {

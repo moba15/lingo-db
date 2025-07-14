@@ -234,7 +234,7 @@
 %type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
-                                                        func_arg_expr select_limit_value case_expr case_default
+                                                        func_arg_expr select_limit_value case_expr case_default cast_expr
 
 %type<std::vector<lingodb::ast::CaseExpression::CaseCheck>> when_clause_list
 %type<lingodb::ast::CaseExpression::CaseCheck> when_clause
@@ -284,6 +284,7 @@
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
 %type<std::optional<lingodb::ast::LogicalType>> opt_interval
+%type<lingodb::ast::LogicalType> Typename
 %type<bool> opt_asymmetric set_quantifier
 
 
@@ -1203,6 +1204,7 @@ c_expr:
         $$ = $1;
     }
     | func_expr {$$=$1;}
+    | cast_expr {$$=$1;}
     | select_with_parens %prec UMINUS
     {
         auto subquery = mkNode<lingodb::ast::SubqueryExpression>(@$, lingodb::ast::SubqueryType::SCALAR, $select_with_parens);
@@ -1429,6 +1431,9 @@ func_arg_expr:
     ;
 
 //TODO missing rules
+/*
+ * Special expressions that are considered to be functions.
+ */
 func_expr_common_subexpr: 
     EXTRACT LP extract_list RP 
     {
@@ -1450,6 +1455,13 @@ func_expr_common_subexpr:
         $$ = function;
     }
 ;
+
+cast_expr:
+    CAST LP a_expr AS Typename RP
+    {
+        $$ = mkNode<lingodb::ast::CastExpression>(@$, $Typename, $a_expr);
+    }
+    ;
 
 extract_list: 
     extract_arg FROM a_expr 
@@ -2208,6 +2220,13 @@ opt_interval:
         $$ = lingodb::ast::LogicalType::YEARS;
      }
     ;
+//TODO missing rules
+Typename: 
+    DATE_P
+    {
+        $$ = lingodb::ast::LogicalType::DATE;
+    }
+    ;
 
 /*
 * GOOLE PIPE syntax
@@ -2267,6 +2286,7 @@ agg_expr:
         
     }
     ;
+   
 func_expr_list: 
     func_expr opt_alias_clause 
     {
