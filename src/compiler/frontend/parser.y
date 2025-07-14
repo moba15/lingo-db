@@ -2219,6 +2219,7 @@ opt_interval:
      {
         $$ = lingodb::ast::LogicalType::YEARS;
      }
+     | %empty
     ;
 //TODO missing rules
 Typename: 
