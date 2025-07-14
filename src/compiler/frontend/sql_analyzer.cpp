@@ -1673,7 +1673,7 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
 
 
 
-
+//TODO cleanup
 /*
  * SQLTypeUtils
  */
@@ -1686,10 +1686,10 @@ catalog::NullableType SQLTypeUtils::getCommonType(catalog::NullableType nullable
          //Get higher decimal
          return getHigherDecimalType(nullableType1, nullableType2);
       }
-
-
-
-
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
+      commonType =type1;
+   } else if (type1.getTypeId() == catalog::LogicalTypeId::STRING && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
+      commonType = type2;
    } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::INTERVAL || type1.getTypeId() == catalog::LogicalTypeId::INTERVAL && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
       return catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
    } else if (type1.getTypeId() == catalog::LogicalTypeId::INT && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
@@ -1785,6 +1785,7 @@ std::vector<catalog::NullableType> SQLTypeUtils::toCommonTypes(std::vector<catal
    std::vector<catalog::NullableType> res;
    for (auto type : types) {
       type.castType = std::make_shared<catalog::NullableType>(commonType);
+      type.castType->isNullable = type.isNullable;
       res.push_back(type);
    }
 
