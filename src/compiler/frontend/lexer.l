@@ -110,6 +110,7 @@ op_chars		    [\~\!\@\#\^\&\|\`\?\+\-\*\/\%\<\>\=]
 ident_start     [a-zA-Z]
 ident_cont      [a-zA-Z0-9_%]
 identifier      {ident_start}{ident_cont}*
+quoted_identifier   \"([^\"]|\"\")*\"
 squote			\'
 dquote			\"
 str       {squote}({ident_cont}|{op_chars}|[ ])*{squote}
@@ -245,6 +246,12 @@ boolean [fF][aA][lL][sS][eE]
                         [](unsigned char c){ return std::tolower(c); });
                     return lingodb::parser::make_IDENTIFIER(std::move(ident), loc);
                 }
+{quoted_identifier} {
+                      std::string text(yytext);
+                      std::string trimmed(text.begin() + 1, text.end()-1);
+                      return lingodb::parser::make_IDENTIFIER(std::move(trimmed), loc);
+
+                    }
 {decinteger}	{
 				    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
 			    }

@@ -1657,7 +1657,7 @@ ColLabel:
 	//TODO | unreserved_keyword					{ }
 	//TODO | col_name_keyword						{ }
 	//TODO | type_func_name_keyword				{ }
-	//TODO | reserved_keyword						{ }
+	| reserved_keyword						{ }
 	;
 /* Bare column label --- names that can be column labels without writing "AS".
  * This classification is orthogonal to the other keyword categories.
@@ -1672,7 +1672,92 @@ BareColLabel:
 
 
 
-
+/* Reserved keyword --- these keywords are usable only as a ColLabel.
+ *
+ * Keywords appear here if they could not be distinguished from variable,
+ * type, or function names in some contexts.  Don't put things here unless
+ * forced to.
+ */
+reserved_keyword:
+			  ALL
+			| ANALYSE
+			| ANALYZE
+			| AND
+			| ANY
+			| ARRAY
+			| AS
+			| ASC
+			| ASYMMETRIC
+			| BOTH
+			| CASE
+			| CAST
+			| CHECK
+			| COLLATE
+			| COLUMN
+			| CONSTRAINT
+			| CREATE
+			| CURRENT_CATALOG
+			| CURRENT_DATE
+			| CURRENT_ROLE
+			| CURRENT_TIME
+			| CURRENT_TIMESTAMP
+			| CURRENT_USER
+			| DEFAULT
+			| DEFERRABLE
+			| DESC
+			| DISTINCT
+			| DO
+			| ELSE
+			| END_P
+			| EXCEPT
+			| FALSE_P
+			| FETCH
+			| FOR
+			| FOREIGN
+			| FROM
+			| GRANT
+			| GROUP_P
+			| HAVING
+			| IN_P
+			| INITIALLY
+			| INTERSECT
+			| INTO
+			| LATERAL_P
+			| LEADING
+			| LIMIT
+			| LOCALTIME
+			| LOCALTIMESTAMP
+			| NOT
+			| NULL_P
+			| OFFSET
+			| ON
+			| ONLY
+			| OR
+			| ORDER
+			| PLACING
+			| PRIMARY
+			| REFERENCES
+			| RETURNING
+			| SELECT
+			| SESSION_USER
+			| SOME
+			| SYMMETRIC
+			| SYSTEM_USER
+			| TABLE
+			| THEN
+			| TO
+			| TRAILING
+			| TRUE_P
+			| UNION
+			| UNIQUE
+			| USER
+			| USING
+			| VARIADIC
+			| WHEN
+			| WHERE
+			| WINDOW
+			| WITH
+		;
 
 /*****************************************************************************
  *
