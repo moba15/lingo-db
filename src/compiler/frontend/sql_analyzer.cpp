@@ -1461,7 +1461,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                      if (constExpr->value->type != ast::ConstantType::STRING) {
                         error("Cannot cast " + constExpr->value->toString() + " to date", constExpr->loc);
                      }
-                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType);
+                     std::string stringRep = std::static_pointer_cast<ast::StringValue>(constExpr->value)->sVal;
+                     stringRep += "days";
+                     return drv.nf.node<ast::BoundCastExpression>(castExpr->loc, catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)), castExpr->alias, boundChild, castExpr->logicalType, stringRep);
                   }
                   default: error("Cast not implemented", rootNode->loc);
                }
@@ -1474,18 +1476,28 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                //TODO hardcoded
                //!Shortcutted here, implement different interval types later
                auto resultType = catalog::Type::intervalDaytime();
+               std::string stringRepresentation = std::static_pointer_cast<ast::StringValue>(constExpr->value)->sVal;
                if (castExpr->optInterval.has_value()) {
                   switch (castExpr->optInterval.value()) {
                      case ast::LogicalType::YEARS: {
                         resultType = catalog::Type::intervalMonths();
+                        stringRepresentation += "years";
                         break;
                      }
-                     default: ;
+                     default: stringRepresentation += "days";
                   }
+               } else {
+                  if (stringRepresentation.ends_with("years")) {
+                     resultType = catalog::Type::intervalMonths();
+                  } else if (stringRepresentation.ends_with("days")) {
+
+                  } else {
+                     error("Cast for strRep: " << stringRepresentation << " not implemented", boundChild->loc);
+                  }
+
                }
-               catalog::Type::intervalMonths();
-               auto boundCast = drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType);
-               boundCast->optInterval = castExpr->optInterval;
+               auto boundCast = drv.nf.node<ast::BoundCastExpression>(castExpr->loc, resultType, castExpr->alias, boundChild, castExpr->logicalType, stringRepresentation);
+
                return boundCast;
             }
             default: error("Cast not implemented", rootNode->loc);
