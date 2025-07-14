@@ -604,9 +604,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   if (!columnRef->alias.empty()) {
                      context->mapAttribute(resolverScope, columnRef->alias, columnRef->namedResult);
                   }
-
-                  /*auto name = target->alias.empty() ? column.getColumnName() : target->alias;
-                  context->currentScope->targetInfo.map(name, std::make_shared<ast::ColumnInfo>(columnRef->scope, column));*/
                   context->currentScope->targetInfo.add(columnRef->namedResult);
                   break;
                }
@@ -625,65 +622,25 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                }
                case ast::ExpressionClass::BOUND_FUNCTION: {
                   error("Not implemented", target->loc);
-
-                 auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(parsedExpression);
+                  auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(parsedExpression);
                   auto fName = function->alias.empty() ? function->functionName : function->alias;
                   assert(function->functionInfo && function->namedResult.has_value());
                   context->currentScope->targetInfo.add(function->functionInfo);
                   break;
                }
-               case ast::ExpressionClass::BOUND_CONSTANT: {
-                  auto constantExpr = std::static_pointer_cast<ast::BoundConstantExpression>(parsedExpression);
-                  assert(constantExpr->resultType.has_value());
-                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, constantExpr->alias, constantExpr->resultType.value(), createTmpScope());
-                  n->displayName = constantExpr->alias.empty() ? "" : constantExpr->alias;
-
-                  context->mapAttribute(resolverScope, constantExpr->alias.empty() ? n->name : constantExpr->alias, n);
-                  targetColumns.emplace_back(n);
-                  context->currentScope->targetInfo.add(n);
-                  context->currentScope->evalBeforeAggr.emplace_back(constantExpr);
-                  constantExpr->namedResult = n;
-                  break;
-
-               }
-               case ast::ExpressionClass::BOUND_OPERATOR: {
-                  auto operatorExpr = std::static_pointer_cast<ast::BoundOperatorExpression>(parsedExpression);
-                  assert(operatorExpr->resultType.has_value());
-                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, operatorExpr->alias, operatorExpr->resultType.value(), createTmpScope());
-                  n->displayName = operatorExpr->alias.empty() ? "" : operatorExpr->alias;
-
-                  context->mapAttribute(resolverScope, operatorExpr->alias.empty() ? n->name : operatorExpr->alias, n);
-                  targetColumns.emplace_back(n);
-                  context->currentScope->targetInfo.add(n);
-                  context->currentScope->evalBeforeAggr.emplace_back(operatorExpr);
-                  operatorExpr->namedResult = n;
-
-                  break;
-               }
+               case ast::ExpressionClass::BOUND_CONSTANT:
+               case ast::ExpressionClass::BOUND_OPERATOR:
+               case ast::ExpressionClass::BOUND_CAST:
                case ast::ExpressionClass::BOUND_CASE: {
-                  auto boundCase = std::static_pointer_cast<ast::BoundCaseExpression>(parsedExpression);
-                  assert(boundCase->resultType.has_value());
-                  auto scope = boundCase->alias.empty() ? boundCase->alias : createTmpScope();
-                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, boundCase->resultType.value(), createTmpScope());
-                  n->displayName = boundCase->alias.empty() ? "" : boundCase->alias;
-                  context->mapAttribute(resolverScope, boundCase->alias.empty() ? n->name : boundCase->alias, n);
+                  assert(parsedExpression->resultType.has_value());
+                  auto scope = parsedExpression->alias.empty() ? parsedExpression->alias : createTmpScope();
+                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, parsedExpression->resultType.value(), createTmpScope());
+                  n->displayName = parsedExpression->alias.empty() ? "" : parsedExpression->alias;
+                  context->mapAttribute(resolverScope, parsedExpression->alias.empty() ? n->name : parsedExpression->alias, n);
                   targetColumns.emplace_back(n);
                   context->currentScope->targetInfo.add(n);
-                  context->currentScope->evalBeforeAggr.emplace_back(boundCase);
-                  boundCase->namedResult = n;
-                  break;
-               }
-               case ast::ExpressionClass::BOUND_CAST: {
-                  auto boundCast = std::static_pointer_cast<ast::BoundCastExpression>(parsedExpression);
-                  assert(boundCast->resultType.has_value());
-                  auto scope = boundCast->alias.empty() ? boundCast->alias : createTmpScope();
-                  auto n = std::make_shared<ast::NamedResult>(ast::NamedResultType::EXPRESSION, scope, boundCast->resultType.value(), createTmpScope());
-                  n->displayName = boundCast->alias.empty() ? "" : boundCast->alias;
-                  context->mapAttribute(resolverScope, boundCast->alias.empty() ? n->name : boundCast->alias, n);
-                  targetColumns.emplace_back(n);
-                  context->currentScope->targetInfo.add(n);
-                  context->currentScope->evalBeforeAggr.emplace_back(boundCast);
-                  boundCast->namedResult = n;
+                  context->currentScope->evalBeforeAggr.emplace_back(parsedExpression);
+                  parsedExpression->namedResult = n;
                   break;
                }
                default: error("Not implemented", target->loc);
