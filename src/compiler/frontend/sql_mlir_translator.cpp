@@ -1240,7 +1240,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
                if (mlir::isa<db::NullableType>(refAttr.getColumn().type)) {
                   aggrResultType = db::NullableType::get(builder.getContext(), aggrResultType);
                }*/
-               aggrFunction->functionInfo->resultType.isNullable = true;
+               assert(aggrFunction->namedResult.has_value());
+               aggrFunction->namedResult.value()->resultType.isNullable = true;
             }
             //TODO move to analyzer
             if (!mlir::isa<db::NullableType>(aggrResultType) && (groupByAttrs.empty()) && aggrFunction->functionName != "count") {
@@ -1248,7 +1249,8 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
 
             }
             if (mlir::isa<db::NullableType>(aggrResultType)) {
-               aggrFunction->functionInfo->resultType.isNullable = true;
+               assert(aggrFunction->namedResult.has_value());
+               aggrFunction->namedResult.value()->resultType.isNullable = true;
             }
 
             expr = aggrBuilder.create<relalg::AggrFuncOp>(builder.getUnknownLoc(), aggrResultType, relalgAggrFunc, currRel, refAttr);
