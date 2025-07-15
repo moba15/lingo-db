@@ -675,10 +675,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                }
                case ast::ExpressionClass::BOUND_FUNCTION: {
                   error("Not implemented", target->loc);
-                  auto function = std::static_pointer_cast<ast::BoundFunctionExpression>(parsedExpression);
-                  auto fName = function->alias.empty() ? function->functionName : function->alias;
-                  assert(function->functionInfo && function->namedResult.has_value());
-                  context->currentScope->targetInfo.add(function->functionInfo);
+                  assert(parsedExpression->resultType.has_value() && parsedExpression->namedResult.has_value());
+                  context->currentScope->targetInfo.add(parsedExpression->namedResult.value());
                   break;
                }
                case ast::ExpressionClass::BOUND_CONSTANT:

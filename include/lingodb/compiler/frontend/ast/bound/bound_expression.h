@@ -116,7 +116,6 @@ class BoundFunctionExpression : public BoundExpression {
    //TODO!!!!!!!
    std::string aliasOrUniqueIdentifier;
    std::vector<std::shared_ptr<BoundExpression>> arguments;
-   std::shared_ptr<FunctionInfo> functionInfo;
 
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
