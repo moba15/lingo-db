@@ -1171,11 +1171,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
 
          } else {
 
-            if (std::find_if(comparison->rightChildren.begin(), comparison->rightChildren.end(), [](auto const &child) {
-               return child->exprClass != ast::ExpressionClass::CONSTANT;
-            }) != comparison->rightChildren.end()) {
-               error("Not implemented: IN (..,..,..) with non constant values", comparison->loc);
-            }
+
          }
 
          auto left = analyzeExpression(comparison->left, context, resolverScope);
