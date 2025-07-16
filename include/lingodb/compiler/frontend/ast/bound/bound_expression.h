@@ -31,6 +31,8 @@ class BoundExpression : public AstNode {
 
    //If this expression is a column reference or (SELECT 2*d from t), it can be used to find the named result
    std::optional<std::shared_ptr<NamedResult>> namedResult;
+
+
 };
 
 class BoundColumnRefExpression : public BoundExpression {
@@ -70,6 +72,16 @@ class BoundConjunctionExpression : public BoundExpression {
    std::vector<std::shared_ptr<BoundExpression>> children;
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
+
+
+
+
+
+
+
+
+
 
    private:
    std::string typeToAscii(ExpressionType type) const;
@@ -119,6 +131,7 @@ class BoundFunctionExpression : public BoundExpression {
 
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+
 };
 
 class BoundStarExpression : public BoundExpression {
