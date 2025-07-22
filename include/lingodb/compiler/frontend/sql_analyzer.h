@@ -111,6 +111,23 @@ class SQLQueryAnalyzer {
 };
 
 struct SQLTypeUtils {
+   /**
+    * !Not yet fully implemented <br>
+    * Determines the common type between two nullable types
+    * Used for type resolution in operations involving two different types (e.g., comparisons, arithmetic operations).
+    *
+    * Handles the following type conversions:
+    * - Identical types (returns the same type, with DECIMAL getting special handling)
+    * - DATE with STRING/INTERVAL
+    * - DECIMAL with INT
+    * - STRING with CHAR
+    * - INT with CHAR
+    *
+    * @param nullableType1 First type to compare
+    * @param nullableType2 Second type to compare
+    * @return A NullableType representing the common type that can hold both values
+    * @throws std::runtime_error if no common type exists between the input types
+    */
    static catalog::NullableType getCommonType(catalog::NullableType nullableType1, catalog::NullableType nullableType2);
    static catalog::NullableType getHigherDecimalType(catalog::NullableType left, catalog::NullableType right);
 
