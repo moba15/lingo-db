@@ -1695,43 +1695,59 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
     * SQLTypeUtils
     */
 catalog::NullableType SQLTypeUtils::getCommonType(catalog::NullableType nullableType1, catalog::NullableType nullableType2) {
-   auto type1 = nullableType1.type;
-   auto type2 = nullableType2.type;
-   catalog::Type commonType = type1;
-   if (type1.getTypeId() == type2.getTypeId()) {
-      if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
-         //Get higher decimal
-         return getHigherDecimalType(nullableType1, nullableType2);
-      }
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
-      commonType = type1;
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::STRING && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
-      commonType = type2;
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::DATE && type2.getTypeId() == catalog::LogicalTypeId::INTERVAL || type1.getTypeId() == catalog::LogicalTypeId::INTERVAL && type2.getTypeId() == catalog::LogicalTypeId::DATE) {
-      return catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::INT && type2.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
-      commonType = type2;
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL && type2.getTypeId() == catalog::LogicalTypeId::INT) {
-      commonType = type1;
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::INT && type2.getTypeId() == catalog::LogicalTypeId::CHAR) {
-      commonType = type1;
-   }
-   else if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type2.getTypeId() == catalog::LogicalTypeId::INT) {
-      commonType = type2;
-   }
-   else if (type1.getTypeId() == catalog::LogicalTypeId::CHAR && type2.getTypeId() == catalog::LogicalTypeId::STRING) {
-      commonType = type2;
-   } else if (type2.getTypeId() == catalog::LogicalTypeId::CHAR && type1.getTypeId() == catalog::LogicalTypeId::STRING) {
-      commonType = type1;
-   } else if (type2.getTypeId() == catalog::LogicalTypeId::NONE) {
-      commonType = type1;
-   } else if (type1.getTypeId() == catalog::LogicalTypeId::NONE) {
-      commonType = type2;
-   } else {
-      throw std::runtime_error("No common type found for " + type1.toString() + " and " + type2.toString());
-   }
-   //TODO is this correct
-   return catalog::NullableType(commonType, nullableType1.isNullable || nullableType2.isNullable);
+    const bool isNullable = nullableType1.isNullable || nullableType2.isNullable;
+
+    // If types are identical, handle special case for DECIMAL or return the type
+    if (nullableType1.type.getTypeId() == nullableType2.type.getTypeId()) {
+        if (nullableType1.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
+            return getHigherDecimalType(nullableType1, nullableType2);
+        }
+        return catalog::NullableType(nullableType1.type, isNullable);
+    }
+
+    for (size_t i = 0; i<2; i++) {
+       const auto& type1 = nullableType1.type;
+       const auto& type2 = nullableType2.type;
+
+       // Check combinations in one direction
+       if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL &&
+           type2.getTypeId() == catalog::LogicalTypeId::INT) {
+          return catalog::NullableType(type1, isNullable);
+           }
+
+       if (type1.getTypeId() == catalog::LogicalTypeId::STRING &&
+           type2.getTypeId() == catalog::LogicalTypeId::CHAR) {
+          return catalog::NullableType(type1, isNullable);
+           }
+
+       if (type1.getTypeId() == catalog::LogicalTypeId::DATE) {
+          if (type2.getTypeId() == catalog::LogicalTypeId::STRING) {
+             return catalog::NullableType(type1, isNullable);
+          }
+          if (type2.getTypeId() == catalog::LogicalTypeId::INTERVAL) {
+             return catalog::NullableType(
+                 catalog::Type(catalog::LogicalTypeId::DATE,
+                             std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY)),
+                 isNullable);
+          }
+       }
+
+       if (type1.getTypeId() == catalog::LogicalTypeId::INT &&
+           type2.getTypeId() == catalog::LogicalTypeId::CHAR) {
+          return catalog::NullableType(type1, isNullable);
+           }
+
+       // Handle NONE type
+       if (type2.getTypeId() == catalog::LogicalTypeId::NONE) {
+          return catalog::NullableType(type1, isNullable);
+       }
+       if (type1.getTypeId() == catalog::LogicalTypeId::NONE) {
+          return catalog::NullableType(type2, isNullable);
+       }
+       std::swap(nullableType1, nullableType2);
+    }
+
+    throw std::runtime_error("No common type found for " + nullableType1.type.toString() + " and " + nullableType2.type.toString());
 }
 
 catalog::NullableType SQLTypeUtils::getHigherDecimalType(catalog::NullableType left, catalog::NullableType right) {
