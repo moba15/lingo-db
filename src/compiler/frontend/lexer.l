@@ -241,6 +241,8 @@ boolean [fF][aA][lL][sS][eE]
 
 [yY][eE][aA][rR]                      { MAKE_KEYWORD(YEAR_P); }
 
+[pP][aA][rR][tT][iI][tT][iI][oO][nN]  { MAKE_KEYWORD(PARTITION); }
+
 
 <<EOF>>    return lingodb::parser::make_YYEOF (loc);
 

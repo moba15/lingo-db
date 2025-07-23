@@ -224,7 +224,9 @@
 %type <std::shared_ptr<lingodb::ast::TableProducer>> select_no_parens SelectStmt  select_with_parens PreparableStmt common_table_expr cte_list with_clause 
 %type <std::shared_ptr<lingodb::ast::QueryNode>> simple_select select_clause
 
-%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt extract_list expr_list substr_list distinct_clause
+%type<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>> target_list group_by_list func_arg_list func_arg_list_opt 
+                                                                    extract_list expr_list substr_list distinct_clause
+                                                                    opt_partition_clause
 
 /*
 * in_expr either returns a SubQuery or a list of expressions
@@ -236,10 +238,13 @@
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item
                                                         func_arg_expr select_limit_value case_expr case_default cast_expr
 
+%type<std::shared_ptr<lingodb::ast::WindowExpression>> over_clause window_specification
+
 %type<std::vector<lingodb::ast::CaseExpression::CaseCheck>> when_clause_list
 %type<lingodb::ast::CaseExpression::CaseCheck> when_clause
 
 %type<std::shared_ptr<lingodb::ast::FunctionExpression>>  func_application func_expr func_expr_common_subexpr
+%type<std::shared_ptr<lingodb::ast::WindowExpression>>  window_func_expr;
 
 %type<std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>>> func_expr_list
 %type<std::shared_ptr<ast::ConstantExpression>> extract_arg
@@ -279,7 +284,8 @@
 
 %type<lingodb::ast::OrderByNullType> opt_nulls_order
 
-%type<std::optional<std::shared_ptr<lingodb::ast::ResultModifier>>> opt_sort_clause opt_select_limit
+%type<std::optional<std::shared_ptr<lingodb::ast::ResultModifier>>>  opt_select_limit
+%type<std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>>> opt_sort_clause
 
 %type<std::shared_ptr<lingodb::ast::LimitModifier>> select_limit limit_clause
 
@@ -1258,6 +1264,7 @@ c_expr:
         $$ = $1;
     }
     | func_expr {$$=$1;}
+    | window_func_expr {$$=$1;}
     | cast_expr {$$=$1;}
     | select_with_parens %prec UMINUS
     {
@@ -1421,28 +1428,30 @@ func_application:
         $$ = funcExpr;
     }
 ;
-/*
- * func_expr and its cousin func_expr_windowless are split out from c_expr just
- * so that we have classifications for "everything that is a function call or
- * looks like one".  This isn't very important, but it saves us having to
- * document which variants are legal in places like "FROM function()" or the
- * backwards-compatible functional-index syntax for CREATE INDEX.
- * (Note that many of the special SQL functions wouldn't actually make any
- * sense as functional index entries, but we ignore that consideration here.)
- */
+
  //TODO add missing rules
  func_expr:
-    func_application //within_group_clause filter_clause 
+    func_application //within_group_clause filter_clause
     {
         //TODO within_group_clause filter_clause over_clause
         $$ = $func_application;
     }
+    
     
     | func_expr_common_subexpr
     {
         $$ = $1;
     }
     ;
+window_func_expr: 
+    func_application over_clause 
+    {
+        $over_clause->functionExpression = $func_application;
+        $$=$over_clause;
+    
+    }
+    ;
+
 func_arg_list_opt: 
     func_arg_list
     {
@@ -1572,16 +1581,27 @@ substr_list:
     {
 
     }
-
-
     ;
+//TODO missing rules
 over_clause:
-    OVER window_specification
+    OVER window_specification 
+    {
+        $$ = $window_specification;
+    }
     | OVER ColId 
+    | %empty
     ;
 //TODO missing
 window_specification:
-    LP opt_sort_clause RP
+    LP opt_existing_window_name opt_partition_clause opt_sort_clause opt_frame_clause RP 
+    {
+        auto windowExpression = mkNode<lingodb::ast::WindowExpression>(@$);
+        windowExpression->partitions = $opt_partition_clause;
+        windowExpression->order = $opt_sort_clause;
+        $$ = windowExpression;
+        
+
+    }
     ;
 
 
@@ -1622,6 +1642,33 @@ target_el:
     | STAR {  $$ =mkNode<lingodb::ast::StarExpression>(@$,"");  }
     ;
 
+
+/*
+ * If we see PARTITION, RANGE, ROWS or GROUPS as the first token after the '('
+ * of a window_specification, we want the assumption to be that there is
+ * no existing_window_name; but those keywords are unreserved and so could
+ * be ColIds.  We fix this by making them have the same precedence as IDENT
+ * and giving the empty production here a slightly higher precedence, so
+ * that the shift/reduce conflict is resolved in favor of reducing the rule.
+ * These keywords are thus precluded from being an existing_window_name but
+ * are not reserved for any other purpose.
+ */
+opt_existing_window_name:
+    ColId						{  }
+	| %empty				%prec Op		{  }
+	;
+
+opt_partition_clause:
+    PARTITION BY expr_list		{ $$=$expr_list; }
+	| %empty				    { $$ = mkListShared<lingodb::ast::ParsedExpression>(); }
+		;
+/*
+ * For frame clauses, we return a WindowDef, but only some fields are used:
+ * frameOptions, startOffset, and endOffset.
+ */
+ //TODO missing rules
+opt_frame_clause:
+    %empty
 
 
 any_operator:

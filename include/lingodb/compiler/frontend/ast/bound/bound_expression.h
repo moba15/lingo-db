@@ -7,6 +7,7 @@
 #include <mlir/Dialect/MLProgram/Transforms/Passes.h.inc>
 #include <mlir/IR/Types.h>
 namespace lingodb::ast {
+class BoundOrderByModifier;
 enum class BindingType : uint8_t {
    TABLE = 1,
    FUNCTION = 2,
@@ -146,6 +147,18 @@ class BoundCastExpression : public BoundExpression {
    std::string stringRepr;
    std::shared_ptr<BoundExpression> child;
    //LogicalType logicalType;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
+};
+
+class BoundWindowExpression : public BoundExpression {
+   public:
+   static constexpr const ExpressionClass TYPE = ExpressionClass::BOUND_WINDOW;
+   BoundWindowExpression(ExpressionType type, std::string alias, catalog::NullableType resultType, std::shared_ptr<BoundFunctionExpression> function, std::vector<std::shared_ptr<BoundExpression>> partitions, std::optional<std::shared_ptr<BoundOrderByModifier>> order );
+
+   std::shared_ptr<BoundFunctionExpression> function;
+   std::vector<std::shared_ptr<BoundExpression>> partitions;
+   std::optional<std::shared_ptr<BoundOrderByModifier>> order;
+
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 

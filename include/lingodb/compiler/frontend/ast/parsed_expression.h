@@ -150,6 +150,7 @@ enum class ExpressionType : uint8_t {
    WINDOW_LEAD = 132,
    WINDOW_LAG = 133,
    WINDOW_NTH_VALUE = 134,
+   WINDOW_INVALID = 135,
 
    // -----------------------------
    // Functions
@@ -475,21 +476,44 @@ enum class WindowBoundary : uint8_t {
 class WindowExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass TYPE = ExpressionClass::WINDOW;
-   WindowExpression(ExpressionType type, std::string catalogName, std::string schemaName, std::string functionName);
+   WindowExpression();
 
-   //TODO
+   //TODO add missing
 
-   std::string functionName;
+   std::shared_ptr<FunctionExpression> functionExpression;
 
-   std::vector<std::shared_ptr<ParsedExpression>> children;
 
+   /// Set of expressions to partition by
    std::vector<std::shared_ptr<ParsedExpression>> partitions;
+   /// Ordering clause
+    std::optional<std::shared_ptr<OrderByModifier>> order;
 
-   std::vector<std::shared_ptr<OrderByModifier>> orders;
+   /// Expression representing a filter, only used for aggregates
+   std::shared_ptr<ast::ParsedExpression> filter;
+
+   bool ignoreNulls = false;
+   bool distinct = false;
 
    /// The window boundaries
    WindowBoundary start = WindowBoundary::INVALID;
    WindowBoundary end = WindowBoundary::INVALID;
+
+   //TODO window exclude clause
+
+   std::shared_ptr<ParsedExpression> startExpr;
+   std::shared_ptr<ParsedExpression> endExpr;
+
+   ///Offset expression for WINDOW_LAG and WINDOW_LEAD functions
+   std::shared_ptr<ParsedExpression> offsetExpr;
+   ///Default expression for WINDOW_LAG and WINDOW_LEAD functions
+   std::shared_ptr<ParsedExpression> defaultExpr;
+
+   /// The set of argument ordering clauses
+   /// These are distinct from the frame ordering clauses e.g., the "x" in
+   /// FIRST_VALUE(a ORDER BY x) OVER (PARTITION BY p ORDER BY s)
+   std::shared_ptr<OrderByModifier> argOrders;
+
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 
 class BetweenExpression : public ParsedExpression {
