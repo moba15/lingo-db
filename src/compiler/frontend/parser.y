@@ -755,7 +755,7 @@ group_clause:
     GROUP_P BY set_quantifier group_by_list
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(@$);
-        node->group_expressions = $group_by_list;
+        node->groupByExpressions = $group_by_list;
         $$ = node;
         //TODO Support set_quantifier
     }
@@ -763,7 +763,7 @@ group_clause:
     | GROUP_P BY set_quantifier rollup_clause %prec ROLLUP_PRIORITY
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(@$);
-        node->group_expressions = $rollup_clause;
+        node->groupByExpressions = $rollup_clause;
         node->rollup = true;
         $$ = node;
     }
@@ -916,6 +916,9 @@ opt_nowait_or_skip:
 join_type: 
     FULL
     | FULL OUTER_P
+    {
+        $$ = lingodb::ast::JoinType::FULL;
+    }
     | LEFT OUTER_P 
     {
         $$ = lingodb::ast::JoinType::LEFT;

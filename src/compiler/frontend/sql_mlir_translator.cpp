@@ -1067,7 +1067,31 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                join.getPredicate().push_back(pred);
                return join;
             }
-            case ast::JoinType::OUTER: {
+            case ast::JoinType::FULL: {
+               mlir::Block* pred;
+               if (!std::holds_alternative<std::shared_ptr<ast::BoundExpression>>(boundJoin->condition)) {
+                  error("Not implemented", tableRef->loc);
+               }
+
+               pred = translatePredicate(builder, std::get<std::shared_ptr<ast::BoundExpression>>(boundJoin->condition), context);
+
+               std::vector<mlir::Attribute> outerJoinMapping{};
+               static size_t i = 0;
+               std::ranges::transform(boundJoin->outerJoinMapping, std::back_inserter(outerJoinMapping), [&](std::pair<std::string, std::shared_ptr<ast::NamedResult>> scopeAndNamedResult) {
+                  i++;
+                  //TODO DEBUG std::cout << "Add to mapping: " << scopeAndNamedResult.second->scope << "," << scopeAndNamedResult.second->name << "from existing: " << scopeAndNamedResult.first << "," << scopeAndNamedResult.second->name << std::endl;
+
+                  auto attrDef = scopeAndNamedResult.second->createDef(builder, attrManager, builder.getArrayAttr({attrManager.createRef(scopeAndNamedResult.first, scopeAndNamedResult.second->name)}));
+
+                  return attrDef;
+               });
+
+               mlir::ArrayAttr mapping = builder.getArrayAttr(outerJoinMapping);
+
+               auto join = builder.create<relalg::FullOuterJoinOp>(builder.getUnknownLoc(), tuples::TupleStreamType::get(builder.getContext()), left, right, mapping);
+               join.getPredicate().push_back(pred);
+               return join;
+
             }
             default: error("Not implemented", tableRef->loc);
          }
