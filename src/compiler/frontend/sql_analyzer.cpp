@@ -166,8 +166,6 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                int i = 0;
                //Canonicalize target expressions
                std::ranges::transform(selectNode->targets, selectNode->targets.begin(), [&](std::shared_ptr<ast::ParsedExpression>& target) {
-                  auto it = context->currentScope->groupedByExpressions.find(target);
-
                   return canonicalizeParsedExpression(target, context, true, context->currentScope->extendNodeAfterAggregations);
                });
                //Canonicalize distinct expressions list
@@ -176,12 +174,12 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                      return canonicalizeParsedExpression(target, context, true, context->currentScope->extendNodeAfterAggregations);
                   });
                }
-               return pipeOp;
+              break;
             }
             case ast::PipeOperatorType::WHERE: {
                assert(pipeOp->node->nodeType == ast::NodeType::EXPRESSION);
                pipeOp->node = canonicalizeParsedExpression(std::static_pointer_cast<ast::ParsedExpression>(pipeOp->node), context, false);
-               return pipeOp;
+               break;
             }
             case ast::PipeOperatorType::AGGREGATE: {
                auto aggNode = std::dynamic_pointer_cast<ast::AggregationNode>(pipeOp->node);
@@ -207,7 +205,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   aggNode->groupByNode->groupByExpressions = std::move(newGroupByExpressions);
                }
 
-               return pipeOp;
+               break;
             }
 
             case ast::PipeOperatorType::RESULT_MODIFIER: {
@@ -222,7 +220,6 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
 
             default: return pipeOp;
          }
-
          return pipeOp;
       }
       case ast::NodeType::TABLE_REF: {
@@ -925,6 +922,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             std::ranges::transform(aggregationNode->groupByNode->groupByExpressions, std::back_inserter(groupNamedResults), [&](auto expr) {
                auto boundExpression = analyzeExpression(expr, context, resolverScope);
                assert(boundExpression->namedResult.has_value());
+               for (auto& n : context->definedAttributes.top()) {
+                  n.second->available = false;
+               }
                context->mapAttribute(resolverScope, boundExpression->namedResult.value()->name, boundExpression->namedResult.value());
                switch (boundExpression->exprClass) {
                   case ast::ExpressionClass::BOUND_FUNCTION: {
@@ -940,6 +940,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   }
                   default:;
                }
+
 
                return boundExpression->namedResult.value();
             });

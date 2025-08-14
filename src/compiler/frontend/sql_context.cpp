@@ -82,6 +82,11 @@ std::shared_ptr<ast::NamedResult> SQLContext::getNamedResultInfo(location loc, s
       throw std::runtime_error(ss.str());
    }
    const auto res = resolver.lookup(name);
+   if (!res->available) {
+      std::stringstream ss;
+      ss << "could not resolve '" << name << "': Not available after aggregation " << loc;
+      throw std::runtime_error(ss.str());
+   }
    return res;
 }
 

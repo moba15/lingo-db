@@ -154,7 +154,7 @@ boolean [fF][aA][lL][sS][eE]
 ">="            { MAKE_KEYWORD(GREATER_EQUAL); }
 ">"             { MAKE_KEYWORD(GREATER); }
 "|>"            { return lingodb::parser::make_PIPE(loc); }
-"::"            { return lingodb::parser::make_TYPECAST(loc); }
+"::"            { MAKE_KEYWORD(TYPECAST); }
 {newline}              { loc.lines();}
 
 [aA][lL][lL]                          { MAKE_KEYWORD(ALL); }

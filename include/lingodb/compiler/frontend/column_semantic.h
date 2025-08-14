@@ -17,6 +17,7 @@ struct NamedResult {
    std::string scope;
    catalog::NullableType resultType;
    std::string name;
+   bool available = true;
    //TODO find better name
    std::string displayName{};
    NamedResult(NamedResultType type, std::string scope, catalog::NullableType resultType, std::string name) : type(type), scope(scope), resultType(resultType), name(name) {}
