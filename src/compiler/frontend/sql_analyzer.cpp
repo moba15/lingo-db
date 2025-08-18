@@ -31,7 +31,7 @@ bool StackGuard::check() {
    }
    size_t size = reinterpret_cast<size_t>(startFameAddress) - reinterpret_cast<size_t>(currentFrameAddress);
 
-   if (size > 950000) {
+   if (size > 90000) {
 
       return true;
    }
@@ -686,6 +686,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
          switch (queryNode->type) {
             case ast::QueryNodeType::CTE_NODE: {
                auto cteNode = std::static_pointer_cast<ast::CTENode>(queryNode);
+               auto boundCteNode = drv.nf.node<ast::BoundCTENode>(cteNode->loc);
+               boundCteNode->alias = cteNode->alias;
 
                if (cteNode->query) {
                   ast::TargetInfo targetInfo{};
@@ -694,11 +696,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
                      auto defineScope = context->createDefineScope();
                      context->pushNewScope();
                      auto subQueryScope = context->currentScope;
-                     cteNode->query = analyzeTableProducer(cteNode->query, context, subQueryResolverScope);
+                     boundCteNode->query = analyzeTableProducer(cteNode->query, context, subQueryResolverScope);
                      targetInfo = context->currentScope->targetInfo;
                      context->popCurrentScope();
 
-                     cteNode->subQueryScope = *subQueryScope;
+                     boundCteNode->subQueryScope = *subQueryScope;
                      std::vector<std::pair<std::shared_ptr<ast::NamedResult>, std::shared_ptr<ast::NamedResult>>> renamedResults;
                      size_t i = 0;
                      for (auto targetColumns : targetInfo.targetColumns) {
@@ -712,16 +714,16 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
                         renamedResults.emplace_back(std::pair{from, to});
                         i++;
                      }
-                     cteNode->renamedResults = std::move(renamedResults);
+                     boundCteNode->renamedResults = std::move(renamedResults);
 
 
-                     context->ctes.insert({cteNode->alias, {targetInfo, cteNode}});
+                     context->ctes.insert({cteNode->alias, {targetInfo, boundCteNode}});
                   }
                }
                if (cteNode->child) {
-                  cteNode->child = analyzeTableProducer(cteNode->child, context, resolverScope);
+                  boundCteNode->child = analyzeTableProducer(cteNode->child, context, resolverScope);
                }
-               return cteNode;
+               return boundCteNode;
             }
             case ast::QueryNodeType::SET_OPERATION_NODE: {
                auto setOperationNode = std::static_pointer_cast<ast::SetOperationNode>(rootNode);
@@ -2473,7 +2475,7 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
       error("Column not found", columnRef->loc);
    }
    found->displayName = columnRef->alias.empty() ? found->displayName : columnRef->alias;
-   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->scope, found->resultType, found, columnRef->alias);
+   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, columnRef->alias);
 }
 
 /*
