@@ -96,9 +96,9 @@ class MLIRFrontend : public lingodb::execution::Frontend {
          error.emit() << "Error can't load module\n";
       }
    }
-   mlir::ModuleOp* getModule() override {
+   std::vector<mlir::ModuleOp*> getModules() override {
       assert(module);
-      return module.operator->();
+      return std::vector{module.operator->()};
    }
 };
 class SQLFrontend : public lingodb::execution::Frontend {
@@ -128,7 +128,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
       funcOp.getBody().push_back(queryBlock);
       module = moduleOp;
       parallismAllowed = translator.isParallelismAllowed();
-      timing.emplace("frontEnd", translator.getTiming());
+      //timing.emplace("frontEnd", translator.getTiming());
    }
    void loadFromFile(std::string fileName) override {
       std::ifstream istream{fileName};
@@ -140,9 +140,9 @@ class SQLFrontend : public lingodb::execution::Frontend {
       std::string sqlQuery = buffer.str();
       loadFromString(sqlQuery);
    }
-   mlir::ModuleOp* getModule() override {
+   std::vector<mlir::ModuleOp*> getModules() override {
       assert(module);
-      return module.operator->();
+      return std::vector{module.operator->()};
    }
    bool isParallelismAllowed() override {
       return parallismAllowed;
@@ -152,49 +152,53 @@ class SQLFrontend : public lingodb::execution::Frontend {
 
 
 class NewSQLFrontend : public lingodb::execution::Frontend {
-   mlir::MLIRContext context;
-   mlir::OwningOpRef<mlir::ModuleOp> module;
+   std::vector<mlir::MLIRContext> contexts;
+   std::vector<mlir::OwningOpRef<mlir::ModuleOp>> modules;
    bool parallismAllowed;
    void loadFromString(std::string sql) override {
 
       sql = ":" + sql;
-      lingodb::execution::initializeContext(context);
+
       driver drv;
 
       if (!drv.parse(sql)) {
          auto results = drv.result;
 
-         if (results.empty() || results.size() > 1) {
+         if (results.empty() || results.size() < 1) {
             error.emit() << "Error during parsing";
          }
-         auto cShared = std::make_shared<lingodb::catalog::Catalog>(*catalog);
-         lingodb::analyzer::SQLQueryAnalyzer sqlAnalyzer{cShared};
-         auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
-         sqlContext->catalog = cShared;
-         lingodb::analyzer::SQLQueryAnalyzer analyzer{cShared};
-         drv.result[0] = analyzer.canonicalizeAndAnalyze(drv.result[0], sqlContext);
-
-         mlir::OpBuilder builder(&context);
-
-         mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-         lingodb::translator::SQLMlirTranslator translator{moduleOp, cShared};
-         builder.setInsertionPointToStart(moduleOp.getBody());
-         auto* queryBlock = new mlir::Block;
-         std::vector<mlir::Type> returnTypes;
-         {
-            mlir::OpBuilder::InsertionGuard guard(builder);
-            builder.setInsertionPointToStart(queryBlock);
-            auto val = translator.translateStart(builder, drv.result[0], sqlContext);
-            if (val.has_value()) {
-               builder.create<lingodb::compiler::dialect::subop::SetResultOp>(builder.getUnknownLoc(), 0, val.value());
+         contexts = std::vector<mlir::MLIRContext>(drv.result.size());
+         for (size_t i = 0; i<drv.result.size(); i++) {
+            lingodb::execution::initializeContext(contexts[i]);
+            lingodb::analyzer::SQLQueryAnalyzer sqlAnalyzer{catalog};
+            auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
+            sqlContext->catalog = catalog;
+            lingodb::analyzer::SQLQueryAnalyzer analyzer{catalog};
+            drv.result[i] = analyzer.canonicalizeAndAnalyze(drv.result[i], sqlContext);
+            mlir::OpBuilder builder(&contexts[i]);
+            mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
+            lingodb::translator::SQLMlirTranslator translator{moduleOp, catalog};
+            builder.setInsertionPointToStart(moduleOp.getBody());
+            auto* queryBlock = new mlir::Block;
+            std::vector<mlir::Type> returnTypes;
+            {
+               mlir::OpBuilder::InsertionGuard guard(builder);
+               builder.setInsertionPointToStart(queryBlock);
+               auto val = translator.translateStart(builder, drv.result[i], sqlContext);
+               if (val.has_value()) {
+                  builder.create<lingodb::compiler::dialect::subop::SetResultOp>(builder.getUnknownLoc(), 0, val.value());
+               }
+               builder.create<mlir::func::ReturnOp>(builder.getUnknownLoc());
             }
-            builder.create<mlir::func::ReturnOp>(builder.getUnknownLoc());
+            mlir::func::FuncOp funcOp = builder.create<mlir::func::FuncOp>(builder.getUnknownLoc(), "main", builder.getFunctionType({}, {}));
+            funcOp.getBody().push_back(queryBlock);
+
+            modules.push_back(moduleOp);
+            parallismAllowed = false;
+         //   timing.emplace("frontEnd", sqlAnalyzer.getTiming() + translator.getTiming());
+
+
          }
-         mlir::func::FuncOp funcOp = builder.create<mlir::func::FuncOp>(builder.getUnknownLoc(), "main", builder.getFunctionType({}, {}));
-         funcOp.getBody().push_back(queryBlock);
-         module = moduleOp;
-         parallismAllowed = false;
-         timing.emplace("frontEnd", sqlAnalyzer.getTiming() + translator.getTiming());
 
       } else {
          error.emit() << "Error during parsing";
@@ -212,9 +216,11 @@ class NewSQLFrontend : public lingodb::execution::Frontend {
       std::string sqlQuery = buffer.str();
       loadFromString(sqlQuery);
    }
-   mlir::ModuleOp* getModule() override {
-      assert(module);
-      return module.operator->();
+   std::vector<mlir::ModuleOp*> getModules() override {
+      assert(!modules.empty());
+      std::vector<mlir::ModuleOp*> modulePointers{};
+      std::ranges::transform(modules, std::back_inserter(modulePointers), [](auto& module) { return module.operator->(); });
+      return modulePointers;
    }
    bool isParallelismAllowed() override {
       return parallismAllowed;

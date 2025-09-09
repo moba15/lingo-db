@@ -2,6 +2,8 @@
 #define LINGODB_EXECUTION_FRONTEND_H
 #include "Error.h"
 #include "lingodb/catalog/Catalog.h"
+
+#include <vector>
 namespace mlir {
 class ModuleOp;
 class MLIRContext;
@@ -28,7 +30,7 @@ class Frontend {
    virtual void loadFromFile(std::string fileName) = 0;
    virtual void loadFromString(std::string data) = 0;
    virtual bool isParallelismAllowed() { return true; }
-   virtual mlir::ModuleOp* getModule() = 0;
+   virtual std::vector<mlir::ModuleOp*> getModules() = 0;
    virtual ~Frontend() {}
 };
 std::unique_ptr<Frontend> createMLIRFrontend();

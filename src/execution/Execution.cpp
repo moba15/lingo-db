@@ -274,59 +274,64 @@ class DefaultQueryExecuter : public QueryExecuter {
       auto serializationState = std::make_shared<SnapshotState>();
       serializationState->serialize = true;
 
-      handleError("FRONTEND", frontend.getError());
-      mlir::ModuleOp& moduleOp = *queryExecutionConfig->frontend->getModule();
-      snapshotImportantStep("canonical", moduleOp, serializationState);
-      if (queryExecutionConfig->queryOptimizer) {
-         auto& queryOptimizer = *queryExecutionConfig->queryOptimizer;
-         queryOptimizer.setCatalog(catalog);
-         queryOptimizer.setSerializationState(serializationState);
-         queryOptimizer.optimize(moduleOp);
-         handleError("OPTIMIZER", queryOptimizer.getError());
-         handleTiming(queryOptimizer.getTiming());
-         if (queryExecutionConfig->trackTupleCount) {
-            mlir::PassManager pm(moduleOp.getContext());
-            pm.addPass(relalg::createTrackTuplesPass());
-            if (pm.run(moduleOp).failed()) {
-               Error e;
-               e.emit() << "createTrackTuplesPass failed";
-               handleError("TUPLE_TRACKING", e);
+
+      for (auto *moduleOpPointer : queryExecutionConfig->frontend->getModules()) {
+         handleError("FRONTEND", frontend.getError());
+         auto& moduleOp = *moduleOpPointer;
+         snapshotImportantStep("canonical", moduleOp, serializationState);
+         if (queryExecutionConfig->queryOptimizer) {
+            auto& queryOptimizer = *queryExecutionConfig->queryOptimizer;
+            queryOptimizer.setCatalog(catalog);
+            queryOptimizer.setSerializationState(serializationState);
+            queryOptimizer.optimize(moduleOp);
+            handleError("OPTIMIZER", queryOptimizer.getError());
+            handleTiming(queryOptimizer.getTiming());
+            if (queryExecutionConfig->trackTupleCount) {
+               mlir::PassManager pm(moduleOp.getContext());
+               pm.addPass(relalg::createTrackTuplesPass());
+               if (pm.run(moduleOp).failed()) {
+                  Error e;
+                  e.emit() << "createTrackTuplesPass failed";
+                  handleError("TUPLE_TRACKING", e);
+               }
+            }
+            snapshotImportantStep("qopt", moduleOp, serializationState);
+         }
+
+         bool parallelismEnabled = false;
+         if (!frontend.isParallelismAllowed() || !parallelismEnabled) {
+            moduleOp->setAttr("subop.sequential", mlir::UnitAttr::get(moduleOp->getContext()));
+            //numThreads = 1;
+         }
+         for (auto& loweringStepPtr : queryExecutionConfig->loweringSteps) {
+            auto& loweringStep = *loweringStepPtr;
+            loweringStep.setCatalog(catalog);
+            loweringStep.setSerializationState(serializationState);
+            loweringStep.implement(moduleOp);
+            snapshotImportantStep(loweringStep.getShortName(), moduleOp, serializationState);
+            handleError("LOWERING", loweringStep.getError());
+            handleTiming(loweringStep.getTiming());
+         }
+         if (queryExecutionConfig->executionBackend) {
+            auto& executionBackend = *queryExecutionConfig->executionBackend;
+            executionBackend.setSerializationState(serializationState);
+            executionBackend.execute(moduleOp, executionContext.get());
+#ifdef TRACER
+            utility::Tracer::dump();
+#endif
+            handleError("BACKEND", executionBackend.getError());
+            handleTiming(executionBackend.getTiming());
+            if (queryExecutionConfig->resultProcessor) {
+               auto& resultProcessor = *queryExecutionConfig->resultProcessor;
+               resultProcessor.process(executionContext.get());
             }
          }
-         snapshotImportantStep("qopt", moduleOp, serializationState);
+         if (queryExecutionConfig->timingProcessor) {
+            queryExecutionConfig->timingProcessor->process();
+         }
+
       }
 
-      bool parallelismEnabled = scheduler::getNumWorkers() != 1 && queryExecutionConfig->parallel;
-      if (!frontend.isParallelismAllowed() || !parallelismEnabled) {
-         moduleOp->setAttr("subop.sequential", mlir::UnitAttr::get(moduleOp->getContext()));
-         //numThreads = 1;
-      }
-      for (auto& loweringStepPtr : queryExecutionConfig->loweringSteps) {
-         auto& loweringStep = *loweringStepPtr;
-         loweringStep.setCatalog(catalog);
-         loweringStep.setSerializationState(serializationState);
-         loweringStep.implement(moduleOp);
-         snapshotImportantStep(loweringStep.getShortName(), moduleOp, serializationState);
-         handleError("LOWERING", loweringStep.getError());
-         handleTiming(loweringStep.getTiming());
-      }
-      if (queryExecutionConfig->executionBackend) {
-         auto& executionBackend = *queryExecutionConfig->executionBackend;
-         executionBackend.setSerializationState(serializationState);
-         executionBackend.execute(moduleOp, executionContext.get());
-#ifdef TRACER
-         utility::Tracer::dump();
-#endif
-         handleError("BACKEND", executionBackend.getError());
-         handleTiming(executionBackend.getTiming());
-         if (queryExecutionConfig->resultProcessor) {
-            auto& resultProcessor = *queryExecutionConfig->resultProcessor;
-            resultProcessor.process(executionContext.get());
-         }
-      }
-      if (queryExecutionConfig->timingProcessor) {
-         queryExecutionConfig->timingProcessor->process();
-      }
    }
 };
 std::unique_ptr<QueryExecutionConfig> createQueryExecutionConfig(execution::ExecutionMode runMode, bool sqlInput) {
