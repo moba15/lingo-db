@@ -47,13 +47,13 @@ void printMLIR(std::string sql, std::shared_ptr<lingodb::catalog::Catalog> catal
       lingodb::translator::SQLMlirTranslator translator{moduleOp, catalog.get()};
       auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
       sqlContext->catalog = catalog.get();
-      if (!drv.parse(":" + sql)) {
+      if (!drv.parse(sql)) {
          auto results = drv.result;
          if (results.size() > 1) {
             throw std::runtime_error("Only one statement allowed");
          }
          drv.result[0] = analyzer.canonicalizeAndAnalyze(drv.result[0], sqlContext);
-         auto val = translator.translateStart(builder, drv.result[0], sqlContext);
+
       } else {
          throw std::runtime_error("Something went wrong");
       }
@@ -86,31 +86,6 @@ int main(int argc, char** argv) {
       std::string dbDir = std::string(argv[2]);
       catalog = lingodb::catalog::Catalog::create(dbDir, false);
    }
-   std::ifstream istream{filename};
-   std::stringstream buffer;
-   buffer << istream.rdbuf();
-   while (true) {
-      std::stringstream query;
-      std::string line;
-      std::getline(buffer, line);
-      while (true) {
-         if (!buffer.good()) {
-            if (buffer.eof()) {
-               query << line << std::endl;
-            }
-            break;
-         }
-         query << line << std::endl;
-         if (!line.empty() && line.find(';') == line.size() - 1) {
-            break;
-         }
-         std::getline(buffer, line);
-      }
-      printMLIR(query.str(), catalog);
-      if (buffer.eof()) {
-         //exit from repl loop
-         break;
-      }
-   }
+   printMLIR(filename, catalog);
    return 0;
 }
