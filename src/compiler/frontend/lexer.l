@@ -9,6 +9,10 @@
 # include <algorithm>
 #include <lingodb/compiler/frontend/sql-parser/gen/location.hh>
 
+// State for dollar-quoted strings
+static std::string literal_buffer;
+static std::string dolq_tag;
+
 %}
 
 %{
@@ -92,9 +96,9 @@
 %{
   // A number symbol corresponding to the value in S.
 
-  
-%}
 
+%}
+%x xdolq
 
 space				[ \t\f\v]+
 newline				[\n\r]
@@ -117,6 +121,14 @@ squote			\'
 dquote			\"
 strChars ([^'])
 str       {squote}({strChars}|{op_chars}|[ ])*{squote}
+
+
+
+dolq_start		[A-Za-z\200-\377_]
+dolq_cont		[A-Za-z\200-\377_0-9]
+dolqdelim		\$({dolq_start}{dolq_cont}*)?\$
+dolqfailed		\${dolq_start}{dolq_cont}*
+dolqinside		[^$]+
 
 operator		{op_chars}+
 
@@ -141,6 +153,7 @@ boolean [fF][aA][lL][sS][eE]
 "."             { return lingodb::parser::make_DOT(loc); }
 ","             { return lingodb::parser::make_COMMA(loc); }
 ";"             { return lingodb::parser::make_SEMICOLON(loc); }
+"#"             { return lingodb::parser::make_SEMICOLON(loc); }
 "+"             { MAKE_KEYWORD(PLUS); }
 "-"             { MAKE_KEYWORD(MINUS); }
 "/"             { MAKE_KEYWORD(SLASH); }
@@ -175,7 +188,7 @@ boolean [fF][aA][lL][sS][eE]
 [cC][rR][eE][aA][tT][eE]              { MAKE_KEYWORD(CREATE); }
 [cC][uU][rR][rR][eE][nN][tT]          { MAKE_KEYWORD(CURRENT_P); }
 [cC][oO][pP][yY]                      { MAKE_KEYWORD(COPY); }
-[cC][sS][vV]                          { MAKE_KEYWORD(CSV); }  
+[cC][sS][vV]                          { MAKE_KEYWORD(CSV); }
 
 [dD][aA][tT][eE]                      { MAKE_KEYWORD(DATE_P); }
 [dD][aA][yY]                          { MAKE_KEYWORD(DAY_P); }
@@ -198,6 +211,7 @@ boolean [fF][aA][lL][sS][eE]
 [fF][oO][rR]                          { MAKE_KEYWORD(FOR); }
 [fF][rR][oO][mM]                      { MAKE_KEYWORD(FROM); }
 [fF][uU][lL][lL]                      { MAKE_KEYWORD(FULL); }
+[fF][uU][nN][cC][tT][iI][oO][nN]      { MAKE_KEYWORD(FUNCTION); }
 
 [gG][rR][oO][uU][pP]                  { MAKE_KEYWORD(GROUP_P); }
 
@@ -217,6 +231,7 @@ boolean [fF][aA][lL][sS][eE]
 
 [kK][eE][yY]                          { MAKE_KEYWORD(KEY); }
 
+[lL][aA][nN][gG][uU][aA][gG][eE]      { MAKE_KEYWORD(LANGUAGE); }
 [lL][eE][fF][tT]                      { MAKE_KEYWORD(LEFT); }
 [lL][iI][kK][eE]                      { MAKE_KEYWORD(LIKE); }
 [lL][iI][mM][iI][tT]                  { MAKE_KEYWORD(LIMIT); }
@@ -240,6 +255,8 @@ boolean [fF][aA][lL][sS][eE]
 [pP][rR][eE][cC][eE][dD][iI][nN][gG]  { MAKE_KEYWORD(PRECEDING); }
 [pP][rR][iI][mM][aA][rR][yY]          { MAKE_KEYWORD(PRIMARY); }
 
+[rR][eE][tT][uU][rR][nN][sS]          { MAKE_KEYWORD(RETURNS); }
+[rR][eE][pP][lL][aA][cC][eE]          { MAKE_KEYWORD(REPLACE); }
 [rR][iI][gG][hH][tT]                  { MAKE_KEYWORD(RIGHT); }
 [rR][oO][lL][lL][uU][pP]              { MAKE_KEYWORD(ROLLUP); }
 [rR][oO][wW]                          { MAKE_KEYWORD(ROW); }
@@ -289,11 +306,11 @@ boolean [fF][aA][lL][sS][eE]
 
                     }
 {decinteger}	{
-				    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
-			    }
+		    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
+		    }
 {numeric}	{
-				    return lingodb::parser::make_FCONST(yytext, loc);
-			    }
+		    return lingodb::parser::make_FCONST(yytext, loc);
+		    }
 {str} {
   std::string ident(yytext);
   ident.erase(0,1);
@@ -323,6 +340,52 @@ boolean [fF][aA][lL][sS][eE]
 
   return lingodb::parser::make_Op(std::move(ident), loc);
 }
+
+
+<xdolq>{dolqinside} {
+    literal_buffer.append(yytext, yyleng);
+    // Handle newlines inside the string for correct location tracking
+    for (int i = 0; i < yyleng; ++i) {
+        if (yytext[i] == '\\n' || yytext[i] == '\\r') {
+            loc.lines();
+        }
+    }
+    loc.columns(yyleng);
+}
+
+<xdolq>"$" {
+    literal_buffer.append("$");
+    loc.columns(1);
+}
+
+<xdolq>{dolqdelim} {
+    if (dolq_tag == yytext) {
+        BEGIN(INITIAL);
+        loc.columns(yyleng);
+        return lingodb::parser::make_STRING_VALUE(std::move(literal_buffer), loc);
+    } else {
+        literal_buffer.append(yytext, yyleng);
+        loc.columns(yyleng);
+    }
+}
+
+<xdolq><<EOF>> {
+    return lingodb::parser::make_YYEOF(loc);
+}
+
+{dolqdelim} {
+    dolq_tag = std::string(yytext);
+    literal_buffer.clear();
+    BEGIN(xdolq);
+    loc.step();
+}
+
+{dolqfailed} {
+    yyless(1);
+    loc.step();
+    return lingodb::parser::make_Op("$", loc);
+}
+
 %%
 
 
