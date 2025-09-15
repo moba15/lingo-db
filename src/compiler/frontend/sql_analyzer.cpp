@@ -1,5 +1,6 @@
 #include "lingodb/compiler/frontend/sql_analyzer.h"
 
+#include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_create_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
@@ -11,6 +12,8 @@
 #include <boost/context/fiber_fcontext.hpp>
 #include <cctype>
 #include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <ranges>
 #include <sys/resource.h>
 namespace lingodb::analyzer {
@@ -979,8 +982,91 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
          createTableInfo->tableElements = std::move(boundTableElements);
          return createNode;
       }
+      case ast::CatalogType::TABLE_FUNCTION_ENTRY: {
+         auto createFunctionInfo = std::static_pointer_cast<ast::CreateFunctionInfo>(createNode->createInfo);
+         analyzeFunctionCreate(createNode, createFunctionInfo, context, resolverScope);
+         return createNode;
+      }
       default: error("Not implemented", createNode->loc);
    }
+}
+
+std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<ast::CreateFunctionInfo> createFunctionInfo, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+   auto logicalTypeToCTypeString = [createNode](ast::LogicalTypeWithMods& type) -> std::string {
+      switch (type.logicalType) {
+         case ast::LogicalType::INT: {
+            return "int32_t";
+         }
+         case ast::LogicalType::CHAR: {
+            if (type.typeModifiers.empty()) {
+               return "char";
+            }
+            size_t l = std::reinterpret_pointer_cast<ast::UnsignedIntValue>(type.typeModifiers[0])->iVal;
+            if (l>1) {
+               return "char*";
+            } else {
+               return "char";
+            }
+            break;
+         }
+         case ast::LogicalType::STRING: {
+            return "char*";
+         }
+         case ast::LogicalType::FLOAT8: {
+            return "double";
+         }
+         case ast::LogicalType::FLOAT4: {
+            return "float";
+         }
+         case ast::LogicalType::BIGINT: {
+            return "int64_t";
+         }
+         case ast::LogicalType::BOOLEAN: {
+            return "bool";
+         }
+         case ast::LogicalType::SMALLINT: {
+            return "int16_t";
+         }
+         default: error("return type for c-udf not implemented", createNode->loc);
+      }
+   };
+   std::string language = "unknown";
+   std::string code = "";
+   for (auto [optionName, optionValue] : createFunctionInfo->options) {
+      if (optionName == "LANGUAGE") {
+         language = optionValue;
+      } else if (optionName == "AS") {
+         code = optionValue;
+      }
+   }
+
+   if (language != "c") {
+      error("Currently only c is allowed" , createNode->loc);
+   }
+   std::string returnTypeStringRepresentation = logicalTypeToCTypeString(createFunctionInfo->returnType);
+   catalog::NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType.logicalType, createFunctionInfo->returnType.typeModifiers);
+
+   std::string argumentsStringRepresentation = "(";
+   for (size_t i = 0; i<createFunctionInfo->argumentTypes.size(); i++) {
+      auto functionArgument = createFunctionInfo->argumentTypes[i];
+      argumentsStringRepresentation+=logicalTypeToCTypeString(functionArgument.type) + " " + functionArgument.name;
+      if (i+1<createFunctionInfo->argumentTypes.size()) {
+         argumentsStringRepresentation+=", ";
+      }
+   }
+   argumentsStringRepresentation+=")";
+
+   code = returnTypeStringRepresentation + " " + createFunctionInfo->functionName + argumentsStringRepresentation +  " { " + code + "}";
+   auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
+   boundCreateFunctionInfo->language = language;
+   boundCreateFunctionInfo->code = code;
+   for (auto& fArgument : createFunctionInfo->argumentTypes) {
+      boundCreateFunctionInfo->argumentTypes.push_back(SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalType, fArgument.type.typeModifiers).type);
+   }
+
+
+   createNode->createInfo = boundCreateFunctionInfo;
+   return createNode;
 }
 
 std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
@@ -2404,10 +2490,11 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(st
 
 std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
    std::vector<std::shared_ptr<ast::BoundExpression>> boundArguments{};
+   std::string upperCaseFName = function->functionName;
+   std::ranges::transform(upperCaseFName, upperCaseFName.begin(), ::toupper);
    if (function->type == ast::ExpressionType::AGGREGATE) {
       auto scope = context->getUniqueScope("tmp_attr");
       auto fName = function->alias.empty() ? function->functionName : function->alias;
-      std::ranges::transform(function->functionName, function->functionName.begin(), ::toupper);
       std::shared_ptr<ast::BoundFunctionExpression> boundFunctionExpression = nullptr;
       catalog::NullableType resultType{catalog::Type::noneType()};
 
@@ -2422,14 +2509,14 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       /**
                 * SUM, AVG, MIN, MAX
                 */
-      if (function->functionName == "SUM" || function->functionName == "AVG" || function->functionName == "MIN" || function->functionName == "MAX") {
+      if (upperCaseFName== "SUM" || upperCaseFName == "AVG" || upperCaseFName== "MIN" || upperCaseFName== "MAX") {
          if (function->arguments.size() > 1) {
             error("Aggregation with more than one argument not supported", function->loc);
          }
          if (!boundArguments[0]->resultType.has_value() && !function->star) {
             error("Argument of aggregation function is not a valid expression", boundArguments[0]->loc);
          }
-         if ((function->functionName == "SUM" || function->functionName == "AVG") && boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::INT &&
+         if ((upperCaseFName== "SUM" || upperCaseFName== "AVG") && boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::INT &&
              boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::FLOAT &&
              boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DECIMAL &&
              boundArguments[0]->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DOUBLE) {
@@ -2441,7 +2528,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
          /**
                     * AVG
                 */
-         if (function->functionName == "AVG") {
+         if (upperCaseFName== "AVG") {
             if (resultType.type.getTypeId() == catalog::LogicalTypeId::INT) {
                resultType = SQLTypeUtils::getCommonTypeAfterOperation(catalog::Type::decimal(19, 0), catalog::Type::decimal(19, 0), ast::ExpressionType::OPERATOR_DIVIDE);
             } else if (resultType.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
@@ -2454,7 +2541,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
          boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArguments);
       }
-      if (function->functionName == "RANK" || function->functionName == "ROW_NUMBER") {
+      if (upperCaseFName== "RANK" || upperCaseFName== "ROW_NUMBER") {
          if (!function->arguments.empty()) {
             error("RANK and ROW_NUMBER do not support any arguments", function->loc);
          }
@@ -2466,7 +2553,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       /*
                 * COUNT
                 */
-      if (function->functionName == "COUNT") {
+      if (upperCaseFName== "COUNT") {
          if (function->arguments.size() > 1) {
             error("Aggregation with more than one argument not supported", function->loc);
          }
@@ -2478,7 +2565,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
          }
          resultType = catalog::Type::int64();
          if (function->star) {
-            function->functionName = function->functionName + "*";
+            function->functionName= function->functionName + "*";
             resultType.useZeroInsteadOfNull = true;
          }
 
@@ -2488,7 +2575,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       /*
             * STDDEV_SAMP
             */
-      if (function->functionName == "STDDEV_SAMP") {
+      if (upperCaseFName== "STDDEV_SAMP") {
          if (boundArguments.size() != 1) {
             error("Aggregation with more than one argument not supported", function->loc);
          }
@@ -2512,13 +2599,12 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       return boundFunctionExpression;
    }
-   std::ranges::transform(function->functionName, function->functionName.begin(), ::toupper);
    auto scope = context->getUniqueScope("tmp_attr");
    auto fName = function->alias.empty() ? function->functionName : function->alias;
    std::shared_ptr<ast::BoundFunctionExpression> boundFunctionExpression = nullptr;
    catalog::NullableType resultType{catalog::Type::noneType()};
 
-   if (function->functionName == "DATE") {
+   if (upperCaseFName== "DATE") {
       if (function->arguments.size() != 1) {
          error("Function date needs exactly one argument", function->loc);
       }
@@ -2529,7 +2615,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       resultType = catalog::Type(catalog::LogicalTypeId::DATE, std::make_shared<catalog::DateTypeInfo>(catalog::DateTypeInfo::DateUnit::DAY));
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg});
 
-   } else if (function->functionName == "COUNT") {
+   } else if (upperCaseFName== "COUNT") {
       if (function->arguments.size() != 1 && !function->star) {
          error("Function count needs exactly one argument", function->loc);
       }
@@ -2546,7 +2632,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, "", function->alias, function->distinct, std::vector{arg});
 
-   } else if (function->functionName == "EXTRACT") {
+   } else if (upperCaseFName== "EXTRACT") {
       if (function->arguments.size() != 2) {
          error("Function extract needs exactly two arguments", function->loc);
       }
@@ -2559,7 +2645,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1, arg2});
 
-   } else if (function->functionName == "DATE_TRUNC") {
+   } else if (upperCaseFName== "DATE_TRUNC") {
       if (function->arguments.size() != 2) {
          error("Function DATE_TRUNC needs exactly two arguments", function->loc);
       }
@@ -2576,7 +2662,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1, arg2});
 
-   } else if (function->functionName == "SUBSTRING" || function->functionName == "SUBSTR") {
+   } else if (upperCaseFName== "SUBSTRING" || upperCaseFName== "SUBSTR") {
       if (function->arguments.size() < 1 && function->arguments.size() >= 4) {
          error("Function extract needs one,two or three arguments", function->loc);
       }
@@ -2605,7 +2691,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       }
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
 
-   } else if (function->functionName == "ROUND") {
+   } else if (upperCaseFName== "ROUND") {
       if (function->arguments.size() != 2) {
          error("Function extract needs two arguments", function->loc);
       }
@@ -2626,7 +2712,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       auto boundArgs = std::vector{numberArg, decimalsArg};
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
-   } else if (function->functionName == "UPPER") {
+   } else if (upperCaseFName== "UPPER") {
       if (function->arguments.size() != 1) {
          error("Function with more than one argument not supported", function->loc);
       }
@@ -2638,7 +2724,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       resultType = arg1->resultType.value();
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1});
-   } else if (function->functionName == "ABS") {
+   } else if (upperCaseFName== "ABS") {
       if (function->arguments.size() != 1) {
          error("Function with more than one argument not supported", function->loc);
       }
@@ -2650,7 +2736,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg1});
 
-   } else if (function->functionName == "COALESCE") {
+   } else if (upperCaseFName== "COALESCE") {
       if (function->arguments.size() < 2) {
          error("Function with less than two argument not supported", function->loc);
       }
@@ -2668,7 +2754,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
 
-   } else if (function->functionName == "GROUPING") {
+   } else if (upperCaseFName== "GROUPING") {
       if (function->arguments.size() != 1) {
          error("Function grouping needs exactly one argument", function->loc);
       }
@@ -2683,7 +2769,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       resultType = catalog::Type::int64();
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg});
 
-   } else if (function->functionName == "LENGTH") {
+   } else if (upperCaseFName== "LENGTH") {
       if (function->arguments.size() != 1) {
          error("Function LENGTH needs exactly one argument", function->loc);
       }
@@ -2696,7 +2782,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       }
       resultType = catalog::Type::int64();
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{arg});
-   } else if (function->functionName == "REGEXP_REPLACE") {
+   } else if (upperCaseFName== "REGEXP_REPLACE") {
       if (function->arguments.size() != 3) {
          error("Function REGEXP_REPLACE needs exactly 3 arguments", function->loc);
       }
@@ -2715,13 +2801,35 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       }
       resultType = text->resultType.value();
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, std::vector{text, pattern, replace});
-   } else if (function->functionName == "HASH") {
+   } else if (upperCaseFName== "HASH") {
       std::vector<std::shared_ptr<ast::BoundExpression>> boundArgs{};
       std::ranges::transform(function->arguments, std::back_inserter(boundArgs), [&](auto c) {
          return analyzeExpression(c, context, resolverScope);
       });
       resultType = catalog::Type::index();
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
+
+   } else {
+      //UDF
+      auto entry = catalog->getTypedEntry<lingodb::catalog::FunctionCatalogEntry>(function->functionName);
+      if (entry.has_value()) {
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundArgs{};
+         if (function->arguments.size() != entry.value()->getArgumentTypes().size()) {
+            error("Function " << function->functionName << " needs " << entry.value()->getArgumentTypes().size() << " arguments but got " << function->arguments.size(), function->loc);
+         }
+         for (size_t i = 0; i<function->arguments.size(); i++) {
+            auto bound = analyzeExpression(function->arguments.at(i), context, resolverScope);
+            auto nullableUDFArgumentType = catalog::NullableType(entry.value()->getArgumentTypes()[i]);
+            if (!bound->resultType.has_value() || bound->resultType.value() !=  nullableUDFArgumentType) {
+               error("Argument " << i << " has wrong type for function " << function->functionName, bound->loc);
+            }
+            boundArgs.emplace_back(bound);
+
+         }
+         resultType = entry.value()->getReturnType();
+         boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
+      }
+
 
    }
 
