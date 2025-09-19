@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_RESULT_MODIFIER_H
-#define LINGODB_COMPILER_FRONTEND_AST_RESULT_MODIFIER_H
-
-
+#pragma once
 #include "lingodb/compiler/frontend/ast/parsed_expression.h"
 #include "table_producer.h"
 #include <memory>
@@ -83,4 +80,3 @@ class OffsetModifier : public ResultModifier {
 };
 
 } // namespace lingodb::ast
-#endif

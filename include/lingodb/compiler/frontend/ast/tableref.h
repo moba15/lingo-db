@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_TABLEREF_H
-#define LINGODB_COMPILER_FRONTEND_AST_TABLEREF_H
-
-
+#pragma once
 #include "ast_node.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "table_producer.h"
@@ -52,7 +49,7 @@ class TableDescription {
 };
 class BaseTableRef : public TableRef {
    public:
-   static constexpr TableReferenceType kType = TableReferenceType::BASE_TABLE;
+   static constexpr TableReferenceType TYPE = TableReferenceType::BASE_TABLE;
    BaseTableRef(TableDescription tableDescription);
 
    //! The catalog name.
@@ -100,7 +97,7 @@ enum class JoinType : uint8_t {
 };
 using jointCondOrUsingCols = std::variant<std::shared_ptr<ParsedExpression>, std::vector<std::shared_ptr<ColumnRefExpression>>>;
 class JoinRef : public TableRef {
-   static constexpr TableReferenceType kType = TableReferenceType::JOIN;
+   static constexpr TableReferenceType TYPE = TableReferenceType::JOIN;
 
    public:
    JoinRef(JoinType type, JoinCondType refType);
@@ -124,7 +121,7 @@ class JoinRef : public TableRef {
 };
 
 class CrossProductRef : public TableRef {
-   static constexpr TableReferenceType kType = TableReferenceType::CROSS_PRODUCT;
+   static constexpr TableReferenceType TYPE = TableReferenceType::CROSS_PRODUCT;
    public:
    CrossProductRef();
    std::vector<std::shared_ptr<TableProducer>> tables;
@@ -133,7 +130,7 @@ class CrossProductRef : public TableRef {
 };
 
 class SubqueryRef : public TableRef {
-   static constexpr TableReferenceType kType = TableReferenceType::SUBQUERY;
+   static constexpr TableReferenceType TYPE = TableReferenceType::SUBQUERY;
 
    public:
    SubqueryRef(std::shared_ptr<TableProducer> subSelectNode);
@@ -151,7 +148,7 @@ class SubqueryRef : public TableRef {
  */
 class ExpressionListRef : public TableRef {
    public:
-   static constexpr TableReferenceType kType = TableReferenceType::EXPRESSION_LIST;
+   static constexpr TableReferenceType TYPE = TableReferenceType::EXPRESSION_LIST;
    ExpressionListRef(std::vector<std::vector<std::shared_ptr<ParsedExpression>>> values);
 
    //! The expressions in the list
@@ -161,4 +158,3 @@ class ExpressionListRef : public TableRef {
 };
 
 } // namespace lingodb::ast
-#endif

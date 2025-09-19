@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
-#define LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
-
-
+#pragma once
 #include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
 #include <cstdint>
 #include <unordered_map>
@@ -64,5 +61,3 @@ class AstNode {
    virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
 };
 } // namespace lingodb::ast
-
-#endif

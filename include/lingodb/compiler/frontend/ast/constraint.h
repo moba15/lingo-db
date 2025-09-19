@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_CONSTRAINT_H
-#define LINGODB_COMPILER_FRONTEND_AST_CONSTRAINT_H
-
-
+#pragma once
 #include <cstdint>
 #include <lingodb/compiler/frontend/sql-parser/gen/location.hh>
 #include <vector>
@@ -35,5 +32,4 @@ class UniqueConstraint : public Constraint {
    std::vector<std::string> columnNames;
 };
 
-} // namespace lingodb::ast
-#endif
+}

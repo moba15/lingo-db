@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_CONSTANT_VALUE_H
-#define LINGODB_COMPILER_FRONTEND_AST_CONSTANT_VALUE_H
-
-
+#pragma once
 #include <cstdint>
 #include <stdexcept>
 #include <string>
@@ -105,4 +102,3 @@ class IntervalValue : public Value {
 };
 
 } // namespace lingodb::ast
-#endif

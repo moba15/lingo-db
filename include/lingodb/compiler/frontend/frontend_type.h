@@ -1,10 +1,8 @@
-#ifndef LINGODB_COMPILER_FRONTEND_FRONTEND_TYPE_H
-#define LINGODB_COMPILER_FRONTEND_FRONTEND_TYPE_H
-
+#pragma once
 #include "lingodb/catalog/TableCatalogEntry.h"
 
-#include "lingodb/catalog/MLIRTypes.h"
 #include <mlir/IR/MLIRContext.h>
+#include "lingodb/catalog/MLIRTypes.h"
 namespace lingodb {
 class NullableType {
    public:
@@ -22,5 +20,4 @@ class NullableType {
    bool operator==(NullableType&);
    bool operator!=(NullableType&);
 };
-} // namespace lingodb
-#endif
+}

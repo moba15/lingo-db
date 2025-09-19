@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_CREATE_NODE_H
-#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_CREATE_NODE_H
-
-
+#pragma once
 
 #include "lingodb/compiler/frontend/ast/create_node.h"
 
@@ -19,5 +16,4 @@ class BoundColumnElement : public TableElement {
    bool primary;
 };
 
-} // namespace lingodb::ast
-#endif
+}

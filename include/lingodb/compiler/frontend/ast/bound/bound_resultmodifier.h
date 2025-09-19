@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
-#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
-
-
+#pragma once
 #include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
@@ -60,5 +57,4 @@ class BoundLimitModifier : public BoundResultModifier {
 
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
-} // namespace lingodb::ast
-#endif
+}

@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_INSERT_NODE_H
-#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_INSERT_NODE_H
-
-
+#pragma once
 
 #include "lingodb/catalog/Column.h"
 #include "lingodb/compiler/frontend/ast/ast_node.h"
@@ -28,4 +25,3 @@ class BoundInsertNode : public AstNode {
 };
 
 } // namespace lingodb::ast
-#endif

@@ -1,7 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_PIPE_OPERATOR_H
-#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_PIPE_OPERATOR_H
-
-
+#pragma once
 
 #include "lingodb/compiler/frontend/ast/pipe_operator.h"
 #include "lingodb/compiler/frontend/column_semantic.h"
@@ -25,4 +22,3 @@ class BoundSetPipeOperator : public PipeOperator {
    std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 } // namespace lingodb::ast
-#endif

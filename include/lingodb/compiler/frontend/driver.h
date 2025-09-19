@@ -1,5 +1,4 @@
-#ifndef LINGODB_COMPILER_FRONTEND_DRIVER_H
-#define LINGODB_COMPILER_FRONTEND_DRIVER_H
+#pragma once
 
 #include "lingodb/compiler/frontend/node_factory.h"
 #include "lingodb/compiler/frontend/sql-parser/gen/parser.hpp"
@@ -23,4 +22,3 @@ class driver {
    bool trace_parsing;
    lingodb::ast::NodeFactory nf;
 };
-#endif
