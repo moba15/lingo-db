@@ -29,7 +29,7 @@
 namespace lingodb::translator {
 using namespace lingodb::compiler::dialect;
 SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, catalog::Catalog* catalog) : moduleOp(moduleOp),
-                                                                                                           attrManager(moduleOp->getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager()), catalog(catalog), translationContext(std::make_shared<TranslationContext>())
+                                                                                                           attrManager(moduleOp->getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager()), translationContext(std::make_shared<TranslationContext>()), catalog(catalog), timing(0)
 {
    moduleOp.getContext()->getLoadedDialect<util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
 }
@@ -77,9 +77,9 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
          for (auto [name, cte] : context->ctes) {
             auto cteNode = cte.second;
             context->pushNewScope(std::make_shared<analyzer::SQLScope>(cteNode->subQueryScope));
-            auto _tree = translateTableProducer(builder, cteNode->query, context);
+            auto tree = translateTableProducer(builder, cteNode->query, context);
             context->popCurrentScope();
-            context->translatedCtes.insert({name, _tree});
+            context->translatedCtes.insert({name, tree});
          }
 
          auto tree = translateTableProducer(builder, tableProducer, context);
@@ -1103,15 +1103,15 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          if (context->ctes.contains(relation)) {
             auto [cteInfo, cteNode] = context->ctes.at(relation);
             if (cteNode->query) {
-               mlir::Value _tree;
+               mlir::Value tree;
                if (context->translatedCtes.contains(relation)) {
                   //Already translated
-                  _tree = context->translatedCtes.at(relation);
+                  tree = context->translatedCtes.at(relation);
                } else {
                   context->pushNewScope(std::make_shared<analyzer::SQLScope>(cteNode->subQueryScope));
-                  _tree = translateTableProducer(builder, cteNode->query, context);
+                  tree = translateTableProducer(builder, cteNode->query, context);
                   context->popCurrentScope();
-                  context->translatedCtes.insert({relation, _tree});
+                  context->translatedCtes.insert({relation, tree});
                }
                std::vector<mlir::Attribute> renamingDefsAsAttr;
                assert(context->ctes.at(cteNode->alias).second->renamedResults.size() == baseTableRef->namedResultsEntries.size());
@@ -1120,7 +1120,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                   renamingDefsAsAttr.emplace_back(baseTableRef->namedResultsEntries[i]->createDef(builder, attrManager, builder.getArrayAttr(from->createRef(builder, attrManager))));
                }
 
-               return builder.create<relalg::RenamingOp>(location, tuples::TupleStreamType::get(mlirContext), _tree, builder.getArrayAttr(renamingDefsAsAttr));
+               return builder.create<relalg::RenamingOp>(location, tuples::TupleStreamType::get(mlirContext), tree, builder.getArrayAttr(renamingDefsAsAttr));
             }
          }
          if (baseTableRef->namedResultsEntries.empty()) {

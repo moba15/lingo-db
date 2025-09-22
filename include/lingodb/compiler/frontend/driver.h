@@ -1,8 +1,8 @@
 #ifndef LINGODB_COMPILER_FRONTEND_DRIVER_H
 #define LINGODB_COMPILER_FRONTEND_DRIVER_H
 
+#include "lingodb/compiler/frontend/generated/parser.hpp"
 #include "lingodb/compiler/frontend/node_factory.h"
-#include "lingodb/compiler/frontend/sql-parser/gen/parser.hpp"
 #define YY_DECL \
    lingodb::parser::symbol_type yylex(driver& drv)
 // ... and declare it for the parser's sake.
@@ -15,12 +15,11 @@ class driver {
    };
    std::vector<std::shared_ptr<lingodb::ast::AstNode>> result;
    int parse(const std::string& f);
-   void scan_begin();
-   void scan_end();
+   void scanBegin();
+   void scanEnd();
    lingodb::location location;
    std::string file;
-   bool trace_scanning;
-   bool trace_parsing;
+   bool traceScanning;
    lingodb::ast::NodeFactory nf;
 };
 #endif

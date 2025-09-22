@@ -3,7 +3,6 @@
 
 
 #include "bound_expression.h"
-#include "lingodb/compiler/frontend/ast/table_producer.h"
 namespace lingodb::ast {
 
 class BoundExtendNode : public AstNode {

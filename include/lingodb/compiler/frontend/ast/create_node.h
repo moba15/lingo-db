@@ -105,7 +105,7 @@ class TableElement {
 class ColumnElement : public TableElement {
    public:
    ColumnElement(std::string name, LogicalTypeWithMods typeMods)
-      : TableElement(TableElementType::COLUMN), name(std::move(name)), logicalTypeWithMods(typeMods) {}
+      : TableElement(TableElementType::COLUMN), logicalTypeWithMods(typeMods), name(std::move(name)) {}
 
    LogicalTypeWithMods logicalTypeWithMods;
    std::string name;

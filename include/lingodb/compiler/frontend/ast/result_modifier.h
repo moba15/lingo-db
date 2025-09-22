@@ -31,12 +31,12 @@ class ResultModifier : public TableProducer {
    explicit ResultModifier(ResultModifierType type)
       : TableProducer(NodeType::RESULT_MODIFIER), modifierType(type) {}
 
-   virtual ~ResultModifier() = default;
+   ~ResultModifier() override = default;
 
    ResultModifierType modifierType;
    std::shared_ptr<TableProducer> input = nullptr;
 
-   virtual std::string toDotGraph(uint32_t depth);
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 /**
  * GROUP BY <element>

@@ -2,7 +2,6 @@
 
 #include "lingodb/compiler/frontend/frontend_error.h"
 
-#include <iostream>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
 ASTTransformContext::ASTTransformContext() : currentScope(std::make_shared<ASTTransformScope>()) {

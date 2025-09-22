@@ -1,7 +1,7 @@
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 namespace lingodb::ast {
 
-std::string ResultModifier::toDotGraph(uint32_t depth) {
+std::string ResultModifier::toDotGraph(uint32_t depth,  NodeIdGenerator& idGen) {
    return "ResultModifier: Not implemented";
 }
 

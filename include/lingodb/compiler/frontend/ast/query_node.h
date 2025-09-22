@@ -1,14 +1,12 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_QUERY_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_QUERY_NODE_H
 
-#include "../sql_scope.h"
 #include "ast_node.h"
 #include "group_by_node.h"
 #include "pipe_operator.h"
 #include "result_modifier.h"
 #include "table_producer.h"
 
-#include <cstdint>
 #include <memory>
 #include <string>
 namespace lingodb::ast {
@@ -28,7 +26,7 @@ enum class QueryNodeType : uint8_t {
 };
 class QueryNode : public TableProducer {
    public:
-   virtual ~QueryNode() override = default;
+   ~QueryNode() override = default;
 
    explicit QueryNode(QueryNodeType type) : TableProducer(NodeType::QUERY_NODE), type(type) {};
 
@@ -40,7 +38,7 @@ class QueryNode : public TableProducer {
 
    std::shared_ptr<TableProducer> input;
 
-   virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override = 0;
 };
 
 class SelectNode : public QueryNode {

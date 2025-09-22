@@ -556,7 +556,7 @@ OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<Pars
 }
 OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, kType), children(std::vector{left, right}) {
 }
-OperatorExpression::OperatorExpression(std::string opString, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(ExpressionType::OPERATOR_UNKNOWN, kType), opString(opString), children(std::vector{left, right}) {
+OperatorExpression::OperatorExpression(std::string opString, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(ExpressionType::OPERATOR_UNKNOWN, kType), children(std::vector{left, right}), opString(opString) {
 }
 std::string OperatorExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
    std::string dot{};
@@ -1224,7 +1224,7 @@ bool SubqueryExpression::operator==(ParsedExpression& other) {
 }
 
 
-CaseExpression::CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, kType), caseExpr(caseExpr), caseChecks(std::move(caseChecks)), elseExpr(std::move(elseExpr)) {
+CaseExpression::CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, kType), caseChecks(std::move(caseChecks)), caseExpr(caseExpr), elseExpr(std::move(elseExpr)) {
 }
 
 std::string CaseExpression::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
@@ -1343,23 +1343,23 @@ size_t SetColumnExpression::hash() {
       const auto& col = kv.first;
       const auto& expr = kv.second;
 
-      size_t pair_hash = 0;
+      size_t pairHash = 0;
       if (col) {
-         pair_hash ^= col->hash() + 0x9e3779b9 + (pair_hash << 6) + (pair_hash >> 2);
+         pairHash ^= col->hash() + 0x9e3779b9 + (pairHash << 6) + (pairHash >> 2);
       } else {
          // Distinguish null column positions
-         pair_hash ^= 0x517cc1b7 + (pair_hash << 6) + (pair_hash >> 2);
+         pairHash ^= 0x517cc1b7 + (pairHash << 6) + (pairHash >> 2);
       }
 
       if (expr) {
-         pair_hash ^= expr->hash() + 0x9e3779b9 + (pair_hash << 6) + (pair_hash >> 2);
+         pairHash ^= expr->hash() + 0x9e3779b9 + (pairHash << 6) + (pairHash >> 2);
       } else {
          // Distinguish null expression positions
-         pair_hash ^= 0x85ebca6b + (pair_hash << 6) + (pair_hash >> 2);
+         pairHash ^= 0x85ebca6b + (pairHash << 6) + (pairHash >> 2);
       }
 
       // Mix into the running result
-      result ^= pair_hash + 0x9e3779b9 + (result << 6) + (result >> 2);
+      result ^= pairHash + 0x9e3779b9 + (result << 6) + (result >> 2);
    }
 
    return result;

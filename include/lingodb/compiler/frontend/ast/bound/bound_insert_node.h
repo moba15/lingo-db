@@ -3,7 +3,6 @@
 
 
 
-#include "lingodb/catalog/Column.h"
 #include "lingodb/compiler/frontend/ast/ast_node.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 #include "lingodb/compiler/frontend/frontend_type.h"

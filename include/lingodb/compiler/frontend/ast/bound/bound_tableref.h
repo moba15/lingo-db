@@ -15,7 +15,7 @@ class BoundTableRef : public TableProducer {
    }
    TableReferenceType type;
 
-   virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override = 0;
 };
 
 class BoundBaseTableRef : public BoundTableRef {

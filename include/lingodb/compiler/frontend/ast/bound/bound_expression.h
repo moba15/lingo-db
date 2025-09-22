@@ -8,7 +8,6 @@
 #include "lingodb/compiler/frontend/sql_scope.h"
 
 #include <mlir/Dialect/MLProgram/Transforms/Passes.h.inc>
-#include <mlir/IR/Types.h>
 namespace lingodb::ast {
 class BoundOrderByModifier;
 enum class BindingType : uint8_t {
@@ -18,8 +17,8 @@ enum class BindingType : uint8_t {
 class BoundExpression : public AstNode {
    public:
    BoundExpression(ExpressionClass exprClass, ExpressionType type, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), alias(alias) {}
-   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(NullableType(resultType)), alias(alias) {}
-   BoundExpression(ExpressionClass exprClass, ExpressionType type, NullableType resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), resultType(resultType), alias(alias) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, catalog::Type resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), alias(alias), resultType(NullableType(resultType)) {}
+   BoundExpression(ExpressionClass exprClass, ExpressionType type, NullableType resultType, std::string alias) : AstNode(NodeType::BOUND_EXPRESSION), exprClass(exprClass), type(type), alias(alias), resultType(resultType) {}
 
    ExpressionClass exprClass;
    ExpressionType type;

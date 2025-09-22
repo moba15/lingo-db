@@ -4,7 +4,6 @@
 
 #include "ast_node.h"
 #include "parsed_expression.h"
-#include "table_producer.h"
 namespace lingodb::ast {
 class ExtendNode : public AstNode {
    public:

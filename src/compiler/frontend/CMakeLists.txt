@@ -1,4 +1,4 @@
-set(GEN_OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/lingodb/compiler/frontend/sql-parser/gen )
+set(GEN_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/include/lingodb/compiler/frontend/generated )
 set(BISON_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/parser.y)
 set(FLEX_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/lexer.l)
 BISON_TARGET(parser ${BISON_INPUT_FILE} ${GEN_OUTPUT_DIR}/parser.cpp)
@@ -8,8 +8,20 @@ FLEX_TARGET(lexer ${FLEX_INPUT_FILE} ${GEN_OUTPUT_DIR}/lexer.cpp)
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.83.0 REQUIRED COMPONENTS context)
 include_directories(${Boost_INCLUDE_DIRS})
-
+set_source_files_properties({GEN_OUTPUT_DIR}/parser.cpp PROPERTIES
+        SKIP_LINTING ON
+)
+set_source_files_properties({GEN_OUTPUT_DIR}/parser.hpp PROPERTIES
+        SKIP_LINTING ON
+)
+set_source_files_properties({GEN_OUTPUT_DIR}/lexer.cpp PROPERTIES
+        SKIP_LINTING ON
+)
+set_source_files_properties({GEN_OUTPUT_DIR}/location.hh PROPERTIES
+        SKIP_LINTING ON
+)
 ADD_FLEX_BISON_DEPENDENCY(lexer parser)
+
 include_directories(lingo-db-sql-translator ${GEN_OUTPUT_DIR})
 add_library(MLIRSQLFrontend
         #analyzer

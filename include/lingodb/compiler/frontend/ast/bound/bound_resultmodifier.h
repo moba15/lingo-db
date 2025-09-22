@@ -6,7 +6,6 @@
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 
-#include <cstdint>
 #include <string>
 namespace lingodb::ast {
 class BoundResultModifier : public TableProducer {
@@ -16,19 +15,19 @@ class BoundResultModifier : public TableProducer {
    BoundResultModifier(ResultModifierType type, std::shared_ptr<TableProducer> input)
       : TableProducer(NodeType::BOUND_RESULT_MODIFIER), modifierType(type), input(input) {}
 
-   virtual ~BoundResultModifier() = default;
+   ~BoundResultModifier() override = default;
 
    ResultModifierType modifierType;
    std::shared_ptr<TableProducer> input = nullptr;
 
-   virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen);
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override;
 };
 /**
  * GROUP BY <element>
  */
 class BoundOrderByElement {
    public:
-   BoundOrderByElement(OrderType type, OrderByNullType nullOrder, std::shared_ptr<NamedResult> namedResult) : type(type), nullOrder(nullOrder), namedResult(namedResult) {};
+   BoundOrderByElement(OrderType type, OrderByNullType nullOrder, std::shared_ptr<NamedResult> namedResult) : type(type), namedResult(std::move(namedResult)), nullOrder(std::move(nullOrder)) {};
 
    /// Sort order
    OrderType type;

@@ -6,7 +6,6 @@
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "table_producer.h"
 
-#include <cstdint>
 #include <string>
 #include <variant>
 namespace lingodb::ast {
@@ -22,7 +21,7 @@ class TableRef : public TableProducer {
    TableReferenceType type;
    std::string alias;
 
-   virtual std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) = 0;
+   std::string toDotGraph(uint32_t depth, NodeIdGenerator& idGen) override = 0;
 };
 
 enum class TableReferenceType : uint8_t {

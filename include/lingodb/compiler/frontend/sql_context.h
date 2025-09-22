@@ -68,7 +68,7 @@ class DefineScope {
 
 class SQLContext {
    public:
-   SQLContext() : definedAttributes(), resolver() {
+   SQLContext() :catalog(nullptr), currentScope() ,definedAttributes() {
       definedAttributes.push({});
    };
 

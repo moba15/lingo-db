@@ -6,13 +6,10 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
 #include "lingodb/compiler/frontend/ast/query_node.h"
 #include "lingodb/compiler/frontend/driver.h"
-#include "lingodb/compiler/frontend/frontend_error.h"
 #include "sql_context.h"
 
 
-#include <boost/context/detail/disable_overload.hpp>
 #include <boost/context/stack_context.hpp>
-#include <functional>
 #include <sys/resource.h>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::NamedResult>, StringInfo>::ScopeTy;
@@ -25,6 +22,7 @@ using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::Na
 class StackGuard {
    public:
    StackGuard() = default;
+   virtual ~StackGuard() = default;
    /**
     * Resets the stack guard
     * Exact behavior depends on implementation (normal stack or fiber)
@@ -101,6 +99,7 @@ class SQLCanonicalizer {
     * @param rootNode The expression tree to canonicalize
     * @param context The transformation context containing scoping and other metadata
     * @param extend Controls whether non-aggregate functions should be added to extension node
+    * @param extendNode
     * @return The canonicalized expression
     */
    std::shared_ptr<ast::ParsedExpression> canonicalizeParsedExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<ASTTransformContext> context, bool extend, std::shared_ptr<ast::ExtendNode> extendNode);

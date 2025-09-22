@@ -10,6 +10,7 @@
 
 
 %code requires {
+ // NOLINT(file)
   # include <string>
   #include <iostream>
   #include <memory>
@@ -43,6 +44,7 @@
 %define parse.lac full
 %locations
 %code {
+
   #include <iostream>
   #include <memory>
   #include "lingodb/compiler/frontend/driver.h"

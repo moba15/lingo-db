@@ -2,7 +2,7 @@
 
 #include "../../../../include/lingodb/compiler/frontend/ast/query_node.h"
 namespace lingodb::ast {
-PipeOperator::PipeOperator(PipeOperatorType pipeOpType, std::shared_ptr<AstNode> node) : TableProducer(NodeType::PIPE_OP), node(node), pipeOpType(pipeOpType) {
+PipeOperator::PipeOperator(PipeOperatorType pipeOpType, std::shared_ptr<AstNode> node) : TableProducer(NodeType::PIPE_OP), pipeOpType(pipeOpType), node(node) {
 }
 
 std::string PipeOperator::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {

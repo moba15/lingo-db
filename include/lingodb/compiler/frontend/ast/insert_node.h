@@ -3,7 +3,6 @@
 
 
 #include "ast_node.h"
-#include "constraint.h"
 #include "parsed_expression.h"
 
 #include <memory>

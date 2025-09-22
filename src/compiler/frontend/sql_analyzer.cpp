@@ -678,7 +678,7 @@ std::shared_ptr<T> SQLCanonicalizer::canonicalizeCast(std::shared_ptr<ast::Table
 /*
     * SQLQueryAnalyzer
     */
-SQLQueryAnalyzer::SQLQueryAnalyzer(catalog::Catalog* catalog) : catalog(std::move(catalog)), parallelismAllowed(false) {
+SQLQueryAnalyzer::SQLQueryAnalyzer(catalog::Catalog* catalog) : parallelismAllowed(false), catalog(std::move(catalog)), totalTime(0) {
    stackGuard = std::make_shared<StackGuardNormal>();
 }
 std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> astRootNode, std::shared_ptr<SQLContext> context) {

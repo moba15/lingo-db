@@ -2,7 +2,7 @@
 #define LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
 
 
-#include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
+#include "lingodb/compiler/frontend/generated/location.hh"
 #include <cstdint>
 #include <unordered_map>
 namespace lingodb::ast {

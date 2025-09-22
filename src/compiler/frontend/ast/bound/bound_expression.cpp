@@ -60,7 +60,7 @@ BoundOperatorExpression::BoundOperatorExpression(ExpressionType type, NullableTy
 /*
  * BoundCastExpression
 */
-BoundCastExpression::BoundCastExpression(NullableType resultType, std::string alias, std::shared_ptr<BoundExpression> child, std::optional<LogicalTypeWithMods> logicalTypeWithMods, std::string stringRepr) : BoundExpression(kType, ExpressionType::CAST, resultType, alias), child(std::move(child)), logicalTypeWithMods(logicalTypeWithMods), stringRepr(stringRepr) {
+BoundCastExpression::BoundCastExpression(NullableType resultType, std::string alias, std::shared_ptr<BoundExpression> child, std::optional<LogicalTypeWithMods> logicalTypeWithMods, std::string stringRepr) : BoundExpression(kType, ExpressionType::CAST, resultType, alias), logicalTypeWithMods(logicalTypeWithMods), stringRepr(stringRepr), child(std::move(child)) {
 }
 
 /*
@@ -78,7 +78,7 @@ BoundBetweenExpression::BoundBetweenExpression(ExpressionType type, catalog::Typ
 /*
  * BoundSubqueryExpression
  */
-BoundSubqueryExpression::BoundSubqueryExpression(SubqueryType subqueryType, NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResultForSubquery, std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subquery, std::shared_ptr<BoundExpression> testExpr) : BoundExpression(kType, ExpressionType::SUBQUERY, resultType, alias), subqueryType(subqueryType), sqlScope(sqlScope), namedResultForSubquery(namedResultForSubquery), subquery(std::move(subquery)), testExpr(testExpr) {
+BoundSubqueryExpression::BoundSubqueryExpression(SubqueryType subqueryType, NullableType resultType, std::string alias, std::shared_ptr<NamedResult> namedResultForSubquery, std::shared_ptr<analyzer::SQLScope> sqlScope, std::shared_ptr<TableProducer> subquery, std::shared_ptr<BoundExpression> testExpr) : BoundExpression(kType, ExpressionType::SUBQUERY, resultType, alias), subqueryType(subqueryType), subquery(std::move(subquery)) ,namedResultForSubquery(namedResultForSubquery), sqlScope(sqlScope), testExpr(testExpr) {
 }
 /*
  * BoundCaseExpression

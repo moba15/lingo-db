@@ -1,7 +1,7 @@
 #ifndef LINGODB_COMPILER_FRONTEND_FRONTEND_ERROR_H
 #define LINGODB_COMPILER_FRONTEND_FRONTEND_ERROR_H
 
-#include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
+#include "lingodb/compiler/frontend/generated/location.hh"
 
 #include <stdexcept>
 namespace lingodb {

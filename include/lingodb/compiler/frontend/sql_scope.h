@@ -2,11 +2,8 @@
 #define LINGODB_COMPILER_FRONTEND_SQL_SCOPE_H
 
 
-#include "lingodb/catalog/Defs.h"
-#include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/frontend/column_semantic.h"
 
-#include <map>
 #include <memory>
 namespace lingodb::ast {
 class BoundExpression;

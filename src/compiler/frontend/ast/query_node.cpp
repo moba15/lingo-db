@@ -74,16 +74,16 @@ std::string SelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
             case ResultModifierType::OFFSET:
                dot.append("OFFSET");
                break;
+               default: break;
          }
          dot.append("\"];\n");
 
          // Add the modifier's graph representation
-         dot.append(modifier->toDotGraph(depth + 1));
+         dot.append(modifier->toDotGraph(depth + 1, idGen));
       }
    }
 
    std::shared_ptr<PipeOperator> currentOp = startPipeOperator;
-   size_t i = 0;
    while (currentOp) {
       dot.append(currentOp->node->toDotGraph(depth + 1, idGen));
       std::string startOpId;
@@ -102,7 +102,6 @@ std::string SelectNode::toDotGraph(uint32_t depth, NodeIdGenerator& idGen) {
       nodeId.append(std::to_string(idGen.getId(reinterpret_cast<uintptr_t>(currentOp->node.get()))));
 
       currentOp = nullptr;
-      i++;
    }
 
    return dot;

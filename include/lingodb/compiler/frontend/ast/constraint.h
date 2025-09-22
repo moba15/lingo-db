@@ -3,7 +3,7 @@
 
 
 #include <cstdint>
-#include <lingodb/compiler/frontend/sql-parser/gen/location.hh>
+#include <lingodb/compiler/frontend/generated/location.hh>
 #include <vector>
 namespace lingodb::ast {
 enum class ConstraintType : std::uint8_t {
@@ -25,8 +25,8 @@ class Constraint {
 
 class UniqueConstraint : public Constraint {
    public:
-   explicit UniqueConstraint(bool isPrimaryKey) : Constraint(ConstraintType::UNIQUE), columnNames({}), isPrimaryKey(isPrimaryKey) {}
-   UniqueConstraint(std::vector<std::string> columnNames, bool isPrimaryKey) : Constraint(ConstraintType::UNIQUE), columnNames(columnNames), isPrimaryKey(isPrimaryKey) {}
+   explicit UniqueConstraint(bool isPrimaryKey) : Constraint(ConstraintType::UNIQUE), isPrimaryKey(isPrimaryKey), columnNames({}) {}
+   UniqueConstraint(std::vector<std::string> columnNames, bool isPrimaryKey) : Constraint(ConstraintType::UNIQUE), isPrimaryKey(isPrimaryKey), columnNames(columnNames) {}
 
    //! Whether this unique constraint is a primary key
    bool isPrimaryKey = false;
