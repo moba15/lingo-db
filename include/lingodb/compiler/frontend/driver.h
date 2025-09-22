@@ -4,14 +4,14 @@
 #include "lingodb/compiler/frontend/generated/parser.hpp"
 #include "lingodb/compiler/frontend/node_factory.h"
 #define YY_DECL \
-   lingodb::parser::symbol_type yylex(driver& drv)
+   lingodb::parser::symbol_type yylex(Driver& drv)
 // ... and declare it for the parser's sake.
 YY_DECL;
 
-class driver {
+class Driver {
    public:
-   driver();
-   ~driver() {
+   Driver();
+   ~Driver() {
    };
    std::vector<std::shared_ptr<lingodb::ast::AstNode>> result;
    int parse(const std::string& f);

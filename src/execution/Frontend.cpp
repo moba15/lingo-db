@@ -107,7 +107,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
    bool parallismAllowed;
    void load(std::string fileOrDirect) {
       lingodb::execution::initializeContext(context);
-      driver drv;
+      Driver drv;
 
       if (!drv.parse(fileOrDirect)) {
          auto results = drv.result;
@@ -124,7 +124,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
          mlir::OpBuilder builder(&context);
 
          mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-         lingodb::translator::SQLMlirTranslator translator{moduleOp, catalog};
+         lingodb::translator::SQLMlirTranslator translator{moduleOp};
          builder.setInsertionPointToStart(moduleOp.getBody());
          auto* queryBlock = new mlir::Block;
          std::vector<mlir::Type> returnTypes;

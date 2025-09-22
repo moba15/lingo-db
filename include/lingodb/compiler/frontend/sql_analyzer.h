@@ -117,7 +117,7 @@ class SQLCanonicalizer {
    template <class T>
    std::shared_ptr<T> canonicalizeCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
 
-   driver drv{};
+   Driver drv{};
    std::shared_ptr<StackGuard> stackGuard = std::make_shared<StackGuardNormal>();
 };
 
@@ -209,7 +209,7 @@ class SQLQueryAnalyzer {
    }
 
    catalog::Catalog* catalog;
-   driver drv{};
+   Driver drv{};
    SQLCanonicalizer sqlCanonicalizer{};
    double totalTime;
 };

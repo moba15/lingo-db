@@ -68,7 +68,7 @@
   #include "lingodb/compiler/frontend/ast/set_node.h"
   #include "lingodb/compiler/frontend/ast/copy_node.h"
   #include "lingodb/compiler/frontend/frontend_error.h"
-  class driver;
+  class Driver;
 
 #line 74 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
 
@@ -5318,7 +5318,7 @@ switch (yykind)
     };
 
     /// Build a parser object.
-    parser (driver& drv_yyarg);
+    parser (Driver& drv_yyarg);
     virtual ~parser ();
 
 #if 201103L <= YY_CPLUSPLUS
@@ -13934,7 +13934,7 @@ switch (yykind)
 
 
     // User arguments.
-    driver& drv;
+    Driver& drv;
 
   };
 

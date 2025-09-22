@@ -31,11 +31,11 @@
   #include "lingodb/compiler/frontend/ast/set_node.h"
   #include "lingodb/compiler/frontend/ast/copy_node.h"
   #include "lingodb/compiler/frontend/frontend_error.h"
-  class driver;
+  class Driver;
 }
 
 // The parsing context.
-%param { driver& drv }
+%param { Driver& drv }
 
 
 

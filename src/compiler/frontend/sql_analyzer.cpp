@@ -206,7 +206,6 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::EXTEND, extendNode);
                //Extract AggFunctions
                std::vector<std::pair<std::string, std::shared_ptr<ast::ParsedExpression>>> toRemove{};
-               int i = 0;
                //Canonicalize target expressions
                std::ranges::transform(selectNode->targets, selectNode->targets.begin(), [&](std::shared_ptr<ast::ParsedExpression>& target) {
                   return canonicalizeParsedExpression(target, context, true, extendNode);
@@ -1178,7 +1177,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                boundAggrNode->groupByNode->localAggregationNamedResults.at(i).end());
                currentLocalAttributes.emplace_back(boundAggrNode->groupByNode->localPresentIntval.at(i).second);
 
-               size_t id = 0;
                std::vector<std::shared_ptr<ast::NamedResult>> unionNamedResults{};
                for (size_t j = 0; j < currentLocalAttributes.size(); j++) {
                   auto left = currentAttributes[j];
@@ -1750,7 +1748,7 @@ std::shared_ptr<ast::BoundResultModifier> SQLQueryAnalyzer::analyzeResultModifie
                      }
                      assert(boundConstant->value);
                      auto constantValue = std::static_pointer_cast<ast::IntValue>(boundConstant->value);
-                     if (context->currentScope->targetInfo.targetColumns.size() < constantValue->iVal || constantValue->iVal <= 0) {
+                     if (context->currentScope->targetInfo.targetColumns.size() < static_cast<size_t>(constantValue->iVal) || constantValue->iVal <= 0) {
                         error("Invalid order by element", boundConstant->loc);
                      }
                      namedResult = context->currentScope->targetInfo.targetColumns.at(constantValue->iVal - 1);
@@ -2303,12 +2301,13 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(st
             case ast::ExpressionType::BOUND_COLUMN_REF: {
                auto boundColRef = std::static_pointer_cast<ast::BoundColumnRefExpression>(boundChild);
                assert(boundColRef->resultType.has_value());
-               if (boundColRef->resultType.value().type.getTypeId() == catalog::LogicalTypeId::DATE) {
-                  return boundColRef;
+               if (boundColRef->resultType.value().type.getTypeId() != catalog::LogicalTypeId::DATE) {
+                  error("Cannot cast " + boundColRef->alias + " to date", boundColRef->loc);
                }
                if (boundColRef->resultType.value().type.getTypeId() != catalog::LogicalTypeId::STRING) {
                   error("Cannot cast " + boundColRef->alias + " to date", boundColRef->loc);
                }
+               return boundColRef;
             }
             default: error("Expression cannot be casted to date (unsupported type)", castExpr->loc);
          }

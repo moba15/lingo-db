@@ -333,7 +333,7 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
 
 
 void
-driver::scanBegin ()
+Driver::scanBegin ()
 {
   yy_flex_debug = traceScanning;
   if (file.empty () || file == "-")
@@ -351,7 +351,7 @@ driver::scanBegin ()
 }
 
 void
-driver::scanEnd ()
+Driver::scanEnd ()
 {
   if (YY_CURRENT_BUFFER) {
       yy_delete_buffer(YY_CURRENT_BUFFER);

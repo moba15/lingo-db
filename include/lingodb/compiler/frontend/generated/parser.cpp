@@ -153,7 +153,7 @@ namespace  lingodb  {
 #line 154 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
 
   /// Build a parser object.
-  parser::parser (driver& drv_yyarg)
+  parser::parser (Driver& drv_yyarg)
 #if YYDEBUG
     : yydebug_ (false),
       yycdebug_ (&std::cerr),
