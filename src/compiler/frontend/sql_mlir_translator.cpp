@@ -9,6 +9,7 @@
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
+#include "lingodb/compiler/frontend/UDFImplementer.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_extend_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_insert_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_query_node.h"
@@ -756,7 +757,7 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                translatedArg = arg->resultType->castValue(builder, translatedArg);
                values.push_back(translatedArg);
             }
-            return func.value()->getImplementer()->callFunction(moduleOp, builder, exprLocation,  mlir::ValueRange(values));
+            return compiler::frontend::getUDFImplementer(func.value())->callFunction(moduleOp, builder, exprLocation, values);
          }
 
          translatorError("Function '" << function->functionName << "' not implemented", expression->loc);

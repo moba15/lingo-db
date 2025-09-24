@@ -41,10 +41,15 @@ add_library(MLIRSQLFrontend
         frontend_error.cpp
         frontend_type.cpp
 
+        UDFImplementer.cpp
+
         ${BISON_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
 
 )
+
+set(COMPILE_DEFS "SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
+target_compile_definitions(MLIRSQLFrontend PRIVATE ${COMPILE_DEFS})
 
 add_dependencies(MLIRSQLFrontend ec-rt-defs)
 target_link_libraries(MLIRSQLFrontend PUBLIC ${dialect_libs}

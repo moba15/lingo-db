@@ -1,22 +1,27 @@
-#include "lingodb/catalog/UDFImplementer.h"
+#include "lingodb/compiler/frontend/UDFImplementer.h"
 
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
-#include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
 #include "lingodb/runtime/StringRuntime.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
 
+#include <lingodb/compiler/Dialect/DB/IR/DBOps.h>
+#include <lingodb/execution/Backend.h>
+#include <lingodb/execution/Frontend.h>
+#include <mlir/Dialect/Func/IR/FuncOps.h>
+#include <mlir/Dialect/SCF/IR/SCF.h>
+#include <mlir/IR/Diagnostics.h>
+#include <mlir/IR/OwningOpRef.h>
+#include <mlir/Parser/Parser.h>
+
 #include <dlfcn.h>
 #include <filesystem>
+#include <mlir/Dialect/Func/Transforms/Passes.h.inc>
 namespace {
 lingodb::utility::GlobalSetting<std::string> cUDFCompilerDriver("system.compilation.c_udf_compiler_driver", "cc");
-std::unordered_map<std::string, void*>& getUdfFunctions() {
-   static std::unordered_map<std::string, void*> udfFunctions;
-   return udfFunctions;
-}
 
 class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    std::string functionName;
@@ -64,7 +69,7 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          throw std::runtime_error(dlsymError);
       }
       assert(reinterpret_cast<lingodb::execution::mainFnType>(dlsym(handle, functionName.c_str())));
-      getUdfFunctions().insert(std::pair(functionName, dlsym(handle, functionName.c_str())));
+      lingodb::catalog::FunctionCatalogEntry::getUdfFunctions().insert(std::pair(functionName, dlsym(handle, functionName.c_str())));
 
       mlir::func::FuncOp func = moduleOp.lookupSymbol<mlir::func::FuncOp>(functionName);;
       if (!func) {
@@ -84,15 +89,15 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
 
 } //namespace
 
-namespace lingodb::catalog {
-void visitUDFFunctions(const std::function<void(std::string, void*)>& fn){
-   auto f = getUdfFunctions();
-   for (auto udf: f) {
-      fn(udf.first, udf.second);
+namespace lingodb::compiler::frontend {
+std::shared_ptr<catalog::MLIRUDFImplementor> getUDFImplementer(std::shared_ptr<catalog::FunctionCatalogEntry> entry) {
+   switch (entry->getEntryType()) {
+      case catalog::CatalogEntry::CatalogEntryType::C_FUNCTION_ENTRY: {
+         return createCUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
+      }
+      default: throw std::runtime_error("getUDFImplementer: unknown catalog entry type");
    }
 }
-}
-namespace lingodb::compiler::frontend {
 std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
    return std::make_shared<CUDFImplementer>(funcName, cCode, argumentTypes, returnType);
 }

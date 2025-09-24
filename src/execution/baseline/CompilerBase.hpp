@@ -4,10 +4,10 @@
 #include "lingodb/compiler/Dialect/util/UtilOps.h"
 #include "lingodb/execution/Backend.h"
 #include "lingodb/execution/baseline/utils.hpp"
+#include "lingodb/catalog/FunctionCatalogEntry.h"
 
 #include "Adaptor.hpp"
 #include "CompilerConfig.hpp"
-#include "lingodb/catalog/UDFImplementer.h"
 
 #include <tpde/CompilerBase.hpp>
 
@@ -94,7 +94,7 @@ struct IRCompilerBase : tpde::CompilerBase<IRAdaptor, Derived, Config> {
 
       dialect::util::FunctionHelper::visitAllFunctions([&](std::string s, void* ptr) { externFuncMap[s] = ptr; });
       execution::visitBareFunctions([&](std::string s, void* ptr) { externFuncMap[s] = ptr; });
-      catalog::visitUDFFunctions([&](std::string s, void* ptr) { externFuncMap[s] = ptr; });
+      catalog::visitUDFFunctions1([&](std::string s, void* ptr) { externFuncMap[s] = ptr; });
 
    }
 
