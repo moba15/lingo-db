@@ -15,4 +15,7 @@ namespace lingodb::compiler::frontend {
 std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(
    std::string funcName, std::string cCode, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType);
 
+std::shared_ptr<catalog::MLIRUDFImplementor> createPLPGSQLUDFImplementer(
+   std::string funcName, std::string cCode, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType);
+
 } // namespace lingodb::compiler::frontend

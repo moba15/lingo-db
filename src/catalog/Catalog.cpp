@@ -36,6 +36,7 @@ std::shared_ptr<CatalogEntry> CatalogEntry::deserialize(lingodb::utility::Deseri
          return LingoDBTableCatalogEntry::deserialize(deserializer);
       case CatalogEntryType::LINGODB_HASH_INDEX_ENTRY:
          return LingoDBHashIndexEntry::deserialize(deserializer);
+      case CatalogEntryType::PLPGSQL_FUNCTION_ENTRY:
       case CatalogEntryType::C_FUNCTION_ENTRY:
          return FunctionCatalogEntry::deserialize(deserializer);
       default:

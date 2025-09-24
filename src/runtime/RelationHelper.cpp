@@ -32,7 +32,15 @@ void RelationHelper::createFunction(runtime::VarLen32 meta) {
    auto& session = context->getSession();
    auto catalog = session.getCatalog();
    auto def = utility::deserializeFromHexString<lingodb::catalog::CreateFunctionDef>(meta.str());
-   auto func = std::make_shared<lingodb::catalog::CFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
+   std::shared_ptr<catalog::FunctionCatalogEntry> func;
+   if (def.language == "c") {
+      func = std::make_shared<lingodb::catalog::CFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
+   } else if (def.language == "plpgsql") {
+      func = std::make_shared<lingodb::catalog::PLPGSQLFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
+   } else {
+      throw std::runtime_error("unsupported language");
+   }
+
    catalog->insertEntry(func, true);
    catalog->persist();
 }

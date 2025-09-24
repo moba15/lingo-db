@@ -984,32 +984,35 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
          code = optionValue;
       }
    }
-
-   if (language != "c") {
-      error("Currently only c is allowed" , createNode->loc);
-   }
-   std::string returnTypeStringRepresentation = logicalTypeToCTypeString(createFunctionInfo->returnType);
    NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType.logicalType, createFunctionInfo->returnType.typeModifiers);
-
-   std::string argumentsStringRepresentation = "(";
-   for (size_t i = 0; i<createFunctionInfo->argumentTypes.size(); i++) {
-      auto functionArgument = createFunctionInfo->argumentTypes[i];
-      argumentsStringRepresentation+=logicalTypeToCTypeString(functionArgument.type) + " " + functionArgument.name;
-      if (i+1<createFunctionInfo->argumentTypes.size()) {
-         argumentsStringRepresentation+=", ";
-      }
-   }
-   argumentsStringRepresentation+=")";
-
-   code = returnTypeStringRepresentation + " " + createFunctionInfo->functionName + argumentsStringRepresentation +  " { " + code + "}";
    auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
-   boundCreateFunctionInfo->language = language;
-   boundCreateFunctionInfo->code = code;
    for (auto& fArgument : createFunctionInfo->argumentTypes) {
       boundCreateFunctionInfo->argumentTypes.push_back(SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalType, fArgument.type.typeModifiers).type);
    }
+   boundCreateFunctionInfo->language = language;
+
+   if (language == "c" ) {
+      std::string returnTypeStringRepresentation = logicalTypeToCTypeString(createFunctionInfo->returnType);
+
+      std::string argumentsStringRepresentation = "(";
+      for (size_t i = 0; i<createFunctionInfo->argumentTypes.size(); i++) {
+         auto functionArgument = createFunctionInfo->argumentTypes[i];
+         argumentsStringRepresentation+=logicalTypeToCTypeString(functionArgument.type) + " " + functionArgument.name;
+         if (i+1<createFunctionInfo->argumentTypes.size()) {
+            argumentsStringRepresentation+=", ";
+         }
+      }
+      argumentsStringRepresentation+=")";
+
+      code = returnTypeStringRepresentation + " " + createFunctionInfo->functionName + argumentsStringRepresentation +  " { " + code + "}";
+      boundCreateFunctionInfo->code = code;
 
 
+   } else if (language == "plpgsql") {
+      boundCreateFunctionInfo->code = code;
+   } else {
+      error("Unsupported language for udf: " << language , createNode->loc);
+   }
    createNode->createInfo = boundCreateFunctionInfo;
    return createNode;
 }

@@ -4,6 +4,7 @@
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
+#include "lingodb/compiler/plpgsql-frontend/pl_driver.h"
 #include "lingodb/execution/Execution.h"
 #include "lingodb/runtime/StringRuntime.h"
 #include "lingodb/utility/Serialization.h"
@@ -82,6 +83,31 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    }
 };
 
+class PLPGSQLUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
+   std::string functionName;
+   std::string code;
+   std::vector<lingodb::catalog::Type> argumentTypes;
+   lingodb::catalog::Type returnType;
+   public:
+   PLPGSQLUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
+   mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args) override {
+      pl_driver pl_driver{};
+      auto currPath = std::filesystem::current_path().string();
+      auto pathToFile = currPath + "/" + functionName + ".plpgsql";
+
+      //1. write c file
+      std::ofstream outputFile(pathToFile);
+      outputFile << code;
+      outputFile.close();
+
+      if (pl_driver.parse(pathToFile)) {
+         throw std::runtime_error("Error parsing plpgsl");
+      }
+      return nullptr;
+   };
+
+};
+
 } //namespace
 
 namespace lingodb::catalog {
@@ -95,6 +121,9 @@ void visitUDFFunctions(const std::function<void(std::string, void*)>& fn){
 namespace lingodb::compiler::frontend {
 std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
    return std::make_shared<CUDFImplementer>(funcName, cCode, argumentTypes, returnType);
+}
+std::shared_ptr<catalog::MLIRUDFImplementor> createPLPGSQLUDFImplementer(std::string funcName, std::string cCode, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType){
+   return std::make_shared<PLPGSQLUDFImplementer>(funcName, cCode, argumentTypes, returnType);
 }
 
 } // namespace lingodb::compiler::frontend

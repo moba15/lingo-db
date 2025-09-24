@@ -17,9 +17,9 @@ class FunctionCatalogEntry : public CatalogEntry {
 
 
    public:
-   static constexpr std::array<CatalogEntryType, 1> entryTypes = {CatalogEntryType::C_FUNCTION_ENTRY};
-   FunctionCatalogEntry( std::string name, std::string code, Type returnType, std::vector<Type> argumentTypes)
-      : CatalogEntry(CatalogEntryType::C_FUNCTION_ENTRY), name(std::move(name)), code(std::move(code)), returnType(std::move(returnType)), argumentTypes(std::move(argumentTypes)) {}
+   static constexpr std::array<CatalogEntryType, 2> entryTypes = {CatalogEntryType::C_FUNCTION_ENTRY, CatalogEntryType::PLPGSQL_FUNCTION_ENTRY};
+   FunctionCatalogEntry(CatalogEntryType type, std::string name, std::string code, Type returnType, std::vector<Type> argumentTypes)
+      : CatalogEntry(type), name(std::move(name)), code(std::move(code)), returnType(std::move(returnType)), argumentTypes(std::move(argumentTypes)) {}
    std::string getName() override { return name; }
    [[nodiscard]] std::string getCode() const { return code; }
    [[nodiscard]] Type getReturnType() const { return returnType; }
@@ -34,7 +34,16 @@ class FunctionCatalogEntry : public CatalogEntry {
 class CFunctionCatalogEntry : public  FunctionCatalogEntry {
    public:
    CFunctionCatalogEntry( std::string name, std::string code, Type returnType, std::vector<Type> argumentTypes)
-      : FunctionCatalogEntry(name, code, returnType, argumentTypes) {}
+      : FunctionCatalogEntry(CatalogEntryType::C_FUNCTION_ENTRY, name, code, returnType, argumentTypes) {}
+   std::shared_ptr<MLIRUDFImplementor> getImplementer() override;
+
+   static std::shared_ptr<FunctionCatalogEntry> deserialize(lingodb::utility::Deserializer& deserializer);
+};
+
+class PLPGSQLFunctionCatalogEntry : public  FunctionCatalogEntry {
+   public:
+   PLPGSQLFunctionCatalogEntry( std::string name, std::string code, Type returnType, std::vector<Type> argumentTypes)
+      : FunctionCatalogEntry(CatalogEntryType::PLPGSQL_FUNCTION_ENTRY, name, code, returnType, argumentTypes) {}
    std::shared_ptr<MLIRUDFImplementor> getImplementer() override;
 
    static std::shared_ptr<FunctionCatalogEntry> deserialize(lingodb::utility::Deserializer& deserializer);

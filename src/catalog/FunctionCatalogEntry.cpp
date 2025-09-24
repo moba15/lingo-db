@@ -22,6 +22,8 @@ std::shared_ptr<FunctionCatalogEntry> FunctionCatalogEntry::deserialize(lingodb:
    switch (entryType) {
       case CatalogEntryType::C_FUNCTION_ENTRY:
          return CFunctionCatalogEntry::deserialize(deserializer);
+      case CatalogEntryType::PLPGSQL_FUNCTION_ENTRY:
+         return PLPGSQLFunctionCatalogEntry::deserialize(deserializer);
       default:
             throw std::runtime_error("Should not happen");
    }
@@ -37,5 +39,18 @@ std::shared_ptr<FunctionCatalogEntry> CFunctionCatalogEntry::deserialize(lingodb
    auto returnType = deserializer.readProperty<Type>(4);
    auto argumentTypes = deserializer.readProperty<std::vector<Type>>(5);
    return std::make_shared<CFunctionCatalogEntry>(name, code, returnType, argumentTypes);
+}
+
+
+std::shared_ptr<MLIRUDFImplementor> PLPGSQLFunctionCatalogEntry::getImplementer(){
+   return compiler::frontend::createPLPGSQLUDFImplementer(name, code, argumentTypes, returnType);
+}
+
+std::shared_ptr<FunctionCatalogEntry> PLPGSQLFunctionCatalogEntry::deserialize(lingodb::utility::Deserializer& deserializer){
+   auto name = deserializer.readProperty<std::string>(2);
+   auto code = deserializer.readProperty<std::string>(3);
+   auto returnType = deserializer.readProperty<Type>(4);
+   auto argumentTypes = deserializer.readProperty<std::vector<Type>>(5);
+   return std::make_shared<PLPGSQLFunctionCatalogEntry>(name, code, returnType, argumentTypes);
 }
 } // namespace lingodb::catalog

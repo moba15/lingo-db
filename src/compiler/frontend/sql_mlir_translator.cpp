@@ -202,23 +202,16 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
    auto code = boundCreateFunctionInfo->code;
    auto language = boundCreateFunctionInfo->language;
    auto returnType = boundCreateFunctionInfo->returnType;
-   if (language == "c") {
-
-      lingodb::catalog::CreateFunctionDef createFunctionDef(
-         functionName,
-         boundCreateFunctionInfo->language,
-         code,
-         returnType.type, boundCreateFunctionInfo->argumentTypes);
-      auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
-      compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
-
-   } else {
+   lingodb::catalog::CreateFunctionDef createFunctionDef(
+              functionName,
+              boundCreateFunctionInfo->language,
+              code,
+              returnType.type, boundCreateFunctionInfo->argumentTypes);
+   auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
+   compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
+   if (language != "c" && language != "plpgsql") {
       translatorError("UDF language not supported " << language, createNode->loc);
    }
-
-
-
-
 
 }
 

@@ -54,6 +54,4 @@ target_link_libraries(MLIRSQLFrontend PUBLIC ${dialect_libs}
         utility
         catalog
         Boost::context
-
-
 )
