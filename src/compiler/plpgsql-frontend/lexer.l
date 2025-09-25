@@ -206,12 +206,8 @@ RETURN          { MAKE_KEYWORD(RETURN_P); }
   return lingodb::frontend::pl::parser::make_STRING_VALUE(std::move(ident), loc);
 }
 
-{all} {
-  std::string ident(yytext);
-  ident.erase(0,1);
-  ident.erase(ident.size()-1,1);
-  return lingodb::frontend::pl::parser::make_ALL(std::move(ident), loc);
-}
+
+
 {operator} {
   std::string ident(yytext);
 

@@ -94,14 +94,19 @@ class PLPGSQLUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
       pl_driver pl_driver{};
       auto currPath = std::filesystem::current_path().string();
       auto pathToFile = currPath + "/" + functionName + ".plpgsql";
+      if (!std::filesystem::exists(pathToFile)) {
+         std::ofstream outputFile(pathToFile);
 
+         outputFile << code;
+         outputFile.close();
+      }
       //1. write c file
-      std::ofstream outputFile(pathToFile);
-      outputFile << code;
-      outputFile.close();
+
 
       if (pl_driver.parse(pathToFile)) {
          throw std::runtime_error("Error parsing plpgsl");
+      } else {
+         std::cout << "UDF Parsing successful" << std::endl;
       }
       return nullptr;
    };

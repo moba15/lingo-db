@@ -16,6 +16,7 @@
   #include <vector>
   #include <utility>
   #include <sstream>
+  #include <variant>
   class pl_driver;
 }
 
@@ -104,7 +105,7 @@ pl_function:
 
 
 pl_block:
-  decl_sect BEGIN proc_sect END
+  decl_sect BEGIN proc_sect END SEMICOLON
 ;
 
 decl_sect: 
@@ -134,7 +135,36 @@ proc_stmt:
 ;
 
 stmt_return:
-  RETURN_P ALL SEMICOLON
+  RETURN_P
+  {
+    std::ostringstream buf;
+      int paren_depth = 0;
+      for (;;) {
+
+        lingodb::frontend::pl::parser::symbol_type t = yylex(drv);
+
+        if(std::holds_alternative<std::string>(t.value)) {
+
+        }
+
+        if(t.kind() == lingodb::frontend::pl::parser::token::TOK_YYEOF) {
+          break;
+          error(@$, "should not happen");
+        } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_LP) {
+          paren_depth++;
+        } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_RP) {
+          paren_depth--;
+        } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_SEMICOLON) {
+          if(paren_depth == 0) {
+          break;
+          } else {
+          error(@$, "should not happen sem");
+          }
+        }
+        
+      
+    }
+  }
   ;
 %%
 void
