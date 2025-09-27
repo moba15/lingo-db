@@ -232,7 +232,7 @@
 */
 %type<std::variant<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>, std::shared_ptr<lingodb::ast::SubqueryExpression>>> in_expr
 
-%type<std::shared_ptr<lingodb::ast::TargetsExpression>> opt_target_list
+%type<std::shared_ptr<lingodb::ast::TargetList>> opt_target_list
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item group_by_item_with_alias
                                                         func_arg_expr select_limit_value case_expr case_default cast_expr offset_clause 
@@ -255,7 +255,7 @@
 
 %type<lingodb::ast::jointCondOrUsingCols> join_qual
 
-%type<std::shared_ptr<lingodb::ast::WindowBoundary>> opt_frame_clause frame_extent frame_bound
+%type<std::shared_ptr<lingodb::ast::WindowFrame>> opt_frame_clause frame_extent frame_bound
 
 /*
 * Columnref or Starexpression for instance
@@ -783,7 +783,7 @@ simple_select:
     | SELECT distinct_clause target_list into_clause from_clause where_clause group_clause having_clause window_clause
     {
         auto t = mkNode<lingodb::ast::SelectNode>(@$);
-        auto target_list = mkNode<lingodb::ast::TargetsExpression>(@$);
+        auto target_list = mkNode<lingodb::ast::TargetList>(@$);
         target_list->targets = std::move($target_list);
 
         target_list->distinct = $distinct_clause;
@@ -1998,7 +1998,7 @@ window_specification:
         auto windowExpression = mkNode<lingodb::ast::WindowExpression>(@$);
         windowExpression->partitions = $opt_partition_clause;
         windowExpression->order = $opt_sort_clause;
-        windowExpression->windowBoundary = $opt_frame_clause;
+        windowExpression->windowFrame = $opt_frame_clause;
         $$ = windowExpression;
 
 
@@ -2026,7 +2026,7 @@ indirection_el:
 opt_target_list:
     target_list
     {
-        auto node = mkNode<lingodb::ast::TargetsExpression>(@$);
+        auto node = mkNode<lingodb::ast::TargetList>(@$);
         node->targets = std::move($target_list);
         $$ = node;
     }
@@ -2107,23 +2107,23 @@ frame_extent:
 frame_bound:
     UNBOUNDED PRECEDING
     {
-        $$ = mkNode<lingodb::ast::WindowBoundary>(@$, lingodb::ast::WindowBoundaryType::UNBOUNDED_PRECEDING );
+        $$ = mkNode<lingodb::ast::WindowFrame>(@$, lingodb::ast::WindowFrameType::UNBOUNDED_PRECEDING );
     }
     | UNBOUNDED FOLLOWING
     {
-        $$ = mkNode<lingodb::ast::WindowBoundary>(@$, lingodb::ast::WindowBoundaryType::UNBOUNDED_FOLLOWING );
+        $$ = mkNode<lingodb::ast::WindowFrame>(@$, lingodb::ast::WindowFrameType::UNBOUNDED_FOLLOWING );
     }
     | CURRENT_P ROW
     {
-        $$ = mkNode<lingodb::ast::WindowBoundary>(@$, lingodb::ast::WindowBoundaryType::CURRENT_ROW );
+        $$ = mkNode<lingodb::ast::WindowFrame>(@$, lingodb::ast::WindowFrameType::CURRENT_ROW );
     }
     | a_expr PRECEDING
     {
-        $$ = mkNode<lingodb::ast::WindowBoundary>(@$, lingodb::ast::WindowBoundaryType::EXPR_PRECEDING, $a_expr );
+        $$ = mkNode<lingodb::ast::WindowFrame>(@$, lingodb::ast::WindowFrameType::EXPR_PRECEDING, $a_expr );
     }
     | a_expr FOLLOWING
     {
-        $$ = mkNode<lingodb::ast::WindowBoundary>(@$, lingodb::ast::WindowBoundaryType::EXPR_FOLLOWING, $a_expr);
+        $$ = mkNode<lingodb::ast::WindowFrame>(@$, lingodb::ast::WindowFrameType::EXPR_FOLLOWING, $a_expr);
     }
     ;
 //TODO misisng rules
@@ -3479,7 +3479,7 @@ pipe_operator:
     }
     | DROP columnref_list
     {
-        auto node = mkNode<lingodb::ast::TargetsExpression>(@$);
+        auto node = mkNode<lingodb::ast::TargetList>(@$);
         node->targets = std::move($columnref_list);
         $$ = mkNode<lingodb::ast::PipeOperator>(@$, lingodb::ast::PipeOperatorType::DROP, node);
     }
