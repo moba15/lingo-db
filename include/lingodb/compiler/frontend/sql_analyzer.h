@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_SQL_ANALYZER_H
+#define LINGODB_COMPILER_FRONTEND_SQL_ANALYZER_H
+
 #include "ast/bound/bound_insert_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_expression.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
@@ -18,11 +20,12 @@ using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::Co
    {                                               \
       std::ostringstream s{};                     \
       s << message; \
-      throw frontend_error(s.str(), loc);          \
+      throw FrontendError(s.str(), loc);          \
    }
 class StackGuard {
    public:
    StackGuard() = default;
+   virtual ~StackGuard() = default;
    /**
     * Resets the stack guard
     * Exact behavior depends on implementation (normal stack or fiber)
@@ -39,6 +42,7 @@ class StackGuard {
 class StackGuardNormal : public StackGuard {
    public:
    StackGuardNormal();
+   ~StackGuardNormal() override = default;
    void reset() override;
    bool newStackNeeded() override;
    private:
@@ -53,6 +57,7 @@ class StackGuardNormal : public StackGuard {
 class StackGuardFiber : public StackGuard {
    public:
    StackGuardFiber(boost::context::stack_context& stackContext);
+   ~StackGuardFiber() override = default;
    void reset() override;
    bool newStackNeeded() override;
    private:
@@ -116,7 +121,7 @@ class SQLCanonicalizer {
    template <class T>
    std::shared_ptr<T> canonicalizeCast(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<ASTTransformContext> context);
 
-   driver drv{};
+   Driver drv{};
    std::shared_ptr<StackGuard> stackGuard = std::make_shared<StackGuardNormal>();
 };
 
@@ -131,9 +136,9 @@ class SQLQueryAnalyzer {
 
    private:
    std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
-   std::shared_ptr<ast::CreateNode> analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::CreateNode> analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode);
    std::shared_ptr<ast::BoundInsertNode> analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::SetNode> analyzeSetNode(std::shared_ptr<ast::SetNode> setNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::SetNode> analyzeSetNode(std::shared_ptr<ast::SetNode> setNode);
    /**
     * Analyzes a single PIPE operator
     *
@@ -144,7 +149,7 @@ class SQLQueryAnalyzer {
     * @param context      Analysis context providing scope and attribute mapping utilities
     * @param resolverScope Resolver scope used for symbol resolution and replacement
     * @return A bound TableProducer representing the analyzed operator
-    * @throws frontend_error on semantic or type errors (e.g., non-boolean WHERE)
+    * @throws FrontendError on semantic or type errors (e.g., non-boolean WHERE)
     */
    std::shared_ptr<ast::TableProducer> analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope);
    /**
@@ -153,7 +158,7 @@ class SQLQueryAnalyzer {
    * @param context      Analysis context providing scope and attribute mapping utilities
    * @param resolverScope Resolver scope used for symbol resolution and replacement
    * @return A bound TableProducer representing the analyzed table reference
-   * @throws frontend_error on semantic or type errors
+   * @throws FrontendError on semantic or type errors
    */
    std::shared_ptr<ast::TableProducer> analyzeTableRef(std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::TableProducer> analyzeExpressionListRef(std::shared_ptr<ast::ExpressionListRef> expressionListRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
@@ -167,7 +172,7 @@ class SQLQueryAnalyzer {
   * @param resultModifier The result modifier to analyze
   * @param context      Analysis context providing scope and attribute mapping utilities
   * @return A bound result modifier representing the analyzed result modifier
-  * @throws frontend_error on semantic or type errors
+  * @throws FrontendError on semantic or type errors
   */
    std::shared_ptr<ast::BoundResultModifier> analyzeResultModifier(std::shared_ptr<ast::ResultModifier> resultModifier, std::shared_ptr<SQLContext> context);
 
@@ -183,7 +188,7 @@ class SQLQueryAnalyzer {
     * @param context      Analysis context providing scope and attribute mapping utilities
     * @param resolverScope Resolver scope used for symbol resolution and replacement
     * @return A bound expression representing the analyzed operator
-    * @throws frontend_error on semantic or type errors (e.g., non-boolean conjunction)
+    * @throws FrontendError on semantic or type errors (e.g., non-boolean conjunction)
     */
    std::shared_ptr<ast::BoundExpression> analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundExpression> analyzeOperatorExpression(std::shared_ptr<ast::OperatorExpression> operatorExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
@@ -201,7 +206,7 @@ class SQLQueryAnalyzer {
    }
 
    catalog::Catalog* catalog;
-   driver drv{};
+   Driver drv{};
    SQLCanonicalizer sqlCanonicalizer{};
 };
 
@@ -239,3 +244,4 @@ struct SQLTypeUtils {
    static std::pair<unsigned long, unsigned long> getAdaptedDecimalPAndSAfterMulDiv(unsigned long p, unsigned long s);
 };
 } // namespace lingodb::analyzer
+#endif

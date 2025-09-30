@@ -85,17 +85,17 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                auto selectNode = std::static_pointer_cast<ast::SelectNode>(queryNode);
                std::shared_ptr<ast::TableProducer> transformed = nullptr;
                //Transform from_clause
-               if (selectNode->from_clause) {
-                  auto transformedFrom = selectNode->from_clause;
+               if (selectNode->fromClause) {
+                  auto transformedFrom = selectNode->fromClause;
 
-                  selectNode->from_clause = nullptr;
+                  selectNode->fromClause = nullptr;
                   transformed = transformedFrom;
                }
                //Transform where_clause
-               if (selectNode->where_clause) {
-                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->where_clause->loc, ast::PipeOperatorType::WHERE, selectNode->where_clause);
+               if (selectNode->whereClause) {
+                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->whereClause->loc, ast::PipeOperatorType::WHERE, selectNode->whereClause);
                   pipe->input = transformed;
-                  selectNode->where_clause = nullptr;
+                  selectNode->whereClause = nullptr;
                   transformed = pipe;
                }
 
@@ -110,7 +110,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
 
 
 
-               auto extendBeforeWindowPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::EXTEND, context->currentScope->extendNodeBeforeWindowFunctions);
+               auto extendBeforeWindowPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->selectList->loc, ast::PipeOperatorType::EXTEND, context->currentScope->extendNodeBeforeWindowFunctions);
                extendBeforeWindowPipeOp->input = transformed;
                transformed = extendBeforeWindowPipeOp;
 
@@ -118,9 +118,9 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
 
 
                //Transform target selection
-               if (selectNode->select_list) {
-                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->select_list->loc, ast::PipeOperatorType::SELECT, selectNode->select_list);
-                  for (auto& target : selectNode->select_list->targets) {
+               if (selectNode->selectList) {
+                  auto pipe = drv.nf.node<ast::PipeOperator>(selectNode->selectList->loc, ast::PipeOperatorType::SELECT, selectNode->selectList);
+                  for (auto& target : selectNode->selectList->targets) {
                      if (target->alias.empty()) {
                         continue;
                      }
@@ -129,7 +129,7 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                   pipe->input = transformed;
 
                   transformed = pipe;
-                  selectNode->select_list = nullptr;
+                  selectNode->selectList = nullptr;
                }
 
                if (selectNode->having) {
@@ -206,7 +206,6 @@ std::shared_ptr<ast::TableProducer> SQLCanonicalizer::canonicalize(std::shared_p
                auto extendPipeOp = drv.nf.node<ast::PipeOperator>(selectNode->loc, ast::PipeOperatorType::EXTEND, extendNode);
                //Extract AggFunctions
                std::vector<std::pair<std::string, std::shared_ptr<ast::ParsedExpression>>> toRemove{};
-               int i = 0;
                //Canonicalize target expressions
                std::ranges::transform(selectNode->targets, selectNode->targets.begin(), [&](std::shared_ptr<ast::ParsedExpression>& target) {
                   return canonicalizeParsedExpression(target, context, true, extendNode);
@@ -690,9 +689,7 @@ std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shar
       switch (astRootNode->nodeType) {
          case ast::NodeType::CREATE_NODE: {
             auto createNode = std::static_pointer_cast<ast::CreateNode>(astRootNode);
-            auto scope = context->createResolverScope();
-            return analyzeCreateNode(createNode, context, scope);
-            ;
+            return analyzeCreateNode(createNode);
          }
          case ast::NodeType::INSERT_NODE: {
             auto insertNode = std::static_pointer_cast<ast::InsertNode>(astRootNode);
@@ -705,8 +702,7 @@ std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shar
          }
          case ast::NodeType::SET_NODE: {
             auto setNode = std::static_pointer_cast<ast::SetNode>(astRootNode);
-            auto scope = context->createResolverScope();
-            setNode = analyzeSetNode(setNode, context, scope);
+            setNode = analyzeSetNode(setNode);
 
             return setNode;
          }
@@ -857,7 +853,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::
    }
 }
 
-std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode) {
    switch (createNode->createInfo->type) {
       case catalog::CatalogEntry::CatalogEntryType::LINGODB_TABLE_ENTRY: {
          auto createTableInfo = std::static_pointer_cast<ast::CreateTableInfo>(createNode->createInfo);
@@ -949,7 +945,7 @@ std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::s
 
    return drv.nf.node<ast::BoundInsertNode>(insertNode->loc, insertNode->schema, insertNode->tableName, exprListTableRef, insertNode->columns, allCollumnTypes);
 }
-std::shared_ptr<ast::SetNode> SQLQueryAnalyzer::analyzeSetNode(std::shared_ptr<ast::SetNode> setNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
+std::shared_ptr<ast::SetNode> SQLQueryAnalyzer::analyzeSetNode(std::shared_ptr<ast::SetNode> setNode) {
    switch (setNode->setType) {
       case ast::SetType::SET: {
          auto setVariableOperation = std::static_pointer_cast<ast::SetVariableStatement>(setNode);
@@ -1180,7 +1176,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                boundAggrNode->groupByNode->localAggregationColumnReferences.at(i).end());
                currentLocalAttributes.emplace_back(boundAggrNode->groupByNode->localPresentIntval.at(i).second);
 
-               size_t id = 0;
                std::vector<std::shared_ptr<ast::ColumnReference>> unionColumnReferences{};
                for (size_t j = 0; j < currentLocalAttributes.size(); j++) {
                   auto left = currentAttributes[j];
@@ -1748,7 +1743,7 @@ std::shared_ptr<ast::BoundResultModifier> SQLQueryAnalyzer::analyzeResultModifie
                      }
                      assert(boundConstant->value);
                      auto constantValue = std::static_pointer_cast<ast::IntValue>(boundConstant->value);
-                     if (context->currentScope->targetInfo.targetColumns.size() < constantValue->iVal || constantValue->iVal <= 0) {
+                     if (context->currentScope->targetInfo.targetColumns.size() < static_cast<size_t>(constantValue->iVal) || constantValue->iVal <= 0) {
                         error("Invalid order by element", boundConstant->loc);
                      }
                      columnReference = context->currentScope->targetInfo.targetColumns.at(constantValue->iVal - 1);
@@ -2301,9 +2296,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(st
                if (boundColRef->resultType.value().type.getTypeId() == catalog::LogicalTypeId::DATE) {
                   return boundColRef;
                }
-               if (boundColRef->resultType.value().type.getTypeId() != catalog::LogicalTypeId::STRING) {
-                  error("Cannot cast " + boundColRef->alias + " to date", boundColRef->loc);
-               }
+               error("Cannot cast " + boundColRef->alias + " to date", boundColRef->loc);
             }
             default: error("Expression cannot be casted to date (unsupported type)", castExpr->loc);
          }

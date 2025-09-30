@@ -1,10 +1,11 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
+#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
+
+
 #include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 
-#include <cstdint>
-#include <string>
 namespace lingodb::ast {
 class BoundResultModifier : public TableProducer {
    public:
@@ -13,7 +14,7 @@ class BoundResultModifier : public TableProducer {
    BoundResultModifier(ResultModifierType type, std::shared_ptr<TableProducer> input)
       : TableProducer(NodeType::BOUND_RESULT_MODIFIER), modifierType(type), input(input) {}
 
-   virtual ~BoundResultModifier() = default;
+   ~BoundResultModifier() override = default;
 
    ResultModifierType modifierType;
    std::shared_ptr<TableProducer> input = nullptr;
@@ -24,7 +25,7 @@ class BoundResultModifier : public TableProducer {
  */
 class BoundOrderByElement {
    public:
-   BoundOrderByElement(OrderType type, OrderByNullType nullOrder, std::shared_ptr<ColumnReference> columnReference) : type(type), nullOrder(nullOrder), columnReference(columnReference) {};
+   BoundOrderByElement(OrderType type, OrderByNullType nullOrder, std::shared_ptr<ColumnReference> columnReference) : type(type), columnReference(columnReference), nullOrder(nullOrder) {};
 
    /// Sort order
    OrderType type;
@@ -52,4 +53,5 @@ class BoundLimitModifier : public BoundResultModifier {
    std::shared_ptr<BoundExpression> limitExpression;
    std::shared_ptr<BoundExpression> offset;
 };
-}
+} // namespace lingodb::ast
+#endif

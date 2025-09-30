@@ -1,4 +1,7 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_GROUP_BY_NODE_H
+#define LINGODB_COMPILER_FRONTEND_AST_GROUP_BY_NODE_H
+
+
 #include "parsed_expression.h"
 #include <memory>
 #include <set>
@@ -21,3 +24,4 @@ class GroupByNode : public AstNode {
 };
 
 } // namespace lingodb::ast
+#endif

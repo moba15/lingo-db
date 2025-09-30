@@ -107,7 +107,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
    bool isFile = false;
    void load(std::string fileOrDirect) {
       lingodb::execution::initializeContext(context);
-      driver drv;
+      Driver drv;
       try {
          if (!drv.parse(fileOrDirect, isFile)) {
             auto results = drv.result;
@@ -124,7 +124,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
             mlir::OpBuilder builder(&context);
 
             mlir::ModuleOp moduleOp = builder.create<mlir::ModuleOp>(builder.getUnknownLoc());
-            lingodb::translator::SQLMlirTranslator translator{moduleOp, catalog};
+            lingodb::translator::SQLMlirTranslator translator{moduleOp};
             builder.setInsertionPointToStart(moduleOp.getBody());
             auto* queryBlock = new mlir::Block;
             std::vector<mlir::Type> returnTypes;
@@ -143,7 +143,7 @@ class SQLFrontend : public lingodb::execution::Frontend {
             } else {
                error.emit() << "Error during parsing";
             }
-      } catch (lingodb::frontend_error& e) {
+      } catch (lingodb::FrontendError& e) {
          error.emit() << e.what();
 
       }

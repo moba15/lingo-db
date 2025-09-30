@@ -2,7 +2,6 @@
 
 #include "lingodb/compiler/frontend/frontend_error.h"
 
-#include <iostream>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
 ASTTransformContext::ASTTransformContext() : currentScope(std::make_shared<ASTTransformScope>()) {
@@ -78,7 +77,7 @@ std::shared_ptr<ast::ColumnReference> SQLContext::getColumnReference(location lo
    if (!resolver.count(name)) {
       std::stringstream ss;
 
-      throw frontend_error("Could not resolve '" + name + "'", loc);
+      throw FrontendError("Could not resolve '" + name + "'", loc);
    }
    const auto res = resolver.lookup(name);
    return res;

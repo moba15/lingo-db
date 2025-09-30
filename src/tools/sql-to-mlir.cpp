@@ -38,9 +38,9 @@ void printMLIR(std::string sql, std::shared_ptr<lingodb::catalog::Catalog> catal
    builder.setInsertionPointToStart(moduleOp.getBody());
    auto* queryBlock = new mlir::Block;
    {
-      driver drv;
+      Driver drv;
       lingodb::analyzer::SQLQueryAnalyzer analyzer{catalog.get()};
-      lingodb::translator::SQLMlirTranslator translator{moduleOp, catalog.get()};
+      lingodb::translator::SQLMlirTranslator translator{moduleOp};
       auto sqlContext = std::make_shared<lingodb::analyzer::SQLContext>();
       sqlContext->catalog = catalog.get();
       if (!drv.parse(sql, false)) {

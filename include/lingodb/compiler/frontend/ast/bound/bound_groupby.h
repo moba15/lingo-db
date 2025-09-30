@@ -1,4 +1,7 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_GROUPBY_H
+#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_GROUPBY_H
+
+
 #include "lingodb/compiler/frontend/ast/ast_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_expression.h"
 #include <memory>
@@ -54,4 +57,5 @@ class BoundGroupByNode : public AstNode {
    std::vector<std::pair<size_t, std::shared_ptr<ColumnReference>>>  groupingFunctions;
 
 };
-}
+} // namespace lingodb::ast
+#endif
