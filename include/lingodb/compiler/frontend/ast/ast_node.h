@@ -1,5 +1,8 @@
-#pragma once
-#include "lingodb/compiler/frontend/sql-parser/gen/location.hh"
+#ifndef LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
+#define LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
+
+
+#include "lingodb/compiler/frontend/generated/location.hh"
 #include <cstdint>
 #include <unordered_map>
 namespace lingodb::ast {
@@ -37,3 +40,5 @@ class AstNode {
    location loc;
 };
 } // namespace lingodb::ast
+
+#endif

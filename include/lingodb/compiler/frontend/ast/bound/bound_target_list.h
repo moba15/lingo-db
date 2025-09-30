@@ -1,8 +1,8 @@
-#ifndef LINGODB_BOUND_TARGET_LIST_H
-#define LINGODB_BOUND_TARGET_LIST_H
+#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_TARGET_LIST_H
+#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_TARGET_LIST_H
 #include "../ast_node.h"
-#include "bound_expression.h"
 #include "../parsed_expression.h"
+#include "bound_expression.h"
 
 #include <memory>
 #include <vector>
@@ -14,6 +14,6 @@ class BoundTargetList : public AstNode {
    std::vector<std::shared_ptr<ColumnReference>> targets;
 
 };
-}
+} // namespace lingodb::ast
 
-#endif //LINGODB_BOUND_TARGET_LIST_H
+#endif // LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_TARGET_LIST_H

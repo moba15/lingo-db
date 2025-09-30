@@ -1,4 +1,7 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_PARSED_EXPRESSION_H
+#define LINGODB_COMPILER_FRONTEND_AST_PARSED_EXPRESSION_H
+
+
 #include "ast_node.h"
 #include "constant_value.h"
 #include "lingodb/catalog/Types.h"
@@ -242,7 +245,7 @@ enum class ExpressionClass : uint8_t {
 
 class ParsedExpression : public BaseExpression {
    public:
-   ParsedExpression(ExpressionType type, ExpressionClass expression_class) : BaseExpression(type, expression_class) {
+   ParsedExpression(ExpressionType type, ExpressionClass expressionClass) : BaseExpression(type, expressionClass) {
    }
    /**
    * Computes a hash value for this expression.
@@ -268,7 +271,7 @@ struct ParsedExprPtrEqual {
 
 class ColumnRefExpression : public ParsedExpression {
    public:
-   static constexpr ExpressionClass TYPE = ExpressionClass::COLUMN_REF;
+   static constexpr ExpressionClass cType = ExpressionClass::COLUMN_REF;
 
    //! Specify both the column and table name
    ColumnRefExpression(std::string columnName, std::string tableName);
@@ -291,7 +294,7 @@ class ColumnRefExpression : public ParsedExpression {
 //! and has two children.
 class ComparisonExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::COMPARISON;
+   static constexpr const ExpressionClass cType = ExpressionClass::COMPARISON;
 
    ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
    ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::vector<std::shared_ptr<ParsedExpression>> rightChildren);
@@ -308,7 +311,7 @@ class ComparisonExpression : public ParsedExpression {
  */
 class ConjunctionExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::CONJUNCTION;
+   static constexpr const ExpressionClass cType = ExpressionClass::CONJUNCTION;
    ConjunctionExpression(ExpressionType type, std::shared_ptr<lingodb::ast::ParsedExpression> left, std::shared_ptr<lingodb::ast::ParsedExpression> right);
    ConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<ParsedExpression>> children);
 
@@ -320,7 +323,7 @@ class ConjunctionExpression : public ParsedExpression {
 
 class ConstantExpression : public ParsedExpression {
    public:
-   static constexpr ExpressionClass TYPE = ExpressionClass::CONSTANT;
+   static constexpr ExpressionClass cType = ExpressionClass::CONSTANT;
    ConstantExpression();
 
    std::shared_ptr<Value> value;
@@ -331,7 +334,7 @@ class ConstantExpression : public ParsedExpression {
 
 class FunctionExpression : public ParsedExpression {
    public:
-   static constexpr ExpressionClass TYPE = ExpressionClass::FUNCTION;
+   static constexpr ExpressionClass cType = ExpressionClass::FUNCTION;
    FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState);
 
    //! Catalog of the function
@@ -366,7 +369,7 @@ static std::vector<std::string> aggregationFunctions{
 
 class StarExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::STAR;
+   static constexpr const ExpressionClass cType = ExpressionClass::STAR;
 
    explicit StarExpression(std::string relationName);
    //! The relation name in case of tbl.*, or empty if this is a normal *
@@ -385,7 +388,7 @@ class StarExpression : public ParsedExpression {
 
 class OperatorExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::OPERATOR;
+   static constexpr const ExpressionClass cType = ExpressionClass::OPERATOR;
    OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left);
    OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
    OperatorExpression(std::string opString, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right);
@@ -399,7 +402,7 @@ class OperatorExpression : public ParsedExpression {
 
 class CastExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::CAST;
+   static constexpr const ExpressionClass cType = ExpressionClass::CAST;
    CastExpression(LogicalTypeWithMods logicalTypeWithMods, std::shared_ptr<ParsedExpression> child);
    std::optional<LogicalTypeWithMods> logicalTypeWithMods;
 
@@ -440,7 +443,7 @@ class WindowFrame {
 };
 class WindowExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::WINDOW;
+   static constexpr const ExpressionClass cType = ExpressionClass::WINDOW;
    WindowExpression();
 
    std::shared_ptr<FunctionExpression> functionExpression;
@@ -477,7 +480,7 @@ class WindowExpression : public ParsedExpression {
 
 class BetweenExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::BETWEEN;
+   static constexpr const ExpressionClass cType = ExpressionClass::BETWEEN;
 
    BetweenExpression(ExpressionType type, std::shared_ptr<ParsedExpression> input, std::shared_ptr<ParsedExpression> lower, std::shared_ptr<ParsedExpression> upper);
 
@@ -502,7 +505,7 @@ enum class SubqueryType : uint8_t {
 
 class SubqueryExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::SUBQUERY;
+   static constexpr const ExpressionClass cType = ExpressionClass::SUBQUERY;
 
    SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery);
 
@@ -528,7 +531,7 @@ class CaseExpression : public ParsedExpression {
       std::shared_ptr<ParsedExpression> thenExpr;
    };
 
-   static constexpr const ExpressionClass TYPE = ExpressionClass::CASE;
+   static constexpr const ExpressionClass cType = ExpressionClass::CASE;
 
    CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr);
 
@@ -545,11 +548,12 @@ class CaseExpression : public ParsedExpression {
  */
 class SetColumnExpression : public ParsedExpression {
    public:
-   static constexpr const ExpressionClass TYPE = ExpressionClass::SET;
-   SetColumnExpression(std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets) : ParsedExpression(ExpressionType::SET, TYPE) , sets(std::move(sets)) {}
+   static constexpr const ExpressionClass cType = ExpressionClass::SET;
+   SetColumnExpression(std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets) : ParsedExpression(ExpressionType::SET, cType) , sets(std::move(sets)) {}
 
    std::vector<std::pair<std::shared_ptr<ColumnRefExpression>,std::shared_ptr<ParsedExpression> >> sets;
    // Custom hash and equality operators are not needed since SetColumnExpression cannot appear in GROUP BY clauses
 };
 
 } // namespace lingodb::ast
+#endif

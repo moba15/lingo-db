@@ -1,4 +1,7 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_AGGREGATION_H
+#define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_AGGREGATION_H
+
+
 #include "bound_expression.h"
 #include "bound_groupby.h"
 namespace lingodb::ast {
@@ -15,4 +18,5 @@ class BoundAggregationNode : public AstNode {
 
    std::vector<std::shared_ptr<BoundExpression>> evalBeforeAggr;
 };
-}
+} // namespace lingodb::ast
+#endif

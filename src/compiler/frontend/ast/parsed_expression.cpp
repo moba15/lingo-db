@@ -2,8 +2,8 @@
 
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 
-#include <cassert>
 #include <clang/AST/Type.h>
+#include <cassert>
 namespace lingodb::ast {
 
 size_t ParsedExpression::hash() {
@@ -22,7 +22,7 @@ ColumnRefExpression::ColumnRefExpression(std::string columnName, std::string tab
 ColumnRefExpression::ColumnRefExpression(std::string columnName) : ColumnRefExpression(std::vector<std::string>{std::move(columnName)}) {
 }
 
-ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) : ParsedExpression(ExpressionType::COLUMN_REF, TYPE), columnNames(columnNames) {
+ColumnRefExpression::ColumnRefExpression(std::vector<std::string> columnNames) : ParsedExpression(ExpressionType::COLUMN_REF, cType), columnNames(columnNames) {
 }
 
 size_t ColumnRefExpression::hash() {
@@ -41,15 +41,15 @@ bool ColumnRefExpression::operator==(ParsedExpression& other) {
 }
 
 /// ComparisonExpression
-ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), left(std::move(left)), rightChildren({std::move(right)}) {
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, cType), left(std::move(left)), rightChildren({std::move(right)}) {
 }
 
-ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::vector<std::shared_ptr<ParsedExpression>> rightChildren) : ParsedExpression(type, TYPE), left(std::move(left)), rightChildren(rightChildren) {
+ComparisonExpression::ComparisonExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::vector<std::shared_ptr<ParsedExpression>> rightChildren) : ParsedExpression(type, cType), left(std::move(left)), rightChildren(rightChildren) {
 }
 
 /// ConjunctionExpression
 ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::shared_ptr<lingodb::ast::ParsedExpression> left, std::shared_ptr<lingodb::ast::ParsedExpression> right) : ConjunctionExpression(type, std::vector{left, right}) {}
-ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<ParsedExpression>> children) : ParsedExpression(type, TYPE), children(std::move(children)) {
+ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<ParsedExpression>> children) : ParsedExpression(type, cType), children(std::move(children)) {
 }
 
 
@@ -73,7 +73,7 @@ bool ConjunctionExpression::operator==(ParsedExpression& other) {
    }
    // Compare each child expression
    for (size_t i = 0; i < children.size(); i++) {
-      if (!(*children[i] == *otherConj.children[i])) {
+      if ((*children[i] != *otherConj.children[i])) {
          return false;
       }
    }
@@ -83,7 +83,7 @@ bool ConjunctionExpression::operator==(ParsedExpression& other) {
 
 
 /// ConstantExpression
-ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, TYPE) {}
+ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, cType) {}
 
 
 size_t ConstantExpression::hash() {
@@ -113,7 +113,7 @@ bool ConstantExpression::operator==(ParsedExpression& other) {
    return *value == *otherConst.value;
 }
 /// FunctionExpression
-FunctionExpression::FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState) : ParsedExpression(ExpressionType::FUNCTION, TYPE), catalog(catalog), schema(schema), functionName(functionName), isOperator(isOperator), distinct(distinct), exportState(exportState) {
+FunctionExpression::FunctionExpression(std::string catalog, std::string schema, std::string functionName, bool isOperator, bool distinct, bool exportState) : ParsedExpression(ExpressionType::FUNCTION, cType), catalog(catalog), schema(schema), functionName(functionName), isOperator(isOperator), distinct(distinct), exportState(exportState) {
    auto found = std::find(aggregationFunctions.begin(), aggregationFunctions.end(), functionName);
    if (found != aggregationFunctions.end()) {
       this->type = ExpressionType::AGGREGATE;
@@ -231,11 +231,11 @@ bool StarExpression::operator==(ParsedExpression& other) {
 }
 
 
-OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left) : ParsedExpression(type, TYPE), children(std::vector{left}) {
+OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left) : ParsedExpression(type, cType), children(std::vector{left}) {
 }
-OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, TYPE), children(std::vector{left, right}) {
+OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(type, cType), children(std::vector{left, right}) {
 }
-OperatorExpression::OperatorExpression(std::string opString, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(ExpressionType::OPERATOR_UNKNOWN, TYPE), opString(opString), children(std::vector{left, right}) {
+OperatorExpression::OperatorExpression(std::string opString, std::shared_ptr<ParsedExpression> left, std::shared_ptr<ParsedExpression> right) : ParsedExpression(ExpressionType::OPERATOR_UNKNOWN, cType), children(std::vector{left, right}), opString(opString) {
 }
 size_t OperatorExpression::hash() {
    size_t result = ParsedExpression::hash();
@@ -269,7 +269,7 @@ bool OperatorExpression::operator==(ParsedExpression& other) {
    }
 
    for (size_t i = 0; i < children.size(); i++) {
-      if (!(*children[i] == *otherOp.children[i])) {
+      if ((*children[i] != *otherOp.children[i])) {
          return false;
       }
    }
@@ -277,7 +277,7 @@ bool OperatorExpression::operator==(ParsedExpression& other) {
    return true;
 }
 
-CastExpression::CastExpression(LogicalTypeWithMods logicalTypeWithMods, std::shared_ptr<ParsedExpression> child) : ParsedExpression(ExpressionType::CAST, TYPE), logicalTypeWithMods(logicalTypeWithMods), child(std::move(child)) {
+CastExpression::CastExpression(LogicalTypeWithMods logicalTypeWithMods, std::shared_ptr<ParsedExpression> child) : ParsedExpression(ExpressionType::CAST, cType), logicalTypeWithMods(logicalTypeWithMods), child(std::move(child)) {
 }
 
 size_t CastExpression::hash() {
@@ -329,7 +329,7 @@ bool CastExpression::operator==(ParsedExpression& other) {
         }
 
         for (size_t i = 0; i < logicalTypeWithMods->typeModifiers.size(); i++) {
-            if (!(*logicalTypeWithMods->typeModifiers[i] ==
+            if ((*logicalTypeWithMods->typeModifiers[i] !=
                   *otherCast.logicalTypeWithMods->typeModifiers[i])) {
                 return false;
             }
@@ -350,10 +350,10 @@ WindowFrame::WindowFrame(WindowFrameType start) : start(start) {
 }
 WindowFrame::WindowFrame(WindowFrameType start, std::shared_ptr<ParsedExpression> startExpr) : start(start), startExpr(startExpr) {
 }
-WindowExpression::WindowExpression() : ParsedExpression(ExpressionType::WINDOW_INVALID, TYPE) {
+WindowExpression::WindowExpression() : ParsedExpression(ExpressionType::WINDOW_INVALID, cType) {
 }
 
-BetweenExpression::BetweenExpression(ExpressionType type, std::shared_ptr<ParsedExpression> input, std::shared_ptr<ParsedExpression> lower, std::shared_ptr<ParsedExpression> upper) : ParsedExpression(type, TYPE), input(input), lower(lower), upper(upper) {
+BetweenExpression::BetweenExpression(ExpressionType type, std::shared_ptr<ParsedExpression> input, std::shared_ptr<ParsedExpression> lower, std::shared_ptr<ParsedExpression> upper) : ParsedExpression(type, cType), input(input), lower(lower), upper(upper) {
    assert(lower != nullptr && upper != nullptr && input != nullptr);
    assert(type == ExpressionType::COMPARE_BETWEEN || type == ExpressionType::COMPARE_NOT_BETWEEN);
 }
@@ -416,7 +416,7 @@ bool BetweenExpression::operator==(ParsedExpression& other) {
 }
 
 
-SubqueryExpression::SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY, TYPE), subQueryType(subQueryType), subquery(subquery) {
+SubqueryExpression::SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY, cType), subQueryType(subQueryType), subquery(subquery) {
 }
 
 size_t SubqueryExpression::hash() {
@@ -467,7 +467,7 @@ bool SubqueryExpression::operator==(ParsedExpression& other) {
 }
 
 
-CaseExpression::CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, TYPE), caseExpr(caseExpr), caseChecks(std::move(caseChecks)), elseExpr(std::move(elseExpr)) {
+CaseExpression::CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, cType), caseChecks(std::move(caseChecks)), caseExpr(caseExpr), elseExpr(std::move(elseExpr)) {
 }
 
 
@@ -508,7 +508,7 @@ bool CaseExpression::operator==(ParsedExpression& other) {
         return false;
     }
     if (caseExpr && *caseExpr && otherCase.caseExpr && *otherCase.caseExpr) {
-        if (!(**caseExpr == **otherCase.caseExpr)) {
+        if ((**caseExpr != **otherCase.caseExpr)) {
             return false;
         }
     }

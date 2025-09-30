@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_SQL_MLIR_TRANSLATOR_H
+#define LINGODB_COMPILER_FRONTEND_SQL_MLIR_TRANSLATOR_H
+
 #include "ast/bound/bound_insert_node.h"
 #include "ast/bound/bound_pipe_operator.h"
 #include "ast/create_node.h"
@@ -6,21 +8,21 @@
 #include "lingodb/compiler/frontend/ast/bound/bound_aggregation.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_resultmodifier.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_tableref.h"
+#include "lingodb/compiler/frontend/ast/copy_node.h"
 #include "lingodb/compiler/frontend/ast/parsed_expression.h"
 #include "lingodb/compiler/frontend/ast/set_node.h"
-#include "lingodb/compiler/frontend/ast/copy_node.h"
 #include "lingodb/compiler/frontend/frontend_error.h"
 #include "lingodb/compiler/frontend/sql_context.h"
 #include "lingodb/compiler/frontend/translation_context.h"
 
 #include <memory>
 
-#include "mlir/IR/BuiltinOps.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/Dialect/LLVMIR/LLVMDialect.h"
 #include "mlir/Dialect/MemRef/IR/MemRef.h"
 #include "mlir/Dialect/SCF/IR/SCF.h"
+#include "mlir/IR/BuiltinOps.h"
 
 #include <lingodb/compiler/Dialect/util/UtilOps.h>
 
@@ -29,11 +31,11 @@ namespace lingodb::translator {
    {                                                                \
       std::ostringstream s{};                                       \
       s << message; \
-      throw frontend_error(s.str(), loc);                            \
+      throw FrontendError(s.str(), loc);                            \
    }
 class SQLMlirTranslator {
    public:
-   SQLMlirTranslator(mlir::ModuleOp moduleOp, catalog::Catalog* catalog);
+   SQLMlirTranslator(mlir::ModuleOp moduleOp);
    mlir::ModuleOp moduleOp;
    compiler::dialect::tuples::ColumnManager& attrManager;
 
@@ -41,7 +43,6 @@ class SQLMlirTranslator {
 
    private:
    std::shared_ptr<TranslationContext> translationContext;
-   catalog::Catalog* catalog;
 
    mlir::Value translateTableProducer(mlir::OpBuilder& builder, std::shared_ptr<ast::TableProducer> tableProducer, std::shared_ptr<analyzer::SQLContext> context);
 
@@ -87,3 +88,4 @@ class SQLMlirTranslator {
    public:
 };
 } // namespace lingodb::translator
+#endif

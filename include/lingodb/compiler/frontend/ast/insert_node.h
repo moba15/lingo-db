@@ -1,4 +1,7 @@
-#pragma once
+#ifndef LINGODB_COMPILER_FRONTEND_AST_INSERT_NODE_H
+#define LINGODB_COMPILER_FRONTEND_AST_INSERT_NODE_H
+
+
 #include "ast_node.h"
 #include "constraint.h"
 #include "parsed_expression.h"
@@ -20,3 +23,4 @@ class InsertNode : public AstNode {
 };
 
 } // namespace lingodb::ast
+#endif
