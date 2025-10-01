@@ -53,11 +53,8 @@ void printMLIR(std::string sql, std::shared_ptr<lingodb::catalog::Catalog> catal
          throw std::runtime_error("Something went wrong");
       }
 
-
       mlir::OpBuilder::InsertionGuard guard(builder);
       builder.setInsertionPointToStart(queryBlock);
-
-
 
       auto val = translator.translateStart(builder, drv.result[0], sqlContext);
       if (val.has_value()) {

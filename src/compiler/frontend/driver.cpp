@@ -1,7 +1,7 @@
 #include "lingodb/compiler/frontend/driver.h"
 
 Driver::Driver()
-   : traceScanning(false) , traceParsing(false) {}
+   : traceScanning(false), traceParsing(false) {}
 
 int Driver::parse(const std::string& f, bool isFile) {
    file = f;

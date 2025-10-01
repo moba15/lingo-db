@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_TABLEREF_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_TABLEREF_H
 
-
 #include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 #include "lingodb/compiler/frontend/ast/tableref.h"
@@ -31,7 +30,7 @@ class BoundJoinRef : public BoundTableRef {
    static constexpr TableReferenceType cType = TableReferenceType::JOIN;
 
    public:
-   BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, boundJoinCond condition) : BoundTableRef(cType), left(std::move(left)), right(std::move(right)), condition(std::move(condition)), type(type), refType(refType)  {}
+   BoundJoinRef(JoinType type, JoinCondType refType, std::shared_ptr<TableProducer> left, std::shared_ptr<TableProducer> right, boundJoinCond condition) : BoundTableRef(cType), left(std::move(left)), right(std::move(right)), condition(std::move(condition)), type(type), refType(refType) {}
 
    //! The left hand side of the join
    //! QueryNode as variant is needed for pipe syntax. Example: FROM Test |> join ok on id1=id2
@@ -61,6 +60,7 @@ class BoundJoinRef : public BoundTableRef {
 
 class BoundCrossProductRef : public BoundTableRef {
    static constexpr TableReferenceType cType = TableReferenceType::CROSS_PRODUCT;
+
    public:
    BoundCrossProductRef(std::vector<std::shared_ptr<TableProducer>> boundTables) : BoundTableRef(cType), boundTables(boundTables) {}
    std::vector<std::shared_ptr<TableProducer>> boundTables;
@@ -83,7 +83,7 @@ class BoundSubqueryRef : public BoundTableRef {
 class BoundExpressionListRef : public BoundTableRef {
    public:
    static constexpr TableReferenceType cType = TableReferenceType::BOUND_EXPRESSION_LIST;
-   BoundExpressionListRef(std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values, std::vector<std::shared_ptr<ColumnReference>> columnReferenceEntries) :  BoundTableRef(cType), values(std::move(values)), columnReferenceEntries(std::move(columnReferenceEntries)) {}
+   BoundExpressionListRef(std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values, std::vector<std::shared_ptr<ColumnReference>> columnReferenceEntries) : BoundTableRef(cType), values(std::move(values)), columnReferenceEntries(std::move(columnReferenceEntries)) {}
 
    //! The expressions in the list
    std::vector<std::vector<std::shared_ptr<BoundConstantExpression>>> values;

@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_QUERY_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_QUERY_NODE_H
 
-
 #include "lingodb/compiler/frontend/ast/query_node.h"
 #include "lingodb/compiler/frontend/sql_scope.h"
 namespace lingodb::ast {

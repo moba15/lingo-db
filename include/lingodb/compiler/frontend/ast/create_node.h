@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_CREATE_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_CREATE_NODE_H
 
-
 #include "ast_node.h"
 #include "constraint.h"
 #include "lingodb/catalog/Catalog.h"
@@ -60,7 +59,7 @@ class TableElement {
 class ColumnElement : public TableElement {
    public:
    ColumnElement(std::string name, LogicalTypeWithMods typeMods)
-      : TableElement(TableElementType::COLUMN), logicalTypeWithMods(typeMods),name(std::move(name)) {}
+      : TableElement(TableElementType::COLUMN), logicalTypeWithMods(typeMods), name(std::move(name)) {}
 
    LogicalTypeWithMods logicalTypeWithMods;
    std::string name;

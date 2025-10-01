@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_AST_NODE_H
 
-
 #include "lingodb/compiler/frontend/generated/location.hh"
 #include <cstdint>
 #include <unordered_map>

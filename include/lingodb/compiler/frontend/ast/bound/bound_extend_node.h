@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_EXTEND_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_EXTEND_NODE_H
 
-
 #include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
 namespace lingodb::ast {

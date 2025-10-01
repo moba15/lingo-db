@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_RESULTMODIFIER_H
 
-
 #include "bound_expression.h"
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"
@@ -48,7 +47,7 @@ class BoundOrderByModifier : public BoundResultModifier {
 
 class BoundLimitModifier : public BoundResultModifier {
    public:
-   BoundLimitModifier(std::shared_ptr<BoundExpression> limitExpression, std::shared_ptr<BoundExpression> offset, std::shared_ptr<TableProducer> input) : BoundResultModifier(ResultModifierType::BOUND_LIMIT, input), limitExpression(limitExpression), offset(offset){}
+   BoundLimitModifier(std::shared_ptr<BoundExpression> limitExpression, std::shared_ptr<BoundExpression> offset, std::shared_ptr<TableProducer> input) : BoundResultModifier(ResultModifierType::BOUND_LIMIT, input), limitExpression(limitExpression), offset(offset) {}
 
    std::shared_ptr<BoundExpression> limitExpression;
    std::shared_ptr<BoundExpression> offset;

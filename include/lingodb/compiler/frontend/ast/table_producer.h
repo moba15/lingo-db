@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_TABLE_PRODUCER_H
 #define LINGODB_COMPILER_FRONTEND_AST_TABLE_PRODUCER_H
 
-
 #include "ast_node.h"
 ///A node that produces a relation/table
 namespace lingodb::ast {

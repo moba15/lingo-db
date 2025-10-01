@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_EXTEND_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_EXTEND_NODE_H
 
-
 #include "ast_node.h"
 #include "parsed_expression.h"
 #include "table_producer.h"

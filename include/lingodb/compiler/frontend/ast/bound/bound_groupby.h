@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_GROUPBY_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_GROUPBY_H
 
-
 #include "lingodb/compiler/frontend/ast/ast_node.h"
 #include "lingodb/compiler/frontend/ast/bound/bound_expression.h"
 #include <memory>
@@ -21,7 +20,7 @@ class BoundGroupByNode : public AstNode {
     * Example: GROUPING SETS ( (e1,e2), (e1), () )
     * localGroupByColumnReferences = {{e1,e2}, {e1}}
     */
-   std::vector<std::vector<std::shared_ptr<ColumnReference>>>   localGroupByColumnReferences;
+   std::vector<std::vector<std::shared_ptr<ColumnReference>>> localGroupByColumnReferences;
 
    /**
    * Stores the ColumnReferences of the aggregation functions for each grouping set
@@ -45,7 +44,7 @@ class BoundGroupByNode : public AstNode {
    /**
     * Stores the current grouping state. Used for GROUPING function
     */
-   std::vector<std::pair<size_t, std::shared_ptr<ColumnReference>>>  localPresentIntval;
+   std::vector<std::pair<size_t, std::shared_ptr<ColumnReference>>> localPresentIntval;
 
    /**
     * Stores the reference/ColumnReference after the union of the different grouping sets
@@ -54,8 +53,7 @@ class BoundGroupByNode : public AstNode {
    /**
     * Stores the reference/ColumnReference to the GROUPING function for the group by expression at the specified index
     */
-   std::vector<std::pair<size_t, std::shared_ptr<ColumnReference>>>  groupingFunctions;
-
+   std::vector<std::pair<size_t, std::shared_ptr<ColumnReference>>> groupingFunctions;
 };
 } // namespace lingodb::ast
 #endif

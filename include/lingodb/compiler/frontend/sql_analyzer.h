@@ -16,11 +16,11 @@
 #include <sys/resource.h>
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
-#define error(message, loc)                       \
-   {                                               \
-      std::ostringstream s{};                     \
-      s << message; \
-      throw FrontendError(s.str(), loc);          \
+#define error(message, loc)              \
+   {                                     \
+      std::ostringstream s{};            \
+      s << message;                      \
+      throw FrontendError(s.str(), loc); \
    }
 class StackGuard {
    public:
@@ -45,10 +45,10 @@ class StackGuardNormal : public StackGuard {
    ~StackGuardNormal() override = default;
    void reset() override;
    bool newStackNeeded() override;
+
    private:
    void* startFameAddress;
    size_t limit;
-
 };
 
 /**
@@ -60,11 +60,11 @@ class StackGuardFiber : public StackGuard {
    ~StackGuardFiber() override = default;
    void reset() override;
    bool newStackNeeded() override;
+
    private:
    size_t limit;
    void* startFameAddress;
    boost::context::stack_context& stackContext;
-
 };
 
 class SQLCanonicalizer {
@@ -127,7 +127,6 @@ class SQLCanonicalizer {
 
 class SQLQueryAnalyzer {
    public:
-
    SQLQueryAnalyzer(catalog::Catalog* catalog);
    std::shared_ptr<SQLContext> context = std::make_shared<SQLContext>();
    std::shared_ptr<StackGuard> stackGuard = std::make_shared<StackGuardNormal>();
@@ -175,8 +174,6 @@ class SQLQueryAnalyzer {
   * @throws FrontendError on semantic or type errors
   */
    std::shared_ptr<ast::BoundResultModifier> analyzeResultModifier(std::shared_ptr<ast::ResultModifier> resultModifier, std::shared_ptr<SQLContext> context);
-
-
 
    /**
     * Analyzes expressions

@@ -140,12 +140,11 @@ class SQLFrontend : public lingodb::execution::Frontend {
             mlir::func::FuncOp funcOp = builder.create<mlir::func::FuncOp>(builder.getUnknownLoc(), "main", builder.getFunctionType({}, {}));
             funcOp.getBody().push_back(queryBlock);
             module = moduleOp;
-            } else {
-               error.emit() << "Error during parsing";
-            }
+         } else {
+            error.emit() << "Error during parsing";
+         }
       } catch (lingodb::FrontendError& e) {
          error.emit() << e.what();
-
       }
    }
 
@@ -157,13 +156,11 @@ class SQLFrontend : public lingodb::execution::Frontend {
       load(fileName);
    }
 
-
    mlir::ModuleOp* getModule() override {
       assert(module);
       return module.operator->();
    }
 };
-
 
 } // namespace
 std::unique_ptr<lingodb::execution::Frontend> lingodb::execution::createMLIRFrontend() {

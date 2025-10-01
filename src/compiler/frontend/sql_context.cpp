@@ -86,7 +86,7 @@ std::shared_ptr<ast::ColumnReference> SQLContext::getColumnReference(location lo
 void SQLContext::replace(ResolverScope& scope, std::shared_ptr<ast::ColumnReference> old, std::shared_ptr<ast::ColumnReference> value) {
    std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> toReplace;
    std::ranges::copy_if(definedAttributes.top(), std::back_inserter(toReplace), [&](auto& p) { return p.second == old; });
-   for (auto& c: toReplace) {
+   for (auto& c : toReplace) {
       mapAttribute(scope, c.first, value);
    }
 }
