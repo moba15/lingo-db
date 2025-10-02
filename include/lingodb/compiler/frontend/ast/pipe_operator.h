@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_PIPE_OPERATOR_H
 #define LINGODB_COMPILER_FRONTEND_AST_PIPE_OPERATOR_H
 
-
 #include "parsed_expression.h"
 #include "table_producer.h"
 #include "tableref.h"

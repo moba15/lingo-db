@@ -1,8 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_PIPE_OPERATOR_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_PIPE_OPERATOR_H
 
-
-
 #include "lingodb/compiler/frontend/ast/pipe_operator.h"
 #include "lingodb/compiler/frontend/column_semantic.h"
 #include "lingodb/compiler/frontend/sql_context.h"

@@ -7,9 +7,9 @@ FrontendError::FrontendError(const std::string& message) : std::runtime_error(me
 }
 FrontendError::FrontendError(const std::string& message, const location& loc) : std::runtime_error(message), loc(loc) {
    std::ostringstream s{};
-   s << runtime_error::what() << " at " << std::endl << loc;
+   s << runtime_error::what() << " at " << std::endl
+     << loc;
    errorMsg = s.str();
-
 }
 const char* FrontendError::what() const noexcept {
    return errorMsg.c_str();

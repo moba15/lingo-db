@@ -12,7 +12,6 @@ class BoundTargetList : public AstNode {
    BoundTargetList(bool distinct, std::vector<std::shared_ptr<ColumnReference>> targets) : AstNode(NodeType::TARGET_LIST), distinct(distinct), targets(std::move(targets)) {}
    bool distinct = false;
    std::vector<std::shared_ptr<ColumnReference>> targets;
-
 };
 } // namespace lingodb::ast
 

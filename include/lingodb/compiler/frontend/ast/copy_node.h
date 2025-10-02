@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_COPY_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_COPY_NODE_H
 
-
 #include "ast_node.h"
 #include "parsed_expression.h"
 
@@ -19,6 +18,7 @@ class CopyInfo {
  */
 class CopyNode : public AstNode {
    static constexpr NodeType cType = NodeType::COPY_NODE;
+
    public:
    CopyNode() : AstNode(cType), copyInfo(std::make_shared<CopyInfo>()) {}
    std::shared_ptr<CopyInfo> copyInfo;

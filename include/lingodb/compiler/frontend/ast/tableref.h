@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_TABLEREF_H
 #define LINGODB_COMPILER_FRONTEND_AST_TABLEREF_H
 
-
 #include "ast_node.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "table_producer.h"
@@ -118,8 +117,9 @@ class JoinRef : public TableRef {
 
 class CrossProductRef : public TableRef {
    static constexpr TableReferenceType cType = TableReferenceType::CROSS_PRODUCT;
+
    public:
-   CrossProductRef() :  TableRef(cType) {}
+   CrossProductRef() : TableRef(cType) {}
    std::vector<std::shared_ptr<TableProducer>> tables;
 };
 
@@ -141,11 +141,10 @@ class SubqueryRef : public TableRef {
 class ExpressionListRef : public TableRef {
    public:
    static constexpr TableReferenceType cType = TableReferenceType::EXPRESSION_LIST;
-   ExpressionListRef(std::vector<std::vector<std::shared_ptr<ParsedExpression>>> values) :  TableRef(cType), values(std::move(values)) {}
+   ExpressionListRef(std::vector<std::vector<std::shared_ptr<ParsedExpression>>> values) : TableRef(cType), values(std::move(values)) {}
 
    //! The expressions in the list
    std::vector<std::vector<std::shared_ptr<ParsedExpression>>> values;
-
 };
 
 } // namespace lingodb::ast

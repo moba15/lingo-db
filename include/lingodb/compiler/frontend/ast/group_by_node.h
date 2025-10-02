@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_GROUP_BY_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_GROUP_BY_NODE_H
 
-
 #include "parsed_expression.h"
 #include <memory>
 #include <set>
@@ -18,7 +17,7 @@ class GroupByNode : public AstNode {
 
    std::vector<std::set<size_t>> groupingSet;
 
-      std::unordered_set<std::shared_ptr<FunctionExpression>, ParsedExprPtrHash, ParsedExprPtrEqual> groupingFunctions;
+   std::unordered_set<std::shared_ptr<FunctionExpression>, ParsedExprPtrHash, ParsedExprPtrEqual> groupingFunctions;
 
    bool rollup = false;
 };

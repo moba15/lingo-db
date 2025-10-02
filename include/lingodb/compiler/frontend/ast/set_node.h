@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_SET_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_SET_NODE_H
 
-
 #include "ast_node.h"
 #include "parsed_expression.h"
 
@@ -17,6 +16,7 @@ enum class SetType : uint8_t {
  */
 class SetNode : public AstNode {
    static constexpr NodeType cType = NodeType::SET_NODE;
+
    public:
    SetNode(SetType setType, std::string name) : AstNode(cType), setType(setType), name(name) {}
 

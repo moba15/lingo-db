@@ -1,8 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_INSERT_NODE_H
 #define LINGODB_COMPILER_FRONTEND_AST_BOUND_BOUND_INSERT_NODE_H
 
-
-
 #include "lingodb/catalog/Column.h"
 #include "lingodb/compiler/frontend/ast/ast_node.h"
 #include "lingodb/compiler/frontend/ast/table_producer.h"

@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_PARSED_EXPRESSION_H
 #define LINGODB_COMPILER_FRONTEND_AST_PARSED_EXPRESSION_H
 
-
 #include "ast_node.h"
 #include "constant_value.h"
 #include "lingodb/catalog/Types.h"
@@ -27,7 +26,6 @@ class LogicalTypeWithMods {
 class BaseExpression : public AstNode {
    public:
    BaseExpression(ExpressionType type, ExpressionClass exprClass) : AstNode(NodeType::EXPRESSION), type(type), exprClass(exprClass) {}
-
 
    ExpressionType type;
    ExpressionClass exprClass;
@@ -385,7 +383,6 @@ class StarExpression : public ParsedExpression {
    bool operator==(ParsedExpression& other) override;
 };
 
-
 class OperatorExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass cType = ExpressionClass::OPERATOR;
@@ -448,11 +445,10 @@ class WindowExpression : public ParsedExpression {
 
    std::shared_ptr<FunctionExpression> functionExpression;
 
-
    /// Set of expressions to partition by
    std::vector<std::shared_ptr<ParsedExpression>> partitions;
    /// Ordering clause
-    std::optional<std::shared_ptr<OrderByModifier>> order;
+   std::optional<std::shared_ptr<OrderByModifier>> order;
 
    /// Expression representing a filter, only used for aggregates
    std::shared_ptr<ParsedExpression> filter;
@@ -549,9 +545,9 @@ class CaseExpression : public ParsedExpression {
 class SetColumnExpression : public ParsedExpression {
    public:
    static constexpr const ExpressionClass cType = ExpressionClass::SET;
-   SetColumnExpression(std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets) : ParsedExpression(ExpressionType::SET, cType) , sets(std::move(sets)) {}
+   SetColumnExpression(std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets) : ParsedExpression(ExpressionType::SET, cType), sets(std::move(sets)) {}
 
-   std::vector<std::pair<std::shared_ptr<ColumnRefExpression>,std::shared_ptr<ParsedExpression> >> sets;
+   std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets;
    // Custom hash and equality operators are not needed since SetColumnExpression cannot appear in GROUP BY clauses
 };
 

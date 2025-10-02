@@ -143,7 +143,7 @@ std::string Type::toString() const {
       case LogicalTypeId::NONE:
          return "none";
       default:
-            return "none";
+         return "none";
    }
 }
 std::string IntTypeInfo::toString() {

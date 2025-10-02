@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_CONSTRAINT_H
 #define LINGODB_COMPILER_FRONTEND_AST_CONSTRAINT_H
 
-
 #include <cstdint>
 #include <lingodb/compiler/frontend/generated/location.hh>
 #include <vector>

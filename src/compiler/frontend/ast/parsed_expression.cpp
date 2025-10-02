@@ -2,7 +2,6 @@
 
 #include "lingodb/compiler/frontend/ast/result_modifier.h"
 
-#include <clang/AST/Type.h>
 #include <cassert>
 namespace lingodb::ast {
 
@@ -52,7 +51,6 @@ ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::shared_pt
 ConjunctionExpression::ConjunctionExpression(ExpressionType type, std::vector<std::shared_ptr<ParsedExpression>> children) : ParsedExpression(type, cType), children(std::move(children)) {
 }
 
-
 size_t ConjunctionExpression::hash() {
    size_t result = ParsedExpression::hash();
    // Hash all children expressions using built-in hash combine
@@ -80,11 +78,8 @@ bool ConjunctionExpression::operator==(ParsedExpression& other) {
    return true;
 }
 
-
-
 /// ConstantExpression
 ConstantExpression::ConstantExpression() : ParsedExpression(ExpressionType::VALUE_CONSTANT, cType) {}
-
 
 size_t ConstantExpression::hash() {
    size_t result = ParsedExpression::hash();
@@ -119,7 +114,6 @@ FunctionExpression::FunctionExpression(std::string catalog, std::string schema, 
       this->type = ExpressionType::AGGREGATE;
    }
 }
-
 
 size_t FunctionExpression::hash() {
    size_t result = ParsedExpression::hash();
@@ -190,7 +184,6 @@ StarExpression::StarExpression(std::string relationName)
    : ParsedExpression(ExpressionType::STAR, ExpressionClass::STAR), relationName(std::move(relationName)) {
 }
 
-
 size_t StarExpression::hash() {
    size_t result = ParsedExpression::hash();
    // Hash the relation name
@@ -229,7 +222,6 @@ bool StarExpression::operator==(ParsedExpression& other) {
    }
    return *expr == *otherStar.expr;
 }
-
 
 OperatorExpression::OperatorExpression(ExpressionType type, std::shared_ptr<ParsedExpression> left) : ParsedExpression(type, cType), children(std::vector{left}) {
 }
@@ -281,69 +273,68 @@ CastExpression::CastExpression(LogicalTypeWithMods logicalTypeWithMods, std::sha
 }
 
 size_t CastExpression::hash() {
-    size_t result = ParsedExpression::hash();
+   size_t result = ParsedExpression::hash();
 
-    // Hash the logical type with mods if present
-    if (logicalTypeWithMods) {
-        // Hash the logical type
-        result ^= std::hash<uint8_t>{}(static_cast<uint8_t>(logicalTypeWithMods->logicalTypeId)) +
-                  0x9e3779b9 + (result << 6) + (result >> 2);
+   // Hash the logical type with mods if present
+   if (logicalTypeWithMods) {
+      // Hash the logical type
+      result ^= std::hash<uint8_t>{}(static_cast<uint8_t>(logicalTypeWithMods->logicalTypeId)) +
+         0x9e3779b9 + (result << 6) + (result >> 2);
 
-        // Hash type modifiers
-        for (const auto& mod : logicalTypeWithMods->typeModifiers) {
-            if (mod) {
-                result ^= mod->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-            }
-        }
-    }
+      // Hash type modifiers
+      for (const auto& mod : logicalTypeWithMods->typeModifiers) {
+         if (mod) {
+            result ^= mod->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+         }
+      }
+   }
 
+   // Hash the child expression
+   if (child) {
+      result ^= child->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+   }
 
-    // Hash the child expression
-    if (child) {
-        result ^= child->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-    }
-
-    return result;
+   return result;
 }
 
 bool CastExpression::operator==(ParsedExpression& other) {
-    if (!ParsedExpression::operator==(other)) {
-        return false;
-    }
+   if (!ParsedExpression::operator==(other)) {
+      return false;
+   }
 
-    auto& otherCast = static_cast<CastExpression&>(other);
+   auto& otherCast = static_cast<CastExpression&>(other);
 
-    // Compare logical type with mods
-    if (logicalTypeWithMods.has_value() != otherCast.logicalTypeWithMods.has_value()) {
-        return false;
-    }
+   // Compare logical type with mods
+   if (logicalTypeWithMods.has_value() != otherCast.logicalTypeWithMods.has_value()) {
+      return false;
+   }
 
-    if (logicalTypeWithMods) {
-        if (logicalTypeWithMods->logicalTypeId != otherCast.logicalTypeWithMods->logicalTypeId) {
+   if (logicalTypeWithMods) {
+      if (logicalTypeWithMods->logicalTypeId != otherCast.logicalTypeWithMods->logicalTypeId) {
+         return false;
+      }
+
+      if (logicalTypeWithMods->typeModifiers.size() !=
+          otherCast.logicalTypeWithMods->typeModifiers.size()) {
+         return false;
+      }
+
+      for (size_t i = 0; i < logicalTypeWithMods->typeModifiers.size(); i++) {
+         if ((*logicalTypeWithMods->typeModifiers[i] !=
+              *otherCast.logicalTypeWithMods->typeModifiers[i])) {
             return false;
-        }
+         }
+      }
+   }
 
-        if (logicalTypeWithMods->typeModifiers.size() !=
-            otherCast.logicalTypeWithMods->typeModifiers.size()) {
-            return false;
-        }
-
-        for (size_t i = 0; i < logicalTypeWithMods->typeModifiers.size(); i++) {
-            if ((*logicalTypeWithMods->typeModifiers[i] !=
-                  *otherCast.logicalTypeWithMods->typeModifiers[i])) {
-                return false;
-            }
-        }
-    }
-
-    // Compare child expressions
-    if (child == otherCast.child) {
-        return true; // Both null or same pointer
-    }
-    if (!child || !otherCast.child) {
-        return false; // One is null, other isn't
-    }
-    return *child == *otherCast.child;
+   // Compare child expressions
+   if (child == otherCast.child) {
+      return true; // Both null or same pointer
+   }
+   if (!child || !otherCast.child) {
+      return false; // One is null, other isn't
+   }
+   return *child == *otherCast.child;
 }
 
 WindowFrame::WindowFrame(WindowFrameType start) : start(start) {
@@ -398,23 +389,22 @@ bool BetweenExpression::operator==(ParsedExpression& other) {
    if (!((input == otherBetween.input) ||
          (input && otherBetween.input && *input == *otherBetween.input))) {
       return false;
-         }
+   }
 
    // Compare lower bounds
    if (!((lower == otherBetween.lower) ||
          (lower && otherBetween.lower && *lower == *otherBetween.lower))) {
       return false;
-         }
+   }
 
    // Compare upper bounds
    if (!((upper == otherBetween.upper) ||
          (upper && otherBetween.upper && *upper == *otherBetween.upper))) {
       return false;
-         }
+   }
 
    return true;
 }
-
 
 SubqueryExpression::SubqueryExpression(SubqueryType subQueryType, std::shared_ptr<TableProducer> subquery) : ParsedExpression(ExpressionType::SUBQUERY, cType), subQueryType(subQueryType), subquery(subquery) {
 }
@@ -424,7 +414,7 @@ size_t SubqueryExpression::hash() {
 
    // Hash subquery type
    result ^= std::hash<uint8_t>{}(static_cast<uint8_t>(subQueryType)) +
-             0x9e3779b9 + (result << 6) + (result >> 2);
+      0x9e3779b9 + (result << 6) + (result >> 2);
 
    // Hash subquery
    if (subquery) {
@@ -461,83 +451,80 @@ bool SubqueryExpression::operator==(ParsedExpression& other) {
    if (!((testExpr == otherSubquery.testExpr) ||
          (testExpr && otherSubquery.testExpr && *testExpr == *otherSubquery.testExpr))) {
       return false;
-         }
+   }
 
    return true;
 }
 
-
 CaseExpression::CaseExpression(std::optional<std::shared_ptr<ParsedExpression>> caseExpr, std::vector<CaseCheck> caseChecks, std::shared_ptr<ParsedExpression> elseExpr) : ParsedExpression(ExpressionType::CASE_EXPR, cType), caseChecks(std::move(caseChecks)), caseExpr(caseExpr), elseExpr(std::move(elseExpr)) {
 }
 
-
 size_t CaseExpression::hash() {
-    size_t result = ParsedExpression::hash();
+   size_t result = ParsedExpression::hash();
 
-    // Hash caseExpr if present
-    if (caseExpr && *caseExpr) {
-        result ^= (*caseExpr)->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-    }
+   // Hash caseExpr if present
+   if (caseExpr && *caseExpr) {
+      result ^= (*caseExpr)->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+   }
 
-    // Hash all caseChecks (WHEN/THEN pairs)
-    for (const auto& check : caseChecks) {
-        if (check.whenExpr) {
-            result ^= check.whenExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-        }
-        if (check.thenExpr) {
-            result ^= check.thenExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-        }
-    }
+   // Hash all caseChecks (WHEN/THEN pairs)
+   for (const auto& check : caseChecks) {
+      if (check.whenExpr) {
+         result ^= check.whenExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+      }
+      if (check.thenExpr) {
+         result ^= check.thenExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+      }
+   }
 
-    // Hash elseExpr if present
-    if (elseExpr) {
-        result ^= elseExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
-    }
+   // Hash elseExpr if present
+   if (elseExpr) {
+      result ^= elseExpr->hash() + 0x9e3779b9 + (result << 6) + (result >> 2);
+   }
 
-    return result;
+   return result;
 }
 
 bool CaseExpression::operator==(ParsedExpression& other) {
-    if (!ParsedExpression::operator==(other)) {
-        return false;
-    }
-    auto& otherCase = static_cast<CaseExpression&>(other);
+   if (!ParsedExpression::operator==(other)) {
+      return false;
+   }
+   auto& otherCase = static_cast<CaseExpression&>(other);
 
-    // Compare caseExpr
-    if (caseExpr.has_value() != otherCase.caseExpr.has_value()) {
-        return false;
-    }
-    if (caseExpr && *caseExpr && otherCase.caseExpr && *otherCase.caseExpr) {
-        if ((**caseExpr != **otherCase.caseExpr)) {
-            return false;
-        }
-    }
+   // Compare caseExpr
+   if (caseExpr.has_value() != otherCase.caseExpr.has_value()) {
+      return false;
+   }
+   if (caseExpr && *caseExpr && otherCase.caseExpr && *otherCase.caseExpr) {
+      if ((**caseExpr != **otherCase.caseExpr)) {
+         return false;
+      }
+   }
 
-    // Compare caseChecks
-    if (caseChecks.size() != otherCase.caseChecks.size()) {
-        return false;
-    }
-    for (size_t i = 0; i < caseChecks.size(); ++i) {
-        const auto& a = caseChecks[i];
-        const auto& b = otherCase.caseChecks[i];
-        if (!((a.whenExpr == b.whenExpr) ||
-              (a.whenExpr && b.whenExpr && *a.whenExpr == *b.whenExpr))) {
-            return false;
-        }
-        if (!((a.thenExpr == b.thenExpr) ||
-              (a.thenExpr && b.thenExpr && *a.thenExpr == *b.thenExpr))) {
-            return false;
-        }
-    }
+   // Compare caseChecks
+   if (caseChecks.size() != otherCase.caseChecks.size()) {
+      return false;
+   }
+   for (size_t i = 0; i < caseChecks.size(); ++i) {
+      const auto& a = caseChecks[i];
+      const auto& b = otherCase.caseChecks[i];
+      if (!((a.whenExpr == b.whenExpr) ||
+            (a.whenExpr && b.whenExpr && *a.whenExpr == *b.whenExpr))) {
+         return false;
+      }
+      if (!((a.thenExpr == b.thenExpr) ||
+            (a.thenExpr && b.thenExpr && *a.thenExpr == *b.thenExpr))) {
+         return false;
+      }
+   }
 
-    // Compare elseExpr
-    if (!((elseExpr == otherCase.elseExpr) ||
-          (elseExpr && otherCase.elseExpr && *elseExpr == *otherCase.elseExpr))) {
-        return false;
-    }
+   // Compare elseExpr
+   if (!((elseExpr == otherCase.elseExpr) ||
+         (elseExpr && otherCase.elseExpr && *elseExpr == *otherCase.elseExpr))) {
+      return false;
+   }
 
-    return true;
+   return true;
 }
-
 
 } // namespace lingodb::ast

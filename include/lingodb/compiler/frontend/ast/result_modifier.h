@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_AST_RESULT_MODIFIER_H
 #define LINGODB_COMPILER_FRONTEND_AST_RESULT_MODIFIER_H
 
-
 #include "lingodb/compiler/frontend/ast/parsed_expression.h"
 #include "table_producer.h"
 #include <memory>
@@ -35,7 +34,6 @@ class ResultModifier : public TableProducer {
 
    ResultModifierType modifierType;
    std::shared_ptr<TableProducer> input = nullptr;
-
 };
 /**
  * GROUP BY <element>

@@ -1,7 +1,6 @@
 #ifndef LINGODB_COMPILER_FRONTEND_FRONTEND_TYPE_H
 #define LINGODB_COMPILER_FRONTEND_FRONTEND_TYPE_H
 
-
 #include "lingodb/catalog/TableCatalogEntry.h"
 
 #include "lingodb/catalog/MLIRTypes.h"

@@ -1,10 +1,10 @@
 #ifndef LINGODB_CATALOG_TYPES_H
 #define LINGODB_CATALOG_TYPES_H
 
-#include <memory>
 #include <mlir/Dialect/Func/Transforms/Passes.h.inc>
 #include <mlir/IR/Builders.h>
-#include <mlir/IR/Types.h>
+
+#include <memory>
 #include <optional>
 #include <string>
 namespace lingodb::utility {

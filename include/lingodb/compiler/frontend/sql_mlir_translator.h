@@ -27,11 +27,11 @@
 #include <lingodb/compiler/Dialect/util/UtilOps.h>
 
 namespace lingodb::translator {
-#define error(message, loc)                                         \
-   {                                                                \
-      std::ostringstream s{};                                       \
-      s << message; \
-      throw FrontendError(s.str(), loc);                            \
+#define error(message, loc)              \
+   {                                     \
+      std::ostringstream s{};            \
+      s << message;                      \
+      throw FrontendError(s.str(), loc); \
    }
 class SQLMlirTranslator {
    public:
@@ -56,7 +56,7 @@ class SQLMlirTranslator {
 
    mlir::Value translateResultModifier(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundResultModifier> resultModifier, std::shared_ptr<analyzer::SQLContext> context, mlir::Value tree);
 
-   mlir::Value translateSubquery(mlir::OpBuilder&builder, std::shared_ptr<ast::BoundSubqueryExpression>subquery, std::shared_ptr<analyzer::SQLContext>context );
+   mlir::Value translateSubquery(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundSubqueryExpression> subquery, std::shared_ptr<analyzer::SQLContext> context);
    mlir::Value translateExpression(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundExpression> expression, std::shared_ptr<analyzer::SQLContext> context);
    mlir::Value translateBinaryOperatorExpression(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundOperatorExpression> expression, std::shared_ptr<analyzer::SQLContext> context, mlir::Value left, mlir::Value right);
    mlir::Value translateWindowExpression(mlir::OpBuilder& builder, mlir::Value tree, std::shared_ptr<ast::BoundWindowExpression> expression, std::shared_ptr<analyzer::SQLContext> context);
