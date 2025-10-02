@@ -45,7 +45,7 @@
 #ifndef YY_YY_HOME_BACHMAIER_PROJECTS_LINGO_DB_INCLUDE_LINGODB_COMPILER_FRONTEND_GENERATED_PARSER_HPP_INCLUDED
 # define YY_YY_HOME_BACHMAIER_PROJECTS_LINGO_DB_INCLUDE_LINGODB_COMPILER_FRONTEND_GENERATED_PARSER_HPP_INCLUDED
 // "%code requires" blocks.
-#line 12 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 11 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
 
   # include <string>
   #include <iostream>
@@ -71,7 +71,7 @@
 
 #line 73 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
 
-# include <cassert>
+
 # include <cstdlib> // std::abort
 # include <iostream>
 # include <stdexcept>
@@ -115,11 +115,6 @@
 # define YY_CONSTEXPR
 #endif
 # include "location.hh"
-#include <typeinfo>
-#ifndef YY_ASSERT
-# include <cassert>
-# define YY_ASSERT assert
-#endif
 
 
 #ifndef YY_ATTRIBUTE_PURE
@@ -210,7 +205,7 @@
 
 #line 5 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
 namespace  lingodb  {
-#line 214 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
+#line 209 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
 
 
 
@@ -239,15 +234,12 @@ namespace  lingodb  {
     /// Empty construction.
     value_type () YY_NOEXCEPT
       : yyraw_ ()
-      , yytypeid_ (YY_NULLPTR)
     {}
 
     /// Construct and fill.
     template <typename T>
     value_type (YY_RVREF (T) t)
-      : yytypeid_ (&typeid (T))
     {
-      YY_ASSERT (sizeof (T) <= size);
       new (yyas_<T> ()) T (YY_MOVE (t));
     }
 
@@ -260,9 +252,7 @@ namespace  lingodb  {
 
     /// Destruction, allowed only if empty.
     ~value_type () YY_NOEXCEPT
-    {
-      YY_ASSERT (!yytypeid_);
-    }
+    {}
 
 # if 201103L <= YY_CPLUSPLUS
     /// Instantiate a \a T in here from \a t.
@@ -270,9 +260,6 @@ namespace  lingodb  {
     T&
     emplace (U&&... u)
     {
-      YY_ASSERT (!yytypeid_);
-      YY_ASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
       return *new (yyas_<T> ()) T (std::forward <U>(u)...);
     }
 # else
@@ -281,9 +268,6 @@ namespace  lingodb  {
     T&
     emplace ()
     {
-      YY_ASSERT (!yytypeid_);
-      YY_ASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
       return *new (yyas_<T> ()) T ();
     }
 
@@ -292,9 +276,6 @@ namespace  lingodb  {
     T&
     emplace (const T& t)
     {
-      YY_ASSERT (!yytypeid_);
-      YY_ASSERT (sizeof (T) <= size);
-      yytypeid_ = & typeid (T);
       return *new (yyas_<T> ()) T (t);
     }
 # endif
@@ -322,9 +303,6 @@ namespace  lingodb  {
     T&
     as () YY_NOEXCEPT
     {
-      YY_ASSERT (yytypeid_);
-      YY_ASSERT (*yytypeid_ == typeid (T));
-      YY_ASSERT (sizeof (T) <= size);
       return *yyas_<T> ();
     }
 
@@ -333,9 +311,6 @@ namespace  lingodb  {
     const T&
     as () const YY_NOEXCEPT
     {
-      YY_ASSERT (yytypeid_);
-      YY_ASSERT (*yytypeid_ == typeid (T));
-      YY_ASSERT (sizeof (T) <= size);
       return *yyas_<T> ();
     }
 
@@ -351,8 +326,6 @@ namespace  lingodb  {
     void
     swap (self_type& that) YY_NOEXCEPT
     {
-      YY_ASSERT (yytypeid_);
-      YY_ASSERT (*yytypeid_ == *that.yytypeid_);
       std::swap (as<T> (), that.as<T> ());
     }
 
@@ -397,7 +370,6 @@ namespace  lingodb  {
     destroy ()
     {
       as<T> ().~T ();
-      yytypeid_ = YY_NULLPTR;
     }
 
   private:
@@ -1245,9 +1217,6 @@ namespace  lingodb  {
       /// A buffer large enough to store any of the semantic values.
       char yyraw_[size];
     };
-
-    /// Whether the content is built: if defined, the name of the stored type.
-    const std::type_info *yytypeid_;
   };
 
 #endif
@@ -5264,18 +5233,7 @@ switch (yykind)
       symbol_type (int tok, const location_type& l)
         : super_type (token_kind_type (tok), l)
 #endif
-      {
-#if !defined _MSC_VER || defined __clang__
-        YY_ASSERT (tok == token::TOK_YYEOF
-                   || (token::TOK_YYerror <= tok && tok <= token::TOK_YYUNDEF)
-                   || (token::TOK_LP <= tok && tok <= token::TOK_DOT)
-                   || (token::TOK_COMMA <= tok && tok <= token::TOK_SEMICOLON)
-                   || (token::TOK_HAT <= tok && tok <= token::TOK_PIPE)
-                   || tok == token::TOK_PARAM
-                   || (token::TOK_DOT_DOT <= tok && tok <= token::TOK_COLON_EQUALS)
-                   || (token::TOK_FORMAT_LA <= tok && tok <= token::TOK_ROLLUP_PRIORITY));
-#endif
-      }
+      {}
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, int v, location_type l)
         : super_type (token_kind_type (tok), std::move (v), std::move (l))
@@ -5283,11 +5241,7 @@ switch (yykind)
       symbol_type (int tok, const int& v, const location_type& l)
         : super_type (token_kind_type (tok), v, l)
 #endif
-      {
-#if !defined _MSC_VER || defined __clang__
-        YY_ASSERT (tok == token::TOK_ICONST);
-#endif
-      }
+      {}
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, std::string v, location_type l)
         : super_type (token_kind_type (tok), std::move (v), std::move (l))
@@ -5295,16 +5249,7 @@ switch (yykind)
       symbol_type (int tok, const std::string& v, const location_type& l)
         : super_type (token_kind_type (tok), v, l)
 #endif
-      {
-#if !defined _MSC_VER || defined __clang__
-        YY_ASSERT ((token::TOK_FCONST <= tok && tok <= token::TOK_NATIONAL_VALUE)
-                   || tok == token::TOK_PERCENT
-                   || (token::TOK_PLUS <= tok && tok <= token::TOK_GREATER)
-                   || (token::TOK_UIDENT <= tok && tok <= token::TOK_Op)
-                   || tok == token::TOK_TYPECAST
-                   || (token::TOK_ABORT_P <= tok && tok <= token::TOK_ZONE));
-#endif
-      }
+      {}
 #if 201103L <= YY_CPLUSPLUS
       symbol_type (int tok, uint64_t v, location_type l)
         : super_type (token_kind_type (tok), std::move (v), std::move (l))
@@ -5312,11 +5257,7 @@ switch (yykind)
       symbol_type (int tok, const uint64_t& v, const location_type& l)
         : super_type (token_kind_type (tok), v, l)
 #endif
-      {
-#if !defined _MSC_VER || defined __clang__
-        YY_ASSERT (tok == token::TOK_INTEGER_VALUE);
-#endif
-      }
+      {}
     };
 
     /// Build a parser object.
@@ -15774,7 +15715,7 @@ switch (yykind)
 
 #line 5 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
 } //  lingodb 
-#line 15778 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
+#line 15719 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.hpp"
 
 
 

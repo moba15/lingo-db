@@ -42,7 +42,7 @@
 
 
 // Unqualified %code blocks.
-#line 45 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 44 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
 
   #include <iostream>
   #include <memory>
@@ -3739,4153 +3739,4153 @@ namespace  lingodb  {
         switch (yykind)
     {
       case symbol_kind::S_ICONST: // ICONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3745 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INTEGER_VALUE: // "integer_value"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3751 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FCONST: // FCONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3757 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IDENT: // IDENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3763 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IDENTIFIER: // "identifier"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3769 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STRING_VALUE: // STRING_VALUE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3775 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BIT_VALUE: // "bit_string"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3781 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HEX_VALUE: // "hex_string"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3787 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NATIONAL_VALUE: // "nat_string"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3793 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PERCENT: // "%"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3799 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PLUS: // "+"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3805 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SLASH: // "/"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3811 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STAR: // "*"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3817 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MINUS: // "-"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3823 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EQUAL: // "="
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3829 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOT_EQUAL: // "<>"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3835 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LESS_EQUAL: // "<="
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3841 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LESS: // "<"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3847 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GREATER_EQUAL: // ">="
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3853 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GREATER: // ">"
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3859 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UIDENT: // UIDENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3865 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SCONST: // SCONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3871 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_USCONST: // USCONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3877 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BCONST: // BCONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3883 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XCONST: // XCONST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3889 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Op: // Op
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3895 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TYPECAST: // TYPECAST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3901 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ABORT_P: // ABORT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3907 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ABSENT: // ABSENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3913 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ABSOLUTE_P: // ABSOLUTE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3919 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ACCESS: // ACCESS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3925 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ACTION: // ACTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3931 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ADD_P: // ADD_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3937 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ADMIN: // ADMIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3943 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AFTER: // AFTER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3949 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AGGREGATE: // AGGREGATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3955 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ALL: // ALL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3961 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ALSO: // ALSO
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3967 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ALTER: // ALTER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3973 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ALWAYS: // ALWAYS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3979 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ANALYSE: // ANALYSE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3985 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ANALYZE: // ANALYZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3991 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AND: // AND
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 3997 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ANY: // ANY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4003 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ARRAY: // ARRAY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4009 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AS: // AS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4015 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ASC: // ASC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4021 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ASENSITIVE: // ASENSITIVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4027 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ASSERTION: // ASSERTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4033 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ASSIGNMENT: // ASSIGNMENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4039 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ASYMMETRIC: // ASYMMETRIC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4045 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ATOMIC: // ATOMIC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4051 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AT: // AT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4057 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ATTACH: // ATTACH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4063 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ATTRIBUTE: // ATTRIBUTE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4069 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AUTHORIZATION: // AUTHORIZATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4075 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BACKWARD: // BACKWARD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4081 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BEFORE: // BEFORE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4087 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BEGIN_P: // BEGIN_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4093 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BETWEEN: // BETWEEN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4099 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BIGINT: // BIGINT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4105 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BINARY: // BINARY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4111 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BIT: // BIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4117 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BOOLEAN_P: // BOOLEAN_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4123 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BOTH: // BOTH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4129 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BREADTH: // BREADTH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4135 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BY: // BY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4141 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CACHE: // CACHE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4147 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CALL: // CALL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4153 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CALLED: // CALLED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4159 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CASCADE: // CASCADE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4165 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CASCADED: // CASCADED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4171 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CASE: // CASE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4177 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CAST: // CAST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4183 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CATALOG_P: // CATALOG_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4189 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHAIN: // CHAIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4195 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHAR_P: // CHAR_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4201 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHARACTER: // CHARACTER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4207 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHARACTERISTICS: // CHARACTERISTICS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4213 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHECK: // CHECK
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4219 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CHECKPOINT: // CHECKPOINT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4225 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CLASS: // CLASS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4231 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CLOSE: // CLOSE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4237 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CLUSTER: // CLUSTER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4243 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COALESCE: // COALESCE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4249 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COLLATE: // COLLATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4255 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COLLATION: // COLLATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4261 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COLUMN: // COLUMN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4267 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COLUMNS: // COLUMNS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4273 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COMMENT: // COMMENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4279 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COMMENTS: // COMMENTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4285 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COMMIT: // COMMIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4291 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COMMITTED: // COMMITTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4297 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COMPRESSION: // COMPRESSION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4303 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONCURRENTLY: // CONCURRENTLY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4309 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONDITIONAL: // CONDITIONAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4315 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONFIGURATION: // CONFIGURATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4321 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONFLICT: // CONFLICT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4327 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONNECTION: // CONNECTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4333 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONSTRAINT: // CONSTRAINT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4339 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONSTRAINTS: // CONSTRAINTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4345 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONTENT_P: // CONTENT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4351 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONTINUE_P: // CONTINUE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4357 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CONVERSION_P: // CONVERSION_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4363 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COPY: // COPY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4369 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_COST: // COST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4375 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CREATE: // CREATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4381 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CROSS: // CROSS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4387 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CSV: // CSV
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4393 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CUBE: // CUBE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4399 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_P: // CURRENT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4405 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_CATALOG: // CURRENT_CATALOG
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4411 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_DATE: // CURRENT_DATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4417 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_ROLE: // CURRENT_ROLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4423 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_SCHEMA: // CURRENT_SCHEMA
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4429 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_TIME: // CURRENT_TIME
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4435 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_TIMESTAMP: // CURRENT_TIMESTAMP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4441 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURRENT_USER: // CURRENT_USER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4447 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CURSOR: // CURSOR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4453 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CYCLE: // CYCLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4459 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DATA_P: // DATA_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4465 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DATABASE: // DATABASE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4471 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DAY_P: // DAY_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4477 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEALLOCATE: // DEALLOCATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4483 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEC: // DEC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4489 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DECIMAL_P: // DECIMAL_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4495 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DECLARE: // DECLARE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4501 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEFAULT: // DEFAULT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4507 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEFAULTS: // DEFAULTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4513 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DATE_P: // DATE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4519 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEFERRABLE: // DEFERRABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4525 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEFERRED: // DEFERRED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4531 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEFINER: // DEFINER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4537 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DELETE_P: // DELETE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4543 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DELIMITER: // DELIMITER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4549 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DELIMITERS: // DELIMITERS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4555 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEPENDS: // DEPENDS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4561 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DEPTH: // DEPTH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4567 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DESC: // DESC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4573 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DETACH: // DETACH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4579 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DICTIONARY: // DICTIONARY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4585 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DISABLE_P: // DISABLE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4591 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DISCARD: // DISCARD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4597 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DISTINCT: // DISTINCT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4603 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DO: // DO
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4609 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DOCUMENT_P: // DOCUMENT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4615 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DOMAIN_P: // DOMAIN_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4621 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DOUBLE_P: // DOUBLE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4627 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_DROP: // DROP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4633 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EACH: // EACH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4639 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ELSE: // ELSE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4645 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EMPTY_P: // EMPTY_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4651 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ENABLE_P: // ENABLE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4657 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ENCODING: // ENCODING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4663 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ENCRYPTED: // ENCRYPTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4669 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_END_P: // END_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4675 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ENFORCED: // ENFORCED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4681 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ENUM_P: // ENUM_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4687 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ERROR_P: // ERROR_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4693 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ESCAPE: // ESCAPE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4699 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EVENT: // EVENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4705 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXCEPT: // EXCEPT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4711 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXCLUDE: // EXCLUDE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4717 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXCLUDING: // EXCLUDING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4723 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXCLUSIVE: // EXCLUSIVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4729 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXECUTE: // EXECUTE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4735 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXISTS: // EXISTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4741 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXPLAIN: // EXPLAIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4747 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXPRESSION: // EXPRESSION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4753 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXTENSION: // EXTENSION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4759 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXTERNAL: // EXTERNAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4765 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXTRACT: // EXTRACT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4771 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FALSE_P: // FALSE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4777 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FAMILY: // FAMILY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4783 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FETCH: // FETCH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4789 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FILTER: // FILTER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4795 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FINALIZE: // FINALIZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4801 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FIRST_P: // FIRST_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4807 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FLOAT_P: // FLOAT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4813 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FOLLOWING: // FOLLOWING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4819 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FOR: // FOR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4825 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FORCE: // FORCE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4831 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FOREIGN: // FOREIGN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4837 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FORMAT: // FORMAT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4843 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FORWARD: // FORWARD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4849 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FREEZE: // FREEZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4855 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FROM: // FROM
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4861 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FULL: // FULL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4867 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FUNCTION: // FUNCTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4873 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_FUNCTIONS: // FUNCTIONS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4879 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GENERATED: // GENERATED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4885 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GLOBAL: // GLOBAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4891 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GRANT: // GRANT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4897 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GRANTED: // GRANTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4903 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GREATEST: // GREATEST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4909 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GROUP_P: // GROUP_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4915 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GROUPING: // GROUPING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4921 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_GROUPS: // GROUPS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4927 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HANDLER: // HANDLER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4933 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HAVING: // HAVING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4939 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HEADER_P: // HEADER_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4945 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HOLD: // HOLD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4951 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_HOUR_P: // HOUR_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4957 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IDENTITY_P: // IDENTITY_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4963 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IF_P: // IF_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4969 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ILIKE: // ILIKE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4975 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IMMEDIATE: // IMMEDIATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4981 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IMMUTABLE: // IMMUTABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4987 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IMPLICIT_P: // IMPLICIT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4993 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IMPORT_P: // IMPORT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 4999 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IN_P: // IN_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5005 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INCLUDE: // INCLUDE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5011 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INCLUDING: // INCLUDING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5017 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INCREMENT: // INCREMENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5023 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INDENT: // INDENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5029 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INDEX: // INDEX
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5035 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INDEXES: // INDEXES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5041 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INHERIT: // INHERIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5047 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INHERITS: // INHERITS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5053 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INITIALLY: // INITIALLY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5059 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INLINE_P: // INLINE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5065 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INNER_P: // INNER_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5071 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INOUT: // INOUT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5077 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INPUT_P: // INPUT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5083 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INSENSITIVE: // INSENSITIVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5089 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INSERT: // INSERT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5095 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INSTEAD: // INSTEAD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5101 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INT_P: // INT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5107 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INTEGER: // INTEGER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5113 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INTERSECT: // INTERSECT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5119 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INTERVAL: // INTERVAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5125 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INTO: // INTO
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5131 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_INVOKER: // INVOKER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5137 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_IS: // IS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5143 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ISNULL: // ISNULL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5149 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ISOLATION: // ISOLATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5155 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JOIN: // JOIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5161 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON: // JSON
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5167 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_ARRAY: // JSON_ARRAY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5173 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_ARRAYAGG: // JSON_ARRAYAGG
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5179 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_EXISTS: // JSON_EXISTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5185 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_OBJECT: // JSON_OBJECT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5191 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_OBJECTAGG: // JSON_OBJECTAGG
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5197 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_QUERY: // JSON_QUERY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5203 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_SCALAR: // JSON_SCALAR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5209 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_SERIALIZE: // JSON_SERIALIZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5215 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_TABLE: // JSON_TABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5221 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_JSON_VALUE: // JSON_VALUE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5227 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_KEEP: // KEEP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5233 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_KEY: // KEY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5239 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_KEYS: // KEYS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5245 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LABEL: // LABEL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5251 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LANGUAGE: // LANGUAGE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5257 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LARGE_P: // LARGE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5263 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LAST_P: // LAST_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5269 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LATERAL_P: // LATERAL_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5275 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LEADING: // LEADING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5281 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LEAKPROOF: // LEAKPROOF
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5287 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LEAST: // LEAST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5293 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LEFT: // LEFT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5299 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LEVEL: // LEVEL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5305 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LIKE: // LIKE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5311 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LIMIT: // LIMIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5317 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LISTEN: // LISTEN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5323 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOAD: // LOAD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5329 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCAL: // LOCAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5335 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCALTIME: // LOCALTIME
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5341 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCALTIMESTAMP: // LOCALTIMESTAMP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5347 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCATION: // LOCATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5353 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCK_P: // LOCK_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5359 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOCKED: // LOCKED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5365 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_LOGGED: // LOGGED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5371 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MAPPING: // MAPPING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5377 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MATCH: // MATCH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5383 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MATCHED: // MATCHED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5389 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MATERIALIZED: // MATERIALIZED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5395 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MAXVALUE: // MAXVALUE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5401 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MERGE: // MERGE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5407 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MERGE_ACTION: // MERGE_ACTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5413 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_METHOD: // METHOD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5419 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MINUTE_P: // MINUTE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5425 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MINVALUE: // MINVALUE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5431 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MODE: // MODE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5437 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MONTH_P: // MONTH_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5443 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_MOVE: // MOVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5449 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NAME_P: // NAME_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5455 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NAMES: // NAMES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5461 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NATIONAL: // NATIONAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5467 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NATURAL: // NATURAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5473 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NCHAR: // NCHAR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5479 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NESTED: // NESTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5485 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NEW: // NEW
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5491 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NEXT: // NEXT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5497 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NFC: // NFC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5503 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NFD: // NFD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5509 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NFKC: // NFKC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5515 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NFKD: // NFKD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5521 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NO: // NO
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5527 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NONE: // NONE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5533 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NORMALIZE: // NORMALIZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5539 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NORMALIZED: // NORMALIZED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5545 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOT: // NOT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5551 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOTHING: // NOTHING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5557 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOTIFY: // NOTIFY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5563 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOTNULL: // NOTNULL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5569 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NOWAIT: // NOWAIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5575 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NULL_P: // NULL_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5581 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NULLIF: // NULLIF
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5587 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NULLS_P: // NULLS_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5593 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NUMERIC: // NUMERIC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5599 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OBJECT_P: // OBJECT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5605 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OBJECTS_P: // OBJECTS_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5611 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OF: // OF
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5617 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OFF: // OFF
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5623 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OFFSET: // OFFSET
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5629 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OIDS: // OIDS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5635 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OLD: // OLD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5641 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OMIT: // OMIT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5647 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ON: // ON
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5653 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ONLY: // ONLY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5659 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OPERATOR: // OPERATOR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5665 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OPTION: // OPTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5671 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OPTIONS: // OPTIONS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5677 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OR: // OR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5683 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ORDER: // ORDER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5689 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ORDINALITY: // ORDINALITY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5695 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OTHERS: // OTHERS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5701 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OUT_P: // OUT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5707 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OUTER_P: // OUTER_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5713 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OVER: // OVER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5719 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OVERLAPS: // OVERLAPS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5725 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OVERLAY: // OVERLAY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5731 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OVERRIDING: // OVERRIDING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5737 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OWNED: // OWNED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5743 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OWNER: // OWNER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5749 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PARALLEL: // PARALLEL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5755 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PARAMETER: // PARAMETER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5761 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PARSER: // PARSER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5767 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PARTIAL: // PARTIAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5773 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PARTITION: // PARTITION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5779 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PASSING: // PASSING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5785 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PASSWORD: // PASSWORD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5791 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PATH: // PATH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5797 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PERIOD: // PERIOD
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5803 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PLACING: // PLACING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5809 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PLAN: // PLAN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5815 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PLANS: // PLANS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5821 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_POLICY: // POLICY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5827 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_POSITION: // POSITION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5833 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRECEDING: // PRECEDING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5839 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRECISION: // PRECISION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5845 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRESERVE: // PRESERVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5851 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PREPARE: // PREPARE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5857 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PREPARED: // PREPARED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5863 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRIMARY: // PRIMARY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5869 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRIOR: // PRIOR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5875 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PRIVILEGES: // PRIVILEGES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5881 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PROCEDURAL: // PROCEDURAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5887 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PROCEDURE: // PROCEDURE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5893 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PROCEDURES: // PROCEDURES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5899 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PROGRAM: // PROGRAM
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5905 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PUBLICATION: // PUBLICATION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5911 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_QUOTES: // QUOTES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5917 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_EXTEND: // EXTEND
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5923 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RANGE: // RANGE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5929 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_READ: // READ
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5935 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REAL: // REAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5941 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REASSIGN: // REASSIGN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5947 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RECURSIVE: // RECURSIVE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5953 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REF_P: // REF_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5959 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REFERENCES: // REFERENCES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5965 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REFERENCING: // REFERENCING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5971 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REFRESH: // REFRESH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5977 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REINDEX: // REINDEX
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5983 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RELATIVE_P: // RELATIVE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5989 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RELEASE: // RELEASE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 5995 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RENAME: // RENAME
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6001 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REPEATABLE: // REPEATABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6007 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REPLACE: // REPLACE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6013 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REPLICA: // REPLICA
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6019 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RESET: // RESET
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6025 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RESTART: // RESTART
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6031 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RESTRICT: // RESTRICT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6037 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RETURN: // RETURN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6043 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RETURNING: // RETURNING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6049 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RETURNS: // RETURNS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6055 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_REVOKE: // REVOKE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6061 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RIGHT: // RIGHT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6067 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROLE: // ROLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6073 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROLLBACK: // ROLLBACK
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6079 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROLLUP: // ROLLUP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6085 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROUTINE: // ROUTINE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6091 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROUTINES: // ROUTINES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6097 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROW: // ROW
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6103 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ROWS: // ROWS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6109 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_RULE: // RULE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6115 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SAVEPOINT: // SAVEPOINT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6121 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SCALAR: // SCALAR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6127 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SCHEMA: // SCHEMA
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6133 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SCHEMAS: // SCHEMAS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6139 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SCROLL: // SCROLL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6145 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SEARCH: // SEARCH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6151 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SECOND_P: // SECOND_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6157 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SECURITY: // SECURITY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6163 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SELECT: // SELECT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6169 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SEQUENCE: // SEQUENCE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6175 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SEQUENCES: // SEQUENCES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6181 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SERIALIZABLE: // SERIALIZABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6187 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SERVER: // SERVER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6193 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SESSION: // SESSION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6199 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SESSION_USER: // SESSION_USER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6205 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SET: // SET
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6211 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SETS: // SETS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6217 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SETOF: // SETOF
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6223 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SHARE: // SHARE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6229 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SHOW: // SHOW
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6235 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SIMILAR: // SIMILAR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6241 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SIMPLE: // SIMPLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6247 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SKIP: // SKIP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6253 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SMALLINT: // SMALLINT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6259 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SNAPSHOT: // SNAPSHOT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6265 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SOME: // SOME
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6271 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SOURCE: // SOURCE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6277 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SQL_P: // SQL_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6283 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STABLE: // STABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6289 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STANDALONE_P: // STANDALONE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6295 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_START: // START
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6301 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STATEMENT: // STATEMENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6307 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STATISTICS: // STATISTICS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6313 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STDIN: // STDIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6319 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STDOUT: // STDOUT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6325 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STORAGE: // STORAGE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6331 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STORED: // STORED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6337 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STRICT_P: // STRICT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6343 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STRING_P: // STRING_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6349 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_STRIP_P: // STRIP_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6355 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SUBSCRIPTION: // SUBSCRIPTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6361 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SUBSTRING: // SUBSTRING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6367 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SUPPORT: // SUPPORT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6373 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SYMMETRIC: // SYMMETRIC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6379 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SYSID: // SYSID
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6385 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SYSTEM_P: // SYSTEM_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6391 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SYSTEM_USER: // SYSTEM_USER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6397 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TABLE: // TABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6403 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TABLES: // TABLES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6409 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TABLESAMPLE: // TABLESAMPLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6415 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TABLESPACE: // TABLESPACE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6421 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TARGET: // TARGET
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6427 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TEMP: // TEMP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6433 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TEMPLATE: // TEMPLATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6439 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TEMPORARY: // TEMPORARY
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6445 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TEXT_P: // TEXT_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6451 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_THEN: // THEN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6457 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TIES: // TIES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6463 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TIME: // TIME
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6469 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TIMESTAMP: // TIMESTAMP
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6475 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TO: // TO
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6481 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRAILING: // TRAILING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6487 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRANSACTION: // TRANSACTION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6493 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRANSFORM: // TRANSFORM
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6499 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TREAT: // TREAT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6505 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRIGGER: // TRIGGER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6511 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRIM: // TRIM
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6517 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRUE_P: // TRUE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6523 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRUNCATE: // TRUNCATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6529 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TRUSTED: // TRUSTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6535 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TYPE_P: // TYPE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6541 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TYPES_P: // TYPES_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6547 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UESCAPE: // UESCAPE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6553 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNBOUNDED: // UNBOUNDED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6559 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNCONDITIONAL: // UNCONDITIONAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6565 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNCOMMITTED: // UNCOMMITTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6571 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNENCRYPTED: // UNENCRYPTED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6577 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNION: // UNION
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6583 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNIQUE: // UNIQUE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6589 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNKNOWN: // UNKNOWN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6595 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNLISTEN: // UNLISTEN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6601 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNLOGGED: // UNLOGGED
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6607 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UNTIL: // UNTIL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6613 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_UPDATE: // UPDATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6619 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_USER: // USER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6625 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_USING: // USING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6631 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VACUUM: // VACUUM
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6637 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VALID: // VALID
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6643 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VALIDATE: // VALIDATE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6649 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VALIDATOR: // VALIDATOR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6655 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VALUE_P: // VALUE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6661 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VALUES: // VALUES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6667 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VARCHAR: // VARCHAR
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6673 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VARIADIC: // VARIADIC
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6679 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VARYING: // VARYING
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6685 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VERBOSE: // VERBOSE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6691 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VERSION_P: // VERSION_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6697 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VIEW: // VIEW
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6703 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VIEWS: // VIEWS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6709 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VIRTUAL: // VIRTUAL
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6715 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VOLATILE: // VOLATILE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6721 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WHEN: // WHEN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6727 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WHERE: // WHERE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6733 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WHITESPACE_P: // WHITESPACE_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6739 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WINDOW: // WINDOW
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6745 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WITH: // WITH
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6751 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WITHIN: // WITHIN
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6757 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WITHOUT: // WITHOUT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6763 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WORK: // WORK
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6769 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WRAPPER: // WRAPPER
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6775 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_WRITE: // WRITE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6781 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XML_P: // XML_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6787 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLATTRIBUTES: // XMLATTRIBUTES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6793 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLCONCAT: // XMLCONCAT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6799 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLELEMENT: // XMLELEMENT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6805 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLEXISTS: // XMLEXISTS
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6811 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLFOREST: // XMLFOREST
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6817 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLNAMESPACES: // XMLNAMESPACES
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6823 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLPARSE: // XMLPARSE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6829 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLPI: // XMLPI
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6835 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLROOT: // XMLROOT
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6841 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLSERIALIZE: // XMLSERIALIZE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6847 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_XMLTABLE: // XMLTABLE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6853 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_YEAR_P: // YEAR_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6859 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_YES_P: // YES_P
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6865 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ZONE: // ZONE
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6871 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_stmtmulti: // stmtmulti
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6877 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_toplevel_stmt: // toplevel_stmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6883 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_stmt: // stmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6889 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SelectStmt: // SelectStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6895 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PipeSQLStmt: // PipeSQLStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6901 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_classic_select_and_pipe_sql_with_parens: // classic_select_and_pipe_sql_with_parens
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6907 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_with_parens: // select_with_parens
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6913 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_pipe_sql_with_parens: // pipe_sql_with_parens
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6919 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_no_parens: // select_no_parens
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6925 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_pipe_sql_no_parens: // pipe_sql_no_parens
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6931 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_pipe_start: // pipe_start
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6937 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_pipe_or_select_clause: // pipe_or_select_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6943 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_clause: // select_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6949 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_PreparableStmt: // PreparableStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6955 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CopyStmt: // CopyStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6961 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_copy_file_name: // copy_file_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6967 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_copy_options: // copy_options
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6973 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_copy_opt_list: // copy_opt_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6979 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_copy_opt_item: // copy_opt_item
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6985 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_copy_delimiter: // copy_delimiter
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6991 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_VariableSetStmt: // VariableSetStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 6997 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_set_rest: // set_rest
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7003 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_generic_set: // generic_set
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7009 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_set_rest_more: // set_rest_more
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7015 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_var_name: // var_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7021 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_var_list: // var_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7027 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_var_value: // var_value
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7033 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_boolean_or_string: // opt_boolean_or_string
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7039 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NonReservedWord_or_Sconst: // NonReservedWord_or_Sconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7045 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NonReservedWord: // NonReservedWord
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7051 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_simple_select: // simple_select
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7057 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_with_clause: // with_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7063 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_distinct_clause: // distinct_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7069 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_cte_list: // cte_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7075 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_common_table_expr: // common_table_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7081 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_from_clause: // opt_from_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7087 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_from_clause: // from_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7093 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_from_list: // from_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7099 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_table_ref: // table_ref
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7105 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_set_quantifier: // set_quantifier
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7111 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_clause: // group_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7117 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_clause_with_alias: // group_clause_with_alias
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7123 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_by_list: // group_by_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7129 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_by_list_with_alias: // group_by_list_with_alias
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7135 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_rollup_clause: // rollup_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7141 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_by_item: // group_by_item
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7147 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_group_by_item_with_alias: // group_by_item_with_alias
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7153 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_having_clause: // having_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7159 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_joined_table: // joined_table
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7165 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_alias_clause: // alias_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7171 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_nulls_order: // opt_nulls_order
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7177 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_alias_clause: // opt_alias_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7183 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_asc_desc: // opt_asc_desc
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7189 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_join_type: // join_type
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7195 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_join_qual: // join_qual
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7201 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_relation_expr: // relation_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7207 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_asymmetric: // opt_asymmetric
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7213 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_sort_clause: // opt_sort_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7219 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_sort_clause: // sort_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7225 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_sortby_list: // sortby_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7231 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_sortby: // sortby
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7237 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_limit: // select_limit
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7243 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_select_limit: // opt_select_limit
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7249 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_limit_clause: // limit_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7255 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_offset_clause: // offset_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7261 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_limit_value: // select_limit_value
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7267 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_select_offset_value: // select_offset_value
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7273 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_values_clause: // values_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7279 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_where_clause: // where_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7285 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_a_expr: // a_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7291 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_and_a_expr: // and_a_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7297 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_or_a_expr: // or_a_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7303 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_b_expr: // b_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7309 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_c_expr: // c_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7315 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_basicComparisonType: // basicComparisonType
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7321 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_in_expr: // in_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7327 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_case_expr: // case_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7333 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_when_clause_list: // when_clause_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7339 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_when_clause: // when_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7345 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_case_default: // case_default
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7351 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_case_arg: // case_arg
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7357 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_columnref_list: // columnref_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7363 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_columnref: // columnref
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7369 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_application: // func_application
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7375 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_expr: // func_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7381 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_window_func_expr: // window_func_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7387 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_arg_list_opt: // func_arg_list_opt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7393 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_arg_list: // func_arg_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7399 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_expr_list: // expr_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7405 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_expr_list_with_alias: // expr_list_with_alias
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7411 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_arg_expr: // func_arg_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7417 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_expr_common_subexpr: // func_expr_common_subexpr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7423 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_cast_expr: // cast_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7429 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_extract_list: // extract_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7435 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_extract_arg: // extract_arg
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7441 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_substr_list: // substr_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7447 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_over_clause: // over_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7453 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_window_specification: // window_specification
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7459 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_indirection: // indirection
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7465 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_indirection_el: // indirection_el
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7471 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_target_list: // opt_target_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7477 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_target_list: // target_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7483 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_target_el: // target_el
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7489 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_partition_clause: // opt_partition_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7495 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_frame_clause: // opt_frame_clause
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7501 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_frame_extent: // frame_extent
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7507 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_frame_bound: // frame_bound
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7513 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_any_operator: // any_operator
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7519 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_qual_Op: // qual_Op
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7525 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_sub_type: // sub_type
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7531 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_all_Op: // all_Op
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7537 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ColId: // ColId
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7543 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_type_function_name: // type_function_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7549 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_type_func_name_keyword: // type_func_name_keyword
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7555 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ColLabel: // ColLabel
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7561 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_BareColLabel: // BareColLabel
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7567 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_reserved_keyword: // reserved_keyword
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7573 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_unreserved_keyword: // unreserved_keyword
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7579 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_col_name_keyword: // col_name_keyword
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7585 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_qualified_name: // qualified_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7591 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_name_list: // opt_name_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7597 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_name_list: // name_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7603 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_name: // name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7609 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_attr_name: // attr_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7615 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_name: // func_name
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7621 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CreateStmt: // CreateStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7627 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OptTemp: // OptTemp
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7633 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_OptTableElementList: // OptTableElementList
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7639 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TableElementList: // TableElementList
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7645 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TableElement: // TableElement
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7651 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_TableConstraint: // TableConstraint
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7657 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_columnElement: // columnElement
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7663 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ColQualList: // ColQualList
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7669 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ColConstraint: // ColConstraint
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7675 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ColConstraintElem: // ColConstraintElem
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7681 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ConstraintElem: // ConstraintElem
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7687 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Type: // Type
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7693 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SimpleType: // SimpleType
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7699 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_type_modifiers: // opt_type_modifiers
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7705 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_type_modifiers: // type_modifiers
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7711 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_type_modifier: // type_modifier
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7717 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ConstTypename: // ConstTypename
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7723 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_NumericOnly: // NumericOnly
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7729 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Numeric_with_opt_lenghth: // Numeric_with_opt_lenghth
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7735 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Numeric: // Numeric
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7741 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Character: // Character
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7747 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ConstCharacter: // ConstCharacter
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7753 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CharacterWithLength: // CharacterWithLength
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7759 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_CharacterWithoutLength: // CharacterWithoutLength
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7765 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_character: // character
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7771 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_varying: // opt_varying
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7777 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ConstDatetime: // ConstDatetime
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7783 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_InsertStmt: // InsertStmt
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7789 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_insert_target: // insert_target
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7795 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_insert_rest: // insert_rest
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7801 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_insert_column_list: // insert_column_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7807 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_insert_column_item: // insert_column_item
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7813 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_AexprConst: // AexprConst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7819 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Iconst: // Iconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7825 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_SignedIconst: // SignedIconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7831 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Fconst: // Fconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7837 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Sconst: // Sconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7843 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Bconst: // Bconst
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7849 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_ConstInterval: // ConstInterval
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7855 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_opt_interval: // opt_interval
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7861 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_Typename: // Typename
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7867 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_pipe_operator: // pipe_operator
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7873 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_agg_expr: // agg_expr
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7879 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_func_expr_list: // func_expr_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7885 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
 
       case symbol_kind::S_set_list: // set_list
-#line 389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {  }
 #line 7891 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
         break;
@@ -9008,13 +9008,13 @@ namespace  lingodb  {
           switch (yyn)
             {
   case 2: // parse_toplevel: stmtmulti
-#line 398 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 397 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               {drv.result = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::AstNode>> > ();}
 #line 9014 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 3: // stmtmulti: toplevel_stmt
-#line 405 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 404 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::AstNode>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::AstNode> > ());
@@ -9024,7 +9024,7 @@ namespace  lingodb  {
     break;
 
   case 4: // stmtmulti: stmtmulti ";" toplevel_stmt
-#line 412 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 411 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         if(yystack_[0].value.as < std::shared_ptr<lingodb::ast::AstNode> > () != nullptr) {
             yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::AstNode>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::AstNode> > ());
@@ -9036,115 +9036,115 @@ namespace  lingodb  {
     break;
 
   case 5: // toplevel_stmt: stmt
-#line 424 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 423 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
          {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::AstNode> > ();}
 #line 9042 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 7: // stmt: SelectStmt
-#line 428 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 427 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9048 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 8: // stmt: CreateStmt
-#line 429 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 428 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::CreateNode> > ();}
 #line 9054 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 9: // stmt: InsertStmt
-#line 430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 429 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::InsertNode> > ();}
 #line 9060 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 10: // stmt: PipeSQLStmt
-#line 431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9066 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 11: // stmt: VariableSetStmt
-#line 432 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<ast::SetVariableStatement> > ();}
 #line 9072 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 12: // stmt: CopyStmt
-#line 433 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 432 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {yylhs.value.as < std::shared_ptr<lingodb::ast::AstNode> > ()=yystack_[0].value.as < std::shared_ptr<ast::CopyNode> > ();}
 #line 9078 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 13: // SelectStmt: select_no_parens
-#line 437 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 436 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                      {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9084 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 14: // SelectStmt: select_with_parens
-#line 438 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 437 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9090 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 15: // PipeSQLStmt: pipe_sql_no_parens
-#line 441 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 440 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9096 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 16: // PipeSQLStmt: pipe_sql_with_parens
-#line 442 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 441 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                            {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9102 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 17: // classic_select_and_pipe_sql_with_parens: select_with_parens
-#line 446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 445 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9108 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 18: // classic_select_and_pipe_sql_with_parens: pipe_sql_with_parens
-#line 447 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                            {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9114 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 19: // select_with_parens: "(" select_no_parens ")"
-#line 451 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 450 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                            {yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9120 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 20: // select_with_parens: "(" select_with_parens ")"
-#line 452 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 451 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                {yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9126 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 21: // pipe_sql_with_parens: "(" pipe_sql_no_parens ")"
-#line 455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 454 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                              {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9132 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 22: // pipe_sql_with_parens: "(" pipe_sql_with_parens ")"
-#line 456 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                  {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();}
 #line 9138 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 23: // select_no_parens: simple_select
-#line 463 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 462 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                   {yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9144 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 24: // select_no_parens: select_clause sort_clause
-#line 465 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 464 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()->modifiers.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::OrderByModifier> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();
@@ -9153,7 +9153,7 @@ namespace  lingodb  {
     break;
 
   case 25: // select_no_parens: select_clause opt_sort_clause opt_select_limit
-#line 470 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 469 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         if (yystack_[1].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().has_value()) {
             yystack_[2].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()->modifiers.emplace_back(yystack_[1].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().value());
@@ -9167,7 +9167,7 @@ namespace  lingodb  {
     break;
 
   case 26: // select_no_parens: with_clause select_clause opt_sort_clause
-#line 481 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 480 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         if (yystack_[0].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().has_value()) {
             yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()->modifiers.emplace_back(yystack_[0].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().value());
@@ -9186,7 +9186,7 @@ namespace  lingodb  {
     break;
 
   case 27: // select_no_parens: with_clause select_clause opt_sort_clause opt_select_limit
-#line 496 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 495 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         if (yystack_[1].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().has_value()) {
             yystack_[2].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()->modifiers.emplace_back(yystack_[1].value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > ().value());
@@ -9209,7 +9209,7 @@ namespace  lingodb  {
     break;
 
   case 29: // pipe_sql_no_parens: from_clause
-#line 518 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 517 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
         yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableRef> > ();
@@ -9219,7 +9219,7 @@ namespace  lingodb  {
     break;
 
   case 30: // pipe_sql_no_parens: PipeSQLStmt "|>" pipe_operator
-#line 524 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 523 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
         auto pipeOp = std::static_pointer_cast<lingodb::ast::PipeOperator>(yystack_[0].value.as < std::shared_ptr<lingodb::ast::PipeOperator> > ());
@@ -9232,7 +9232,7 @@ namespace  lingodb  {
     break;
 
   case 32: // pipe_start: from_clause
-#line 536 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 535 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
      {
 
 
@@ -9241,7 +9241,7 @@ namespace  lingodb  {
     break;
 
   case 33: // pipe_start: select_no_parens "|>" pipe_operator
-#line 541 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 540 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -9249,31 +9249,31 @@ namespace  lingodb  {
     break;
 
   case 34: // pipe_or_select_clause: pipe_start
-#line 546 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 545 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::PipeOperator> > ();}
 #line 9255 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 35: // pipe_or_select_clause: select_clause
-#line 547 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 546 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                     {yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9261 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 36: // select_clause: simple_select
-#line 550 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 549 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                   {yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9267 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 37: // select_clause: select_with_parens
-#line 551 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 550 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();}
 #line 9273 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 38: // PreparableStmt: SelectStmt
-#line 558 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 557 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::TableProducer> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ();
     }
@@ -9281,7 +9281,7 @@ namespace  lingodb  {
     break;
 
   case 39: // CopyStmt: COPY qualified_name copy_from copy_file_name copy_options copy_delimiter
-#line 565 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 564 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::CopyNode>(yylhs.location);
         node->copyInfo->table = yystack_[4].value.as < std::string > ();
@@ -9293,7 +9293,7 @@ namespace  lingodb  {
     break;
 
   case 41: // copy_file_name: STRING_VALUE
-#line 580 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 579 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
@@ -9301,7 +9301,7 @@ namespace  lingodb  {
     break;
 
   case 42: // copy_options: copy_opt_list
-#line 587 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 586 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::pair<std::string, std::string>> > () = yystack_[0].value.as < std::vector<std::pair<std::string, std::string>> > ();
     }
@@ -9309,7 +9309,7 @@ namespace  lingodb  {
     break;
 
   case 43: // copy_opt_list: copy_opt_list copy_opt_item
-#line 593 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 592 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::vector<std::pair<std::string, std::string>> > ().emplace_back(yystack_[0].value.as < std::pair<std::string, std::string> > ());
         yylhs.value.as < std::vector<std::pair<std::string, std::string>> > () = yystack_[1].value.as < std::vector<std::pair<std::string, std::string>> > ();
@@ -9318,7 +9318,7 @@ namespace  lingodb  {
     break;
 
   case 44: // copy_opt_list: %empty
-#line 598 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 597 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::pair<std::string, std::string>> > () = mkList<std::pair<std::string,std::string>>();
     }
@@ -9326,7 +9326,7 @@ namespace  lingodb  {
     break;
 
   case 45: // copy_opt_item: DELIMITER STRING_VALUE
-#line 604 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 603 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string str = yystack_[0].value.as < std::string > ();
         yylhs.value.as < std::pair<std::string, std::string> > () = std::pair<std::string, std::string>("DELIMITER", str);
@@ -9335,7 +9335,7 @@ namespace  lingodb  {
     break;
 
   case 46: // copy_opt_item: NULL_P STRING_VALUE
-#line 609 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 608 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string str = yystack_[0].value.as < std::string > ();
         yylhs.value.as < std::pair<std::string, std::string> > () = std::pair<std::string, std::string>("NULL", str);
@@ -9344,7 +9344,7 @@ namespace  lingodb  {
     break;
 
   case 47: // copy_opt_item: CSV
-#line 614 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 613 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::string> > () = std::pair<std::string, std::string>("FORMAT", "csv");
     }
@@ -9352,7 +9352,7 @@ namespace  lingodb  {
     break;
 
   case 48: // copy_opt_item: ESCAPE STRING_VALUE
-#line 618 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 617 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string str = yystack_[0].value.as < std::string > ();
         yylhs.value.as < std::pair<std::string, std::string> > () = std::pair<std::string, std::string>("ESCAPE", str);
@@ -9361,13 +9361,13 @@ namespace  lingodb  {
     break;
 
   case 49: // copy_delimiter: DELIMITERS Sconst
-#line 624 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 623 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     { yylhs.value.as < std::string > () = yystack_[1].value.as < std::string > (); }
 #line 9367 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 51: // VariableSetStmt: SET set_rest
-#line 631 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 630 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<ast::SetVariableStatement> > () = yystack_[0].value.as < std::shared_ptr<ast::SetVariableStatement> > ();
     }
@@ -9375,7 +9375,7 @@ namespace  lingodb  {
     break;
 
   case 54: // set_rest: set_rest_more
-#line 639 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 638 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<ast::SetVariableStatement> > () = yystack_[0].value.as < std::shared_ptr<ast::SetVariableStatement> > ();
     }
@@ -9383,7 +9383,7 @@ namespace  lingodb  {
     break;
 
   case 55: // generic_set: var_name TO var_list
-#line 645 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 644 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        yylhs.value.as < std::shared_ptr<ast::SetVariableStatement> > () = mkNode<lingodb::ast::SetVariableStatement>(yylhs.location, yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ());
     }
@@ -9391,7 +9391,7 @@ namespace  lingodb  {
     break;
 
   case 56: // generic_set: var_name "=" var_list
-#line 649 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 648 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
          yylhs.value.as < std::shared_ptr<ast::SetVariableStatement> > () = mkNode<lingodb::ast::SetVariableStatement>(yylhs.location, yystack_[2].value.as < std::string > (), yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ());
     }
@@ -9399,7 +9399,7 @@ namespace  lingodb  {
     break;
 
   case 57: // set_rest_more: generic_set
-#line 656 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 655 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<ast::SetVariableStatement> > () =yystack_[0].value.as < std::shared_ptr<ast::SetVariableStatement> > ();
     }
@@ -9407,7 +9407,7 @@ namespace  lingodb  {
     break;
 
   case 58: // var_name: ColId
-#line 663 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 662 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
@@ -9415,7 +9415,7 @@ namespace  lingodb  {
     break;
 
   case 59: // var_name: var_name "." ColId
-#line 667 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 666 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[2].value.as < std::string > () + "." + yystack_[0].value.as < std::string > ();
     }
@@ -9423,7 +9423,7 @@ namespace  lingodb  {
     break;
 
   case 60: // var_list: var_value
-#line 673 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 672 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -9433,7 +9433,7 @@ namespace  lingodb  {
     break;
 
   case 61: // var_list: var_list "," var_value
-#line 679 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 678 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9442,7 +9442,7 @@ namespace  lingodb  {
     break;
 
   case 62: // var_value: opt_boolean_or_string
-#line 686 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 685 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -9450,7 +9450,7 @@ namespace  lingodb  {
     break;
 
   case 63: // var_value: NumericOnly
-#line 690 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 689 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -9458,7 +9458,7 @@ namespace  lingodb  {
     break;
 
   case 64: // opt_boolean_or_string: TRUE_P
-#line 696 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 695 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::BoolValue>(true);
@@ -9468,7 +9468,7 @@ namespace  lingodb  {
     break;
 
   case 65: // opt_boolean_or_string: FALSE_P
-#line 702 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 701 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::BoolValue>(false);
@@ -9478,7 +9478,7 @@ namespace  lingodb  {
     break;
 
   case 66: // opt_boolean_or_string: ON
-#line 708 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 707 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::StringValue>("on");
@@ -9488,7 +9488,7 @@ namespace  lingodb  {
     break;
 
   case 67: // opt_boolean_or_string: NonReservedWord_or_Sconst
-#line 714 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 713 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -9496,7 +9496,7 @@ namespace  lingodb  {
     break;
 
   case 68: // NonReservedWord_or_Sconst: NonReservedWord
-#line 720 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 719 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     { 
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::StringValue>(yystack_[0].value.as < std::string > ());
@@ -9506,7 +9506,7 @@ namespace  lingodb  {
     break;
 
   case 69: // NonReservedWord_or_Sconst: Sconst
-#line 726 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 725 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     { 
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (); 
     }
@@ -9514,31 +9514,31 @@ namespace  lingodb  {
     break;
 
   case 70: // NonReservedWord: IDENT
-#line 731 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 730 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 9520 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 71: // NonReservedWord: unreserved_keyword
-#line 732 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 731 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 9526 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 72: // NonReservedWord: col_name_keyword
-#line 733 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 732 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 9532 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 73: // NonReservedWord: type_func_name_keyword
-#line 734 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 733 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 9538 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 74: // simple_select: SELECT opt_all_clause opt_target_list opt_from_clause where_clause group_clause having_clause
-#line 770 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 769 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::SelectNode>(yylhs.location);
         t->selectList = yystack_[4].value.as < std::shared_ptr<lingodb::ast::TargetList> > ();
@@ -9552,7 +9552,7 @@ namespace  lingodb  {
     break;
 
   case 75: // simple_select: SELECT distinct_clause target_list into_clause from_clause where_clause group_clause having_clause window_clause
-#line 780 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 779 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::SelectNode>(yylhs.location);
         auto target_list = mkNode<lingodb::ast::TargetList>(yylhs.location);
@@ -9570,7 +9570,7 @@ namespace  lingodb  {
     break;
 
   case 76: // simple_select: select_clause UNION set_quantifier select_clause
-#line 795 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 794 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::UNION, yystack_[3].value.as < std::shared_ptr<lingodb::ast::QueryNode> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -9581,7 +9581,7 @@ namespace  lingodb  {
     break;
 
   case 77: // simple_select: select_clause INTERSECT set_quantifier select_clause
-#line 802 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 801 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::INTERSECT, yystack_[3].value.as < std::shared_ptr<lingodb::ast::QueryNode> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -9592,7 +9592,7 @@ namespace  lingodb  {
     break;
 
   case 78: // simple_select: select_clause EXCEPT set_quantifier select_clause
-#line 809 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 808 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::EXCEPT, yystack_[3].value.as < std::shared_ptr<lingodb::ast::QueryNode> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -9602,7 +9602,7 @@ namespace  lingodb  {
     break;
 
   case 79: // simple_select: values_clause
-#line 815 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 814 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > () = mkNode<lingodb::ast::ValuesQueryNode>(yylhs.location, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ExpressionListRef> > ());
     }
@@ -9610,7 +9610,7 @@ namespace  lingodb  {
     break;
 
   case 80: // with_clause: WITH cte_list
-#line 822 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 821 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();
 
@@ -9619,7 +9619,7 @@ namespace  lingodb  {
     break;
 
   case 81: // with_clause: WITH_LA cte_list
-#line 827 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 826 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -9627,13 +9627,13 @@ namespace  lingodb  {
     break;
 
   case 82: // distinct_clause: DISTINCT
-#line 832 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 831 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < bool > () = true;}
 #line 9633 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 83: // cte_list: common_table_expr
-#line 836 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 835 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::QueryNode> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ();
     }
@@ -9641,7 +9641,7 @@ namespace  lingodb  {
     break;
 
   case 84: // cte_list: cte_list "," common_table_expr
-#line 840 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 839 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto current = std::static_pointer_cast<lingodb::ast::CTENode>(yystack_[2].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ());
         while(current->child != nullptr) {
@@ -9658,7 +9658,7 @@ namespace  lingodb  {
     break;
 
   case 87: // common_table_expr: name opt_name_list AS opt_materialized "(" PreparableStmt ")"
-#line 866 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 865 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto cteNode = mkNode<lingodb::ast::CTENode>(yylhs.location);
         cteNode->alias = yystack_[6].value.as < std::string > ();
@@ -9671,25 +9671,25 @@ namespace  lingodb  {
     break;
 
   case 89: // opt_materialized: %empty
-#line 878 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 877 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                 {}
 #line 9677 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 90: // opt_from_clause: FROM from_list
-#line 888 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 887 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                         { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > (); }
 #line 9683 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 91: // opt_from_clause: %empty
-#line 889 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 888 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                                 {  }
 #line 9689 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 92: // from_clause: FROM from_list
-#line 895 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 894 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {
                 yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > ();
             }
@@ -9697,13 +9697,13 @@ namespace  lingodb  {
     break;
 
   case 93: // from_list: table_ref
-#line 900 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 899 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               { auto crossProd = mkNode<lingodb::ast::CrossProductRef>(yylhs.location); crossProd->tables.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableRef> > ()) ; yylhs.value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > ()=crossProd;}
 #line 9703 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 94: // from_list: from_list "," table_ref
-#line 902 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 901 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > ()->tables.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableRef> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > () = yystack_[2].value.as < std::shared_ptr<lingodb::ast::CrossProductRef> > ();
@@ -9712,7 +9712,7 @@ namespace  lingodb  {
     break;
 
   case 95: // table_ref: relation_expr opt_alias_clause
-#line 915 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 914 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO Alias clause
         //TODO schema
@@ -9727,19 +9727,19 @@ namespace  lingodb  {
     break;
 
   case 96: // table_ref: joined_table
-#line 925 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 924 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableRef> > ();}
 #line 9733 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 98: // table_ref: joined_table opt_alias_clause
-#line 927 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 926 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::TableRef> > (); }
 #line 9739 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 99: // table_ref: select_with_parens opt_alias_clause
-#line 929 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 928 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO
         auto subquery = mkNode<lingodb::ast::SubqueryRef>(yylhs.location, std::static_pointer_cast<lingodb::ast::SelectNode>(yystack_[1].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()));
@@ -9751,7 +9751,7 @@ namespace  lingodb  {
     break;
 
   case 100: // set_quantifier: ALL
-#line 943 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 942 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < bool > () = true;
     }
@@ -9759,7 +9759,7 @@ namespace  lingodb  {
     break;
 
   case 102: // set_quantifier: %empty
-#line 948 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 947 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < bool > () = false;
     }
@@ -9767,7 +9767,7 @@ namespace  lingodb  {
     break;
 
   case 103: // group_clause: GROUP_P BY set_quantifier group_by_list
-#line 975 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 974 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(yylhs.location);
         node->groupByExpressions = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9778,7 +9778,7 @@ namespace  lingodb  {
     break;
 
   case 104: // group_clause: GROUP_P BY set_quantifier rollup_clause
-#line 983 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 982 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(yylhs.location);
         node->groupByExpressions = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9789,7 +9789,7 @@ namespace  lingodb  {
     break;
 
   case 106: // group_clause_with_alias: GROUP_P BY set_quantifier group_by_list_with_alias
-#line 993 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 992 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(yylhs.location);
         node->groupByExpressions = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9800,7 +9800,7 @@ namespace  lingodb  {
     break;
 
   case 107: // group_clause_with_alias: GROUP_P BY set_quantifier rollup_clause
-#line 1000 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 999 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::GroupByNode>(yylhs.location);
         node->groupByExpressions = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9811,7 +9811,7 @@ namespace  lingodb  {
     break;
 
   case 109: // group_by_list: group_by_item
-#line 1012 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1011 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -9821,7 +9821,7 @@ namespace  lingodb  {
     break;
 
   case 110: // group_by_list: group_by_list "," group_by_item
-#line 1018 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1017 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9830,7 +9830,7 @@ namespace  lingodb  {
     break;
 
   case 111: // group_by_list_with_alias: group_by_item_with_alias
-#line 1025 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1024 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -9840,7 +9840,7 @@ namespace  lingodb  {
     break;
 
   case 112: // group_by_list_with_alias: group_by_list "," group_by_item_with_alias
-#line 1031 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1030 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -9849,7 +9849,7 @@ namespace  lingodb  {
     break;
 
   case 113: // rollup_clause: ROLLUP "(" expr_list ")"
-#line 1038 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1037 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
     }
@@ -9857,55 +9857,55 @@ namespace  lingodb  {
     break;
 
   case 114: // group_by_item: a_expr
-#line 1043 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1042 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 9863 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 115: // group_by_item: empty_grouping_set
-#line 1044 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1043 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {}
 #line 9869 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 116: // group_by_item_with_alias: a_expr
-#line 1049 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1048 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 9875 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 117: // group_by_item_with_alias: a_expr AS ColId
-#line 1050 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1049 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                       {yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()->alias = yystack_[0].value.as < std::string > (); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 9881 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 118: // group_by_item_with_alias: empty_grouping_set
-#line 1051 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1050 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {}
 #line 9887 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 120: // having_clause: HAVING a_expr
-#line 1060 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1059 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                   {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 9893 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 122: // joined_table: "(" joined_table ")"
-#line 1103 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1102 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::TableRef> > ();}
 #line 9899 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 123: // joined_table: table_ref CROSS JOIN table_ref
-#line 1104 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1103 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[3].value.as < std::shared_ptr<lingodb::ast::TableRef> > (); }
 #line 9905 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 124: // joined_table: table_ref join_type JOIN table_ref join_qual
-#line 1106 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1105 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto join = mkNode<lingodb::ast::JoinRef>(yylhs.location, yystack_[3].value.as < lingodb::ast::JoinType > (), lingodb::ast::JoinCondType::REGULAR);
         join->left = yystack_[4].value.as < std::shared_ptr<lingodb::ast::TableRef> > ();
@@ -9918,7 +9918,7 @@ namespace  lingodb  {
     break;
 
   case 125: // joined_table: table_ref JOIN table_ref join_qual
-#line 1115 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1114 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO find out correct JoinCondType
         auto join = mkNode<lingodb::ast::JoinRef>(yylhs.location, lingodb::ast::JoinType::INNER, lingodb::ast::JoinCondType::REGULAR);
@@ -9931,19 +9931,19 @@ namespace  lingodb  {
     break;
 
   case 126: // joined_table: table_ref NATURAL join_type JOIN table_ref
-#line 1123 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1122 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[4].value.as < std::shared_ptr<lingodb::ast::TableRef> > (); }
 #line 9937 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 127: // joined_table: table_ref NATURAL JOIN table_ref
-#line 1124 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1123 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::shared_ptr<lingodb::ast::TableRef> > () = yystack_[3].value.as < std::shared_ptr<lingodb::ast::TableRef> > (); }
 #line 9943 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 128: // alias_clause: AS ColId "(" name_list ")"
-#line 1129 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1128 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = std::make_pair(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<std::string> > ());
     }
@@ -9951,7 +9951,7 @@ namespace  lingodb  {
     break;
 
   case 129: // alias_clause: AS ColId
-#line 1133 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1132 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = std::make_pair(yystack_[0].value.as < std::string > (), std::vector<std::string>());
     }
@@ -9959,7 +9959,7 @@ namespace  lingodb  {
     break;
 
   case 130: // alias_clause: ColId "(" name_list ")"
-#line 1137 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1136 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = std::make_pair(yystack_[3].value.as < std::string > (), yystack_[1].value.as < std::vector<std::string> > ());
     }
@@ -9967,7 +9967,7 @@ namespace  lingodb  {
     break;
 
   case 131: // alias_clause: ColId
-#line 1141 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1140 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = std::make_pair(yystack_[0].value.as < std::string > (), std::vector<std::string>());
     }
@@ -9975,7 +9975,7 @@ namespace  lingodb  {
     break;
 
   case 134: // opt_nulls_order: %empty
-#line 1151 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1150 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::OrderByNullType > () = lingodb::ast::OrderByNullType::ORDER_DEFAULT;
     }
@@ -9983,7 +9983,7 @@ namespace  lingodb  {
     break;
 
   case 135: // opt_alias_clause: alias_clause
-#line 1157 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1156 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = yystack_[0].value.as < std::pair<std::string, std::vector<std::string>> > ();
     }
@@ -9991,7 +9991,7 @@ namespace  lingodb  {
     break;
 
   case 136: // opt_alias_clause: %empty
-#line 1161 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1160 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::pair<std::string, std::vector<std::string>> > () = std::make_pair<std::string, std::vector<std::string>>("", std::vector<std::string>());
     }
@@ -9999,7 +9999,7 @@ namespace  lingodb  {
     break;
 
   case 137: // opt_asc_desc: ASC
-#line 1173 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1172 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::OrderType > () = lingodb::ast::OrderType::ASCENDING;
     }
@@ -10007,7 +10007,7 @@ namespace  lingodb  {
     break;
 
   case 138: // opt_asc_desc: DESC
-#line 1177 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1176 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::OrderType > () = lingodb::ast::OrderType::DESCENDING;
     }
@@ -10015,7 +10015,7 @@ namespace  lingodb  {
     break;
 
   case 139: // opt_asc_desc: %empty
-#line 1180 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1179 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {
         yylhs.value.as < lingodb::ast::OrderType > () = lingodb::ast::OrderType::ASCENDING;
     }
@@ -10023,7 +10023,7 @@ namespace  lingodb  {
     break;
 
   case 141: // join_type: FULL OUTER_P
-#line 1193 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1192 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::FULL;
     }
@@ -10031,7 +10031,7 @@ namespace  lingodb  {
     break;
 
   case 142: // join_type: LEFT OUTER_P
-#line 1197 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1196 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::LEFT;
     }
@@ -10039,7 +10039,7 @@ namespace  lingodb  {
     break;
 
   case 143: // join_type: LEFT
-#line 1201 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1200 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::LEFT;
     }
@@ -10047,7 +10047,7 @@ namespace  lingodb  {
     break;
 
   case 144: // join_type: RIGHT
-#line 1205 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1204 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::RIGHT;
     }
@@ -10055,7 +10055,7 @@ namespace  lingodb  {
     break;
 
   case 145: // join_type: RIGHT OUTER_P
-#line 1209 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1208 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::RIGHT;
     }
@@ -10063,7 +10063,7 @@ namespace  lingodb  {
     break;
 
   case 146: // join_type: INNER_P
-#line 1213 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1212 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::JoinType > () = lingodb::ast::JoinType::INNER;
     }
@@ -10071,7 +10071,7 @@ namespace  lingodb  {
     break;
 
   case 147: // join_qual: USING "(" name_list ")"
-#line 1232 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1231 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto name_list = yystack_[1].value.as < std::vector<std::string> > ();
         auto list = mkListShared<lingodb::ast::ColumnRefExpression>();
@@ -10085,43 +10085,43 @@ namespace  lingodb  {
     break;
 
   case 148: // join_qual: ON a_expr
-#line 1241 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1240 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 {yylhs.value.as < lingodb::ast::jointCondOrUsingCols > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10091 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 149: // relation_expr: qualified_name
-#line 1245 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1244 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();}
 #line 10097 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 154: // opt_asymmetric: ASYMMETRIC
-#line 1255 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1254 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < bool > ()=true;}
 #line 10103 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 155: // opt_asymmetric: %empty
-#line 1256 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1255 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < bool > ()=false;}
 #line 10109 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 158: // opt_sort_clause: sort_clause
-#line 1263 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1262 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 {yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::OrderByModifier> > ();}
 #line 10115 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 159: // opt_sort_clause: %empty
-#line 1264 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1263 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::OrderByModifier>> > () = std::nullopt;}
 #line 10121 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 160: // sort_clause: ORDER BY sortby_list
-#line 1268 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1267 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto n = mkNode<lingodb::ast::OrderByModifier>(yylhs.location);
         n->orderByElements = std::move(yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::OrderByElement>> > ());
@@ -10131,7 +10131,7 @@ namespace  lingodb  {
     break;
 
   case 161: // sortby_list: sortby
-#line 1276 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1275 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::OrderByElement>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::OrderByElement> > ());
@@ -10141,7 +10141,7 @@ namespace  lingodb  {
     break;
 
   case 162: // sortby_list: sortby_list "," sortby
-#line 1282 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1281 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::OrderByElement>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::OrderByElement> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::OrderByElement>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::OrderByElement>> > ();
@@ -10150,7 +10150,7 @@ namespace  lingodb  {
     break;
 
   case 164: // sortby: a_expr opt_asc_desc opt_nulls_order
-#line 1290 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1289 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto orderByElement = mkNode<lingodb::ast::OrderByElement>(yylhs.location, yystack_[1].value.as < lingodb::ast::OrderType > (), yystack_[0].value.as < lingodb::ast::OrderByNullType > ());
         orderByElement->expression = yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
@@ -10160,7 +10160,7 @@ namespace  lingodb  {
     break;
 
   case 165: // select_limit: limit_clause offset_clause
-#line 1301 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1300 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ()->offset = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
         yylhs.value.as < std::shared_ptr<lingodb::ast::LimitModifier> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ();
@@ -10169,7 +10169,7 @@ namespace  lingodb  {
     break;
 
   case 166: // select_limit: offset_clause limit_clause
-#line 1306 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1305 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[0].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ()->offset = yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
         yylhs.value.as < std::shared_ptr<lingodb::ast::LimitModifier> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ();
@@ -10178,31 +10178,31 @@ namespace  lingodb  {
     break;
 
   case 167: // select_limit: limit_clause
-#line 1310 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1309 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {yylhs.value.as < std::shared_ptr<lingodb::ast::LimitModifier> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ();}
 #line 10184 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 169: // opt_select_limit: select_limit
-#line 1315 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1314 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::ResultModifier>> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ();}
 #line 10190 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 170: // opt_select_limit: %empty
-#line 1316 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1315 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::ResultModifier>> > ()=std::nullopt;}
 #line 10196 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 171: // limit_clause: LIMIT select_limit_value
-#line 1320 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1319 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                              {yylhs.value.as < std::shared_ptr<lingodb::ast::LimitModifier> > () = mkNode<lingodb::ast::LimitModifier>(yylhs.location, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());}
 #line 10202 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 173: // offset_clause: OFFSET select_offset_value
-#line 1326 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1325 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -10210,19 +10210,19 @@ namespace  lingodb  {
     break;
 
   case 174: // select_limit_value: a_expr
-#line 1332 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1331 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10216 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 176: // select_offset_value: a_expr
-#line 1337 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1336 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10222 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 177: // values_clause: VALUES "(" expr_list ")"
-#line 1347 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1346 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //ExpressionListRef is a TableRef and therefore a TableProducer and therefore can be used stand alone
         auto exprListList = mkList<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>>();
@@ -10235,7 +10235,7 @@ namespace  lingodb  {
     break;
 
   case 178: // values_clause: values_clause "," "(" expr_list ")"
-#line 1356 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1355 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::static_pointer_cast<lingodb::ast::ExpressionListRef>(yystack_[4].value.as < std::shared_ptr<lingodb::ast::ExpressionListRef> > ())->values.emplace_back(yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ExpressionListRef> > () = yystack_[4].value.as < std::shared_ptr<lingodb::ast::ExpressionListRef> > ();
@@ -10244,19 +10244,19 @@ namespace  lingodb  {
     break;
 
   case 179: // where_clause: WHERE a_expr
-#line 1396 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1395 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10250 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 181: // a_expr: c_expr
-#line 1401 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1400 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10256 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 182: // a_expr: a_expr "+" a_expr
-#line 1406 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1405 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_PLUS, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10264,7 +10264,7 @@ namespace  lingodb  {
     break;
 
   case 183: // a_expr: a_expr TYPECAST Type
-#line 1410 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1409 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
      yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::CastExpression>(yylhs.location, yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > (), yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10272,7 +10272,7 @@ namespace  lingodb  {
     break;
 
   case 184: // a_expr: a_expr "-" a_expr
-#line 1414 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1413 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_MINUS, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10280,7 +10280,7 @@ namespace  lingodb  {
     break;
 
   case 185: // a_expr: a_expr "*" a_expr
-#line 1418 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1417 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_TIMES, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10288,7 +10288,7 @@ namespace  lingodb  {
     break;
 
   case 186: // a_expr: a_expr "/" a_expr
-#line 1422 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1421 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_DIVIDE, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10296,7 +10296,7 @@ namespace  lingodb  {
     break;
 
   case 187: // a_expr: a_expr "%" a_expr
-#line 1426 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1425 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_MOD, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10304,13 +10304,13 @@ namespace  lingodb  {
     break;
 
   case 188: // a_expr: a_expr "^" a_expr
-#line 1429 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1428 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (); }
 #line 10310 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 189: // a_expr: a_expr "<" a_expr
-#line 1431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_LESSTHAN, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10318,7 +10318,7 @@ namespace  lingodb  {
     break;
 
   case 190: // a_expr: a_expr ">" a_expr
-#line 1435 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1434 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_GREATERTHAN, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10326,7 +10326,7 @@ namespace  lingodb  {
     break;
 
   case 191: // a_expr: a_expr "=" a_expr
-#line 1439 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1438 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_EQUAL, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10334,7 +10334,7 @@ namespace  lingodb  {
     break;
 
   case 192: // a_expr: a_expr "<=" a_expr
-#line 1443 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1442 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_LESSTHANOREQUALTO, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10342,7 +10342,7 @@ namespace  lingodb  {
     break;
 
   case 193: // a_expr: a_expr ">=" a_expr
-#line 1447 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_GREATERTHANOREQUALTO, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10350,7 +10350,7 @@ namespace  lingodb  {
     break;
 
   case 194: // a_expr: a_expr "<>" a_expr
-#line 1451 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1450 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_NOTEQUAL, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -10358,7 +10358,7 @@ namespace  lingodb  {
     break;
 
   case 195: // a_expr: and_a_expr
-#line 1455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1454 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ConjunctionExpression> > ();
     }
@@ -10366,7 +10366,7 @@ namespace  lingodb  {
     break;
 
   case 196: // a_expr: or_a_expr
-#line 1459 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1458 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ConjunctionExpression> > ();
     }
@@ -10374,7 +10374,7 @@ namespace  lingodb  {
     break;
 
   case 197: // a_expr: NOT a_expr
-#line 1463 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1462 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_NOT, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10382,7 +10382,7 @@ namespace  lingodb  {
     break;
 
   case 198: // a_expr: a_expr LIKE a_expr
-#line 1467 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1466 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_LIKE, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10390,7 +10390,7 @@ namespace  lingodb  {
     break;
 
   case 199: // a_expr: a_expr NOT LIKE a_expr
-#line 1471 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1470 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ComparisonExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_NOT_LIKE, yystack_[3].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10398,7 +10398,7 @@ namespace  lingodb  {
     break;
 
   case 200: // a_expr: a_expr IN_P in_expr
-#line 1475 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1474 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         /*
         * in_expr either returns a SubQuery or a list of expressions
@@ -10418,7 +10418,7 @@ namespace  lingodb  {
     break;
 
   case 201: // a_expr: a_expr NOT IN_P in_expr
-#line 1491 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1490 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         /*
         * in_expr either returns a SubQuery or a list of expressions
@@ -10439,7 +10439,7 @@ namespace  lingodb  {
     break;
 
   case 202: // a_expr: a_expr BETWEEN opt_asymmetric b_expr AND a_expr
-#line 1508 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1507 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::BetweenExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_BETWEEN, yystack_[5].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         node->asymmetric = yystack_[3].value.as < bool > ();
@@ -10449,7 +10449,7 @@ namespace  lingodb  {
     break;
 
   case 203: // a_expr: a_expr NOT BETWEEN opt_asymmetric b_expr AND a_expr
-#line 1514 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1513 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::BetweenExpression>(yylhs.location, lingodb::ast::ExpressionType::COMPARE_NOT_BETWEEN, yystack_[6].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         node->asymmetric = yystack_[3].value.as < bool > ();
@@ -10459,7 +10459,7 @@ namespace  lingodb  {
     break;
 
   case 204: // a_expr: a_expr IS NULL_P
-#line 1520 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1519 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_IS_NULL, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10467,7 +10467,7 @@ namespace  lingodb  {
     break;
 
   case 205: // a_expr: a_expr IS NOT NULL_P
-#line 1524 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1523 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_IS_NOT_NULL, yystack_[3].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10475,7 +10475,7 @@ namespace  lingodb  {
     break;
 
   case 206: // a_expr: a_expr qual_Op a_expr
-#line 1528 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1527 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, yystack_[1].value.as < std::string > (), yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10483,7 +10483,7 @@ namespace  lingodb  {
     break;
 
   case 207: // a_expr: qual_Op a_expr
-#line 1532 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1531 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, yystack_[1].value.as < std::string > (), nullptr, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10491,7 +10491,7 @@ namespace  lingodb  {
     break;
 
   case 208: // a_expr: a_expr basicComparisonType sub_type select_with_parens
-#line 1536 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1535 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        auto subQueryExpression = mkNode<lingodb::ast::SubqueryExpression>(yylhs.location, yystack_[1].value.as < lingodb::ast::SubqueryType > (), std::static_pointer_cast<lingodb::ast::SelectNode>(yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ()));
        subQueryExpression->testExpr = yystack_[3].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
@@ -10502,7 +10502,7 @@ namespace  lingodb  {
     break;
 
   case 209: // and_a_expr: a_expr AND a_expr
-#line 1545 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1544 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        yylhs.value.as < std::shared_ptr<lingodb::ast::ConjunctionExpression> > () = mkNode<lingodb::ast::ConjunctionExpression>(yylhs.location, lingodb::ast::ExpressionType::CONJUNCTION_AND , yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10510,7 +10510,7 @@ namespace  lingodb  {
     break;
 
   case 210: // or_a_expr: a_expr OR a_expr
-#line 1551 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1550 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        yylhs.value.as < std::shared_ptr<lingodb::ast::ConjunctionExpression> > () = mkNode<lingodb::ast::ConjunctionExpression>(yylhs.location, lingodb::ast::ExpressionType::CONJUNCTION_OR , yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10518,13 +10518,13 @@ namespace  lingodb  {
     break;
 
   case 211: // b_expr: c_expr
-#line 1557 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1556 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10524 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 212: // b_expr: b_expr "+" b_expr
-#line 1559 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1558 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_PLUS, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10532,7 +10532,7 @@ namespace  lingodb  {
     break;
 
   case 213: // b_expr: b_expr "-" b_expr
-#line 1563 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1562 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_MINUS, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10540,7 +10540,7 @@ namespace  lingodb  {
     break;
 
   case 214: // b_expr: b_expr "*" b_expr
-#line 1567 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1566 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_TIMES, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10548,7 +10548,7 @@ namespace  lingodb  {
     break;
 
   case 215: // b_expr: b_expr "/" b_expr
-#line 1571 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1570 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::OperatorExpression>(yylhs.location, lingodb::ast::ExpressionType::OPERATOR_DIVIDE, yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -10556,25 +10556,25 @@ namespace  lingodb  {
     break;
 
   case 216: // c_expr: columnref
-#line 1580 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1579 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10562 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 217: // c_expr: AexprConst
-#line 1581 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1580 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10568 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 218: // c_expr: "(" a_expr ")"
-#line 1583 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1582 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10574 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 219: // c_expr: case_expr
-#line 1585 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1584 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -10582,25 +10582,25 @@ namespace  lingodb  {
     break;
 
   case 220: // c_expr: func_expr
-#line 1588 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1587 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ();}
 #line 10588 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 221: // c_expr: window_func_expr
-#line 1589 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1588 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowExpression> > ();}
 #line 10594 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 222: // c_expr: cast_expr
-#line 1590 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1589 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10600 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 223: // c_expr: classic_select_and_pipe_sql_with_parens
-#line 1592 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1591 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto subquery = mkNode<lingodb::ast::SubqueryExpression>(yylhs.location, lingodb::ast::SubqueryType::SCALAR, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = subquery;
@@ -10609,7 +10609,7 @@ namespace  lingodb  {
     break;
 
   case 224: // c_expr: EXISTS classic_select_and_pipe_sql_with_parens
-#line 1598 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1597 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto subquery = mkNode<lingodb::ast::SubqueryExpression>(yylhs.location, lingodb::ast::SubqueryType::EXISTS, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = subquery;
@@ -10618,7 +10618,7 @@ namespace  lingodb  {
     break;
 
   case 225: // c_expr: NOT EXISTS classic_select_and_pipe_sql_with_parens
-#line 1603 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1602 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto subquery = mkNode<lingodb::ast::SubqueryExpression>(yylhs.location, lingodb::ast::SubqueryType::NOT_EXISTS, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = subquery;
@@ -10627,7 +10627,7 @@ namespace  lingodb  {
     break;
 
   case 226: // basicComparisonType: "="
-#line 1616 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1615 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_EQUAL;
     }
@@ -10635,7 +10635,7 @@ namespace  lingodb  {
     break;
 
   case 227: // basicComparisonType: "<>"
-#line 1620 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1619 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_NOTEQUAL;
     }
@@ -10643,7 +10643,7 @@ namespace  lingodb  {
     break;
 
   case 228: // basicComparisonType: "<"
-#line 1624 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1623 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_LESSTHAN;
     }
@@ -10651,7 +10651,7 @@ namespace  lingodb  {
     break;
 
   case 229: // basicComparisonType: ">"
-#line 1628 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1627 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_GREATERTHAN;
     }
@@ -10659,7 +10659,7 @@ namespace  lingodb  {
     break;
 
   case 230: // basicComparisonType: "<="
-#line 1632 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1631 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_LESSTHANOREQUALTO;
     }
@@ -10667,7 +10667,7 @@ namespace  lingodb  {
     break;
 
   case 231: // basicComparisonType: ">="
-#line 1636 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1635 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_GREATERTHANOREQUALTO;
     }
@@ -10675,7 +10675,7 @@ namespace  lingodb  {
     break;
 
   case 232: // basicComparisonType: LIKE
-#line 1640 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1639 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_LIKE;
     }
@@ -10683,7 +10683,7 @@ namespace  lingodb  {
     break;
 
   case 233: // basicComparisonType: NOT LIKE
-#line 1644 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1643 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::ExpressionType > () = lingodb::ast::ExpressionType::COMPARE_NOT_LIKE;
     }
@@ -10691,7 +10691,7 @@ namespace  lingodb  {
     break;
 
   case 234: // in_expr: select_with_parens
-#line 1651 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1650 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto subquery = mkNode<lingodb::ast::SubqueryExpression>(yylhs.location, lingodb::ast::SubqueryType::ANY, yystack_[0].value.as < std::shared_ptr<lingodb::ast::QueryNode> > ());
         yylhs.value.as < std::variant<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>, std::shared_ptr<lingodb::ast::SubqueryExpression>> > () = subquery;
@@ -10701,7 +10701,7 @@ namespace  lingodb  {
     break;
 
   case 235: // in_expr: "(" expr_list ")"
-#line 1657 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1656 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::variant<std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>, std::shared_ptr<lingodb::ast::SubqueryExpression>> > () = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
     }
@@ -10709,7 +10709,7 @@ namespace  lingodb  {
     break;
 
   case 236: // case_expr: CASE case_arg when_clause_list case_default END_P
-#line 1663 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1662 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto caseExpr = mkNode<lingodb::ast::CaseExpression>(yylhs.location, yystack_[3].value.as < std::optional<std::shared_ptr<lingodb::ast::ParsedExpression>> > (), yystack_[2].value.as < std::vector<lingodb::ast::CaseExpression::CaseCheck> > (), yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = caseExpr;
@@ -10718,7 +10718,7 @@ namespace  lingodb  {
     break;
 
   case 237: // when_clause_list: when_clause
-#line 1670 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1669 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkList<lingodb::ast::CaseExpression::CaseCheck>();
         list.emplace_back(yystack_[0].value.as < lingodb::ast::CaseExpression::CaseCheck > ());
@@ -10729,7 +10729,7 @@ namespace  lingodb  {
     break;
 
   case 238: // when_clause_list: when_clause_list when_clause
-#line 1677 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1676 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::vector<lingodb::ast::CaseExpression::CaseCheck> > ().emplace_back(yystack_[0].value.as < lingodb::ast::CaseExpression::CaseCheck > ());
         yylhs.value.as < std::vector<lingodb::ast::CaseExpression::CaseCheck> > () = yystack_[1].value.as < std::vector<lingodb::ast::CaseExpression::CaseCheck> > ();
@@ -10738,7 +10738,7 @@ namespace  lingodb  {
     break;
 
   case 239: // when_clause: WHEN a_expr THEN a_expr
-#line 1685 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1684 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto whenCheck = lingodb::ast::CaseExpression::CaseCheck(yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > (),yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < lingodb::ast::CaseExpression::CaseCheck > () = whenCheck;
@@ -10747,7 +10747,7 @@ namespace  lingodb  {
     break;
 
   case 240: // case_default: ELSE a_expr
-#line 1693 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1692 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -10755,7 +10755,7 @@ namespace  lingodb  {
     break;
 
   case 242: // case_arg: a_expr
-#line 1701 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1700 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -10763,13 +10763,13 @@ namespace  lingodb  {
     break;
 
   case 243: // case_arg: %empty
-#line 1704 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1703 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::optional<std::shared_ptr<lingodb::ast::ParsedExpression>> > ()=std::nullopt;}
 #line 10769 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 244: // columnref_list: columnref
-#line 1709 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1708 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -10779,7 +10779,7 @@ namespace  lingodb  {
     break;
 
   case 245: // columnref_list: columnref_list "," columnref
-#line 1715 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1714 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -10788,13 +10788,13 @@ namespace  lingodb  {
     break;
 
   case 246: // columnref: ColId
-#line 1722 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1721 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
           {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::ColumnRefExpression>(yylhs.location, yystack_[0].value.as < std::string > ());}
 #line 10794 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 247: // columnref: ColId indirection
-#line 1723 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1722 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                         {
         auto in = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
         if(in->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF) {
@@ -10815,7 +10815,7 @@ namespace  lingodb  {
     break;
 
   case 248: // func_application: func_name "(" ")"
-#line 1742 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1741 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string catalog("");
         std::string schema("");
@@ -10830,7 +10830,7 @@ namespace  lingodb  {
     break;
 
   case 249: // func_application: func_name "(" func_arg_list opt_sort_clause ")"
-#line 1753 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1752 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string catalog("");
         std::string schema("");
@@ -10848,7 +10848,7 @@ namespace  lingodb  {
     break;
 
   case 253: // func_application: func_name "(" DISTINCT func_arg_list opt_alias_clause ")"
-#line 1770 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1769 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string catalog("");
         std::string schema("");
@@ -10866,7 +10866,7 @@ namespace  lingodb  {
     break;
 
   case 254: // func_application: func_name "(" "*" ")"
-#line 1784 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1783 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::string catalog("");
         std::string schema("");
@@ -10886,7 +10886,7 @@ namespace  lingodb  {
     break;
 
   case 255: // func_expr: func_application
-#line 1804 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1803 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO within_group_clause filter_clause over_clause
         yylhs.value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ();
@@ -10895,7 +10895,7 @@ namespace  lingodb  {
     break;
 
   case 256: // func_expr: func_expr_common_subexpr
-#line 1811 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1810 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ();
     }
@@ -10903,7 +10903,7 @@ namespace  lingodb  {
     break;
 
   case 257: // window_func_expr: func_application over_clause
-#line 1817 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1816 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowExpression> > ()->functionExpression = yystack_[1].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ();
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowExpression> > ();
@@ -10913,7 +10913,7 @@ namespace  lingodb  {
     break;
 
   case 258: // func_arg_list_opt: func_arg_list
-#line 1826 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1825 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
     }
@@ -10921,7 +10921,7 @@ namespace  lingodb  {
     break;
 
   case 259: // func_arg_list_opt: %empty
-#line 1830 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1829 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO
     }
@@ -10929,7 +10929,7 @@ namespace  lingodb  {
     break;
 
   case 260: // func_arg_list: func_arg_expr
-#line 1837 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1836 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -10939,7 +10939,7 @@ namespace  lingodb  {
     break;
 
   case 261: // func_arg_list: func_arg_list "," func_arg_expr
-#line 1843 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1842 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ()= yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -10948,7 +10948,7 @@ namespace  lingodb  {
     break;
 
   case 262: // expr_list: a_expr
-#line 1850 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1849 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -10958,7 +10958,7 @@ namespace  lingodb  {
     break;
 
   case 263: // expr_list: expr_list "," a_expr
-#line 1856 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1855 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -10967,7 +10967,7 @@ namespace  lingodb  {
     break;
 
   case 264: // expr_list_with_alias: a_expr opt_alias_clause
-#line 1863 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1862 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()->alias = yystack_[0].value.as < std::pair<std::string, std::vector<std::string>> > ().first;
@@ -10978,7 +10978,7 @@ namespace  lingodb  {
     break;
 
   case 265: // expr_list_with_alias: expr_list "," a_expr opt_alias_clause
-#line 1870 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1869 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()->alias = yystack_[0].value.as < std::pair<std::string, std::vector<std::string>> > ().first;
         yystack_[3].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -10988,13 +10988,13 @@ namespace  lingodb  {
     break;
 
   case 266: // func_arg_expr: a_expr
-#line 1878 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1877 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 10994 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 269: // func_expr_common_subexpr: EXTRACT "(" extract_list ")"
-#line 1889 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1888 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto function  = mkNode<lingodb::ast::FunctionExpression>(yylhs.location, "", "", "EXTRACT", false, false, false);
         function->arguments = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -11005,7 +11005,7 @@ namespace  lingodb  {
     break;
 
   case 270: // func_expr_common_subexpr: SUBSTRING "(" substr_list ")"
-#line 1896 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1895 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto function = mkNode<lingodb::ast::FunctionExpression>(yylhs.location, "", "", "SUBSTRING", false, false, false);
         function->arguments = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -11015,7 +11015,7 @@ namespace  lingodb  {
     break;
 
   case 271: // func_expr_common_subexpr: SUBSTRING "(" func_arg_list_opt ")"
-#line 1902 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1901 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto function = mkNode<lingodb::ast::FunctionExpression>(yylhs.location, "", "", "SUBSTRING", false, false, false);
         function->arguments = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -11025,7 +11025,7 @@ namespace  lingodb  {
     break;
 
   case 272: // cast_expr: CAST "(" a_expr AS Typename ")"
-#line 1911 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1910 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = mkNode<lingodb::ast::CastExpression>(yylhs.location, yystack_[1].value.as < lingodb::ast::LogicalTypeWithMods > (), yystack_[3].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -11033,7 +11033,7 @@ namespace  lingodb  {
     break;
 
   case 273: // extract_list: extract_arg FROM a_expr
-#line 1918 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1917 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[2].value.as < std::shared_ptr<ast::ConstantExpression> > ());
@@ -11044,7 +11044,7 @@ namespace  lingodb  {
     break;
 
   case 274: // extract_arg: YEAR_P
-#line 1927 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1926 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto constant = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         constant->value = std::make_shared<lingodb::ast::StringValue>("year");
@@ -11054,7 +11054,7 @@ namespace  lingodb  {
     break;
 
   case 275: // extract_arg: MONTH_P
-#line 1933 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1932 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto constant = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         constant->value = std::make_shared<lingodb::ast::StringValue>("month");
@@ -11064,7 +11064,7 @@ namespace  lingodb  {
     break;
 
   case 276: // extract_arg: DAY_P
-#line 1939 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1938 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto constant = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         constant->value = std::make_shared<lingodb::ast::StringValue>("day");
@@ -11074,7 +11074,7 @@ namespace  lingodb  {
     break;
 
   case 277: // extract_arg: MINUTE_P
-#line 1945 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1944 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto constant = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         constant->value = std::make_shared<lingodb::ast::StringValue>("minute");
@@ -11084,7 +11084,7 @@ namespace  lingodb  {
     break;
 
   case 278: // substr_list: a_expr FROM a_expr FOR a_expr
-#line 1954 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1953 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::ParsedExpression>();
         list.emplace_back(yystack_[4].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
@@ -11097,7 +11097,7 @@ namespace  lingodb  {
     break;
 
   case 279: // substr_list: a_expr FOR a_expr FROM a_expr
-#line 1963 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1962 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -11105,7 +11105,7 @@ namespace  lingodb  {
     break;
 
   case 280: // substr_list: a_expr FROM a_expr
-#line 1967 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1966 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -11113,7 +11113,7 @@ namespace  lingodb  {
     break;
 
   case 281: // substr_list: a_expr FOR a_expr
-#line 1971 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1970 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -11121,7 +11121,7 @@ namespace  lingodb  {
     break;
 
   case 282: // over_clause: OVER window_specification
-#line 1978 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1977 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowExpression> > ();
     }
@@ -11129,7 +11129,7 @@ namespace  lingodb  {
     break;
 
   case 285: // window_specification: "(" opt_existing_window_name opt_partition_clause opt_sort_clause opt_frame_clause ")"
-#line 1987 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 1986 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto windowExpression = mkNode<lingodb::ast::WindowExpression>(yylhs.location);
         windowExpression->partitions = yystack_[3].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -11143,31 +11143,31 @@ namespace  lingodb  {
     break;
 
   case 286: // indirection: indirection_el
-#line 2001 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2000 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 11149 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 287: // indirection: indirection indirection_el
-#line 2002 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2001 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                  {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 11155 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 288: // indirection_el: "." attr_name
-#line 2005 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2004 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                   {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=mkNode<lingodb::ast::ColumnRefExpression>(yylhs.location, yystack_[0].value.as < std::string > ());}
 #line 11161 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 289: // indirection_el: "." "*"
-#line 2006 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2005 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=mkNode<lingodb::ast::StarExpression>(yylhs.location, "");}
 #line 11167 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 291: // opt_target_list: target_list
-#line 2018 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2017 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::TargetList>(yylhs.location);
         node->targets = std::move(yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ());
@@ -11177,67 +11177,67 @@ namespace  lingodb  {
     break;
 
   case 293: // target_list: target_el
-#line 2026 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2025 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
               { auto list = mkListShared<lingodb::ast::ParsedExpression>(); list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()); yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ()=list;}
 #line 11183 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 294: // target_list: target_list "," target_el
-#line 2027 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2026 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                         { yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()); yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ()=yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();}
 #line 11189 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 295: // target_el: a_expr AS ColLabel
-#line 2030 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2029 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {  yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()->alias = yystack_[0].value.as < std::string > (); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[2].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 11195 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 296: // target_el: a_expr BareColLabel
-#line 2031 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2030 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           {yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()->alias = yystack_[0].value.as < std::string > (); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 11201 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 297: // target_el: a_expr
-#line 2032 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2031 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 11207 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 298: // target_el: "*"
-#line 2033 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2032 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {  yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () =mkNode<lingodb::ast::StarExpression>(yylhs.location,"");  }
 #line 11213 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 299: // opt_existing_window_name: ColId
-#line 2048 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2047 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                         {  }
 #line 11219 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 300: // opt_existing_window_name: %empty
-#line 2049 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2048 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                         {  }
 #line 11225 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 301: // opt_partition_clause: PARTITION BY expr_list
-#line 2053 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2052 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                         { yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ()=yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > (); }
 #line 11231 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 302: // opt_partition_clause: %empty
-#line 2054 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2053 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                     { yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > () = mkListShared<lingodb::ast::ParsedExpression>(); }
 #line 11237 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 304: // opt_frame_clause: RANGE frame_extent opt_window_exclusion_clause
-#line 2063 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2062 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->windowMode = lingodb::ast::WindowMode::RANGE;
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ();
@@ -11246,7 +11246,7 @@ namespace  lingodb  {
     break;
 
   case 305: // opt_frame_clause: ROWS frame_extent opt_window_exclusion_clause
-#line 2068 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2067 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->windowMode = lingodb::ast::WindowMode::ROWS;
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ();
@@ -11255,7 +11255,7 @@ namespace  lingodb  {
     break;
 
   case 306: // opt_frame_clause: GROUPS frame_extent opt_window_exclusion_clause
-#line 2073 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2072 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->windowMode = lingodb::ast::WindowMode::GROUPS;
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = yystack_[1].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ();
@@ -11264,7 +11264,7 @@ namespace  lingodb  {
     break;
 
   case 307: // opt_frame_clause: %empty
-#line 2078 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2077 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
     }
@@ -11272,7 +11272,7 @@ namespace  lingodb  {
     break;
 
   case 308: // frame_extent: frame_bound
-#line 2085 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2084 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ();
     }
@@ -11280,7 +11280,7 @@ namespace  lingodb  {
     break;
 
   case 309: // frame_extent: BETWEEN frame_bound AND frame_bound
-#line 2089 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2088 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->end = yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->start;
         yystack_[2].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->endExpr = yystack_[0].value.as < std::shared_ptr<lingodb::ast::WindowFrame> > ()->startExpr;
@@ -11291,7 +11291,7 @@ namespace  lingodb  {
     break;
 
   case 310: // frame_bound: UNBOUNDED PRECEDING
-#line 2099 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2098 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = mkNode<lingodb::ast::WindowFrame>(yylhs.location, lingodb::ast::WindowFrameType::UNBOUNDED_PRECEDING );
     }
@@ -11299,7 +11299,7 @@ namespace  lingodb  {
     break;
 
   case 311: // frame_bound: UNBOUNDED FOLLOWING
-#line 2103 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2102 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = mkNode<lingodb::ast::WindowFrame>(yylhs.location, lingodb::ast::WindowFrameType::UNBOUNDED_FOLLOWING );
     }
@@ -11307,7 +11307,7 @@ namespace  lingodb  {
     break;
 
   case 312: // frame_bound: CURRENT_P ROW
-#line 2107 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2106 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = mkNode<lingodb::ast::WindowFrame>(yylhs.location, lingodb::ast::WindowFrameType::CURRENT_ROW );
     }
@@ -11315,7 +11315,7 @@ namespace  lingodb  {
     break;
 
   case 313: // frame_bound: a_expr PRECEDING
-#line 2111 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2110 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = mkNode<lingodb::ast::WindowFrame>(yylhs.location, lingodb::ast::WindowFrameType::EXPR_PRECEDING, yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () );
     }
@@ -11323,7 +11323,7 @@ namespace  lingodb  {
     break;
 
   case 314: // frame_bound: a_expr FOLLOWING
-#line 2115 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2114 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::WindowFrame> > () = mkNode<lingodb::ast::WindowFrame>(yylhs.location, lingodb::ast::WindowFrameType::EXPR_FOLLOWING, yystack_[1].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
     }
@@ -11331,7 +11331,7 @@ namespace  lingodb  {
     break;
 
   case 317: // any_operator: all_Op
-#line 2126 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2125 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
@@ -11339,13 +11339,13 @@ namespace  lingodb  {
     break;
 
   case 318: // qual_Op: all_Op
-#line 2133 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2132 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11345 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 321: // sub_type: ANY
-#line 2155 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2154 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::SubqueryType > () = lingodb::ast::SubqueryType::ANY;
     }
@@ -11353,7 +11353,7 @@ namespace  lingodb  {
     break;
 
   case 322: // sub_type: ALL
-#line 2159 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2158 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::SubqueryType > () = lingodb::ast::SubqueryType::ALL;
     }
@@ -11361,7 +11361,7 @@ namespace  lingodb  {
     break;
 
   case 323: // sub_type: SOME
-#line 2163 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2162 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::SubqueryType > () = lingodb::ast::SubqueryType::ANY;
     }
@@ -11369,3055 +11369,3055 @@ namespace  lingodb  {
     break;
 
   case 324: // all_Op: Op
-#line 2169 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2168 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
        {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11375 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 325: // ColId: "identifier"
-#line 2202 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2201 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11381 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 326: // ColId: unreserved_keyword
-#line 2203 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2202 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11387 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 327: // ColId: col_name_keyword
-#line 2204 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2203 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11393 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 328: // type_function_name: "identifier"
-#line 2209 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2208 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11399 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 329: // type_function_name: unreserved_keyword
-#line 2210 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2209 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                          {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 11405 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 330: // type_function_name: type_func_name_keyword
-#line 2211 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2210 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11411 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 331: // type_function_name: DATE_P
-#line 2212 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2211 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::string > ()="date";}
 #line 11417 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 332: // type_func_name_keyword: AUTHORIZATION
-#line 2215 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2214 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11423 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 333: // type_func_name_keyword: BINARY
-#line 2216 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2215 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11429 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 334: // type_func_name_keyword: COLLATION
-#line 2217 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2216 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11435 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 335: // type_func_name_keyword: CONCURRENTLY
-#line 2218 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2217 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11441 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 336: // type_func_name_keyword: CROSS
-#line 2219 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2218 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11447 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 337: // type_func_name_keyword: CURRENT_SCHEMA
-#line 2220 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2219 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11453 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 338: // type_func_name_keyword: FREEZE
-#line 2221 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2220 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11459 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 339: // type_func_name_keyword: FULL
-#line 2222 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2221 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11465 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 340: // type_func_name_keyword: ILIKE
-#line 2223 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2222 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11471 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 341: // type_func_name_keyword: INNER_P
-#line 2224 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2223 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11477 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 342: // type_func_name_keyword: IS
-#line 2225 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2224 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11483 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 343: // type_func_name_keyword: ISNULL
-#line 2226 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2225 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11489 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 344: // type_func_name_keyword: JOIN
-#line 2227 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2226 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11495 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 345: // type_func_name_keyword: LEFT
-#line 2228 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2227 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11501 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 346: // type_func_name_keyword: LIKE
-#line 2229 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2228 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11507 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 347: // type_func_name_keyword: NATURAL
-#line 2230 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2229 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11513 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 348: // type_func_name_keyword: NOTNULL
-#line 2231 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2230 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11519 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 349: // type_func_name_keyword: OUTER_P
-#line 2232 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2231 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11525 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 350: // type_func_name_keyword: OVERLAPS
-#line 2233 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2232 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11531 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 351: // type_func_name_keyword: RIGHT
-#line 2234 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2233 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11537 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 352: // type_func_name_keyword: SIMILAR
-#line 2235 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2234 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11543 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 353: // type_func_name_keyword: TABLESAMPLE
-#line 2236 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2235 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11549 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 354: // type_func_name_keyword: VERBOSE
-#line 2237 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2236 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11555 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 355: // ColLabel: "identifier"
-#line 2245 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2244 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                                 { yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > (); }
 #line 11561 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 356: // ColLabel: unreserved_keyword
-#line 2246 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2245 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                 { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();}
 #line 11567 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 357: // ColLabel: col_name_keyword
-#line 2247 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2246 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                         { yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > (); }
 #line 11573 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 358: // ColLabel: reserved_keyword
-#line 2249 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2248 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                         { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11579 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 359: // BareColLabel: "identifier"
-#line 2255 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2254 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                                                         { yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > (); }
 #line 11585 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 360: // reserved_keyword: ALL
-#line 2271 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2270 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11591 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 361: // reserved_keyword: ANALYSE
-#line 2272 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2271 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11597 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 362: // reserved_keyword: ANALYZE
-#line 2273 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2272 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11603 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 363: // reserved_keyword: AND
-#line 2274 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2273 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11609 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 364: // reserved_keyword: ANY
-#line 2275 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2274 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11615 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 365: // reserved_keyword: ARRAY
-#line 2276 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2275 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11621 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 366: // reserved_keyword: AS
-#line 2277 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2276 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11627 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 367: // reserved_keyword: ASC
-#line 2278 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2277 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11633 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 368: // reserved_keyword: ASYMMETRIC
-#line 2279 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2278 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11639 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 369: // reserved_keyword: BOTH
-#line 2280 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2279 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11645 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 370: // reserved_keyword: CASE
-#line 2281 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2280 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11651 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 371: // reserved_keyword: CAST
-#line 2282 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2281 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11657 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 372: // reserved_keyword: CHECK
-#line 2283 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2282 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11663 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 373: // reserved_keyword: COLLATE
-#line 2284 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2283 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11669 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 374: // reserved_keyword: COLUMN
-#line 2285 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2284 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11675 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 375: // reserved_keyword: CONSTRAINT
-#line 2286 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2285 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11681 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 376: // reserved_keyword: CREATE
-#line 2287 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2286 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11687 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 377: // reserved_keyword: CURRENT_CATALOG
-#line 2288 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2287 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11693 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 378: // reserved_keyword: CURRENT_DATE
-#line 2289 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2288 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11699 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 379: // reserved_keyword: CURRENT_ROLE
-#line 2290 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2289 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11705 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 380: // reserved_keyword: CURRENT_TIME
-#line 2291 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2290 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11711 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 381: // reserved_keyword: CURRENT_TIMESTAMP
-#line 2292 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2291 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11717 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 382: // reserved_keyword: CURRENT_USER
-#line 2293 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2292 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11723 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 383: // reserved_keyword: DEFAULT
-#line 2294 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2293 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11729 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 384: // reserved_keyword: DEFERRABLE
-#line 2295 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2294 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11735 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 385: // reserved_keyword: DESC
-#line 2296 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2295 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11741 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 386: // reserved_keyword: DISTINCT
-#line 2297 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2296 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11747 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 387: // reserved_keyword: DO
-#line 2298 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2297 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11753 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 388: // reserved_keyword: ELSE
-#line 2299 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2298 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11759 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 389: // reserved_keyword: END_P
-#line 2300 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2299 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11765 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 390: // reserved_keyword: EXCEPT
-#line 2301 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2300 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11771 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 391: // reserved_keyword: FALSE_P
-#line 2302 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2301 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11777 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 392: // reserved_keyword: FETCH
-#line 2303 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2302 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11783 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 393: // reserved_keyword: FOR
-#line 2304 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2303 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11789 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 394: // reserved_keyword: FOREIGN
-#line 2305 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2304 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11795 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 395: // reserved_keyword: FROM
-#line 2306 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2305 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11801 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 396: // reserved_keyword: GRANT
-#line 2307 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2306 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11807 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 397: // reserved_keyword: GROUP_P
-#line 2308 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2307 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11813 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 398: // reserved_keyword: HAVING
-#line 2309 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2308 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11819 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 399: // reserved_keyword: IN_P
-#line 2310 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2309 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11825 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 400: // reserved_keyword: INITIALLY
-#line 2311 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2310 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11831 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 401: // reserved_keyword: INTERSECT
-#line 2312 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2311 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11837 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 402: // reserved_keyword: INTO
-#line 2313 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2312 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11843 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 403: // reserved_keyword: LATERAL_P
-#line 2314 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2313 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11849 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 404: // reserved_keyword: LEADING
-#line 2315 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2314 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11855 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 405: // reserved_keyword: LIMIT
-#line 2316 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2315 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11861 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 406: // reserved_keyword: LOCALTIME
-#line 2317 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2316 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11867 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 407: // reserved_keyword: LOCALTIMESTAMP
-#line 2318 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2317 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11873 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 408: // reserved_keyword: NOT
-#line 2319 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2318 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11879 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 409: // reserved_keyword: NULL_P
-#line 2320 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2319 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11885 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 410: // reserved_keyword: OFFSET
-#line 2321 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2320 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11891 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 411: // reserved_keyword: ON
-#line 2322 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2321 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11897 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 412: // reserved_keyword: ONLY
-#line 2323 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2322 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11903 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 413: // reserved_keyword: OR
-#line 2324 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2323 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11909 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 414: // reserved_keyword: ORDER
-#line 2325 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2324 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11915 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 415: // reserved_keyword: PLACING
-#line 2326 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2325 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11921 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 416: // reserved_keyword: PRIMARY
-#line 2327 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2326 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11927 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 417: // reserved_keyword: REFERENCES
-#line 2328 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2327 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11933 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 418: // reserved_keyword: RETURNING
-#line 2329 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2328 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11939 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 419: // reserved_keyword: SELECT
-#line 2330 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2329 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11945 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 420: // reserved_keyword: SESSION_USER
-#line 2331 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2330 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11951 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 421: // reserved_keyword: SOME
-#line 2332 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2331 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11957 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 422: // reserved_keyword: SYMMETRIC
-#line 2333 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2332 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11963 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 423: // reserved_keyword: SYSTEM_USER
-#line 2334 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2333 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11969 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 424: // reserved_keyword: TABLE
-#line 2335 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2334 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11975 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 425: // reserved_keyword: THEN
-#line 2336 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2335 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11981 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 426: // reserved_keyword: TO
-#line 2337 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2336 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11987 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 427: // reserved_keyword: TRAILING
-#line 2338 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2337 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11993 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 428: // reserved_keyword: TRUE_P
-#line 2339 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2338 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 11999 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 429: // reserved_keyword: UNION
-#line 2340 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2339 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12005 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 430: // reserved_keyword: UNIQUE
-#line 2341 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2340 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12011 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 431: // reserved_keyword: USER
-#line 2342 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2341 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12017 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 432: // reserved_keyword: USING
-#line 2343 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2342 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12023 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 433: // reserved_keyword: VARIADIC
-#line 2344 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2343 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12029 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 434: // reserved_keyword: WHEN
-#line 2345 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2344 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12035 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 435: // reserved_keyword: WHERE
-#line 2346 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2345 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12041 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 436: // reserved_keyword: WINDOW
-#line 2347 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2346 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12047 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 437: // reserved_keyword: WITH
-#line 2348 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2347 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12053 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 438: // unreserved_keyword: ABORT_P
-#line 2351 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2350 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12059 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 439: // unreserved_keyword: ABSENT
-#line 2352 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2351 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12065 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 440: // unreserved_keyword: ABSOLUTE_P
-#line 2353 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2352 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12071 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 441: // unreserved_keyword: ACCESS
-#line 2354 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2353 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12077 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 442: // unreserved_keyword: ACTION
-#line 2355 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2354 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12083 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 443: // unreserved_keyword: ADD_P
-#line 2356 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2355 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12089 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 444: // unreserved_keyword: ADMIN
-#line 2357 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2356 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12095 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 445: // unreserved_keyword: AFTER
-#line 2358 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2357 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12101 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 446: // unreserved_keyword: AGGREGATE
-#line 2359 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2358 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12107 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 447: // unreserved_keyword: ALSO
-#line 2360 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2359 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12113 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 448: // unreserved_keyword: ALTER
-#line 2361 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2360 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12119 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 449: // unreserved_keyword: ALWAYS
-#line 2362 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2361 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12125 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 450: // unreserved_keyword: ASENSITIVE
-#line 2363 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2362 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12131 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 451: // unreserved_keyword: ASSERTION
-#line 2364 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2363 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12137 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 452: // unreserved_keyword: ASSIGNMENT
-#line 2365 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2364 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12143 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 453: // unreserved_keyword: AT
-#line 2366 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2365 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12149 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 454: // unreserved_keyword: ATOMIC
-#line 2367 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2366 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12155 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 455: // unreserved_keyword: ATTACH
-#line 2368 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2367 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12161 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 456: // unreserved_keyword: ATTRIBUTE
-#line 2369 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2368 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12167 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 457: // unreserved_keyword: BACKWARD
-#line 2370 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2369 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12173 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 458: // unreserved_keyword: BEFORE
-#line 2371 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2370 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12179 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 459: // unreserved_keyword: BEGIN_P
-#line 2372 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2371 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12185 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 460: // unreserved_keyword: BREADTH
-#line 2373 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2372 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12191 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 461: // unreserved_keyword: BY
-#line 2374 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2373 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12197 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 462: // unreserved_keyword: CACHE
-#line 2375 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2374 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12203 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 463: // unreserved_keyword: CALL
-#line 2376 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2375 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12209 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 464: // unreserved_keyword: CALLED
-#line 2377 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2376 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12215 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 465: // unreserved_keyword: CASCADE
-#line 2378 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2377 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12221 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 466: // unreserved_keyword: CASCADED
-#line 2379 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2378 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12227 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 467: // unreserved_keyword: CATALOG_P
-#line 2380 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2379 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12233 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 468: // unreserved_keyword: CHAIN
-#line 2381 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2380 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12239 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 469: // unreserved_keyword: CHARACTERISTICS
-#line 2382 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2381 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12245 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 470: // unreserved_keyword: CHECKPOINT
-#line 2383 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2382 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12251 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 471: // unreserved_keyword: CLASS
-#line 2384 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2383 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12257 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 472: // unreserved_keyword: CLOSE
-#line 2385 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2384 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12263 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 473: // unreserved_keyword: CLUSTER
-#line 2386 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2385 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12269 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 474: // unreserved_keyword: COLUMNS
-#line 2387 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2386 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12275 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 475: // unreserved_keyword: COMMENT
-#line 2388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2387 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12281 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 476: // unreserved_keyword: COMMENTS
-#line 2389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2388 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12287 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 477: // unreserved_keyword: COMMIT
-#line 2390 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12293 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 478: // unreserved_keyword: COMMITTED
-#line 2391 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2390 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12299 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 479: // unreserved_keyword: COMPRESSION
-#line 2392 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2391 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12305 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 480: // unreserved_keyword: CONDITIONAL
-#line 2393 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2392 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12311 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 481: // unreserved_keyword: CONFIGURATION
-#line 2394 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2393 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12317 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 482: // unreserved_keyword: CONFLICT
-#line 2395 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2394 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12323 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 483: // unreserved_keyword: CONNECTION
-#line 2396 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2395 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12329 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 484: // unreserved_keyword: CONSTRAINTS
-#line 2397 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2396 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12335 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 485: // unreserved_keyword: CONTENT_P
-#line 2398 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2397 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12341 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 486: // unreserved_keyword: CONTINUE_P
-#line 2399 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2398 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12347 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 487: // unreserved_keyword: CONVERSION_P
-#line 2400 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2399 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12353 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 488: // unreserved_keyword: COPY
-#line 2401 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2400 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12359 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 489: // unreserved_keyword: COST
-#line 2402 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2401 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12365 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 490: // unreserved_keyword: CSV
-#line 2403 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2402 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12371 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 491: // unreserved_keyword: CUBE
-#line 2404 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2403 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12377 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 492: // unreserved_keyword: CURRENT_P
-#line 2405 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2404 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12383 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 493: // unreserved_keyword: CURSOR
-#line 2406 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2405 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12389 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 494: // unreserved_keyword: CYCLE
-#line 2407 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2406 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12395 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 495: // unreserved_keyword: DATA_P
-#line 2408 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2407 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12401 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 496: // unreserved_keyword: DATABASE
-#line 2409 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2408 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12407 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 497: // unreserved_keyword: DAY_P
-#line 2410 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2409 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12413 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 498: // unreserved_keyword: DEALLOCATE
-#line 2411 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2410 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12419 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 499: // unreserved_keyword: DECLARE
-#line 2412 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2411 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12425 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 500: // unreserved_keyword: DEFAULTS
-#line 2413 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2412 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12431 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 501: // unreserved_keyword: DEFERRED
-#line 2414 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2413 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12437 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 502: // unreserved_keyword: DEFINER
-#line 2415 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2414 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12443 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 503: // unreserved_keyword: DELETE_P
-#line 2416 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2415 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12449 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 504: // unreserved_keyword: DELIMITER
-#line 2417 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2416 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12455 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 505: // unreserved_keyword: DELIMITERS
-#line 2418 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2417 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12461 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 506: // unreserved_keyword: DEPENDS
-#line 2419 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2418 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12467 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 507: // unreserved_keyword: DEPTH
-#line 2420 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2419 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12473 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 508: // unreserved_keyword: DETACH
-#line 2421 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2420 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12479 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 509: // unreserved_keyword: DICTIONARY
-#line 2422 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2421 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12485 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 510: // unreserved_keyword: DISABLE_P
-#line 2423 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2422 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12491 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 511: // unreserved_keyword: DISCARD
-#line 2424 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2423 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12497 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 512: // unreserved_keyword: DOCUMENT_P
-#line 2425 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2424 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12503 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 513: // unreserved_keyword: DOMAIN_P
-#line 2426 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2425 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12509 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 514: // unreserved_keyword: DOUBLE_P
-#line 2427 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2426 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12515 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 515: // unreserved_keyword: DROP
-#line 2428 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2427 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12521 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 516: // unreserved_keyword: EACH
-#line 2429 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2428 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12527 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 517: // unreserved_keyword: EMPTY_P
-#line 2430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2429 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12533 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 518: // unreserved_keyword: ENABLE_P
-#line 2431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12539 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 519: // unreserved_keyword: ENCODING
-#line 2432 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12545 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 520: // unreserved_keyword: ENCRYPTED
-#line 2433 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2432 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12551 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 521: // unreserved_keyword: ENFORCED
-#line 2434 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2433 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12557 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 522: // unreserved_keyword: ENUM_P
-#line 2435 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2434 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12563 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 523: // unreserved_keyword: ERROR_P
-#line 2436 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2435 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12569 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 524: // unreserved_keyword: ESCAPE
-#line 2437 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2436 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12575 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 525: // unreserved_keyword: EVENT
-#line 2438 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2437 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12581 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 526: // unreserved_keyword: EXCLUDE
-#line 2439 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2438 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12587 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 527: // unreserved_keyword: EXCLUDING
-#line 2440 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2439 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12593 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 528: // unreserved_keyword: EXCLUSIVE
-#line 2441 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2440 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12599 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 529: // unreserved_keyword: EXECUTE
-#line 2442 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2441 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12605 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 530: // unreserved_keyword: EXPLAIN
-#line 2443 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2442 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12611 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 531: // unreserved_keyword: EXPRESSION
-#line 2444 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2443 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12617 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 532: // unreserved_keyword: EXTENSION
-#line 2445 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2444 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12623 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 533: // unreserved_keyword: EXTERNAL
-#line 2446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2445 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12629 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 534: // unreserved_keyword: FAMILY
-#line 2447 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12635 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 535: // unreserved_keyword: FILTER
-#line 2448 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2447 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12641 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 536: // unreserved_keyword: FINALIZE
-#line 2449 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2448 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12647 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 537: // unreserved_keyword: FIRST_P
-#line 2450 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2449 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12653 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 538: // unreserved_keyword: FOLLOWING
-#line 2451 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2450 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12659 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 539: // unreserved_keyword: FORCE
-#line 2452 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2451 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12665 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 540: // unreserved_keyword: FORMAT
-#line 2453 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2452 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12671 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 541: // unreserved_keyword: FORWARD
-#line 2454 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2453 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12677 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 542: // unreserved_keyword: FUNCTION
-#line 2455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2454 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12683 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 543: // unreserved_keyword: FUNCTIONS
-#line 2456 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12689 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 544: // unreserved_keyword: GENERATED
-#line 2457 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2456 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12695 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 545: // unreserved_keyword: GLOBAL
-#line 2458 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2457 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12701 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 546: // unreserved_keyword: GRANTED
-#line 2459 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2458 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12707 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 547: // unreserved_keyword: GROUPS
-#line 2460 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2459 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12713 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 548: // unreserved_keyword: HANDLER
-#line 2461 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2460 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12719 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 549: // unreserved_keyword: HEADER_P
-#line 2462 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2461 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12725 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 550: // unreserved_keyword: HOLD
-#line 2463 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2462 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12731 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 551: // unreserved_keyword: HOUR_P
-#line 2464 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2463 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12737 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 552: // unreserved_keyword: IDENTITY_P
-#line 2465 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2464 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12743 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 553: // unreserved_keyword: IF_P
-#line 2466 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2465 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12749 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 554: // unreserved_keyword: IMMEDIATE
-#line 2467 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2466 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12755 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 555: // unreserved_keyword: IMMUTABLE
-#line 2468 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2467 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12761 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 556: // unreserved_keyword: IMPLICIT_P
-#line 2469 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2468 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12767 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 557: // unreserved_keyword: IMPORT_P
-#line 2470 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2469 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12773 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 558: // unreserved_keyword: INCLUDE
-#line 2471 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2470 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12779 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 559: // unreserved_keyword: INCLUDING
-#line 2472 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2471 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12785 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 560: // unreserved_keyword: INCREMENT
-#line 2473 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2472 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12791 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 561: // unreserved_keyword: INDENT
-#line 2474 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2473 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12797 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 562: // unreserved_keyword: INDEX
-#line 2475 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2474 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12803 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 563: // unreserved_keyword: INDEXES
-#line 2476 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2475 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12809 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 564: // unreserved_keyword: INHERIT
-#line 2477 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2476 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12815 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 565: // unreserved_keyword: INHERITS
-#line 2478 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2477 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12821 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 566: // unreserved_keyword: INLINE_P
-#line 2479 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2478 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12827 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 567: // unreserved_keyword: INPUT_P
-#line 2480 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2479 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12833 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 568: // unreserved_keyword: INSENSITIVE
-#line 2481 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2480 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12839 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 569: // unreserved_keyword: INSERT
-#line 2482 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2481 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12845 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 570: // unreserved_keyword: INSTEAD
-#line 2483 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2482 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12851 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 571: // unreserved_keyword: INVOKER
-#line 2484 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2483 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12857 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 572: // unreserved_keyword: ISOLATION
-#line 2485 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2484 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12863 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 573: // unreserved_keyword: KEEP
-#line 2486 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2485 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12869 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 574: // unreserved_keyword: KEY
-#line 2487 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2486 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12875 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 575: // unreserved_keyword: KEYS
-#line 2488 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2487 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12881 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 576: // unreserved_keyword: LABEL
-#line 2489 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2488 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12887 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 577: // unreserved_keyword: LANGUAGE
-#line 2490 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2489 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12893 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 578: // unreserved_keyword: LARGE_P
-#line 2491 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2490 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12899 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 579: // unreserved_keyword: LAST_P
-#line 2492 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2491 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12905 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 580: // unreserved_keyword: LEAKPROOF
-#line 2493 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2492 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12911 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 581: // unreserved_keyword: LEVEL
-#line 2494 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2493 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12917 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 582: // unreserved_keyword: LISTEN
-#line 2495 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2494 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12923 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 583: // unreserved_keyword: LOAD
-#line 2496 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2495 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12929 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 584: // unreserved_keyword: LOCAL
-#line 2497 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2496 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12935 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 585: // unreserved_keyword: LOCATION
-#line 2498 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2497 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12941 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 586: // unreserved_keyword: LOCK_P
-#line 2499 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2498 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12947 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 587: // unreserved_keyword: LOCKED
-#line 2500 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2499 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12953 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 588: // unreserved_keyword: LOGGED
-#line 2501 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2500 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12959 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 589: // unreserved_keyword: MAPPING
-#line 2502 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2501 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12965 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 590: // unreserved_keyword: MATCH
-#line 2503 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2502 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12971 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 591: // unreserved_keyword: MATCHED
-#line 2504 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2503 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12977 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 592: // unreserved_keyword: MATERIALIZED
-#line 2505 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2504 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12983 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 593: // unreserved_keyword: MAXVALUE
-#line 2506 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2505 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12989 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 594: // unreserved_keyword: MERGE
-#line 2507 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2506 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 12995 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 595: // unreserved_keyword: METHOD
-#line 2508 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2507 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13001 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 596: // unreserved_keyword: MINUTE_P
-#line 2509 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2508 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13007 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 597: // unreserved_keyword: MINVALUE
-#line 2510 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2509 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13013 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 598: // unreserved_keyword: MODE
-#line 2511 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2510 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13019 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 599: // unreserved_keyword: MONTH_P
-#line 2512 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2511 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13025 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 600: // unreserved_keyword: MOVE
-#line 2513 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2512 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13031 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 601: // unreserved_keyword: NAME_P
-#line 2514 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2513 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13037 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 602: // unreserved_keyword: NAMES
-#line 2515 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2514 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13043 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 603: // unreserved_keyword: NESTED
-#line 2516 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2515 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13049 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 604: // unreserved_keyword: NEW
-#line 2517 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2516 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13055 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 605: // unreserved_keyword: NEXT
-#line 2518 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2517 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13061 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 606: // unreserved_keyword: NFC
-#line 2519 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2518 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13067 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 607: // unreserved_keyword: NFD
-#line 2520 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2519 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13073 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 608: // unreserved_keyword: NFKC
-#line 2521 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2520 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13079 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 609: // unreserved_keyword: NFKD
-#line 2522 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2521 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13085 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 610: // unreserved_keyword: NO
-#line 2523 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2522 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13091 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 611: // unreserved_keyword: NORMALIZED
-#line 2524 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2523 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13097 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 612: // unreserved_keyword: NOTHING
-#line 2525 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2524 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13103 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 613: // unreserved_keyword: NOTIFY
-#line 2526 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2525 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13109 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 614: // unreserved_keyword: NOWAIT
-#line 2527 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2526 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13115 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 615: // unreserved_keyword: NULLS_P
-#line 2528 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2527 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13121 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 616: // unreserved_keyword: OBJECT_P
-#line 2529 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2528 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13127 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 617: // unreserved_keyword: OBJECTS_P
-#line 2530 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2529 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13133 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 618: // unreserved_keyword: OF
-#line 2531 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2530 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13139 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 619: // unreserved_keyword: OFF
-#line 2532 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2531 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13145 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 620: // unreserved_keyword: OIDS
-#line 2533 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2532 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13151 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 621: // unreserved_keyword: OLD
-#line 2534 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2533 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13157 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 622: // unreserved_keyword: OMIT
-#line 2535 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2534 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13163 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 623: // unreserved_keyword: OPERATOR
-#line 2536 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2535 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13169 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 624: // unreserved_keyword: OPTION
-#line 2537 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2536 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13175 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 625: // unreserved_keyword: OPTIONS
-#line 2538 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2537 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13181 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 626: // unreserved_keyword: ORDINALITY
-#line 2539 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2538 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13187 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 627: // unreserved_keyword: OTHERS
-#line 2540 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2539 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13193 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 628: // unreserved_keyword: OVER
-#line 2541 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2540 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13199 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 629: // unreserved_keyword: OVERRIDING
-#line 2542 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2541 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13205 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 630: // unreserved_keyword: OWNED
-#line 2543 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2542 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13211 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 631: // unreserved_keyword: OWNER
-#line 2544 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2543 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13217 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 632: // unreserved_keyword: PARALLEL
-#line 2545 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2544 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13223 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 633: // unreserved_keyword: PARAMETER
-#line 2546 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2545 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13229 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 634: // unreserved_keyword: PARSER
-#line 2547 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2546 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13235 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 635: // unreserved_keyword: PARTIAL
-#line 2548 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2547 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13241 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 636: // unreserved_keyword: PARTITION
-#line 2549 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2548 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13247 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 637: // unreserved_keyword: PASSING
-#line 2550 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2549 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13253 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 638: // unreserved_keyword: PASSWORD
-#line 2551 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2550 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13259 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 639: // unreserved_keyword: PATH
-#line 2552 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2551 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13265 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 640: // unreserved_keyword: PERIOD
-#line 2553 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2552 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13271 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 641: // unreserved_keyword: PLAN
-#line 2554 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2553 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13277 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 642: // unreserved_keyword: PLANS
-#line 2555 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2554 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13283 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 643: // unreserved_keyword: POLICY
-#line 2556 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2555 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13289 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 644: // unreserved_keyword: PRECEDING
-#line 2557 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2556 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13295 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 645: // unreserved_keyword: PREPARE
-#line 2558 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2557 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13301 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 646: // unreserved_keyword: PREPARED
-#line 2559 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2558 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13307 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 647: // unreserved_keyword: PRESERVE
-#line 2560 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2559 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13313 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 648: // unreserved_keyword: PRIOR
-#line 2561 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2560 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13319 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 649: // unreserved_keyword: PRIVILEGES
-#line 2562 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2561 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13325 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 650: // unreserved_keyword: PROCEDURAL
-#line 2563 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2562 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13331 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 651: // unreserved_keyword: PROCEDURE
-#line 2564 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2563 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13337 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 652: // unreserved_keyword: PROCEDURES
-#line 2565 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2564 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13343 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 653: // unreserved_keyword: PROGRAM
-#line 2566 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2565 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13349 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 654: // unreserved_keyword: PUBLICATION
-#line 2567 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2566 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13355 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 656: // unreserved_keyword: QUOTES
-#line 2569 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2568 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13361 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 657: // unreserved_keyword: RANGE
-#line 2570 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2569 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13367 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 658: // unreserved_keyword: READ
-#line 2571 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2570 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13373 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 659: // unreserved_keyword: REASSIGN
-#line 2572 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2571 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13379 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 660: // unreserved_keyword: RECURSIVE
-#line 2573 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2572 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13385 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 661: // unreserved_keyword: REF_P
-#line 2574 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2573 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13391 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 662: // unreserved_keyword: REFERENCING
-#line 2575 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2574 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13397 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 663: // unreserved_keyword: REFRESH
-#line 2576 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2575 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13403 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 664: // unreserved_keyword: REINDEX
-#line 2577 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2576 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13409 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 665: // unreserved_keyword: RELATIVE_P
-#line 2578 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2577 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13415 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 666: // unreserved_keyword: RELEASE
-#line 2579 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2578 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13421 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 667: // unreserved_keyword: RENAME
-#line 2580 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2579 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13427 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 668: // unreserved_keyword: REPEATABLE
-#line 2581 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2580 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13433 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 669: // unreserved_keyword: REPLACE
-#line 2582 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2581 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13439 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 670: // unreserved_keyword: REPLICA
-#line 2583 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2582 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13445 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 671: // unreserved_keyword: RESET
-#line 2584 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2583 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13451 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 672: // unreserved_keyword: RESTART
-#line 2585 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2584 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13457 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 673: // unreserved_keyword: RESTRICT
-#line 2586 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2585 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13463 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 674: // unreserved_keyword: RETURN
-#line 2587 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2586 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13469 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 675: // unreserved_keyword: RETURNS
-#line 2588 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2587 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13475 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 676: // unreserved_keyword: REVOKE
-#line 2589 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2588 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13481 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 677: // unreserved_keyword: ROLE
-#line 2590 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2589 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13487 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 678: // unreserved_keyword: ROLLBACK
-#line 2591 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2590 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13493 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 679: // unreserved_keyword: ROLLUP
-#line 2592 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2591 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13499 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 680: // unreserved_keyword: ROUTINE
-#line 2593 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2592 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13505 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 681: // unreserved_keyword: ROUTINES
-#line 2594 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2593 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13511 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 682: // unreserved_keyword: ROWS
-#line 2595 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2594 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13517 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 683: // unreserved_keyword: RULE
-#line 2596 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2595 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13523 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 684: // unreserved_keyword: SAVEPOINT
-#line 2597 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2596 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13529 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 685: // unreserved_keyword: SCALAR
-#line 2598 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2597 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13535 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 686: // unreserved_keyword: SCHEMA
-#line 2599 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2598 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13541 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 687: // unreserved_keyword: SCHEMAS
-#line 2600 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2599 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13547 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 688: // unreserved_keyword: SCROLL
-#line 2601 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2600 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13553 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 689: // unreserved_keyword: SEARCH
-#line 2602 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2601 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13559 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 690: // unreserved_keyword: SECOND_P
-#line 2603 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2602 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13565 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 691: // unreserved_keyword: SECURITY
-#line 2604 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2603 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13571 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 692: // unreserved_keyword: SEQUENCE
-#line 2605 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2604 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13577 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 693: // unreserved_keyword: SEQUENCES
-#line 2606 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2605 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13583 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 694: // unreserved_keyword: SERIALIZABLE
-#line 2607 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2606 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13589 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 695: // unreserved_keyword: SERVER
-#line 2608 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2607 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13595 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 696: // unreserved_keyword: SESSION
-#line 2609 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2608 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13601 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 697: // unreserved_keyword: SET
-#line 2610 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2609 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13607 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 698: // unreserved_keyword: SETS
-#line 2611 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2610 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13613 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 699: // unreserved_keyword: SHARE
-#line 2612 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2611 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13619 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 700: // unreserved_keyword: SHOW
-#line 2613 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2612 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13625 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 701: // unreserved_keyword: SIMPLE
-#line 2614 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2613 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13631 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 702: // unreserved_keyword: SKIP
-#line 2615 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2614 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13637 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 703: // unreserved_keyword: SNAPSHOT
-#line 2616 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2615 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13643 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 704: // unreserved_keyword: SOURCE
-#line 2617 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2616 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13649 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 705: // unreserved_keyword: SQL_P
-#line 2618 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2617 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13655 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 706: // unreserved_keyword: STABLE
-#line 2619 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2618 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13661 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 707: // unreserved_keyword: STANDALONE_P
-#line 2620 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2619 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13667 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 708: // unreserved_keyword: START
-#line 2621 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2620 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13673 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 709: // unreserved_keyword: STATEMENT
-#line 2622 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2621 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13679 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 710: // unreserved_keyword: STATISTICS
-#line 2623 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2622 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13685 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 711: // unreserved_keyword: STDIN
-#line 2624 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2623 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13691 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 712: // unreserved_keyword: STDOUT
-#line 2625 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2624 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13697 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 713: // unreserved_keyword: STORAGE
-#line 2626 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2625 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13703 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 714: // unreserved_keyword: STORED
-#line 2627 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2626 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13709 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 715: // unreserved_keyword: STRICT_P
-#line 2628 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2627 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13715 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 716: // unreserved_keyword: STRING_P
-#line 2629 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2628 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13721 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 717: // unreserved_keyword: STRIP_P
-#line 2630 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2629 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13727 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 718: // unreserved_keyword: SUBSCRIPTION
-#line 2631 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2630 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13733 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 719: // unreserved_keyword: SUPPORT
-#line 2632 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2631 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13739 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 720: // unreserved_keyword: SYSID
-#line 2633 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2632 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13745 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 721: // unreserved_keyword: SYSTEM_P
-#line 2634 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2633 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13751 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 722: // unreserved_keyword: TABLES
-#line 2635 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2634 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13757 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 723: // unreserved_keyword: TABLESPACE
-#line 2636 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2635 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13763 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 724: // unreserved_keyword: TARGET
-#line 2637 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2636 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13769 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 725: // unreserved_keyword: TEMP
-#line 2638 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2637 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13775 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 726: // unreserved_keyword: TEMPLATE
-#line 2639 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2638 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13781 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 727: // unreserved_keyword: TEMPORARY
-#line 2640 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2639 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13787 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 728: // unreserved_keyword: TEXT_P
-#line 2641 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2640 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13793 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 729: // unreserved_keyword: TIES
-#line 2642 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2641 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13799 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 730: // unreserved_keyword: TRANSACTION
-#line 2643 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2642 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13805 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 731: // unreserved_keyword: TRANSFORM
-#line 2644 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2643 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13811 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 732: // unreserved_keyword: TRIGGER
-#line 2645 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2644 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13817 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 733: // unreserved_keyword: TRUNCATE
-#line 2646 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2645 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13823 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 734: // unreserved_keyword: TRUSTED
-#line 2647 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2646 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13829 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 735: // unreserved_keyword: TYPE_P
-#line 2648 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2647 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13835 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 736: // unreserved_keyword: TYPES_P
-#line 2649 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2648 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13841 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 737: // unreserved_keyword: UESCAPE
-#line 2650 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2649 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13847 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 738: // unreserved_keyword: UNBOUNDED
-#line 2651 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2650 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13853 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 739: // unreserved_keyword: UNCOMMITTED
-#line 2652 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2651 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13859 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 740: // unreserved_keyword: UNCONDITIONAL
-#line 2653 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2652 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13865 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 741: // unreserved_keyword: UNENCRYPTED
-#line 2654 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2653 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13871 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 742: // unreserved_keyword: UNKNOWN
-#line 2655 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2654 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13877 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 743: // unreserved_keyword: UNLISTEN
-#line 2656 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2655 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13883 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 744: // unreserved_keyword: UNLOGGED
-#line 2657 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2656 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13889 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 745: // unreserved_keyword: UNTIL
-#line 2658 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2657 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13895 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 746: // unreserved_keyword: UPDATE
-#line 2659 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2658 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13901 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 747: // unreserved_keyword: VACUUM
-#line 2660 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2659 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13907 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 748: // unreserved_keyword: VALID
-#line 2661 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2660 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13913 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 749: // unreserved_keyword: VALIDATE
-#line 2662 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2661 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13919 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 750: // unreserved_keyword: VALIDATOR
-#line 2663 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2662 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13925 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 751: // unreserved_keyword: VALUE_P
-#line 2664 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2663 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13931 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 752: // unreserved_keyword: VARYING
-#line 2665 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2664 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13937 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 753: // unreserved_keyword: VERSION_P
-#line 2666 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2665 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13943 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 754: // unreserved_keyword: VIEW
-#line 2667 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2666 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13949 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 755: // unreserved_keyword: VIEWS
-#line 2668 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2667 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13955 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 756: // unreserved_keyword: VIRTUAL
-#line 2669 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2668 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13961 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 757: // unreserved_keyword: VOLATILE
-#line 2670 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2669 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13967 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 758: // unreserved_keyword: WHITESPACE_P
-#line 2671 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2670 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13973 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 759: // unreserved_keyword: WITHIN
-#line 2672 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2671 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13979 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 760: // unreserved_keyword: WITHOUT
-#line 2673 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2672 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13985 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 761: // unreserved_keyword: WORK
-#line 2674 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2673 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13991 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 762: // unreserved_keyword: WRAPPER
-#line 2675 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2674 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 13997 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 763: // unreserved_keyword: WRITE
-#line 2676 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2675 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14003 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 764: // unreserved_keyword: XML_P
-#line 2677 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2676 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14009 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 765: // unreserved_keyword: YEAR_P
-#line 2678 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2677 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14015 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 766: // unreserved_keyword: YES_P
-#line 2679 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2678 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14021 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 767: // unreserved_keyword: ZONE
-#line 2680 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2679 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14027 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 768: // col_name_keyword: BETWEEN
-#line 2693 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2692 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14033 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 769: // col_name_keyword: BIGINT
-#line 2694 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2693 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14039 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 770: // col_name_keyword: BIT
-#line 2695 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2694 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14045 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 771: // col_name_keyword: BOOLEAN_P
-#line 2696 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2695 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14051 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 772: // col_name_keyword: CHAR_P
-#line 2697 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2696 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14057 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 773: // col_name_keyword: CHARACTER
-#line 2698 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2697 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14063 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 774: // col_name_keyword: COALESCE
-#line 2699 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2698 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14069 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 775: // col_name_keyword: DEC
-#line 2700 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2699 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14075 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 776: // col_name_keyword: DECIMAL_P
-#line 2701 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2700 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14081 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 777: // col_name_keyword: EXISTS
-#line 2702 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2701 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14087 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 778: // col_name_keyword: EXTRACT
-#line 2703 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2702 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14093 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 779: // col_name_keyword: FLOAT_P
-#line 2704 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2703 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14099 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 780: // col_name_keyword: GREATEST
-#line 2705 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2704 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14105 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 781: // col_name_keyword: GROUPING
-#line 2706 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2705 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14111 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 782: // col_name_keyword: INOUT
-#line 2707 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2706 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14117 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 783: // col_name_keyword: INT_P
-#line 2708 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2707 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14123 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 784: // col_name_keyword: INTEGER
-#line 2709 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2708 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14129 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 785: // col_name_keyword: INTERVAL
-#line 2710 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2709 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14135 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 786: // col_name_keyword: JSON
-#line 2711 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2710 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14141 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 787: // col_name_keyword: JSON_ARRAY
-#line 2712 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2711 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14147 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 788: // col_name_keyword: JSON_ARRAYAGG
-#line 2713 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2712 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14153 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 789: // col_name_keyword: JSON_EXISTS
-#line 2714 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2713 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14159 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 790: // col_name_keyword: JSON_OBJECT
-#line 2715 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2714 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14165 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 791: // col_name_keyword: JSON_OBJECTAGG
-#line 2716 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2715 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14171 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 792: // col_name_keyword: JSON_QUERY
-#line 2717 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2716 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14177 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 793: // col_name_keyword: JSON_SCALAR
-#line 2718 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2717 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14183 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 794: // col_name_keyword: JSON_SERIALIZE
-#line 2719 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2718 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14189 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 795: // col_name_keyword: JSON_TABLE
-#line 2720 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2719 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14195 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 796: // col_name_keyword: JSON_VALUE
-#line 2721 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2720 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14201 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 797: // col_name_keyword: LEAST
-#line 2722 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2721 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14207 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 798: // col_name_keyword: MERGE_ACTION
-#line 2723 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2722 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14213 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 799: // col_name_keyword: NATIONAL
-#line 2724 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2723 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14219 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 800: // col_name_keyword: NCHAR
-#line 2725 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2724 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14225 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 801: // col_name_keyword: NONE
-#line 2726 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2725 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14231 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 802: // col_name_keyword: NORMALIZE
-#line 2727 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2726 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14237 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 803: // col_name_keyword: NULLIF
-#line 2728 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2727 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14243 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 804: // col_name_keyword: NUMERIC
-#line 2729 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2728 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14249 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 805: // col_name_keyword: OUT_P
-#line 2730 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2729 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14255 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 806: // col_name_keyword: OVERLAY
-#line 2731 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2730 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14261 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 807: // col_name_keyword: POSITION
-#line 2732 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2731 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14267 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 808: // col_name_keyword: PRECISION
-#line 2733 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2732 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14273 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 809: // col_name_keyword: REAL
-#line 2734 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2733 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14279 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 810: // col_name_keyword: ROW
-#line 2735 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2734 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14285 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 811: // col_name_keyword: SETOF
-#line 2736 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2735 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14291 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 812: // col_name_keyword: SMALLINT
-#line 2737 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2736 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14297 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 813: // col_name_keyword: SUBSTRING
-#line 2738 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2737 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14303 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 814: // col_name_keyword: TIME
-#line 2739 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2738 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14309 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 815: // col_name_keyword: TIMESTAMP
-#line 2740 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2739 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14315 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 816: // col_name_keyword: TREAT
-#line 2741 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2740 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14321 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 817: // col_name_keyword: TRIM
-#line 2742 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2741 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14327 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 818: // col_name_keyword: VALUES
-#line 2743 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2742 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14333 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 819: // col_name_keyword: VARCHAR
-#line 2744 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2743 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14339 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 820: // col_name_keyword: XMLATTRIBUTES
-#line 2745 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2744 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14345 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 821: // col_name_keyword: XMLCONCAT
-#line 2746 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2745 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14351 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 822: // col_name_keyword: XMLELEMENT
-#line 2747 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2746 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14357 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 823: // col_name_keyword: XMLEXISTS
-#line 2748 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2747 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14363 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 824: // col_name_keyword: XMLFOREST
-#line 2749 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2748 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14369 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 825: // col_name_keyword: XMLNAMESPACES
-#line 2750 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2749 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14375 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 826: // col_name_keyword: XMLPARSE
-#line 2751 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2750 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14381 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 827: // col_name_keyword: XMLPI
-#line 2752 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2751 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14387 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 828: // col_name_keyword: XMLROOT
-#line 2753 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2752 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14393 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 829: // col_name_keyword: XMLSERIALIZE
-#line 2754 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2753 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14399 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 830: // col_name_keyword: XMLTABLE
-#line 2755 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2754 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                           { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14405 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 831: // qualified_name: ColId
-#line 2793 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2792 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
           { yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 14411 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 832: // qualified_name: ColId indirection
-#line 2794 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2793 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::string > () = yystack_[1].value.as < std::string > (); }
 #line 14417 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 833: // opt_name_list: "(" name_list ")"
-#line 2798 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2797 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::string> > () = yystack_[1].value.as < std::vector<std::string> > ();
     }
@@ -14425,7 +14425,7 @@ namespace  lingodb  {
     break;
 
   case 834: // opt_name_list: %empty
-#line 2802 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2801 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::string> > () = std::vector<std::string>{};
     }
@@ -14433,43 +14433,43 @@ namespace  lingodb  {
     break;
 
   case 835: // name_list: name
-#line 2808 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2807 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
          { auto t = mkList<std::string>(); t.emplace_back(yystack_[0].value.as < std::string > ()); yylhs.value.as < std::vector<std::string> > ()=t;}
 #line 14439 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 836: // name_list: name_list "," name
-#line 2809 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2808 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                                  {yystack_[2].value.as < std::vector<std::string> > ().emplace_back(yystack_[0].value.as < std::string > ()); yylhs.value.as < std::vector<std::string> > ()=yystack_[2].value.as < std::vector<std::string> > ();}
 #line 14445 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 837: // name: ColId
-#line 2811 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2810 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 14451 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 838: // attr_name: ColLabel
-#line 2812 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2811 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                     {yylhs.value.as < std::string > ()=yystack_[0].value.as < std::string > ();}
 #line 14457 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 839: // func_name: type_function_name
-#line 2823 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2822 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     { yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > (); }
 #line 14463 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 840: // func_name: ColId indirection
-#line 2824 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2823 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
       { yylhs.value.as < std::string > () = yystack_[1].value.as < std::string > (); }
 #line 14469 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 842: // CreateStmt: CREATE OptTemp TABLE qualified_name "(" OptTableElementList ")"
-#line 2842 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2841 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {   
         auto createTableInfo = std::make_shared<lingodb::ast::CreateTableInfo>("", "", yystack_[5].value.as < bool > ());
         createTableInfo->tableName = yystack_[3].value.as < std::string > ();
@@ -14485,25 +14485,25 @@ namespace  lingodb  {
     break;
 
   case 843: // OptTemp: TEMP
-#line 2858 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2857 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
          {yylhs.value.as < bool > ()=true;}
 #line 14491 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 844: // OptTemp: TEMPORARY
-#line 2859 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2858 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 {yylhs.value.as < bool > ()=true;}
 #line 14497 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 845: // OptTemp: %empty
-#line 2860 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2859 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < bool > ()=false;}
 #line 14503 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 846: // OptTableElementList: TableElementList
-#line 2865 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2864 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > () = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > ();
     }
@@ -14511,7 +14511,7 @@ namespace  lingodb  {
     break;
 
   case 847: // OptTableElementList: %empty
-#line 2869 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2868 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > () = std::vector<std::shared_ptr<lingodb::ast::TableElement>>();
     }
@@ -14519,7 +14519,7 @@ namespace  lingodb  {
     break;
 
   case 848: // TableElementList: TableElement
-#line 2876 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2875 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::TableElement>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableElement> > ());
@@ -14529,7 +14529,7 @@ namespace  lingodb  {
     break;
 
   case 849: // TableElementList: TableElementList "," TableElement
-#line 2882 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2881 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableElement> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::TableElement>> > ();
@@ -14538,19 +14538,19 @@ namespace  lingodb  {
     break;
 
   case 850: // TableElement: columnElement
-#line 2890 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2889 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                   {yylhs.value.as < std::shared_ptr<lingodb::ast::TableElement> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableElement> > ();}
 #line 14544 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 851: // TableElement: TableConstraint
-#line 2891 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2890 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                       {yylhs.value.as < std::shared_ptr<lingodb::ast::TableElement> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableElement> > ();}
 #line 14550 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 852: // TableConstraint: ConstraintElem
-#line 2897 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2896 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::TableElement> > () = mkNode<lingodb::ast::TableConstraintElement>(yylhs.location, yystack_[0].value.as < std::shared_ptr<lingodb::ast::Constraint> > ());
     }
@@ -14558,7 +14558,7 @@ namespace  lingodb  {
     break;
 
   case 853: // columnElement: ColId Type opt_column_storage opt_column_compression create_generic_options ColQualList
-#line 2904 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2903 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto columnDef = mkNode<lingodb::ast::ColumnElement>(yylhs.location, yystack_[5].value.as < std::string > (), yystack_[4].value.as < lingodb::ast::LogicalTypeWithMods > ());
         columnDef->constraints = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::Constraint>> > ();
@@ -14568,7 +14568,7 @@ namespace  lingodb  {
     break;
 
   case 855: // ColQualList: ColQualList ColConstraint
-#line 2917 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2916 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::Constraint>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::Constraint> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::Constraint>> > () = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::Constraint>> > ();
@@ -14577,19 +14577,19 @@ namespace  lingodb  {
     break;
 
   case 856: // ColQualList: %empty
-#line 2921 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2920 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::Constraint>> > () = std::vector<std::shared_ptr<lingodb::ast::Constraint>>();}
 #line 14583 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 857: // ColConstraint: ColConstraintElem
-#line 2925 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2924 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {yylhs.value.as < std::shared_ptr<lingodb::ast::Constraint> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::Constraint> > ();}
 #line 14589 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 858: // ColConstraintElem: NOT NULL_P
-#line 2948 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2947 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::Constraint> > () = mkNode<lingodb::ast::Constraint>(yylhs.location, lingodb::ast::ConstraintType::NOT_NULL);
     }
@@ -14597,7 +14597,7 @@ namespace  lingodb  {
     break;
 
   case 859: // ColConstraintElem: NULL_P
-#line 2952 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2951 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::Constraint> > () = mkNode<lingodb::ast::Constraint>(yylhs.location, lingodb::ast::ConstraintType::NULLABLE);
     }
@@ -14605,7 +14605,7 @@ namespace  lingodb  {
     break;
 
   case 860: // ColConstraintElem: PRIMARY KEY
-#line 2956 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2955 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::Constraint> > () = mkNode<lingodb::ast::UniqueConstraint>(yylhs.location, std::vector<std::string>(), true);
     }
@@ -14613,7 +14613,7 @@ namespace  lingodb  {
     break;
 
   case 861: // ConstraintElem: PRIMARY KEY "(" name_list opt_without_overlaps ")"
-#line 2963 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2962 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::Constraint> > () = mkNode<lingodb::ast::UniqueConstraint>(yylhs.location, yystack_[2].value.as < std::vector<std::string> > (), true);
     }
@@ -14621,7 +14621,7 @@ namespace  lingodb  {
     break;
 
   case 862: // opt_without_overlaps: WITHOUT OVERLAPS
-#line 2970 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2969 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //TODO
         error(yylhs.location, "WITHOUT OVERLAPS is not supported yet!");
@@ -14630,7 +14630,7 @@ namespace  lingodb  {
     break;
 
   case 866: // Type: SimpleType
-#line 2996 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 2995 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14638,13 +14638,13 @@ namespace  lingodb  {
     break;
 
   case 867: // SimpleType: Numeric_with_opt_lenghth
-#line 3002 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3001 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                              {yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();}
 #line 14644 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 868: // SimpleType: Character
-#line 3005 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3004 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14652,7 +14652,7 @@ namespace  lingodb  {
     break;
 
   case 869: // SimpleType: ConstDatetime
-#line 3009 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3008 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14660,7 +14660,7 @@ namespace  lingodb  {
     break;
 
   case 870: // SimpleType: ConstInterval
-#line 3013 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3012 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14668,7 +14668,7 @@ namespace  lingodb  {
     break;
 
   case 871: // opt_type_modifiers: "(" type_modifiers ")"
-#line 3020 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3019 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > () = yystack_[1].value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > ();
     }
@@ -14676,7 +14676,7 @@ namespace  lingodb  {
     break;
 
   case 872: // opt_type_modifiers: %empty
-#line 3024 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3023 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > () = std::vector<std::shared_ptr<lingodb::ast::Value>>();
     }
@@ -14684,7 +14684,7 @@ namespace  lingodb  {
     break;
 
   case 873: // type_modifiers: type_modifier
-#line 3031 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3030 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::Value>();
         list.emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::Value> > ());
@@ -14694,7 +14694,7 @@ namespace  lingodb  {
     break;
 
   case 874: // type_modifiers: type_modifiers "," type_modifier
-#line 3037 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3036 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > ().emplace_back(yystack_[0].value.as < std::shared_ptr<lingodb::ast::Value> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > () = yystack_[2].value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > ();
@@ -14703,7 +14703,7 @@ namespace  lingodb  {
     break;
 
   case 875: // type_modifier: ICONST
-#line 3044 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3043 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto value = std::make_shared<lingodb::ast::UnsignedIntValue>(yystack_[0].value.as < int > ());
 
@@ -14713,37 +14713,37 @@ namespace  lingodb  {
     break;
 
   case 876: // ConstTypename: Numeric
-#line 3063 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3062 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();}
 #line 14719 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 877: // ConstTypename: ConstCharacter
-#line 3064 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3063 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                      {yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();}
 #line 14725 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 878: // ConstTypename: ConstDatetime
-#line 3065 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3064 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                     {yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();}
 #line 14731 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 879: // NumericOnly: Fconst
-#line 3069 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3068 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
            {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 14737 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 880: // NumericOnly: SignedIconst
-#line 3070 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3069 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 14743 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 881: // Numeric_with_opt_lenghth: Numeric
-#line 3074 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3073 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14751,7 +14751,7 @@ namespace  lingodb  {
     break;
 
   case 882: // Numeric_with_opt_lenghth: Numeric "(" type_modifier ")"
-#line 3078 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3077 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[3].value.as < lingodb::ast::LogicalTypeWithMods > ().typeModifiers.emplace_back(yystack_[1].value.as < std::shared_ptr<lingodb::ast::Value> > ());
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[3].value.as < lingodb::ast::LogicalTypeWithMods > ();
@@ -14760,7 +14760,7 @@ namespace  lingodb  {
     break;
 
   case 883: // Numeric: INT_P
-#line 3086 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3085 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::INT);
     }
@@ -14768,7 +14768,7 @@ namespace  lingodb  {
     break;
 
   case 884: // Numeric: INTEGER
-#line 3090 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3089 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::INT);
     }
@@ -14776,7 +14776,7 @@ namespace  lingodb  {
     break;
 
   case 885: // Numeric: SMALLINT
-#line 3094 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3093 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::INT);
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > ().typeModifiers.emplace_back(std::make_shared<lingodb::ast::UnsignedIntValue>(2));
@@ -14785,7 +14785,7 @@ namespace  lingodb  {
     break;
 
   case 886: // Numeric: BIGINT
-#line 3099 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3098 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::INT);
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > ().typeModifiers.emplace_back(std::make_shared<lingodb::ast::UnsignedIntValue>(8));
@@ -14794,7 +14794,7 @@ namespace  lingodb  {
     break;
 
   case 888: // Numeric: FLOAT_P
-#line 3105 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3104 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto type = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::FLOAT);
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = type;
@@ -14803,7 +14803,7 @@ namespace  lingodb  {
     break;
 
   case 889: // Numeric: DOUBLE_P
-#line 3110 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3109 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto type = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::FLOAT);
         auto value = std::make_shared<lingodb::ast::UnsignedIntValue>(4);
@@ -14814,7 +14814,7 @@ namespace  lingodb  {
     break;
 
   case 890: // Numeric: DECIMAL_P opt_type_modifiers
-#line 3117 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3116 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         lingodb::ast::LogicalTypeWithMods type{catalog::LogicalTypeId::DECIMAL};
         type.typeModifiers = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > ();
@@ -14825,7 +14825,7 @@ namespace  lingodb  {
     break;
 
   case 892: // Numeric: NUMERIC opt_type_modifiers
-#line 3125 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3124 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         lingodb::ast::LogicalTypeWithMods type{catalog::LogicalTypeId::DECIMAL};
         type.typeModifiers = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::Value>> > ();
@@ -14835,7 +14835,7 @@ namespace  lingodb  {
     break;
 
   case 893: // Numeric: BOOLEAN_P
-#line 3131 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3130 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::BOOLEAN);
     }
@@ -14843,7 +14843,7 @@ namespace  lingodb  {
     break;
 
   case 894: // Character: CharacterWithLength
-#line 3138 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3137 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () =yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14851,7 +14851,7 @@ namespace  lingodb  {
     break;
 
   case 895: // Character: CharacterWithoutLength
-#line 3142 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3141 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () =yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14859,7 +14859,7 @@ namespace  lingodb  {
     break;
 
   case 896: // ConstCharacter: CharacterWithLength
-#line 3148 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3147 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         /* Length was not specified so allow to be unrestricted.
         * This handles problems with fixed-length (bpchar) strings
@@ -14874,7 +14874,7 @@ namespace  lingodb  {
     break;
 
   case 897: // ConstCharacter: CharacterWithoutLength
-#line 3159 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3158 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () =yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14882,7 +14882,7 @@ namespace  lingodb  {
     break;
 
   case 898: // CharacterWithLength: character "(" type_modifier ")"
-#line 3165 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3164 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         //Change Iconst rule to unsigned long and use it here
         yystack_[3].value.as < lingodb::ast::LogicalTypeWithMods > ().typeModifiers.emplace_back(yystack_[1].value.as < std::shared_ptr<lingodb::ast::Value> > ());
@@ -14892,7 +14892,7 @@ namespace  lingodb  {
     break;
 
   case 899: // CharacterWithoutLength: character
-#line 3173 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3172 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();
     }
@@ -14900,7 +14900,7 @@ namespace  lingodb  {
     break;
 
   case 900: // character: CHARACTER opt_varying
-#line 3180 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3179 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         if(yystack_[0].value.as < bool > ()) {
             yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::STRING);
@@ -14912,7 +14912,7 @@ namespace  lingodb  {
     break;
 
   case 901: // character: VARCHAR
-#line 3188 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3187 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::STRING);
     }
@@ -14920,7 +14920,7 @@ namespace  lingodb  {
     break;
 
   case 902: // character: CHAR_P
-#line 3192 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3191 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::CHAR);
     }
@@ -14928,7 +14928,7 @@ namespace  lingodb  {
     break;
 
   case 903: // character: TEXT_P
-#line 3196 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3195 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::STRING);
     }
@@ -14936,7 +14936,7 @@ namespace  lingodb  {
     break;
 
   case 904: // character: STRING_P
-#line 3200 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3199 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::STRING);
     }
@@ -14944,7 +14944,7 @@ namespace  lingodb  {
     break;
 
   case 905: // opt_varying: VARYING
-#line 3206 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3205 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < bool > () = true;
     }
@@ -14952,7 +14952,7 @@ namespace  lingodb  {
     break;
 
   case 906: // opt_varying: %empty
-#line 3210 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3209 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < bool > () = false;
     }
@@ -14960,7 +14960,7 @@ namespace  lingodb  {
     break;
 
   case 907: // ConstDatetime: TIMESTAMP
-#line 3217 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3216 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::TIMESTAMP);
     }
@@ -14968,7 +14968,7 @@ namespace  lingodb  {
     break;
 
   case 908: // ConstDatetime: DATE_P
-#line 3222 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3221 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::DATE);
     }
@@ -14976,7 +14976,7 @@ namespace  lingodb  {
     break;
 
   case 909: // InsertStmt: INSERT INTO insert_target insert_rest
-#line 3238 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3237 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[0].value.as < std::shared_ptr<lingodb::ast::InsertNode> > ()->tableName = yystack_[1].value.as < std::string > ();
         yylhs.value.as < std::shared_ptr<lingodb::ast::InsertNode> > () = yystack_[0].value.as < std::shared_ptr<lingodb::ast::InsertNode> > ();
@@ -14986,7 +14986,7 @@ namespace  lingodb  {
     break;
 
   case 910: // insert_target: qualified_name
-#line 3254 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3253 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
@@ -14994,7 +14994,7 @@ namespace  lingodb  {
     break;
 
   case 911: // insert_rest: SelectStmt
-#line 3264 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3263 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::InsertNode> > () = mkNode<lingodb::ast::InsertNode>(yylhs.location, "", "", yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
     }
@@ -15002,7 +15002,7 @@ namespace  lingodb  {
     break;
 
   case 912: // insert_rest: "(" insert_column_list ")" SelectStmt
-#line 3268 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3267 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto insertNode = mkNode<lingodb::ast::InsertNode>(yylhs.location, "", "", yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         insertNode->columns = yystack_[2].value.as < std::vector<std::string> > ();
@@ -15012,7 +15012,7 @@ namespace  lingodb  {
     break;
 
   case 913: // insert_column_list: insert_column_item
-#line 3278 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3277 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkList<std::string>();
         list.emplace_back(yystack_[0].value.as < std::string > ());
@@ -15022,7 +15022,7 @@ namespace  lingodb  {
     break;
 
   case 914: // insert_column_list: insert_column_list "," insert_column_item
-#line 3284 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3283 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[2].value.as < std::vector<std::string> > ().emplace_back(yystack_[0].value.as < std::string > ());
         yylhs.value.as < std::vector<std::string> > () = yystack_[2].value.as < std::vector<std::string> > ();
@@ -15031,7 +15031,7 @@ namespace  lingodb  {
     break;
 
   case 915: // insert_column_item: ColId
-#line 3292 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3291 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::string > () = yystack_[0].value.as < std::string > ();
     }
@@ -15039,31 +15039,31 @@ namespace  lingodb  {
     break;
 
   case 916: // AexprConst: SignedIconst
-#line 3303 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3302 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 15045 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 917: // AexprConst: Fconst
-#line 3304 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3303 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              { yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 15051 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 918: // AexprConst: Sconst
-#line 3305 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3304 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 15057 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 919: // AexprConst: Bconst
-#line 3306 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3305 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();}
 #line 15063 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 920: // AexprConst: func_name Sconst
-#line 3307 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3306 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                        {
         //TODO move logic to analyzer?
         if(yystack_[1].value.as < std::string > () == "date") {
@@ -15078,7 +15078,7 @@ namespace  lingodb  {
     break;
 
   case 921: // AexprConst: ConstInterval Sconst opt_interval
-#line 3318 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3317 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto intervalWithTypeMods = yystack_[2].value.as < lingodb::ast::LogicalTypeWithMods > ();
         if(yystack_[0].value.as < std::optional<std::string> > ().has_value()) {
@@ -15092,7 +15092,7 @@ namespace  lingodb  {
     break;
 
   case 922: // AexprConst: ConstTypename Sconst
-#line 3328 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3327 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto dateExpr = mkNode<lingodb::ast::CastExpression>(yylhs.location, yystack_[1].value.as < lingodb::ast::LogicalTypeWithMods > (), yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > () = dateExpr;
@@ -15101,7 +15101,7 @@ namespace  lingodb  {
     break;
 
   case 923: // AexprConst: NULL_P
-#line 3332 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3331 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
              {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location); t->value=std::make_shared<lingodb::ast::NullValue>(); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=t; 
 
@@ -15110,13 +15110,13 @@ namespace  lingodb  {
     break;
 
   case 924: // Iconst: ICONST
-#line 3340 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3339 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                 { auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location); t->value=std::make_shared<lingodb::ast::IntValue>(yystack_[0].value.as < int > ()); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=t;  }
 #line 15116 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 925: // SignedIconst: "+" Iconst
-#line 3344 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3343 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
     
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
@@ -15125,7 +15125,7 @@ namespace  lingodb  {
     break;
 
   case 926: // SignedIconst: "-" Iconst
-#line 3349 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3348 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         std::static_pointer_cast<lingodb::ast::IntValue>(std::static_pointer_cast<lingodb::ast::ConstantExpression>(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ())->value)->iVal = -std::static_pointer_cast<lingodb::ast::IntValue>(std::static_pointer_cast<lingodb::ast::ConstantExpression>(yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ())->value)->iVal;
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
@@ -15135,7 +15135,7 @@ namespace  lingodb  {
     break;
 
   case 927: // SignedIconst: Iconst
-#line 3355 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3354 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ();
     }
@@ -15143,25 +15143,25 @@ namespace  lingodb  {
     break;
 
   case 928: // Fconst: FCONST
-#line 3360 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3359 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
             {auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location); t->value=std::make_shared<lingodb::ast::FloatValue>(yystack_[0].value.as < std::string > ()); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=t; }
 #line 15149 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 930: // Fconst: "-" FCONST
-#line 3362 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3361 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                    {error(yylhs.location, "Negative float constants are not supported yet!");}
 #line 15155 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 931: // Sconst: STRING_VALUE
-#line 3364 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3363 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                  { auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location); t->value=std::make_shared<lingodb::ast::StringValue>(yystack_[0].value.as < std::string > ()); yylhs.value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()=t; }
 #line 15161 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 932: // Bconst: TRUE_P
-#line 3368 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3367 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::BoolValue>(true);
@@ -15171,7 +15171,7 @@ namespace  lingodb  {
     break;
 
   case 933: // Bconst: FALSE_P
-#line 3374 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3373 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = mkNode<lingodb::ast::ConstantExpression>(yylhs.location);
         t->value=std::make_shared<lingodb::ast::BoolValue>(false);
@@ -15181,7 +15181,7 @@ namespace  lingodb  {
     break;
 
   case 935: // ConstInterval: INTERVAL
-#line 3382 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3381 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto t = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::INTERVAL);
         yylhs.value.as < lingodb::ast::LogicalTypeWithMods > () = t;
@@ -15190,7 +15190,7 @@ namespace  lingodb  {
     break;
 
   case 936: // opt_interval: DAY_P
-#line 3390 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3389 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
      {
         yylhs.value.as < std::optional<std::string> > () = "days";
      }
@@ -15198,7 +15198,7 @@ namespace  lingodb  {
     break;
 
   case 937: // opt_interval: YEAR_P
-#line 3394 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3393 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
      {
         yylhs.value.as < std::optional<std::string> > () = "years";
      }
@@ -15206,7 +15206,7 @@ namespace  lingodb  {
     break;
 
   case 938: // opt_interval: MONTH_P
-#line 3398 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3397 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
      {
         yylhs.value.as < std::optional<std::string> > () = "months";
      }
@@ -15214,13 +15214,13 @@ namespace  lingodb  {
     break;
 
   case 940: // Typename: SimpleType
-#line 3405 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3404 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
                {yylhs.value.as < lingodb::ast::LogicalTypeWithMods > ()=yystack_[0].value.as < lingodb::ast::LogicalTypeWithMods > ();}
 #line 15220 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
     break;
 
   case 941: // pipe_operator: where_clause
-#line 3414 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3413 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::WHERE, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ());
         
@@ -15229,7 +15229,7 @@ namespace  lingodb  {
     break;
 
   case 942: // pipe_operator: SELECT opt_target_list
-#line 3419 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3418 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
        yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::SELECT, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TargetList> > ());
     }
@@ -15237,7 +15237,7 @@ namespace  lingodb  {
     break;
 
   case 943: // pipe_operator: sort_clause
-#line 3423 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3422 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::RESULT_MODIFIER, yystack_[0].value.as < std::shared_ptr<lingodb::ast::OrderByModifier> > ());
     }
@@ -15245,7 +15245,7 @@ namespace  lingodb  {
     break;
 
   case 944: // pipe_operator: limit_clause
-#line 3427 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3426 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::RESULT_MODIFIER, yystack_[0].value.as < std::shared_ptr<lingodb::ast::LimitModifier> > ());   
     }
@@ -15253,7 +15253,7 @@ namespace  lingodb  {
     break;
 
   case 945: // pipe_operator: join_type JOIN table_ref join_qual
-#line 3431 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3430 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto joinType = yystack_[3].value.as < lingodb::ast::JoinType > ();
         auto joinRef = mkNode<lingodb::ast::JoinRef>(yylhs.location, joinType, lingodb::ast::JoinCondType::REGULAR );
@@ -15265,7 +15265,7 @@ namespace  lingodb  {
     break;
 
   case 946: // pipe_operator: JOIN table_ref join_qual
-#line 3439 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3438 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto joinRef = mkNode<lingodb::ast::JoinRef>(yylhs.location, lingodb::ast::JoinType::INNER, lingodb::ast::JoinCondType::REGULAR );
         joinRef->right = yystack_[1].value.as < std::shared_ptr<lingodb::ast::TableRef> > ();
@@ -15276,7 +15276,7 @@ namespace  lingodb  {
     break;
 
   case 947: // pipe_operator: AGGREGATE agg_expr
-#line 3446 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3445 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
          yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::AGGREGATE, yystack_[0].value.as < std::shared_ptr<lingodb::ast::AggregationNode> > ());
     }
@@ -15284,7 +15284,7 @@ namespace  lingodb  {
     break;
 
   case 948: // pipe_operator: EXTEND expr_list_with_alias
-#line 3450 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3449 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto extendNode = mkNode<lingodb::ast::ExtendNode>(yylhs.location, false);
         extendNode->extensions = yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ();
@@ -15294,7 +15294,7 @@ namespace  lingodb  {
     break;
 
   case 949: // pipe_operator: UNION set_quantifier pipe_or_select_clause
-#line 3456 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3455 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::UNION, nullptr, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -15304,7 +15304,7 @@ namespace  lingodb  {
     break;
 
   case 950: // pipe_operator: INTERSECT set_quantifier pipe_or_select_clause
-#line 3462 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3461 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::INTERSECT, nullptr, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -15314,7 +15314,7 @@ namespace  lingodb  {
     break;
 
   case 951: // pipe_operator: EXCEPT set_quantifier pipe_or_select_clause
-#line 3468 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3467 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto setOpNode = mkNode<lingodb::ast::SetOperationNode>(yylhs.location, lingodb::ast::SetOperationType::EXCEPT, nullptr, yystack_[0].value.as < std::shared_ptr<lingodb::ast::TableProducer> > ());
         setOpNode->setOpAll = yystack_[1].value.as < bool > ();
@@ -15324,7 +15324,7 @@ namespace  lingodb  {
     break;
 
   case 952: // pipe_operator: DROP columnref_list
-#line 3474 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3473 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto node = mkNode<lingodb::ast::TargetList>(yylhs.location);
         node->targets = std::move(yystack_[0].value.as < std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>> > ());
@@ -15334,7 +15334,7 @@ namespace  lingodb  {
     break;
 
   case 953: // pipe_operator: SET set_list
-#line 3480 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3479 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
 
         yylhs.value.as < std::shared_ptr<lingodb::ast::PipeOperator> > () = mkNode<lingodb::ast::PipeOperator>(yylhs.location, lingodb::ast::PipeOperatorType::SET, yystack_[0].value.as < std::shared_ptr<lingodb::ast::SetColumnExpression> > ());
@@ -15343,7 +15343,7 @@ namespace  lingodb  {
     break;
 
   case 954: // agg_expr: func_expr_list group_clause_with_alias
-#line 3491 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3490 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto aggNode = mkNode<lingodb::ast::AggregationNode>(yylhs.location);
         aggNode->groupByNode = yystack_[0].value.as < std::shared_ptr<lingodb::ast::GroupByNode> > ();
@@ -15356,7 +15356,7 @@ namespace  lingodb  {
     break;
 
   case 955: // agg_expr: group_clause
-#line 3500 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3499 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto aggNode = mkNode<lingodb::ast::AggregationNode>(yylhs.location);
         aggNode->groupByNode = yystack_[0].value.as < std::shared_ptr<lingodb::ast::GroupByNode> > ();
@@ -15368,7 +15368,7 @@ namespace  lingodb  {
     break;
 
   case 956: // func_expr_list: func_expr opt_alias_clause
-#line 3511 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3510 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto list = mkListShared<lingodb::ast::FunctionExpression>();
         yystack_[1].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ()->alias=yystack_[0].value.as < std::pair<std::string, std::vector<std::string>> > ().first;
@@ -15380,7 +15380,7 @@ namespace  lingodb  {
     break;
 
   case 957: // func_expr_list: func_expr_list "," func_expr opt_alias_clause
-#line 3519 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3518 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         yystack_[3].value.as < std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>> > ().emplace_back(yystack_[1].value.as < std::shared_ptr<lingodb::ast::FunctionExpression> > ());
         yylhs.value.as < std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>> > () = yystack_[3].value.as < std::vector<std::shared_ptr<lingodb::ast::FunctionExpression>> > ();
@@ -15389,7 +15389,7 @@ namespace  lingodb  {
     break;
 
   case 958: // set_list: ColId "=" a_expr
-#line 3527 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3526 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto columnRef = mkNode<lingodb::ast::ColumnRefExpression>(yylhs.location, yystack_[2].value.as < std::string > ());
         auto setNode = mkNode<lingodb::ast::SetColumnExpression>(yylhs.location, std::vector<std::pair<std::shared_ptr<lingodb::ast::ColumnRefExpression>, std::shared_ptr<lingodb::ast::ParsedExpression>>>{std::pair(columnRef, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ())});
@@ -15399,7 +15399,7 @@ namespace  lingodb  {
     break;
 
   case 959: // set_list: set_list "," ColId "=" a_expr
-#line 3533 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3532 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
     {
         auto columnRef = mkNode<lingodb::ast::ColumnRefExpression>(yylhs.location, yystack_[2].value.as < std::string > ());
         yystack_[4].value.as < std::shared_ptr<lingodb::ast::SetColumnExpression> > ()->sets.emplace_back(std::pair(columnRef, yystack_[0].value.as < std::shared_ptr<lingodb::ast::ParsedExpression> > ()));
@@ -20948,102 +20948,102 @@ namespace  lingodb  {
   const short
   parser::yyrline_[] =
   {
-       0,   398,   398,   404,   411,   424,   425,   428,   429,   430,
-     431,   432,   433,   437,   438,   441,   442,   446,   447,   451,
-     452,   455,   456,   463,   464,   469,   480,   495,   516,   517,
-     523,   534,   535,   540,   546,   547,   550,   551,   557,   564,
-     575,   579,   586,   592,   597,   603,   608,   613,   617,   624,
-     626,   630,   634,   635,   638,   644,   648,   655,   662,   666,
-     672,   678,   685,   689,   695,   701,   707,   713,   719,   725,
-     731,   732,   733,   734,   766,   779,   794,   801,   808,   814,
-     821,   826,   832,   835,   839,   856,   860,   865,   877,   878,
-     888,   889,   894,   900,   901,   914,   925,   926,   927,   928,
-     942,   946,   947,   974,   982,   989,   992,   999,  1006,  1011,
-    1017,  1024,  1030,  1037,  1043,  1044,  1049,  1050,  1051,  1056,
-    1060,  1061,  1103,  1104,  1105,  1114,  1123,  1124,  1128,  1132,
-    1136,  1140,  1148,  1149,  1150,  1156,  1160,  1172,  1176,  1180,
-    1191,  1192,  1196,  1200,  1204,  1208,  1212,  1231,  1241,  1245,
-    1246,  1250,  1251,  1252,  1255,  1256,  1259,  1260,  1263,  1264,
-    1267,  1275,  1281,  1288,  1289,  1300,  1305,  1310,  1311,  1315,
-    1316,  1320,  1321,  1325,  1332,  1333,  1337,  1346,  1355,  1396,
-    1397,  1401,  1405,  1409,  1413,  1417,  1421,  1425,  1429,  1430,
-    1434,  1438,  1442,  1446,  1450,  1454,  1458,  1462,  1466,  1470,
-    1474,  1490,  1507,  1513,  1519,  1523,  1527,  1531,  1535,  1544,
-    1550,  1557,  1558,  1562,  1566,  1570,  1580,  1581,  1583,  1584,
-    1588,  1589,  1590,  1591,  1597,  1602,  1615,  1619,  1623,  1627,
-    1631,  1635,  1639,  1643,  1650,  1656,  1662,  1669,  1676,  1684,
-    1692,  1696,  1700,  1704,  1708,  1714,  1722,  1723,  1741,  1752,
-    1766,  1767,  1768,  1769,  1783,  1803,  1810,  1816,  1825,  1829,
-    1836,  1842,  1849,  1855,  1862,  1869,  1878,  1879,  1880,  1888,
-    1895,  1901,  1910,  1917,  1926,  1932,  1938,  1944,  1953,  1962,
-    1966,  1970,  1977,  1981,  1982,  1986,  2001,  2002,  2005,  2006,
-    2007,  2017,  2023,  2026,  2027,  2030,  2031,  2032,  2033,  2048,
-    2049,  2053,  2054,  2061,  2062,  2067,  2072,  2077,  2084,  2088,
-    2098,  2102,  2106,  2110,  2114,  2120,  2121,  2125,  2133,  2138,
-    2139,  2154,  2158,  2162,  2169,  2202,  2203,  2204,  2209,  2210,
-    2211,  2212,  2215,  2216,  2217,  2218,  2219,  2220,  2221,  2222,
-    2223,  2224,  2225,  2226,  2227,  2228,  2229,  2230,  2231,  2232,
-    2233,  2234,  2235,  2236,  2237,  2245,  2246,  2247,  2249,  2255,
-    2271,  2272,  2273,  2274,  2275,  2276,  2277,  2278,  2279,  2280,
-    2281,  2282,  2283,  2284,  2285,  2286,  2287,  2288,  2289,  2290,
-    2291,  2292,  2293,  2294,  2295,  2296,  2297,  2298,  2299,  2300,
-    2301,  2302,  2303,  2304,  2305,  2306,  2307,  2308,  2309,  2310,
-    2311,  2312,  2313,  2314,  2315,  2316,  2317,  2318,  2319,  2320,
-    2321,  2322,  2323,  2324,  2325,  2326,  2327,  2328,  2329,  2330,
-    2331,  2332,  2333,  2334,  2335,  2336,  2337,  2338,  2339,  2340,
-    2341,  2342,  2343,  2344,  2345,  2346,  2347,  2348,  2351,  2352,
-    2353,  2354,  2355,  2356,  2357,  2358,  2359,  2360,  2361,  2362,
-    2363,  2364,  2365,  2366,  2367,  2368,  2369,  2370,  2371,  2372,
-    2373,  2374,  2375,  2376,  2377,  2378,  2379,  2380,  2381,  2382,
-    2383,  2384,  2385,  2386,  2387,  2388,  2389,  2390,  2391,  2392,
-    2393,  2394,  2395,  2396,  2397,  2398,  2399,  2400,  2401,  2402,
-    2403,  2404,  2405,  2406,  2407,  2408,  2409,  2410,  2411,  2412,
-    2413,  2414,  2415,  2416,  2417,  2418,  2419,  2420,  2421,  2422,
-    2423,  2424,  2425,  2426,  2427,  2428,  2429,  2430,  2431,  2432,
-    2433,  2434,  2435,  2436,  2437,  2438,  2439,  2440,  2441,  2442,
-    2443,  2444,  2445,  2446,  2447,  2448,  2449,  2450,  2451,  2452,
-    2453,  2454,  2455,  2456,  2457,  2458,  2459,  2460,  2461,  2462,
-    2463,  2464,  2465,  2466,  2467,  2468,  2469,  2470,  2471,  2472,
-    2473,  2474,  2475,  2476,  2477,  2478,  2479,  2480,  2481,  2482,
-    2483,  2484,  2485,  2486,  2487,  2488,  2489,  2490,  2491,  2492,
-    2493,  2494,  2495,  2496,  2497,  2498,  2499,  2500,  2501,  2502,
-    2503,  2504,  2505,  2506,  2507,  2508,  2509,  2510,  2511,  2512,
-    2513,  2514,  2515,  2516,  2517,  2518,  2519,  2520,  2521,  2522,
-    2523,  2524,  2525,  2526,  2527,  2528,  2529,  2530,  2531,  2532,
-    2533,  2534,  2535,  2536,  2537,  2538,  2539,  2540,  2541,  2542,
-    2543,  2544,  2545,  2546,  2547,  2548,  2549,  2550,  2551,  2552,
-    2553,  2554,  2555,  2556,  2557,  2558,  2559,  2560,  2561,  2562,
-    2563,  2564,  2565,  2566,  2567,  2568,  2569,  2570,  2571,  2572,
-    2573,  2574,  2575,  2576,  2577,  2578,  2579,  2580,  2581,  2582,
-    2583,  2584,  2585,  2586,  2587,  2588,  2589,  2590,  2591,  2592,
-    2593,  2594,  2595,  2596,  2597,  2598,  2599,  2600,  2601,  2602,
-    2603,  2604,  2605,  2606,  2607,  2608,  2609,  2610,  2611,  2612,
-    2613,  2614,  2615,  2616,  2617,  2618,  2619,  2620,  2621,  2622,
-    2623,  2624,  2625,  2626,  2627,  2628,  2629,  2630,  2631,  2632,
-    2633,  2634,  2635,  2636,  2637,  2638,  2639,  2640,  2641,  2642,
-    2643,  2644,  2645,  2646,  2647,  2648,  2649,  2650,  2651,  2652,
-    2653,  2654,  2655,  2656,  2657,  2658,  2659,  2660,  2661,  2662,
-    2663,  2664,  2665,  2666,  2667,  2668,  2669,  2670,  2671,  2672,
-    2673,  2674,  2675,  2676,  2677,  2678,  2679,  2680,  2693,  2694,
-    2695,  2696,  2697,  2698,  2699,  2700,  2701,  2702,  2703,  2704,
-    2705,  2706,  2707,  2708,  2709,  2710,  2711,  2712,  2713,  2714,
-    2715,  2716,  2717,  2718,  2719,  2720,  2721,  2722,  2723,  2724,
-    2725,  2726,  2727,  2728,  2729,  2730,  2731,  2732,  2733,  2734,
-    2735,  2736,  2737,  2738,  2739,  2740,  2741,  2742,  2743,  2744,
-    2745,  2746,  2747,  2748,  2749,  2750,  2751,  2752,  2753,  2754,
-    2755,  2793,  2794,  2797,  2801,  2808,  2809,  2811,  2812,  2823,
-    2824,  2827,  2841,  2858,  2859,  2860,  2864,  2868,  2875,  2881,
-    2890,  2891,  2896,  2903,  2913,  2916,  2921,  2925,  2947,  2951,
-    2955,  2962,  2969,  2974,  2980,  2990,  2995,  3002,  3004,  3008,
-    3012,  3019,  3023,  3030,  3036,  3043,  3063,  3064,  3065,  3069,
-    3070,  3073,  3077,  3085,  3089,  3093,  3098,  3103,  3104,  3109,
-    3116,  3123,  3124,  3130,  3137,  3141,  3147,  3158,  3164,  3172,
-    3179,  3187,  3191,  3195,  3199,  3205,  3209,  3216,  3221,  3237,
-    3253,  3263,  3267,  3277,  3283,  3291,  3303,  3304,  3305,  3306,
-    3307,  3317,  3327,  3332,  3340,  3343,  3348,  3354,  3360,  3361,
-    3362,  3364,  3367,  3373,  3380,  3381,  3389,  3393,  3397,  3401,
-    3405,  3413,  3418,  3422,  3426,  3430,  3438,  3445,  3449,  3455,
-    3461,  3467,  3473,  3479,  3490,  3499,  3510,  3518,  3526,  3532
+       0,   397,   397,   403,   410,   423,   424,   427,   428,   429,
+     430,   431,   432,   436,   437,   440,   441,   445,   446,   450,
+     451,   454,   455,   462,   463,   468,   479,   494,   515,   516,
+     522,   533,   534,   539,   545,   546,   549,   550,   556,   563,
+     574,   578,   585,   591,   596,   602,   607,   612,   616,   623,
+     625,   629,   633,   634,   637,   643,   647,   654,   661,   665,
+     671,   677,   684,   688,   694,   700,   706,   712,   718,   724,
+     730,   731,   732,   733,   765,   778,   793,   800,   807,   813,
+     820,   825,   831,   834,   838,   855,   859,   864,   876,   877,
+     887,   888,   893,   899,   900,   913,   924,   925,   926,   927,
+     941,   945,   946,   973,   981,   988,   991,   998,  1005,  1010,
+    1016,  1023,  1029,  1036,  1042,  1043,  1048,  1049,  1050,  1055,
+    1059,  1060,  1102,  1103,  1104,  1113,  1122,  1123,  1127,  1131,
+    1135,  1139,  1147,  1148,  1149,  1155,  1159,  1171,  1175,  1179,
+    1190,  1191,  1195,  1199,  1203,  1207,  1211,  1230,  1240,  1244,
+    1245,  1249,  1250,  1251,  1254,  1255,  1258,  1259,  1262,  1263,
+    1266,  1274,  1280,  1287,  1288,  1299,  1304,  1309,  1310,  1314,
+    1315,  1319,  1320,  1324,  1331,  1332,  1336,  1345,  1354,  1395,
+    1396,  1400,  1404,  1408,  1412,  1416,  1420,  1424,  1428,  1429,
+    1433,  1437,  1441,  1445,  1449,  1453,  1457,  1461,  1465,  1469,
+    1473,  1489,  1506,  1512,  1518,  1522,  1526,  1530,  1534,  1543,
+    1549,  1556,  1557,  1561,  1565,  1569,  1579,  1580,  1582,  1583,
+    1587,  1588,  1589,  1590,  1596,  1601,  1614,  1618,  1622,  1626,
+    1630,  1634,  1638,  1642,  1649,  1655,  1661,  1668,  1675,  1683,
+    1691,  1695,  1699,  1703,  1707,  1713,  1721,  1722,  1740,  1751,
+    1765,  1766,  1767,  1768,  1782,  1802,  1809,  1815,  1824,  1828,
+    1835,  1841,  1848,  1854,  1861,  1868,  1877,  1878,  1879,  1887,
+    1894,  1900,  1909,  1916,  1925,  1931,  1937,  1943,  1952,  1961,
+    1965,  1969,  1976,  1980,  1981,  1985,  2000,  2001,  2004,  2005,
+    2006,  2016,  2022,  2025,  2026,  2029,  2030,  2031,  2032,  2047,
+    2048,  2052,  2053,  2060,  2061,  2066,  2071,  2076,  2083,  2087,
+    2097,  2101,  2105,  2109,  2113,  2119,  2120,  2124,  2132,  2137,
+    2138,  2153,  2157,  2161,  2168,  2201,  2202,  2203,  2208,  2209,
+    2210,  2211,  2214,  2215,  2216,  2217,  2218,  2219,  2220,  2221,
+    2222,  2223,  2224,  2225,  2226,  2227,  2228,  2229,  2230,  2231,
+    2232,  2233,  2234,  2235,  2236,  2244,  2245,  2246,  2248,  2254,
+    2270,  2271,  2272,  2273,  2274,  2275,  2276,  2277,  2278,  2279,
+    2280,  2281,  2282,  2283,  2284,  2285,  2286,  2287,  2288,  2289,
+    2290,  2291,  2292,  2293,  2294,  2295,  2296,  2297,  2298,  2299,
+    2300,  2301,  2302,  2303,  2304,  2305,  2306,  2307,  2308,  2309,
+    2310,  2311,  2312,  2313,  2314,  2315,  2316,  2317,  2318,  2319,
+    2320,  2321,  2322,  2323,  2324,  2325,  2326,  2327,  2328,  2329,
+    2330,  2331,  2332,  2333,  2334,  2335,  2336,  2337,  2338,  2339,
+    2340,  2341,  2342,  2343,  2344,  2345,  2346,  2347,  2350,  2351,
+    2352,  2353,  2354,  2355,  2356,  2357,  2358,  2359,  2360,  2361,
+    2362,  2363,  2364,  2365,  2366,  2367,  2368,  2369,  2370,  2371,
+    2372,  2373,  2374,  2375,  2376,  2377,  2378,  2379,  2380,  2381,
+    2382,  2383,  2384,  2385,  2386,  2387,  2388,  2389,  2390,  2391,
+    2392,  2393,  2394,  2395,  2396,  2397,  2398,  2399,  2400,  2401,
+    2402,  2403,  2404,  2405,  2406,  2407,  2408,  2409,  2410,  2411,
+    2412,  2413,  2414,  2415,  2416,  2417,  2418,  2419,  2420,  2421,
+    2422,  2423,  2424,  2425,  2426,  2427,  2428,  2429,  2430,  2431,
+    2432,  2433,  2434,  2435,  2436,  2437,  2438,  2439,  2440,  2441,
+    2442,  2443,  2444,  2445,  2446,  2447,  2448,  2449,  2450,  2451,
+    2452,  2453,  2454,  2455,  2456,  2457,  2458,  2459,  2460,  2461,
+    2462,  2463,  2464,  2465,  2466,  2467,  2468,  2469,  2470,  2471,
+    2472,  2473,  2474,  2475,  2476,  2477,  2478,  2479,  2480,  2481,
+    2482,  2483,  2484,  2485,  2486,  2487,  2488,  2489,  2490,  2491,
+    2492,  2493,  2494,  2495,  2496,  2497,  2498,  2499,  2500,  2501,
+    2502,  2503,  2504,  2505,  2506,  2507,  2508,  2509,  2510,  2511,
+    2512,  2513,  2514,  2515,  2516,  2517,  2518,  2519,  2520,  2521,
+    2522,  2523,  2524,  2525,  2526,  2527,  2528,  2529,  2530,  2531,
+    2532,  2533,  2534,  2535,  2536,  2537,  2538,  2539,  2540,  2541,
+    2542,  2543,  2544,  2545,  2546,  2547,  2548,  2549,  2550,  2551,
+    2552,  2553,  2554,  2555,  2556,  2557,  2558,  2559,  2560,  2561,
+    2562,  2563,  2564,  2565,  2566,  2567,  2568,  2569,  2570,  2571,
+    2572,  2573,  2574,  2575,  2576,  2577,  2578,  2579,  2580,  2581,
+    2582,  2583,  2584,  2585,  2586,  2587,  2588,  2589,  2590,  2591,
+    2592,  2593,  2594,  2595,  2596,  2597,  2598,  2599,  2600,  2601,
+    2602,  2603,  2604,  2605,  2606,  2607,  2608,  2609,  2610,  2611,
+    2612,  2613,  2614,  2615,  2616,  2617,  2618,  2619,  2620,  2621,
+    2622,  2623,  2624,  2625,  2626,  2627,  2628,  2629,  2630,  2631,
+    2632,  2633,  2634,  2635,  2636,  2637,  2638,  2639,  2640,  2641,
+    2642,  2643,  2644,  2645,  2646,  2647,  2648,  2649,  2650,  2651,
+    2652,  2653,  2654,  2655,  2656,  2657,  2658,  2659,  2660,  2661,
+    2662,  2663,  2664,  2665,  2666,  2667,  2668,  2669,  2670,  2671,
+    2672,  2673,  2674,  2675,  2676,  2677,  2678,  2679,  2692,  2693,
+    2694,  2695,  2696,  2697,  2698,  2699,  2700,  2701,  2702,  2703,
+    2704,  2705,  2706,  2707,  2708,  2709,  2710,  2711,  2712,  2713,
+    2714,  2715,  2716,  2717,  2718,  2719,  2720,  2721,  2722,  2723,
+    2724,  2725,  2726,  2727,  2728,  2729,  2730,  2731,  2732,  2733,
+    2734,  2735,  2736,  2737,  2738,  2739,  2740,  2741,  2742,  2743,
+    2744,  2745,  2746,  2747,  2748,  2749,  2750,  2751,  2752,  2753,
+    2754,  2792,  2793,  2796,  2800,  2807,  2808,  2810,  2811,  2822,
+    2823,  2826,  2840,  2857,  2858,  2859,  2863,  2867,  2874,  2880,
+    2889,  2890,  2895,  2902,  2912,  2915,  2920,  2924,  2946,  2950,
+    2954,  2961,  2968,  2973,  2979,  2989,  2994,  3001,  3003,  3007,
+    3011,  3018,  3022,  3029,  3035,  3042,  3062,  3063,  3064,  3068,
+    3069,  3072,  3076,  3084,  3088,  3092,  3097,  3102,  3103,  3108,
+    3115,  3122,  3123,  3129,  3136,  3140,  3146,  3157,  3163,  3171,
+    3178,  3186,  3190,  3194,  3198,  3204,  3208,  3215,  3220,  3236,
+    3252,  3262,  3266,  3276,  3282,  3290,  3302,  3303,  3304,  3305,
+    3306,  3316,  3326,  3331,  3339,  3342,  3347,  3353,  3359,  3360,
+    3361,  3363,  3366,  3372,  3379,  3380,  3388,  3392,  3396,  3400,
+    3404,  3412,  3417,  3421,  3425,  3429,  3437,  3444,  3448,  3454,
+    3460,  3466,  3472,  3478,  3489,  3498,  3509,  3517,  3525,  3531
   };
 
   void
@@ -21078,7 +21078,7 @@ namespace  lingodb  {
 } //  lingodb 
 #line 21080 "/home/bachmaier/projects/lingo-db/include/lingodb/compiler/frontend/generated/parser.cpp"
 
-#line 3538 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
+#line 3537 "/home/bachmaier/projects/lingo-db/src/compiler/frontend/parser.y"
 
 void
 lingodb::parser::error (const location_type& l, const std::string& m)
