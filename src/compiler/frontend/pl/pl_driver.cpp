@@ -1,20 +1,26 @@
 #include "lingodb/compiler/frontend/pl/pl_driver.h"
+#include "lingodb/compiler/frontend/pl/pl_parser.hpp"
 
-#include "lingodb/compiler/frontend/generated/pl/pl_parser.hpp"
+// These functions are implemented in the lexer (pl_lexer.l)
+extern void pl_scan_string(const char* s);
+extern void pl_delete_buffer();
 
-
-#include <lingodb/compiler/frontend/UDFImplementer.h>
-
-pl_driver::pl_driver()
-   : trace_parsing(false), trace_scanning(false) {}
-
-int pl_driver::parse(const std::string& f) {
-   file = f;
-
-   scan_begin();
+int pl_driver::parse() {
+   scanBegin();
    lingodb::frontend::pl::parser parse(*this);
-   parse.set_debug_level(trace_parsing);
+   parse.set_debug_level(traceParsing);
    int res = parse();
-   scan_end();
+   scanEnd();
    return res;
+}
+
+void pl_driver::scanBegin() {
+   // yy_flex_debug is a global from flex
+   extern int plpgsql_debug;
+   plpgsql_debug = traceScanning;
+   pl_scan_string(text.c_str());
+}
+
+void pl_driver::scanEnd() {
+   pl_delete_buffer();
 }

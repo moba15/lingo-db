@@ -18,6 +18,16 @@
   #include <sstream>
   #include <variant>
   class pl_driver;
+  /*
+   * The idea is to have a separate AST for the PL/pgSQL language.
+   * This AST will embed the standard SQL AST for SQL statements.
+  */
+  #include "lingodb/compiler/frontend/pl/pl_ast.h"
+  /*
+   * We include the main SQL driver to be able to invoke the SQL parser
+   * from within our PL/pgSQL parser's actions.
+  */
+  #include "lingodb/compiler/frontend/driver.h"
 }
 
 // The parsing context.
@@ -38,73 +48,37 @@
 }
 
 %define api.token.prefix {TOK_}
-%token <int> ICONST
-%token <uint64_t>	    INTEGER_VALUE	"integer_value"
-%token <std::string>	FCONST
-%token <std::string>     IDENT
-%token <std::string>	IDENTIFIER	"identifier"
-%token <std::string>	STRING_VALUE
-%token <std::string>	BIT_VALUE	"bit_string"
-%token <std::string>	HEX_VALUE	"hex_string"
-%token <std::string>	NATIONAL_VALUE	"nat_string"
-%token 			LP		"("
-%token 			RP		")"
-%token 			LB		"["
-%token 			RB		"]"
-%token 			DOT		"."
-%token          PERCENT "%"
-%token 			COMMA		","
-%token 			SEMICOLON	";"
-%token 			PLUS		"+"
-%token 			SLASH		"/"
-%token 			STAR		"*"
-%token 			MINUS		"-"
-%token 			EQUAL		"="
-%token 			NOT_EQUAL	"<>"
-%token 			LESS_EQUAL	"<="
-%token 			LESS		"<"
-%token 			GREATER_EQUAL	">="
-%token 			GREATER		">"
-%token      HAT         "^"
-%token 			QUOTE		"'"
-
-%token <std::string>  PERCENT EQUAL NOT_EQUAL LESS_EQUAL LESS GREATER_EQUAL GREATER QUOTE MINUS STAR PLUS SLASH Op
-                      DECLARE BEGIN END       RETURN_P
 /*
- * Taken directly from postgres grammatic
- * TODO LINK
-**/
-%token <std::string> TEST
-
-/*
- * The grammar thinks these are keywords, but they are not in the kwlist.h
- * list and so can never be entered directly.  The filter in parser.c
- * creates these tokens when required (based on looking one token ahead).
- *
- * NOT_LA exists so that productions such as NOT LIKE can be given the same
- * precedence as LIKE; otherwise they'd effectively have the same precedence
- * as NOT, at least with respect to their left-hand subexpression.
- * FORMAT_LA, NULLS_LA, WITH_LA, and WITHOUT_LA are needed to make the grammar
- * LALR(1).
- */
+ * This is the new token that will hold the raw SQL string
+ * captured by the lexer.
+*/
+%token <std::string> SQL_TEXT "SQL text"
+%token DECLARE BEGIN END RETURN_P SEMICOLON
 
 
+%type <std::shared_ptr<lingodb::ast::pl::Block>> pl_block
+%type <std::vector<std::shared_ptr<lingodb::ast::pl::Stmt>>> proc_sect
+%type <std::shared_ptr<lingodb::ast::pl::Stmt>> proc_stmt stmt_return
 
-
-%printer {  } <*>;
+%printer { yyo << $$; } <*>;
 
 %%
 %start pl_function;
 
 
 pl_function:
-  pl_block
+  pl_block { drv.result = $1; }
 ;
 
 
 
 pl_block:
   decl_sect BEGIN proc_sect END SEMICOLON
+  {
+      auto block = std::make_shared<lingodb::ast::pl::Block>();
+      block->body = $3;
+      $$ = block;
+  }
 ;
 
 decl_sect:
@@ -121,22 +95,43 @@ decl_start:
 
 
 proc_sect:
-  proc_sect proc_stmt
+  proc_sect[list] proc_stmt
   {
-
+      $list.push_back($2);
+      $$ = $list;
   }
   | %empty
+  {
+      $$ = std::vector<std::shared_ptr<lingodb::ast::pl::Stmt>>();
+  }
 ;
 //TODO
 proc_stmt:
-  pl_block SEMICOLON
-  | stmt_return
+  pl_block SEMICOLON { $$ = $1; }
+  | stmt_return { $$ = $1; }
 ;
 
     stmt_return:
-      RETURN_P
+      RETURN_P SQL_TEXT SEMICOLON
       {
+          /*
+           * This is the core of the solution.
+           * 1. The lexer has provided the SQL statement as a raw string in SQL_TEXT ($2).
+           * 2. We create an instance of the standard SQL parser driver.
+           * 3. We call its parse() method on the captured string.
+           * 4. The resulting SQL AST is retrieved from the driver.
+           * 5. We create a PL/pgSQL ReturnStmt AST node and store the SQL AST in it.
+          */
+          Driver sql_driver;
+          sql_driver.parse($2, false);
 
+          std::shared_ptr<lingodb::ast::AstNode> query_ast = nullptr;
+          if (!sql_driver.result.empty()) {
+              // A SQL string can contain multiple statements. We'll take the first.
+              query_ast = sql_driver.result[0];
+          }
+
+          $$ = std::make_shared<lingodb::ast::pl::ReturnStmt>(query_ast);
       }
       ;
 %%
