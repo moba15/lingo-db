@@ -136,16 +136,7 @@ proc_stmt:
     stmt_return:
       RETURN_P
       {
-      std::ostringstream buf;
-            int paren_depth = 0;
-            for (;;) {
 
-
-
-
-
-
-          }
       }
       ;
 %%
