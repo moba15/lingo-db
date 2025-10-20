@@ -4,12 +4,16 @@ set(FLEX_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/lexer.l)
 BISON_TARGET(parser ${BISON_INPUT_FILE} ${GEN_OUTPUT_DIR}/parser.cpp)
 FLEX_TARGET(lexer ${FLEX_INPUT_FILE} ${GEN_OUTPUT_DIR}/lexer.cpp)
 
+set(PL_FLEX_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/pl/pl_lexer.l)
+set(PL_BISON_INPUT_FILE ${CMAKE_SOURCE_DIR}/src/compiler/frontend/pl/pl_parser.y)
+FLEX_TARGET(pl_lexer ${PL_FLEX_INPUT_FILE} ${GEN_OUTPUT_DIR}/pl/pl_lexer.cpp)
+BISON_TARGET(pl_parser ${PL_BISON_INPUT_FILE} ${GEN_OUTPUT_DIR}/pl/pl_parser.cpp)
 
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.83.0 REQUIRED COMPONENTS context)
 include_directories(${Boost_INCLUDE_DIRS})
 
-ADD_FLEX_BISON_DEPENDENCY(lexer parser)
+ADD_FLEX_BISON_DEPENDENCY(lexer parser pl_lexer pl_parser)
 
 add_library(MLIRSQLFrontendGen
         ${BISON_parser_OUTPUTS}
@@ -35,8 +39,13 @@ add_library(MLIRSQLFrontend
         frontend_error.cpp
         frontend_type.cpp
 
+        pl/pl_driver.cpp
+
         ${BISON_parser_OUTPUTS}
+        ${BISON_pl_parser_OUTPUTS}
         ${FLEX_lexer_OUTPUTS}
+        ${FLEX_pl_lexer_OUTPUTS}
+        pl/ast/pl_expression.cpp
 
 )
 

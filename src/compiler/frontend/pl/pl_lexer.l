@@ -4,10 +4,8 @@
 # include <cstdlib>
 # include <cstring> // strerror
 # include <string>
-# include "lingodb/compiler/frontend/driver.h"
+# include "lingodb/compiler/frontend/pl/pl_driver.h"
 # include "parser.hpp"
-
-
 # include <algorithm>
 #include <lingodb/compiler/frontend/generated/location.hh>
 
@@ -88,12 +86,12 @@ static std::string dolq_tag;
 #endif
 
 #define MAKE_KEYWORD(token_name) \
-    return lingodb::parser::make_##token_name(std::string(yytext),loc);
+    return lingodb::frontend::pl::parser::make_##token_name(std::string(yytext),loc);
 
 
 %}
 
-%option noyywrap nounput noinput batch debug
+%option noyywrap nounput noinput batch debug prefix="plpgsql_"
 
 %{
   // A number symbol corresponding to the value in S.
@@ -124,7 +122,7 @@ dquote			\"
 strChars ([^'])
 str       {squote}({strChars}|{op_chars}|[ ])*{squote}
 
-
+all ([^'])
 
 dolq_start		[A-Za-z\200-\377_]
 dolq_cont		[A-Za-z\200-\377_0-9]
@@ -146,17 +144,17 @@ boolean [fF][aA][lL][sS][eE]
 %%
 %{
   // A handy shortcut to the location held by the driver.
-  lingodb::location& loc = drv.location;
+  lingodb::frontend::pl::location& loc = drv.location;
   // Code run each time yylex is called.
   loc.step ();
 %}
-"("             { return lingodb::parser::make_LP(loc); }
-")"             { return lingodb::parser::make_RP(loc); }
-"["             { return lingodb::parser::make_LB(loc); }
-"]"             { return lingodb::parser::make_RB(loc); }
-"."             { return lingodb::parser::make_DOT(loc); }
-","             { return lingodb::parser::make_COMMA(loc); }
-";"             { return lingodb::parser::make_SEMICOLON(loc); }
+"("             { return lingodb::frontend::pl::parser::make_LP(loc); }
+")"             { return lingodb::frontend::pl::parser::make_RP(loc); }
+"["             { return lingodb::frontend::pl::parser::make_LB(loc); }
+"]"             { return lingodb::frontend::pl::parser::make_RB(loc); }
+"."             { return lingodb::frontend::pl::parser::make_DOT(loc); }
+","             { return lingodb::frontend::pl::parser::make_COMMA(loc); }
+";"             { return lingodb::frontend::pl::parser::make_SEMICOLON(loc); }
 "+"             { MAKE_KEYWORD(PLUS); }
 "-"             { MAKE_KEYWORD(MINUS); }
 "/"             { MAKE_KEYWORD(SLASH); }
@@ -169,136 +167,16 @@ boolean [fF][aA][lL][sS][eE]
 "<"             { MAKE_KEYWORD(LESS); }
 ">="            { MAKE_KEYWORD(GREATER_EQUAL); }
 ">"             { MAKE_KEYWORD(GREATER); }
-"|>"            { return lingodb::parser::make_PIPE(loc); }
-"::"            { MAKE_KEYWORD(TYPECAST); }
 {newline}              { loc.lines();}
+BEGIN           {MAKE_KEYWORD(BEGIN); }
 
-AGGREGATE   { MAKE_KEYWORD(AGGREGATE); }
-ALL         { MAKE_KEYWORD(ALL); }
-AND         { MAKE_KEYWORD(AND); }
-AS          { MAKE_KEYWORD(AS); }
-ASC         { MAKE_KEYWORD(ASC); }
-ANY         { MAKE_KEYWORD(ANY); }
+DECLARE         { MAKE_KEYWORD(DECLARE); }
 
-BETWEEN     { MAKE_KEYWORD(BETWEEN); }
-BIGINT      { MAKE_KEYWORD(BIGINT); }
-INT8        { MAKE_KEYWORD(BIGINT); }
-BOOLEAN     { MAKE_KEYWORD(BOOLEAN_P); }
-BOOL        { MAKE_KEYWORD(BOOLEAN_P); }
-BY          { MAKE_KEYWORD(BY); }
+END             { MAKE_KEYWORD(END); }
 
-CASE        { MAKE_KEYWORD(CASE); }
-CAST        { MAKE_KEYWORD(CAST); }
-CHAR        { MAKE_KEYWORD(CHAR_P); }
-CHARACTER   { MAKE_KEYWORD(CHARACTER); }
-CREATE      { MAKE_KEYWORD(CREATE); }
-CURRENT     { MAKE_KEYWORD(CURRENT_P); }
-COPY        { MAKE_KEYWORD(COPY); }
-CSV         { MAKE_KEYWORD(CSV); }
+RETURN          { MAKE_KEYWORD(RETURN_P); }
 
-DATE        { MAKE_KEYWORD(DATE_P); }
-DAY         { MAKE_KEYWORD(DAY_P); }
-DECIMAL     { MAKE_KEYWORD(DECIMAL_P); }
-DESC        { MAKE_KEYWORD(DESC); }
-DISTINCT    { MAKE_KEYWORD(DISTINCT); }
-DROP        { MAKE_KEYWORD(DROP); }
-DELIMITER   { MAKE_KEYWORD(DELIMITER); }
-
-ELSE        { MAKE_KEYWORD(ELSE); }
-END         { MAKE_KEYWORD(END_P); }
-EXCEPT      { MAKE_KEYWORD(EXCEPT); }
-EXISTS      { MAKE_KEYWORD(EXISTS); }
-EXTEND      { MAKE_KEYWORD(EXTEND); }
-EXTRACT     { MAKE_KEYWORD(EXTRACT); }
-ESCAPE      { MAKE_KEYWORD(ESCAPE); }
-
-FALSE       { MAKE_KEYWORD(FALSE_P); }
-FLOAT       { MAKE_KEYWORD(FLOAT_P); }
-FLOAT4      { MAKE_KEYWORD(FLOAT_P); }
-FLOAT8      { MAKE_KEYWORD(DOUBLE_P); }
-FOR         { MAKE_KEYWORD(FOR); }
-FROM        { MAKE_KEYWORD(FROM); }
-FULL        { MAKE_KEYWORD(FULL); }
-FOLLOWING   { MAKE_KEYWORD(FOLLOWING); }
-FUNCTION    { MAKE_KEYWORD(FUNCTION); }
-
-GROUP       { MAKE_KEYWORD(GROUP_P); }
-
-HAVING      { MAKE_KEYWORD(HAVING); }
-
-IN          { MAKE_KEYWORD(IN_P); }
-INNER       { MAKE_KEYWORD(INNER_P); }
-INSERT      { MAKE_KEYWORD(INSERT); }
-INT         { MAKE_KEYWORD(INT_P); }
-INT4         { MAKE_KEYWORD(INT_P); }
-INTEGER     { MAKE_KEYWORD(INTEGER); }
-INTERSECT   { MAKE_KEYWORD(INTERSECT); }
-INTERVAL    { MAKE_KEYWORD(INTERVAL); }
-INTO        { MAKE_KEYWORD(INTO); }
-IS          { MAKE_KEYWORD(IS); }
-
-JOIN        { MAKE_KEYWORD(JOIN); }
-
-KEY         { MAKE_KEYWORD(KEY); }
-
-LANGUAGE    { MAKE_KEYWORD(LANGUAGE); }
-LEFT        { MAKE_KEYWORD(LEFT); }
-LIKE        { MAKE_KEYWORD(LIKE); }
-LIMIT       { MAKE_KEYWORD(LIMIT); }
-
-MINUTE      { MAKE_KEYWORD(MINUTE_P); }
-MONTH       { MAKE_KEYWORD(MONTH_P); }
-
-NATURAL     { MAKE_KEYWORD(NATURAL); }
-NOT         { MAKE_KEYWORD(NOT); }
-NULL        { MAKE_KEYWORD(NULL_P); }
-NUMERIC     { MAKE_KEYWORD(NUMERIC); }
-
-OFFSET      { MAKE_KEYWORD(OFFSET); }
-ON          { MAKE_KEYWORD(ON); }
-OR          { MAKE_KEYWORD(OR); }
-ORDER       { MAKE_KEYWORD(ORDER); }
-OUTER       { MAKE_KEYWORD(OUTER_P); }
-OVER        { MAKE_KEYWORD(OVER); }
-
-PARTITION   { MAKE_KEYWORD(PARTITION); }
-PRECEDING   { MAKE_KEYWORD(PRECEDING); }
-PRIMARY     { MAKE_KEYWORD(PRIMARY); }
-
-RETURNS     { MAKE_KEYWORD(RETURNS); }
-REPLACE     { MAKE_KEYWORD(REPLACE); }
-RIGHT       { MAKE_KEYWORD(RIGHT); }
-ROLLUP      { MAKE_KEYWORD(ROLLUP); }
-ROW         { MAKE_KEYWORD(ROW); }
-ROWS        { MAKE_KEYWORD(ROWS); }
-
-SELECT      { MAKE_KEYWORD(SELECT); }
-SET         { MAKE_KEYWORD(SET); }
-SOME        { MAKE_KEYWORD(SOME); }
-STRING      { MAKE_KEYWORD(STRING_P); }
-SUBSTRING   { MAKE_KEYWORD(SUBSTRING); }
-
-TABLE       { MAKE_KEYWORD(TABLE); }
-TEXT        { MAKE_KEYWORD(TEXT_P); }
-THEN        { MAKE_KEYWORD(THEN); }
-TRUE        { MAKE_KEYWORD(TRUE_P); }
-TIMESTAMP   { MAKE_KEYWORD(TIMESTAMP); }
-
-UNBOUNDED   { MAKE_KEYWORD(UNBOUNDED); }
-UNION       { MAKE_KEYWORD(UNION); }
-
-VALUES      { MAKE_KEYWORD(VALUES); }
-VARCHAR     { MAKE_KEYWORD(VARCHAR); }
-VARYING     { MAKE_KEYWORD(VARYING); }
-
-WHEN        { MAKE_KEYWORD(WHEN); }
-WHERE       { MAKE_KEYWORD(WHERE); }
-WITH        { MAKE_KEYWORD(WITH); }
-
-YEAR        { MAKE_KEYWORD(YEAR_P); }
-
-
-<<EOF>>    return lingodb::parser::make_YYEOF (loc);
+<<EOF>>    return lingodb::frontend::pl::parser::make_YYEOF (loc);
 
 {whitespace}    {
                   /*Ignore*/
@@ -307,26 +185,29 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
                     std::string ident(yytext);
                     std::transform(ident.begin(), ident.end(), ident.begin(),
                         [](unsigned char c){ return std::tolower(c); });
-                    return lingodb::parser::make_IDENTIFIER(std::move(ident), loc);
+                    return lingodb::frontend::pl::parser::make_IDENTIFIER(std::move(ident), loc);
                 }
 {quoted_identifier} {
                       std::string text(yytext);
                       std::string trimmed(text.begin() + 1, text.end()-1);
-                      return lingodb::parser::make_IDENTIFIER(std::move(trimmed), loc);
+                      return lingodb::frontend::pl::parser::make_IDENTIFIER(std::move(trimmed), loc);
 
                     }
 {decinteger}	{
-				    return lingodb::parser::make_ICONST(std::stoul(yytext), loc);
+				    return lingodb::frontend::pl::parser::make_ICONST(std::stoul(yytext), loc);
 			    }
 {numeric}	{
-				    return lingodb::parser::make_FCONST(yytext, loc);
+				    return lingodb::frontend::pl::parser::make_FCONST(yytext, loc);
 			    }
 {str} {
   std::string ident(yytext);
   ident.erase(0,1);
   ident.erase(ident.size()-1,1);
-  return lingodb::parser::make_STRING_VALUE(std::move(ident), loc);
+  return lingodb::frontend::pl::parser::make_STRING_VALUE(std::move(ident), loc);
 }
+
+
+
 {operator} {
   std::string ident(yytext);
 
@@ -341,14 +222,14 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
   yyless(ident.length());
 
   if(ident == "<=") {
-    return lingodb::parser::make_LESS_EQUAL("<=", loc);
+    return lingodb::frontend::pl::parser::make_LESS_EQUAL("<=", loc);
   } else if(ident == "<>" || ident == "!=") {
-    return lingodb::parser::make_NOT_EQUAL("<>", loc);
+    return lingodb::frontend::pl::parser::make_NOT_EQUAL("<>", loc);
   } else if(ident == ">=") {
-    return lingodb::parser::make_GREATER_EQUAL(">=", loc);
+    return lingodb::frontend::pl::parser::make_GREATER_EQUAL(">=", loc);
   }
 
-  return lingodb::parser::make_Op(std::move(ident), loc);
+  return lingodb::frontend::pl::parser::make_Op(std::move(ident), loc);
 }
 
 
@@ -372,7 +253,7 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
     if (dolq_tag == yytext) {
         BEGIN(INITIAL);
         loc.columns(yyleng);
-        return lingodb::parser::make_STRING_VALUE(std::move(literal_buffer), loc);
+        return lingodb::frontend::pl::parser::make_STRING_VALUE(std::move(literal_buffer), loc);
     } else {
         literal_buffer.append(yytext, yyleng);
         loc.columns(yyleng);
@@ -380,7 +261,7 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
 }
 
 <xdolq><<EOF>> {
-    return lingodb::parser::make_YYEOF(loc);
+    return lingodb::frontend::pl::parser::make_YYEOF(loc);
 }
 
 {dolqdelim} {
@@ -390,24 +271,18 @@ YEAR        { MAKE_KEYWORD(YEAR_P); }
     loc.step();
 }
 
-{dolqfailed} {
-    yyless(1);
-    loc.step();
-    return lingodb::parser::make_Op("$", loc);
-}
-
 %%
 
 
 
 void
-Driver::scanBegin (bool isFile)
+pl_driver::scan_begin ()
 {
-  yy_flex_debug = traceScanning;
+  yy_flex_debug = trace_scanning;
   if (file.empty () || file == "-")
     yyin = stdin;
-  if(!isFile) {
-     const char* sql = file.c_str();
+  if(file.starts_with(":")) {
+     const char* sql = file.c_str() + 1; // Skip the ":" prefix
      YY_BUFFER_STATE buffer = yy_scan_string(sql);
      yy_switch_to_buffer(buffer);
   }
@@ -419,7 +294,7 @@ Driver::scanBegin (bool isFile)
 }
 
 void
-Driver::scanEnd ()
+pl_driver::scan_end ()
 {
   if (YY_CURRENT_BUFFER) {
       yy_delete_buffer(YY_CURRENT_BUFFER);

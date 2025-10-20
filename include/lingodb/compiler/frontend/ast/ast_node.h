@@ -29,6 +29,8 @@ enum class NodeType : uint8_t {
    BOUND_EXTEND_NODE = 28,
    BOUND_INSERT_NODE = 30,
    BOUND_TARGET_LIST = 31,
+
+   PL_EXPRESSION = 32,
 };
 class AstNode {
    public:
