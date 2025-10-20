@@ -34,6 +34,7 @@
   #include <iostream>
   #include <memory>
   #include "lingodb/compiler/frontend/pl/pl_driver.h"
+
 }
 
 %define api.token.prefix {TOK_}
@@ -132,34 +133,21 @@ proc_stmt:
   | stmt_return
 ;
 
-stmt_return:
-  RETURN_P
-  {
-  std::ostringstream buf;
-        int paren_depth = 0;
-        for (;;) {
+    stmt_return:
+      RETURN_P
+      {
+      std::ostringstream buf;
+            int paren_depth = 0;
+            for (;;) {
 
-          lingodb::frontend::pl::parser::symbol_type t = yylex(drv);
 
-          if(t.kind() == lingodb::frontend::pl::parser::token::TOK_YYEOF) {
-            break;
-            error(@$, "should not happen");
-          } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_LP) {
-            paren_depth++;
-          } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_RP) {
-            paren_depth--;
-          } else if(t.kind() == lingodb::frontend::pl::parser::token::TOK_SEMICOLON) {
-            if(paren_depth == 0) {
-            break;
-            } else {
-            error(@$, "should not happen sem");
-            }
+
+
+
+
           }
-
-
       }
-  }
-  ;
+      ;
 %%
 void
 lingodb::frontend::pl::parser::error (const location_type& l, const std::string& m)

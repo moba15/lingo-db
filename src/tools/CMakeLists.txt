@@ -44,3 +44,9 @@ add_executable(run-sql run-sql.cpp)
 target_link_libraries(run-sql PUBLIC runner runtime utility mlir-support scheduler)
 set_target_properties(run-sql PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 target_compile_definitions(run-sql PRIVATE ${COMPILE_DEFS})
+
+# test
+add_executable(test-pl test.cpp)
+target_link_libraries(test-pl PUBLIC runner runtime utility mlir-support scheduler)
+set_target_properties(test-pl PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+target_compile_definitions(test-pl PRIVATE ${COMPILE_DEFS})
