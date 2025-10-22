@@ -17,6 +17,8 @@
 #include <filesystem>
 
 #include <dlfcn.h>
+
+#include <Python.h>
 namespace {
 lingodb::utility::GlobalSetting<std::string> cUDFCompilerDriver("system.compilation.c_udf_compiler_driver", "cc");
 
@@ -119,6 +121,105 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    }
 };
 
+class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
+   std::string functionName;
+   std::string code;
+   std::vector<lingodb::catalog::Type> argumentTypes;
+   lingodb::catalog::Type returnType;
+
+   public:
+   PythonUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
+
+   mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
+      std::string pythonPath = "";
+      if (!catalog->getDbDir().empty()) {
+         pythonPath = catalog->getDbDir() + "/udf/" + functionName + ".py";
+         std::filesystem::create_directories(catalog->getDbDir() + "/udf/");
+      }
+      if (!std::filesystem::exists(pythonPath)) {
+         std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
+
+         tempFile << code;
+
+
+      }
+      Py_Initialize();
+
+      PyStatus status;
+
+      PyConfig config;
+      PyConfig_InitPythonConfig(&config);
+      status = PyConfig_Read(&config);
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+      config.module_search_paths_set = 1;
+
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+
+      PyObject* sysPath = PySys_GetObject("path");
+      PyObject* pyDirObj = PyUnicode_DecodeFSDefault("/home/bachmaier/projects/lingo-db/resources/data/uni/udf");
+      PyList_Append(sysPath, pyDirObj);
+      Py_DECREF(pyDirObj);
+
+
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+
+
+      PyObject *pName, *pModule, *pFunc;
+      PyObject *pArgs, *pValue;
+      //Get file
+      pName = PyUnicode_DecodeFSDefault("addone");
+
+      if (pName == nullptr) {
+         throw std::runtime_error("Could not create/find python function");
+      }
+      //Import
+      pModule = PyImport_Import(pName);
+      if (pModule == nullptr) {
+         PyErr_Print();
+         throw std::runtime_error("Could not import module");
+      }
+      Py_DECREF(pName);
+
+      //Get function
+      pFunc = PyObject_GetAttrString(pModule, "multiply");
+      if (pFunc == nullptr && !PyCallable_Check(pFunc)) {
+         PyErr_Print();
+         throw std::runtime_error("Could not find function");
+      }
+      pArgs = PyTuple_New(2);
+      pValue = PyLong_FromLong(2);
+      if (!pValue) {
+         Py_DECREF(pArgs);
+         Py_DECREF(pModule);
+         Py_DECREF(pFunc);
+         throw std::runtime_error("Could not convert argument");
+      }
+      PyTuple_SetItem(pArgs, 0, pValue);
+      pValue = PyLong_FromLong(3);
+      PyTuple_SetItem(pArgs, 1, pValue);
+
+      pValue = PyObject_CallObject(pFunc, pArgs);
+      Py_DECREF(pArgs);
+      if (!pValue) {
+         Py_DECREF(pFunc);
+         Py_DECREF(pModule);
+         PyErr_Print();
+         throw std::runtime_error("Function did not return anything");
+      }
+      std::cout << "Result " << PyLong_AsLong(pValue) << std::endl;
+
+
+
+      throw std::runtime_error("Calling python udf not supported yet");
+   }
+};
+
 } //namespace
 
 namespace lingodb::compiler::frontend {
@@ -127,11 +228,18 @@ std::shared_ptr<catalog::MLIRUDFImplementor> getUDFImplementer(std::shared_ptr<c
       case catalog::CatalogEntry::CatalogEntryType::C_FUNCTION_ENTRY: {
          return createCUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
       }
+         case catalog::CatalogEntry::CatalogEntryType::PYTHON_FUNCTION_ENTRY: {
+         return createPythonUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());;
+      }
       default: throw std::runtime_error("getUDFImplementer: unknown catalog entry type");
    }
 }
 std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
    return std::make_shared<CUDFImplementer>(funcName, cCode, argumentTypes, returnType);
+}
+
+std::shared_ptr<catalog::MLIRUDFImplementor> createPythonUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
+   return std::make_shared<PythonUDFImplementer>(funcName, cCode, argumentTypes, returnType);
 }
 
 } // namespace lingodb::compiler::frontend
