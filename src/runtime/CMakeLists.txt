@@ -27,6 +27,7 @@ add_library(runtime OBJECT
         ExecutionContext.cpp
         RelationHelper.cpp
         EntryLock.cpp
+        UDFRuntime.cpp
         #Database.cpp
         #ArrowDirDatabase.cpp
         #ExternalArrowDatabase.cpp

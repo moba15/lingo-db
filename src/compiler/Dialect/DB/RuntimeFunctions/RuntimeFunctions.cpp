@@ -5,6 +5,7 @@
 #include "lingodb/compiler/runtime/DecimalRuntime.h"
 #include "lingodb/compiler/runtime/DumpRuntime.h"
 #include "lingodb/compiler/runtime/FloatRuntime.h"
+#include "lingodb/compiler/runtime/F"
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
@@ -321,6 +322,8 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("ExtractSecondFromDate").matchesTypes({RuntimeFunction::dateLike}, resTypeIsI64).implementedAs(DateRuntime::extractSecond);
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
+
+   builtinRegistry->add("test").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, RuntimeFunction::matchesArgument()).implementedAs(UDFRuntime::callPythonUdf);
 
    builtinRegistry->add("AbsInt").handlesInvalid().matchesTypes({RuntimeFunction::intLike}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
    builtinRegistry->add("AbsDecimal").handlesInvalid().matchesTypes({RuntimeFunction::anyDecimal}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
