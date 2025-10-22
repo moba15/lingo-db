@@ -962,7 +962,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
       boundCreateFunctionInfo->language = language;
       boundCreateFunctionInfo->code = code;
       for (auto& fArgument : createFunctionInfo->argumentTypes) {
-         boundCreateFunctionInfo->argumentTypes.push_back(SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
+         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
       }
       createNode->createInfo = boundCreateFunctionInfo;
       return createNode;

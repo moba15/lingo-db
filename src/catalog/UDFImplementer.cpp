@@ -184,22 +184,25 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
       Py_DECREF(pName);
 
       //Get function
-      pFunc = PyObject_GetAttrString(pModule, "multiply");
+      pFunc = PyObject_GetAttrString(pModule, functionName.c_str());
       if (pFunc == nullptr && !PyCallable_Check(pFunc)) {
          PyErr_Print();
          throw std::runtime_error("Could not find function");
       }
-      pArgs = PyTuple_New(2);
-      pValue = PyLong_FromLong(2);
-      if (!pValue) {
-         Py_DECREF(pArgs);
-         Py_DECREF(pModule);
-         Py_DECREF(pFunc);
-         throw std::runtime_error("Could not convert argument");
-      }
-      PyTuple_SetItem(pArgs, 0, pValue);
-      pValue = PyLong_FromLong(3);
-      PyTuple_SetItem(pArgs, 1, pValue);
+      pArgs = PyTuple_New(args.size());
+        for (size_t i = 0; i < args.size(); i++) {
+           //Currently only support integer arguments
+           int64_t argValue;
+
+           PyObject* pValue = PyLong_FromLong(1);
+           if (!pValue) {
+                Py_DECREF(pArgs);
+                Py_DECREF(pModule);
+                throw std::runtime_error("Cannot convert argument");
+           }
+           PyTuple_SetItem(pArgs, i, pValue);
+        }
+
 
       pValue = PyObject_CallObject(pFunc, pArgs);
       Py_DECREF(pArgs);

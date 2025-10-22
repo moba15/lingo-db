@@ -198,6 +198,8 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
    auto code = boundCreateFunctionInfo->code;
    auto language = boundCreateFunctionInfo->language;
    auto returnType = boundCreateFunctionInfo->returnType;
+   std::vector<catalog::Type> standaloneArgumentTypes;
+   standaloneArgumentTypes.reserve(boundCreateFunctionInfo->argumentTypes.size());
    if (language == "c") {
       auto logicalTypeToCTypeString = [createNode](catalog::Type& type) -> std::string {
          switch (type.getTypeId()) {
@@ -232,8 +234,7 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
             default: translatorError("return type for c-udf not implemented", createNode->loc);
          }
       };
-      std::vector<catalog::Type> standaloneArgumentTypes;
-      standaloneArgumentTypes.reserve(boundCreateFunctionInfo->argumentTypes.size());
+
       //Create method head
       std::string returnTypeStringRepresentation = logicalTypeToCTypeString(boundCreateFunctionInfo->returnType.type);
       std::string argumentsStringRepresentation = "(";
@@ -256,16 +257,27 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
 
    } else if (language == "python") {
-      std::string arguments = "";
+      std::string argumentsStringRepresentation = "(";
+      for (size_t i = 0; i < boundCreateFunctionInfo->argumentTypes.size(); i++) {
+         standaloneArgumentTypes.emplace_back(boundCreateFunctionInfo->argumentTypes[i].second);
+         auto functionArgument = boundCreateFunctionInfo->argumentTypes[i];
+         argumentsStringRepresentation += functionArgument.first;
+         if (i + 1 < boundCreateFunctionInfo->argumentTypes.size()) {
+            argumentsStringRepresentation += ", ";
+         }
+      }
+      argumentsStringRepresentation += ")";
 
       //Create method head
-      std::string code = "def: " + functionName + "\n";
-      code << "def: " << functionName;
+      code = "def " + functionName + ""  + argumentsStringRepresentation + ":\n" + code;
+
+
+
       lingodb::catalog::CreateFunctionDef createFunctionDef(
          functionName,
          boundCreateFunctionInfo->language,
          code,
-         returnType.type, boundCreateFunctionInfo->argumentTypes);
+         returnType.type, standaloneArgumentTypes);
       auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
    } else {
