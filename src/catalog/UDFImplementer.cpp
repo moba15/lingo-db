@@ -213,8 +213,7 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          throw std::runtime_error("Function did not return anything");
       }
       std::cout << "Result " << PyLong_AsLong(pValue) << std::endl;
-
-      return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, returnType.getMLIRTypeCreator()->createType(builder.getContext()), "test", mlir::ValueRange({args})).getRes();
+      return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, returnType.getMLIRTypeCreator()->createType(builder.getContext()), "test", args).getRes();
       throw std::runtime_error("Calling python udf not supported yet");
    }
 };

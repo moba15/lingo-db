@@ -27,6 +27,7 @@ mlir::Value udfImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments
 
 mlir::Value dateAddImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments, mlir::TypeRange originalArgumentTypes, mlir::Type resType, const mlir::TypeConverter* typeConverter, mlir::Location loc) {
    using namespace mlir;
+
    if (mlir::cast<db::IntervalType>(originalArgumentTypes[1]).getUnit() == db::IntervalUnitAttr::daytime) {
       return rewriter.create<mlir::arith::AddIOp>(loc, loweredArguments);
    } else {
@@ -329,7 +330,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
-   builtinRegistry->add("test").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, RuntimeFunction::matchesArgument()).implementedAs(udfImpl);
+   builtinRegistry->add("test").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, RuntimeFunction::matchesArgument()).implementedAs(UDFRuntime::callPythonUDF);
 
    builtinRegistry->add("AbsInt").handlesInvalid().matchesTypes({RuntimeFunction::intLike}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
    builtinRegistry->add("AbsDecimal").handlesInvalid().matchesTypes({RuntimeFunction::anyDecimal}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
