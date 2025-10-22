@@ -5,10 +5,10 @@
 #include "lingodb/compiler/runtime/DecimalRuntime.h"
 #include "lingodb/compiler/runtime/DumpRuntime.h"
 #include "lingodb/compiler/runtime/FloatRuntime.h"
-#include "lingodb/compiler/runtime/F"
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
+#include "lingodb/compiler/runtime/UDFRuntime.h"
 #include "lingodb/runtime/DateRuntime.h"
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
@@ -19,6 +19,12 @@ lingodb::compiler::dialect::db::RuntimeFunction* lingodb::compiler::dialect::db:
 namespace {
 using namespace lingodb::compiler::runtime;
 using namespace lingodb::compiler::dialect;
+
+mlir::Value udfImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments, mlir::TypeRange originalArgumentTypes, mlir::Type resType, const mlir::TypeConverter* typeConverter, mlir::Location loc) {
+   using namespace mlir;
+   return rewriter.create<arith::ConstantIntOp>(rewriter.getUnknownLoc(), 1, 1);
+}
+
 mlir::Value dateAddImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments, mlir::TypeRange originalArgumentTypes, mlir::Type resType, const mlir::TypeConverter* typeConverter, mlir::Location loc) {
    using namespace mlir;
    if (mlir::cast<db::IntervalType>(originalArgumentTypes[1]).getUnit() == db::IntervalUnitAttr::daytime) {
@@ -323,7 +329,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
-   builtinRegistry->add("test").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, RuntimeFunction::matchesArgument()).implementedAs(UDFRuntime::callPythonUdf);
+   builtinRegistry->add("test").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, RuntimeFunction::matchesArgument()).implementedAs(udfImpl);
 
    builtinRegistry->add("AbsInt").handlesInvalid().matchesTypes({RuntimeFunction::intLike}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
    builtinRegistry->add("AbsDecimal").handlesInvalid().matchesTypes({RuntimeFunction::anyDecimal}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);

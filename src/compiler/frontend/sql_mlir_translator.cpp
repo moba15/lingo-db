@@ -256,11 +256,16 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
 
    } else if (language == "python") {
+      std::string arguments = "";
+
+      //Create method head
+      std::string code = "def: " + functionName + "\n";
+      code << "def: " << functionName;
       lingodb::catalog::CreateFunctionDef createFunctionDef(
-        functionName,
-        boundCreateFunctionInfo->language,
-        code,
-        returnType.type, boundCreateFunctionInfo->argumentTypes);
+         functionName,
+         boundCreateFunctionInfo->language,
+         code,
+         returnType.type, boundCreateFunctionInfo->argumentTypes);
       auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
    } else {

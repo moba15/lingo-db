@@ -3,6 +3,7 @@
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
+#include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
@@ -140,8 +141,6 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
 
          tempFile << code;
-
-
       }
       Py_Initialize();
 
@@ -164,11 +163,9 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
       PyList_Append(sysPath, pyDirObj);
       Py_DECREF(pyDirObj);
 
-
       if (PyStatus_Exception(status)) {
          throw std::runtime_error("Could not read python config");
       }
-
 
       PyObject *pName, *pModule, *pFunc;
       PyObject *pArgs, *pValue;
@@ -214,8 +211,7 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
       }
       std::cout << "Result " << PyLong_AsLong(pValue) << std::endl;
 
-
-
+      return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, returnType.getMLIRTypeCreator()->createType(builder.getContext()), "test", mlir::ValueRange({args})).getRes();
       throw std::runtime_error("Calling python udf not supported yet");
    }
 };
@@ -228,8 +224,9 @@ std::shared_ptr<catalog::MLIRUDFImplementor> getUDFImplementer(std::shared_ptr<c
       case catalog::CatalogEntry::CatalogEntryType::C_FUNCTION_ENTRY: {
          return createCUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
       }
-         case catalog::CatalogEntry::CatalogEntryType::PYTHON_FUNCTION_ENTRY: {
-         return createPythonUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());;
+      case catalog::CatalogEntry::CatalogEntryType::PYTHON_FUNCTION_ENTRY: {
+         return createPythonUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
+         ;
       }
       default: throw std::runtime_error("getUDFImplementer: unknown catalog entry type");
    }
