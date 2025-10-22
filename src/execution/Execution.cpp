@@ -234,11 +234,17 @@ ExecutionMode getExecutionMode() {
 }
 
 class DefaultQueryExecuter : public QueryExecuter {
-   void handleError(std::string phase, Error& e) {
-      if (e) {
-         std::cerr << phase << ": " << e.getMessage() << std::endl;
-         exit(1);
-      }
+#define handleError(phase, e)                                          \
+   {                                                                   \
+      if (e) {                                                         \
+         if (exitOnError) {                                            \
+            std::cerr << phase << ": " << e.getMessage() << std::endl; \
+            exit(1);                                                   \
+         } else {                                                      \
+            error->emit() << e.getMessage();                           \
+            return;                                                    \
+         }                                                             \
+      }                                                                \
    }
    void handleTiming(const std::unordered_map<std::string, double>& timing) {
       if (queryExecutionConfig->timingProcessor) {
@@ -274,11 +280,8 @@ class DefaultQueryExecuter : public QueryExecuter {
 
       auto serializationState = std::make_shared<SnapshotState>();
       serializationState->serialize = true;
-      if (frontend.getError()) {
-         std::cerr << frontend.getError().getMessage() << std::endl;
-         return;
-      }
-      mlir::ModuleOp& moduleOp = *queryExecutionConfig->frontend->getModule();
+      handleError("FRONTEND", frontend.getError())
+         mlir::ModuleOp& moduleOp = *queryExecutionConfig->frontend->getModule();
       snapshotImportantStep("canonical", moduleOp, serializationState);
       if (queryExecutionConfig->queryOptimizer) {
          auto& queryOptimizer = *queryExecutionConfig->queryOptimizer;

@@ -238,7 +238,7 @@ static std::vector<std::string> split(std::string_view input, char del = ' ')
    return result;
 }
 
-void runStatement(runtime::Session& session, const std::vector<std::string>& lines, size_t& line) {
+void runStatement(runtime::Session& session, const std::vector<std::string>& lines, size_t& line, std::function<void(execution::Error& error)> onError) {
    auto parts = split(lines[line]);
    line++;
    std::string statement;
@@ -257,7 +257,12 @@ void runStatement(runtime::Session& session, const std::vector<std::string>& lin
    queryExecutionConfig->resultProcessor = std::unique_ptr<execution::ResultProcessor>();
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), session);
    executer->fromData(statement);
+   executer->setExitOnError(false);
+   std::shared_ptr<execution::Error> e = executer->getError();
    scheduler::awaitEntryTask(std::make_unique<execution::QueryExecutionTask>(std::move(executer)));
+   if (e && *e) {
+      onError(*e.get());
+   }
 }
 inline std::string& rtrim(std::string& s, const char* t) {
    s.erase(s.find_last_not_of(t) + 1);
@@ -410,7 +415,24 @@ int main(int argc, char** argv) {
       }
       if (parts[0] == "statement") {
          try {
-            runStatement(*session, lines, line);
+            runStatement(*session, lines, line, [&](execution::Error& error) {
+               if (parts.size() > 1 && parts[1] == "error") {
+                  //Error allowed
+                  if (parts.size() > 2) {
+                     std::string expectedError = parts[2];
+                     for (size_t i = 3; i < parts.size(); i++) {
+                        expectedError += " " + parts[i];
+                     }
+                     if (error.getMessage().find(expectedError) == std::string::npos) {
+                        std::cerr << "ERROR: expected error containing '" << expectedError << "' but got '" << error.getMessage() << "'" << std::endl;
+                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                     }
+                  }
+               } else {
+                  std::cerr << "ERROR: " << error.getMessage() << std::endl;
+                  std::cerr << "while executing statement: " << lines[line] << std::endl;
+               }
+            });
          } catch (const std::exception& e) {
             std::cerr << "ERROR: " << e.what() << std::endl;
             std::cerr << "while executing statement: " << lines[line] << std::endl;
