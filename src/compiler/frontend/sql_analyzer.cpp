@@ -943,7 +943,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
          code = optionValue;
       }
    }
-
+   NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType.logicalTypeId, createFunctionInfo->returnType.typeModifiers);
    if (language == "c") {
       NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType.logicalTypeId, createFunctionInfo->returnType.typeModifiers);
 
@@ -954,6 +954,16 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
          boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
       }
 
+      createNode->createInfo = boundCreateFunctionInfo;
+      return createNode;
+
+   } else if (language == "python") {
+      auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
+      boundCreateFunctionInfo->language = language;
+      boundCreateFunctionInfo->code = code;
+      for (auto& fArgument : createFunctionInfo->argumentTypes) {
+         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
+      }
       createNode->createInfo = boundCreateFunctionInfo;
       return createNode;
    } else {

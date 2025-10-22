@@ -34,8 +34,9 @@ void RelationHelper::createFunction(runtime::VarLen32 meta) {
    auto& session = context->getSession();
    auto catalog = session.getCatalog();
    auto def = utility::deserializeFromHexString<lingodb::catalog::CreateFunctionDef>(meta.str());
-   auto func = std::make_shared<lingodb::catalog::CFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
+   std::shared_ptr<lingodb::catalog::FunctionCatalogEntry> func;
    if (def.language == "c") {
+      func = std::make_shared<lingodb::catalog::CFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
       //Remove possible so file
       auto find = catalog::FunctionCatalogEntry::getUdfFunctions().find(def.name);
       if (find != catalog::FunctionCatalogEntry::getUdfFunctions().end()) {
@@ -45,6 +46,8 @@ void RelationHelper::createFunction(runtime::VarLen32 meta) {
       if (!catalog->getDbDir().empty() && std::filesystem::exists(catalog->getDbDir() + "/udf/" + def.name + ".so")) {
          std::filesystem::remove(catalog->getDbDir() + "/udf/" + def.name + ".so");
       }
+   } else if (def.language == "python") {
+      func = std::make_shared<lingodb::catalog::PythonFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
    }
    catalog->insertEntry(func, true);
    catalog->persist();
