@@ -27,6 +27,7 @@ add_library(runtime OBJECT
         ExecutionContext.cpp
         RelationHelper.cpp
         EntryLock.cpp
+        UDFRuntime.cpp
         #Database.cpp
         #ArrowDirDatabase.cpp
         #ExternalArrowDatabase.cpp
@@ -45,6 +46,7 @@ endif (ENABLE_GPU_BACKEND)
 
 target_compile_definitions(runtime PUBLIC ${COMPILE_DEFS})
 target_link_libraries(runtime PRIVATE Arrow::arrow_static)
-
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+target_link_libraries(runtime PRIVATE Python3::Python)
 add_subdirectory(GPU)
 target_link_libraries(runtime PUBLIC GPU-rt scheduler)

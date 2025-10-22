@@ -8,6 +8,7 @@
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
+#include "lingodb/compiler/runtime/UDFRuntime.h"
 #include "lingodb/runtime/DateRuntime.h"
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
@@ -18,8 +19,15 @@ lingodb::compiler::dialect::db::RuntimeFunction* lingodb::compiler::dialect::db:
 namespace {
 using namespace lingodb::compiler::runtime;
 using namespace lingodb::compiler::dialect;
+
+mlir::Value udfImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments, mlir::TypeRange originalArgumentTypes, mlir::Type resType, const mlir::TypeConverter* typeConverter, mlir::Location loc) {
+   using namespace mlir;
+   return rewriter.create<arith::ConstantIntOp>(rewriter.getUnknownLoc(), 1, 1);
+}
+
 mlir::Value dateAddImpl(mlir::OpBuilder& rewriter, mlir::ValueRange loweredArguments, mlir::TypeRange originalArgumentTypes, mlir::Type resType, const mlir::TypeConverter* typeConverter, mlir::Location loc) {
    using namespace mlir;
+
    if (mlir::cast<db::IntervalType>(originalArgumentTypes[1]).getUnit() == db::IntervalUnitAttr::daytime) {
       return rewriter.create<mlir::arith::AddIOp>(loc, loweredArguments);
    } else {
@@ -270,6 +278,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    auto builtinRegistry = std::make_shared<RuntimeFunctionRegistry>(context);
    builtinRegistry->add("DumpValue").handlesNulls().matchesTypes({RuntimeFunction::anyType}, RuntimeFunction::noReturnType).implementedAs(dumpValuesImpl);
    auto resTypeIsI64 = [](mlir::Type t, mlir::TypeRange) { return t.isInteger(64); };
+   auto resTypeIsI32 = [](mlir::Type t, mlir::TypeRange) { return t.isInteger(32); };
    auto resTypeIsF64 = [](mlir::Type t, mlir::TypeRange) { return t.isF64(); };
    auto resTypeIsBool = [](mlir::Type t, mlir::TypeRange) { return t.isInteger(1); };
    auto resTypeIsIndex = [](mlir::Type t, mlir::TypeRange) { return t.isIndex(); };
@@ -321,6 +330,17 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("ExtractSecondFromDate").matchesTypes({RuntimeFunction::dateLike}, resTypeIsI64).implementedAs(DateRuntime::extractSecond);
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
+
+   builtinRegistry->add("callPythonUdf1").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, RuntimeFunction::matchesArgument()).implementedAs(UDFRuntime::callPythonUDF);
+   builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::callPythonUDF4);
+   builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int64ToPythonLong);
+   builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int32ToPythonInt);
+   builtinRegistry->add("doubleToPythonDouble").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::doubleToPythonDouble);
+
+   builtinRegistry->add("pythonLongToInt64").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::pythonLongToInt64);
+   builtinRegistry->add("pythonIntToInt32").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI32).implementedAs(UDFRuntime::pythonIntToInt32);
+   builtinRegistry->add("pythonDoubleToDouble").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsF64).implementedAs(UDFRuntime::pythonDoubleToDouble);
+
 
    builtinRegistry->add("AbsInt").handlesInvalid().matchesTypes({RuntimeFunction::intLike}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
    builtinRegistry->add("AbsDecimal").handlesInvalid().matchesTypes({RuntimeFunction::anyDecimal}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);

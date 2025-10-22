@@ -10,3 +10,5 @@ target_link_libraries(catalog PUBLIC mlirTypes)
 
 set(COMPILE_DEFS "SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 target_compile_definitions(mlirTypes PRIVATE ${COMPILE_DEFS})
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+target_link_libraries(mlirTypes PRIVATE Python3::Python)

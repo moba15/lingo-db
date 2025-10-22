@@ -3,6 +3,7 @@
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
+#include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
@@ -17,6 +18,8 @@
 #include <filesystem>
 
 #include <dlfcn.h>
+
+#include <Python.h>
 namespace {
 lingodb::utility::GlobalSetting<std::string> cUDFCompilerDriver("system.compilation.c_udf_compiler_driver", "cc");
 
@@ -119,6 +122,88 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    }
 };
 
+class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
+   std::string functionName;
+   std::string code;
+   std::vector<lingodb::catalog::Type> argumentTypes;
+   lingodb::catalog::Type returnType;
+
+   public:
+   PythonUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
+
+   mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
+      std::string pythonPath = "";
+      if (!catalog->getDbDir().empty()) {
+         pythonPath = catalog->getDbDir() + "/udf/" + functionName + ".py";
+         std::filesystem::create_directories(catalog->getDbDir() + "/udf/");
+      }
+      if (!std::filesystem::exists(pythonPath)) {
+         std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
+
+         tempFile << code;
+      }
+      Py_Initialize();
+      std::vector<mlir::Value> pythonArgs;
+      pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
+      for (size_t i = 0; i < args.size(); i++) {
+         auto currentArg = args[i];
+         mlir::Value pythonArg;
+         switch (argumentTypes[i].getTypeId()) {
+            case lingodb::catalog::LogicalTypeId::INT: {
+               auto s = mlir::dyn_cast<mlir::IntegerType>(currentArg.getType()).getWidth();
+               if (s==32) {
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "int32ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+               } else if (s==64){
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "int64ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+               } else {
+                  throw std::runtime_error("The current type is not supported in python UDFs");
+               }
+               break;
+
+            }
+            case lingodb::catalog::LogicalTypeId::DOUBLE: {
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
+               break;
+            }
+
+
+            default: throw std::runtime_error("The current type is not supported in python UDFs");
+         }
+         pythonArgs.push_back(pythonArg);
+      }
+
+      //String const
+      auto tmp = builder.getStringAttr(functionName);
+      auto mlirReturnType = returnType.getMLIRTypeCreator()->createType(builder.getContext());
+
+      //Create string
+
+
+      auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "callPythonUdf4", pythonArgs).getResult(0);
+
+
+      //Now convert back
+      switch (returnType.getTypeId()) {
+         case lingodb::catalog::LogicalTypeId::INT: {
+            auto s = mlir::dyn_cast<mlir::IntegerType>(mlirReturnType).getWidth();
+            if (s==32) {
+               return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 32), "pythonIntToInt32", mlir::ValueRange({pythonResult})).getResult(0);
+            } else if (s==64){
+               return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "pythonLongToInt64", mlir::ValueRange({pythonResult})).getResult(0);
+            } else {
+               throw std::runtime_error("The current type is not supported in python UDFs");
+            }
+         }
+         case lingodb::catalog::LogicalTypeId::DOUBLE: {
+            return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::Float64Type::get(builder.getContext()), "pythonDoubleToDouble", mlir::ValueRange({pythonResult})).getResult(0);
+         }
+            default: throw std::runtime_error("The current return result type is not supported in python UDFs");
+      }
+
+   }
+
+};
+
 } //namespace
 
 namespace lingodb::compiler::frontend {
@@ -127,11 +212,19 @@ std::shared_ptr<catalog::MLIRUDFImplementor> getUDFImplementer(std::shared_ptr<c
       case catalog::CatalogEntry::CatalogEntryType::C_FUNCTION_ENTRY: {
          return createCUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
       }
+      case catalog::CatalogEntry::CatalogEntryType::PYTHON_FUNCTION_ENTRY: {
+         return createPythonUDFImplementer(entry->getName(), entry->getCode(), entry->getArgumentTypes(), entry->getReturnType());
+         ;
+      }
       default: throw std::runtime_error("getUDFImplementer: unknown catalog entry type");
    }
 }
 std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
    return std::make_shared<CUDFImplementer>(funcName, cCode, argumentTypes, returnType);
+}
+
+std::shared_ptr<catalog::MLIRUDFImplementor> createPythonUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
+   return std::make_shared<PythonUDFImplementer>(funcName, cCode, argumentTypes, returnType);
 }
 
 } // namespace lingodb::compiler::frontend

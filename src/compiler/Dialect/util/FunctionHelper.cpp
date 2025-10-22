@@ -33,6 +33,9 @@ mlir::Value lingodb::compiler::dialect::util::FunctionHelper::convertValue(mlir:
    if (mlir::isa<BufferType>(t) && mlir::isa<BufferType>(currentType)) {
       return builder.create<BufferCastOp>(loc, t, v);
    }
+   if (mlir::isa<RefType>(t) && !mlir::isa<RefType>(currentType)) {
+      return builder.create<ToMemrefOp>(loc, t, v);
+   }
    return v; //todo
 }
 mlir::func::CallOp lingodb::compiler::dialect::util::FunctionHelper::call(mlir::OpBuilder& builder, mlir::Location loc, const FunctionSpec& function, mlir::ValueRange values) {
