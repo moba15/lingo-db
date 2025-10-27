@@ -1087,9 +1087,13 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             auto boundExpr = analyzeExpression(expr, context, resolverScope);
             assert(boundExpr->exprClass == ast::ExpressionClass::BOUND_FUNCTION);
             auto boundFunction = std::static_pointer_cast<ast::BoundFunctionExpression>(boundExpr);
-            //Check if count
+
             auto fName = boundFunction->functionName;
             std::ranges::transform(fName, fName.begin(), ::toupper);
+            /**
+             * Updadte nullable flag for count aggregation.
+             * If empty group by clause set nullable=true else false
+             */
             if (fName != "COUNT" && fName != "COUNT*" && nullable) {
                boundExpr->resultType->isNullable = nullable;
                boundExpr->columnReference.value()->resultType.isNullable = nullable;
@@ -1097,7 +1101,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             return boundFunction;
          });
          /**
-          * Analyze GroupByNode
+          * Analyze GroupBy Clause
           */
          if (aggregationNode->groupByNode) {
             std::ranges::transform(aggregationNode->groupByNode->groupByExpressions, std::back_inserter(groupColumnReferences), [&](auto expr) {
@@ -1105,10 +1109,31 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                assert(boundExpression->columnReference.has_value());
                context->mapAttribute(resolverScope, boundExpression->columnReference.value()->name, boundExpression->columnReference.value());
                //Add GROUP BY to TargetInfo for the current scope (see PIPE SQL Syntax)
-               context->currentScope->targetInfo.add(boundExpression->columnReference.value());
+               auto cRef = boundExpression->columnReference.value();
+               context->currentScope->targetInfo.add(cRef);
+
                return boundExpression->columnReference.value();
             });
          }
+         if (!groupColumnReferences.empty() || !boundAggregationExpressions.empty()) {
+            for (auto& c : context->getTopDefinedColumns()) {
+               auto found = std::ranges::find_if(groupColumnReferences, [&](auto cRef) {
+                  return cRef->name == c.second->name && cRef->scope == c.second->scope;
+               });
+               auto found2 = std::ranges::find_if(boundAggregationExpressions, [&](auto& cExpr) {
+                  return cExpr->columnReference.value()->name == c.second->name && cExpr->columnReference.value()->scope == c.second->scope;
+               });
+               /*
+                * If a column reference is not part of the GROUP BY, mark it as not selectable.
+                * It cannot be removed from defined columns because aggregation functions may still reference it.
+                * A future scope-lookup redesign could allow safely pruning such columns instead of toggling selectability.
+                */
+               if (found == groupColumnReferences.end() && found2 == boundAggregationExpressions.end()) {
+                  c.second->isSelectable = false;
+               }
+            }
+         }
+
          auto boundGroupByNode = drv.nf.node<ast::BoundGroupByNode>(aggregationNode->groupByNode ? aggregationNode->groupByNode->loc : aggregationNode->loc, groupColumnReferences);
          std::vector<std::shared_ptr<ast::BoundExpression>> toMap{};
 
@@ -1930,6 +1955,9 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             if (p.second) {
                i++;
             }
+            if (!p.first->first->isSelectable) {
+               error("Column" << p.first->second << " is not available after aggregation", star->loc);
+            }
          }
 
          auto boundStar = drv.nf.node<ast::BoundStarExpression>(star->loc, relationName, topDefinedColumnsWithoutDuplicates);
@@ -2381,8 +2409,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
          error("Aggregation with more than one argument not supported", function->loc);
       }
       for (auto arg : function->arguments) {
+         context->ignore = true;
          auto boundArg = analyzeExpression(arg, context, resolverScope);
          boundArguments.push_back(boundArg);
+         context->ignore = false;
       }
 
       /**
@@ -2719,7 +2749,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
    return boundFunctionExpression;
 }
 
-std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context) {
+std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context, bool ignoreAvailabilityChecks) {
    //new implementation which uses the new concept of TableProducers
    auto columnName = columnRef->columnNames.size() == 1 ? columnRef->columnNames[0] : columnRef->columnNames[1];
 
@@ -2735,6 +2765,9 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
    }
    if (!found) {
       error("Column not found", columnRef->loc);
+   }
+   if (!found->isSelectable && !context->ignore) {
+      error("Column" << columnName << " is not available after aggregation", columnRef->loc);
    }
    found->displayName = !columnRef->alias.empty() || columnRef->forceToUseAlias ? columnRef->alias : found->displayName;
    return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, columnRef->alias);

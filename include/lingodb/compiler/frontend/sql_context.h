@@ -86,6 +86,7 @@ class SQLContext {
    catalog::Catalog* catalog;
    std::vector<std::shared_ptr<SQLScope>> scopes;
    std::shared_ptr<SQLScope> currentScope;
+   bool ignore = false;
 
    std::stack<std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>>> definedAttributes;
    using renameCte = std::vector<std::pair<std::shared_ptr<ast::ColumnReference>, std::shared_ptr<ast::ColumnReference>>>;
