@@ -1105,9 +1105,23 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                assert(boundExpression->columnReference.has_value());
                context->mapAttribute(resolverScope, boundExpression->columnReference.value()->name, boundExpression->columnReference.value());
                //Add GROUP BY to TargetInfo for the current scope (see PIPE SQL Syntax)
-               context->currentScope->targetInfo.add(boundExpression->columnReference.value());
+               auto cRef = boundExpression->columnReference.value();
+               context->currentScope->targetInfo.add(cRef);
+
                return boundExpression->columnReference.value();
             });
+            for (auto& c: context->getTopDefinedColumns()) {
+               auto found = std::ranges::find_if(groupColumnReferences, [&](auto cRef) {
+                  return cRef->name == c.second->name && cRef->scope == c.second->scope;
+               });
+               if (found == groupColumnReferences.end()) {
+                  c.second->available = false;
+               }
+
+            }
+         }
+         for (auto& expr: boundAggregationExpressions) {
+            expr->columnReference.value()->available = true;
          }
          auto boundGroupByNode = drv.nf.node<ast::BoundGroupByNode>(aggregationNode->groupByNode ? aggregationNode->groupByNode->loc : aggregationNode->loc, groupColumnReferences);
          std::vector<std::shared_ptr<ast::BoundExpression>> toMap{};
@@ -2381,8 +2395,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
          error("Aggregation with more than one argument not supported", function->loc);
       }
       for (auto arg : function->arguments) {
+         context->ignore = true;
          auto boundArg = analyzeExpression(arg, context, resolverScope);
          boundArguments.push_back(boundArg);
+         context->ignore = false;
       }
 
       /**
@@ -2719,7 +2735,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
    return boundFunctionExpression;
 }
 
-std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context) {
+std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context, bool ignoreAvailabilityChecks) {
    //new implementation which uses the new concept of TableProducers
    auto columnName = columnRef->columnNames.size() == 1 ? columnRef->columnNames[0] : columnRef->columnNames[1];
 
@@ -2735,6 +2751,9 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
    }
    if (!found) {
       error("Column not found", columnRef->loc);
+   }
+   if (!found->available && !context->ignore) {
+      error("Column" << columnName << " is not available after aggregation", columnRef->loc);
    }
    found->displayName = !columnRef->alias.empty() || columnRef->forceToUseAlias ? columnRef->alias : found->displayName;
    return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, columnRef->alias);
