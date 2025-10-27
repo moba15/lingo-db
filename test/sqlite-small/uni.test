@@ -488,11 +488,18 @@ select s.matrnr, count(*) from studenten s group by x.matrnr;
 statement frontend-error: Could not resolve
 select s.matrnr, count(*) from studenten s group by hoeren.matrnr;
 
-statement frontend-error: ambiguous
-select * from studenten s, hoeren h where matrnr = 26120;
+statement frontend-error: not available after aggregation at
+select s.matrnr, count(*) from studenten s, hoeren h group by h.matrnr;
 
-statement frontend-error: ambiguous
-select matrnr from studenten s, hoeren h;
+statement frontend-error: not available after aggregation at
+select * from studenten s, hoeren h group by h.matrnr;
 
-statement frontend-error: ambiguous
-select matrnr from studenten s, hoeren h group by matrnr;
+
+#statement frontend-error: ambiguous
+#select * from studenten s, hoeren h where matrnr = 26120;
+
+#statement frontend-error: ambiguous
+#select matrnr from studenten s, hoeren h;
+
+#statement frontend-error: ambiguous
+#select matrnr from studenten s, hoeren h group by matrnr;

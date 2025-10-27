@@ -16,6 +16,7 @@ class ColumnReference {
    NullableType resultType;
    std::string name;
    std::string displayName{};
+   bool available = true;
    ColumnReference(std::string scope, NullableType resultType, std::string name) : scope(scope), resultType(resultType), name(name) {}
    ColumnReference(std::string scope, catalog::Column c) : scope(scope), resultType(NullableType(c.getLogicalType(), c.getIsNullable())), name(c.getColumnName()), displayName(c.getColumnName()) {}
 
