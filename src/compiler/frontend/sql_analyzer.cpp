@@ -957,7 +957,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
       createNode->createInfo = boundCreateFunctionInfo;
       return createNode;
 
-   } else if (language == "python") {
+   } else if (language == "plpython3u") {
       auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
       boundCreateFunctionInfo->language = language;
       boundCreateFunctionInfo->code = code;

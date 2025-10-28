@@ -256,7 +256,7 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
       auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
 
-   } else if (language == "python") {
+   } else if (language == "plpython3u") {
       std::string argumentsStringRepresentation = "(";
       for (size_t i = 0; i < boundCreateFunctionInfo->argumentTypes.size(); i++) {
          standaloneArgumentTypes.emplace_back(boundCreateFunctionInfo->argumentTypes[i].second);
