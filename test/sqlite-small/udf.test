@@ -137,3 +137,16 @@ select addDoubles(i,1.577) from ints
 3.577
 4.577
 5.577
+
+
+statement ok
+CREATE FUNCTION addInt(a int, b int)
+RETURNS int
+AS $$
+    return a+b
+$$ LANGUAGE plpython3u
+
+query 9
+select addint(1,10)
+----
+11

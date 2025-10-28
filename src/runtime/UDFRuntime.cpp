@@ -82,6 +82,87 @@ uint64_t lingodb::runtime::UDFRuntime::callPythonUDF(int64_t arg) {
    return 19855;
 }
 
+uint64_t lingodb::runtime::UDFRuntime::callPythonUDF2(VarLen32 fnName, int64_t arg, int64_t arg1) {
+   if (Py_IsInitialized()) {
+      PyStatus status;
+
+      PyConfig config;
+      PyConfig_InitPythonConfig(&config);
+      status = PyConfig_Read(&config);
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+      config.module_search_paths_set = 1;
+
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+
+      PyObject* sysPath = PySys_GetObject("path");
+      PyObject* pyDirObj = PyUnicode_DecodeFSDefault("/home/bachmaier/projects/lingo-db/resources/data/uni-udf/udf");
+      PyList_Append(sysPath, pyDirObj);
+      Py_DECREF(pyDirObj);
+
+      if (PyStatus_Exception(status)) {
+         throw std::runtime_error("Could not read python config");
+      }
+
+      PyObject *pName, *pModule, *pFunc;
+      PyObject *pArgs, *pValue;
+      //Get file
+      pName = PyUnicode_DecodeFSDefault(fnName.str().c_str());
+
+      if (pName == nullptr) {
+         throw std::runtime_error("Could not create/find python function");
+      }
+      //Import
+      pModule = PyImport_Import(pName);
+      if (pModule == nullptr) {
+         PyErr_Print();
+         throw std::runtime_error("Could not import module");
+      }
+      Py_DECREF(pName);
+
+      //Get function
+      pFunc = PyObject_GetAttrString(pModule, fnName.str().c_str());
+      if (pFunc == nullptr && !PyCallable_Check(pFunc)) {
+         PyErr_Print();
+         throw std::runtime_error("Could not find function");
+      }
+      pArgs = PyTuple_New(2);
+      int64_t argValue;
+      pValue = reinterpret_cast<PyObject*>(arg);
+      if (!pValue) {
+         Py_DECREF(pArgs);
+         Py_DECREF(pModule);
+         throw std::runtime_error("Cannot convert argument");
+      }
+      PyTuple_SetItem(pArgs, 0, pValue);
+
+      pValue = reinterpret_cast<PyObject*>(arg1);
+      if (!pValue) {
+         Py_DECREF(pArgs);
+         Py_DECREF(pModule);
+         throw std::runtime_error("Cannot convert argument");
+      }
+      PyTuple_SetItem(pArgs, 1, pValue);
+
+      pValue = PyObject_CallObject(pFunc, pArgs);
+      Py_DECREF(pArgs);
+      if (!pValue) {
+         Py_DECREF(pFunc);
+         Py_DECREF(pModule);
+         PyErr_Print();
+         throw std::runtime_error("Function did not return anything");
+      }
+      return reinterpret_cast<uint64_t>(pValue);
+   } else {
+      throw std::runtime_error("Python not initialized");
+      return -1;
+   }
+   return 19855;
+}
+
 uint64_t lingodb::runtime::UDFRuntime::callPythonUDF4(VarLen32 fnName, int64_t arg, int64_t arg1, int64_t arg2, int64_t arg3) {
    if (Py_IsInitialized()) {
       PyStatus status;

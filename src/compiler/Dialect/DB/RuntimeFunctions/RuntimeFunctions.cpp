@@ -332,6 +332,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
    builtinRegistry->add("callPythonUdf1").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, RuntimeFunction::matchesArgument()).implementedAs(UDFRuntime::callPythonUDF);
+   builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::callPythonUDF2);
    builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::callPythonUDF4);
    builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int64ToPythonLong);
    builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({   RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int32ToPythonInt);

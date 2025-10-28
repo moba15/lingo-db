@@ -46,7 +46,7 @@ void RelationHelper::createFunction(runtime::VarLen32 meta) {
       if (!catalog->getDbDir().empty() && std::filesystem::exists(catalog->getDbDir() + "/udf/" + def.name + ".so")) {
          std::filesystem::remove(catalog->getDbDir() + "/udf/" + def.name + ".so");
       }
-   } else if (def.language == "python") {
+   } else if (def.language == "plpython3u") {
       func = std::make_shared<lingodb::catalog::PythonFunctionCatalogEntry>(def.name, def.code, def.returnType, def.argumentTypes);
    }
    catalog->insertEntry(func, true);

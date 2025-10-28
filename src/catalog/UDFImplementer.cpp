@@ -178,8 +178,10 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
 
       //Create string
 
+      std::string runtimeName = "callPythonUdf";
+      runtimeName += std::to_string(argumentTypes.size());
 
-      auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "callPythonUdf4", pythonArgs).getResult(0);
+      auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), runtimeName, pythonArgs).getResult(0);
 
 
       //Now convert back
