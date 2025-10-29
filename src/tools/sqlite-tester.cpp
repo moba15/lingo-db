@@ -13,6 +13,7 @@
 #include <string>
 
 #include "md5.h"
+#include "lingodb/utility/PythonUtility.h"
 
 #include <Python.h>
 namespace {
@@ -358,6 +359,7 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
       expectedResult += lines[line] + "\n";
       line++;
    }
+
    auto queryExecutionConfig = execution::createQueryExecutionConfig(execution::getExecutionMode(), true);
    auto resultHasher = std::make_unique<ResultHasher>();
    auto& resultHasherRef = *resultHasher;
@@ -365,7 +367,7 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
    resultHasher->tsv = tsv;
    queryExecutionConfig->resultProcessor = std::move(resultHasher);
    std::cerr << "executing:" << description << std::endl;
-
+   utility::PythonUtility::initialize();
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), session);
    executer->fromData(query);
    auto task = std::make_unique<execution::QueryExecutionTask>(std::move(executer), [&]() {
@@ -380,6 +382,7 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
       }
    });
    scheduler::awaitEntryTask(std::move(task));
+
 }
 } // namespace
 int main(int argc, char** argv) {
@@ -387,32 +390,7 @@ int main(int argc, char** argv) {
       printFeatures();
       return 0;
    }
-   Py_Initialize();
-   PyConfig config;
-   PyConfig_InitPythonConfig(&config);
-   PyStatus status;
-   status = PyConfig_Read(&config);
-   if (PyStatus_Exception(status)) {
-      throw std::runtime_error("Could not read python config");
-   }
-   config.module_search_paths_set = 1;
 
-   if (PyStatus_Exception(status)) {
-      throw std::runtime_error("Could not read python config");
-   }
-
-   PyObject* sysPath = PySys_GetObject("path");
-   PyObject* pyDirObj = PyUnicode_DecodeFSDefault("/home/bachmaier/projects/lingo-db/resources/data/uni-udf/udf");
-   PyList_Append(sysPath, pyDirObj);
-   Py_DECREF(pyDirObj);
-
-   if (PyStatus_Exception(status)) {
-      PyErr_Print();
-      throw std::runtime_error("Could not read python config");
-   }
-   PyConfig_Clear(&config);
-
-   PyThreadState* mainThreadState = PyEval_SaveThread();
 
    lingodb::compiler::support::eval::init();
    if (argc < 2 || argc > 3) {
@@ -459,10 +437,6 @@ int main(int argc, char** argv) {
          line += 2;
       }
    }
-
-   PyEval_RestoreThread(mainThreadState);
-
-   Py_FinalizeEx();
 
    return 0;
 }
