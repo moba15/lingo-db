@@ -146,7 +146,25 @@ AS $$
     return a+b
 $$ LANGUAGE plpython3u
 
+statement ok
+CREATE OR REPLACE FUNCTION addIntAndFloat(a int, b float4)
+RETURNS float4
+AS $$
+    return a+b
+$$ LANGUAGE plpython3u
+
 query 9
-select addint(1,10)
+select addint(i,1) from ints
 ----
-11
+2
+3
+4
+5
+
+query 9
+select addintandfloat(i,1.1) from ints
+----
+2.1
+3.1
+4.1
+5.1
