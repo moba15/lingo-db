@@ -22,6 +22,7 @@ struct PythonUDFRuntime {
    static uint64_t int32ToPythonInt(int32_t value);
    static uint64_t floatToPythonFloat(float value);
    static uint64_t doubleToPythonDouble(double value);
+   static uint64_t stringToPythonString(VarLen32 value);
 
    /***
     * IMPORTANT: This method call decref on the python object after conversion
@@ -35,6 +36,10 @@ struct PythonUDFRuntime {
     * IMPORTANT: This method call decref on the python object after conversion
     */
    static double pythonDoubleToDouble(uint64_t pyObj);
+   /***
+    * IMPORTANT: This method call decref on the python object after conversion
+    */
+   static VarLen32 pythonStringToString(uint64_t pyObj);
 };
 
 } // namespace lingodb::runtime
