@@ -2,6 +2,7 @@ name: build+test (macOS 15 aarch64)
 
 on:
   pull_request:
+  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
