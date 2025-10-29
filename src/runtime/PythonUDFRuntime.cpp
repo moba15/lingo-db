@@ -131,7 +131,6 @@ uint64_t PythonUDFRuntime::int32ToPythonInt(int32_t value) {
       throw std::runtime_error("Python not initialized");
    }
 }
-
 uint64_t PythonUDFRuntime::floatToPythonFloat(float value) {
    PyGuard pyGuard{};
    if (Py_IsInitialized()) {
@@ -156,6 +155,19 @@ uint64_t PythonUDFRuntime::doubleToPythonDouble(double value) {
       throw std::runtime_error("Python not initialized");
    }
 }
+uint64_t PythonUDFRuntime::stringToPythonString(VarLen32 value) {
+   PyGuard pyGuard{};
+   if (!Py_IsInitialized()) {
+      throw std::runtime_error("Python not initialized");
+   }
+   PyObject* pyValue = PyUnicode_FromString(value.str().c_str());
+   if (!pyValue) {
+      throw std::runtime_error("Could not convert double to python float");
+   }
+   return reinterpret_cast<uint64_t>(pyValue);
+}
+
+
 
 uint64_t PythonUDFRuntime::pythonLongToInt64(uint64_t pyObj) {
    PyGuard pyGuard{};
@@ -204,6 +216,28 @@ double PythonUDFRuntime::pythonDoubleToDouble(uint64_t pyObj) {
    } else {
       Py_DECREF(pValue);
       throw std::runtime_error("Provided object is not a python double");
+   }
+}
+VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
+   PyGuard pyGuard{};
+   if (!Py_IsInitialized()) {
+      throw std::runtime_error("Python not initialized");
+   }
+   PyObject* pValue = reinterpret_cast<PyObject*>(pyObj);
+   if (PyUnicode_Check(pValue)) {
+      PyObject* utf8 = PyUnicode_AsUTF8String(pValue);
+      if (!utf8) {
+         Py_DECREF(pValue);
+         throw std::runtime_error("Could not convert python string to utf8");
+      }
+      char* str = PyBytes_AsString(utf8);
+      VarLen32 result = VarLen32::fromString(std::string(str));
+      Py_DECREF(utf8);
+      Py_DECREF(pValue);
+      return result;
+   } else {
+      Py_DECREF(pValue);
+      throw std::runtime_error("Provided object is not a python string");
    }
 }
 } // namespace lingodb::runtime

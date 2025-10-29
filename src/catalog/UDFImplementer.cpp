@@ -143,6 +143,13 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          tempFile << code;
       }
 
+      char tempSoFileTemplate[] = "/tmp/py_udf_XXXXXX";
+      int soFd = mkstemp(tempSoFileTemplate);
+      if (soFd == -1) {
+         throw std::runtime_error("Failed to create temporary file.");
+      }
+
+
       std::vector<mlir::Value> pythonArgs;
       pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
       for (size_t i = 0; i < args.size(); i++) {
@@ -164,6 +171,11 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
                pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
+            case lingodb::catalog::LogicalTypeId::STRING: {
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "stringToPythonString", mlir::ValueRange({currentArg})).getResult(0);
+               break;
+            }
+
 
             default: throw std::runtime_error("The current type is not supported in python UDFs");
          }
@@ -194,6 +206,13 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
             finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::Float64Type::get(builder.getContext()), "pythonDoubleToDouble", mlir::ValueRange({pythonResult})).getResult(0);
             break;
          }
+         case lingodb::catalog::LogicalTypeId::CHAR:
+            //Do the same as with string for now
+         case lingodb::catalog::LogicalTypeId::STRING: {
+            finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), "pythonStringToString", mlir::ValueRange({pythonResult})).getResult(0);
+            break;
+         }
+
          default: throw std::runtime_error("The current return result type is not supported in python UDFs");
       }
 
