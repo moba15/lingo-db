@@ -5,6 +5,7 @@
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
+#include "lingodb/utility/PythonUtility.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
 
@@ -132,22 +133,11 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    PythonUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
 
    mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
-      std::string pythonPath = "";
-      if (!catalog->getDbDir().empty()) {
-         pythonPath = catalog->getDbDir() + "/udf/" + functionName + ".py";
-         std::filesystem::create_directories(catalog->getDbDir() + "/udf/");
-      }
-      if (!std::filesystem::exists(pythonPath)) {
-         std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
-
-         tempFile << code;
-      }
-
-      char tempSoFileTemplate[] = "/tmp/py_udf_XXXXXX";
-      int soFd = mkstemp(tempSoFileTemplate);
-      if (soFd == -1) {
-         throw std::runtime_error("Failed to create temporary file.");
-      }
+      std::string pythonPath = lingodb::utility::PythonUtility::pythonPath;
+      assert(!pythonPath.empty());
+      pythonPath = pythonPath + "/" + functionName + ".py";
+      std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
+      tempFile << code;
 
 
       std::vector<mlir::Value> pythonArgs;

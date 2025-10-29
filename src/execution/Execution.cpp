@@ -25,7 +25,7 @@
 #include <chrono>
 #include <sstream>
 #include <unordered_set>
-
+#include <Python.h>
 namespace {
 namespace utility = lingodb::utility;
 utility::GlobalSetting<std::string> executionModeSetting("system.execution_mode", "DEFAULT");
@@ -330,6 +330,9 @@ class DefaultQueryExecuter : public QueryExecuter {
       if (queryExecutionConfig->timingProcessor) {
          queryExecutionConfig->timingProcessor->process();
       }
+
+
+
    }
 };
 
