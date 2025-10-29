@@ -14,6 +14,7 @@
 
 #include "md5.h"
 
+#include <Python.h>
 namespace {
 using namespace lingodb;
 enum SortMode {
@@ -386,6 +387,32 @@ int main(int argc, char** argv) {
       printFeatures();
       return 0;
    }
+   Py_Initialize();
+   PyConfig config;
+   PyConfig_InitPythonConfig(&config);
+   PyStatus status;
+   status = PyConfig_Read(&config);
+   if (PyStatus_Exception(status)) {
+      throw std::runtime_error("Could not read python config");
+   }
+   config.module_search_paths_set = 1;
+
+   if (PyStatus_Exception(status)) {
+      throw std::runtime_error("Could not read python config");
+   }
+
+   PyObject* sysPath = PySys_GetObject("path");
+   PyObject* pyDirObj = PyUnicode_DecodeFSDefault("/home/bachmaier/projects/lingo-db/resources/data/uni-udf/udf");
+   PyList_Append(sysPath, pyDirObj);
+   Py_DECREF(pyDirObj);
+
+   if (PyStatus_Exception(status)) {
+      PyErr_Print();
+      throw std::runtime_error("Could not read python config");
+   }
+   PyConfig_Clear(&config);
+
+   PyThreadState* mainThreadState = PyEval_SaveThread();
 
    lingodb::compiler::support::eval::init();
    if (argc < 2 || argc > 3) {
@@ -432,6 +459,10 @@ int main(int argc, char** argv) {
          line += 2;
       }
    }
+
+   PyEval_RestoreThread(mainThreadState);
+
+   Py_FinalizeEx();
 
    return 0;
 }

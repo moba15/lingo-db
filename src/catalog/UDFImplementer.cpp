@@ -142,7 +142,7 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
 
          tempFile << code;
       }
-      Py_Initialize();
+
       std::vector<mlir::Value> pythonArgs;
       pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
       for (size_t i = 0; i < args.size(); i++) {
@@ -151,59 +151,56 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          switch (argumentTypes[i].getTypeId()) {
             case lingodb::catalog::LogicalTypeId::INT: {
                auto s = mlir::dyn_cast<mlir::IntegerType>(currentArg.getType()).getWidth();
-               if (s==32) {
-                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "int32ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
-               } else if (s==64){
-                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "int64ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+               if (s == 32) {
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "int32ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+               } else if (s == 64) {
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "int64ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
                } else {
                   throw std::runtime_error("The current type is not supported in python UDFs");
                }
                break;
-
             }
             case lingodb::catalog::LogicalTypeId::DOUBLE: {
-               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
-
 
             default: throw std::runtime_error("The current type is not supported in python UDFs");
          }
          pythonArgs.push_back(pythonArg);
       }
 
-      //String const
-      auto tmp = builder.getStringAttr(functionName);
       auto mlirReturnType = returnType.getMLIRTypeCreator()->createType(builder.getContext());
-
-      //Create string
 
       std::string runtimeName = "callPythonUdf";
       runtimeName += std::to_string(argumentTypes.size());
-
       auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), runtimeName, pythonArgs).getResult(0);
 
-
       //Now convert back
+      mlir::Value finalResult;
       switch (returnType.getTypeId()) {
          case lingodb::catalog::LogicalTypeId::INT: {
             auto s = mlir::dyn_cast<mlir::IntegerType>(mlirReturnType).getWidth();
-            if (s==32) {
-               return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 32), "pythonIntToInt32", mlir::ValueRange({pythonResult})).getResult(0);
-            } else if (s==64){
-               return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 64), "pythonLongToInt64", mlir::ValueRange({pythonResult})).getResult(0);
+            if (s == 32) {
+               finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "pythonIntToInt32", mlir::ValueRange({pythonResult})).getResult(0);
+            } else if (s == 64) {
+               finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "pythonLongToInt64", mlir::ValueRange({pythonResult})).getResult(0);
             } else {
                throw std::runtime_error("The current type is not supported in python UDFs");
             }
+            break;
          }
          case lingodb::catalog::LogicalTypeId::DOUBLE: {
-            return builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::Float64Type::get(builder.getContext()), "pythonDoubleToDouble", mlir::ValueRange({pythonResult})).getResult(0);
+            finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::Float64Type::get(builder.getContext()), "pythonDoubleToDouble", mlir::ValueRange({pythonResult})).getResult(0);
+            break;
          }
-            default: throw std::runtime_error("The current return result type is not supported in python UDFs");
+         default: throw std::runtime_error("The current return result type is not supported in python UDFs");
       }
 
-   }
+      //builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 1), "finalyzePythonInterpreter", mlir::ValueRange({})).getResult(0);
 
+      return finalResult;
+   }
 };
 
 } //namespace
@@ -227,6 +224,70 @@ std::shared_ptr<catalog::MLIRUDFImplementor> createCUDFImplementer(std::string f
 
 std::shared_ptr<catalog::MLIRUDFImplementor> createPythonUDFImplementer(std::string funcName, std::string cCode, std::vector<catalog::Type> argumentTypes, catalog::Type returnType) {
    return std::make_shared<PythonUDFImplementer>(funcName, cCode, argumentTypes, returnType);
+}
+
+int main(int argc, char* argv[]) {
+   PyObject *pName, *pModule, *pFunc;
+   PyObject *pArgs, *pValue;
+   int i;
+
+   if (argc < 3) {
+      fprintf(stderr, "Usage: call pythonfile funcname [args]\n");
+      return 1;
+   }
+
+   Py_Initialize();
+   pName = PyUnicode_DecodeFSDefault(argv[1]);
+   /* Error checking of pName left out */
+
+   pModule = PyImport_Import(pName);
+   Py_DECREF(pName);
+
+   if (pModule != NULL) {
+      pFunc = PyObject_GetAttrString(pModule, argv[2]);
+      /* pFunc is a new reference */
+
+      if (pFunc && PyCallable_Check(pFunc)) {
+         pArgs = PyTuple_New(argc - 3);
+         for (i = 0; i < argc - 3; ++i) {
+            pValue = PyLong_FromLong(atoi(argv[i + 3]));
+            if (!pValue) {
+               Py_DECREF(pArgs);
+               Py_DECREF(pModule);
+               fprintf(stderr, "Cannot convert argument\n");
+               return 1;
+            }
+            /* pValue reference stolen here: */
+            PyTuple_SetItem(pArgs, i, pValue);
+         }
+         pValue = PyObject_CallObject(pFunc, pArgs);
+         Py_DECREF(pArgs);
+         if (pValue != NULL) {
+            printf("Result of call: %ld\n", PyLong_AsLong(pValue));
+            Py_DECREF(pValue);
+         } else {
+            Py_DECREF(pFunc);
+            Py_DECREF(pModule);
+            PyErr_Print();
+            fprintf(stderr, "Call failed\n");
+            return 1;
+         }
+      } else {
+         if (PyErr_Occurred())
+            PyErr_Print();
+         fprintf(stderr, "Cannot find function \"%s\"\n", argv[2]);
+      }
+      Py_XDECREF(pFunc);
+      Py_DECREF(pModule);
+   } else {
+      PyErr_Print();
+      fprintf(stderr, "Failed to load \"%s\"\n", argv[1]);
+      return 1;
+   }
+   if (Py_FinalizeEx() < 0) {
+      return 120;
+   }
+   return 0;
 }
 
 } // namespace lingodb::compiler::frontend
