@@ -8,8 +8,9 @@
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
-#include "lingodb/compiler/runtime/UDFRuntime.h"
+#include "lingodb/compiler/runtime/PythonUDFRuntime.h"
 #include "lingodb/runtime/DateRuntime.h"
+#include "lingodb/runtime/PythonUDFRuntime.h"
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
 
@@ -331,15 +332,15 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
-   builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::callPythonUDF2);
-   builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::callPythonUDF4);
-   builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int64ToPythonLong);
-   builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::int32ToPythonInt);
-   builtinRegistry->add("doubleToPythonDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::doubleToPythonDouble);
+   builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF2);
+   builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF4);
+   builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::int64ToPythonLong);
+   builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::int32ToPythonInt);
+   builtinRegistry->add("doubleToPythonDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::doubleToPythonDouble);
 
-   builtinRegistry->add("pythonLongToInt64").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(UDFRuntime::pythonLongToInt64);
-   builtinRegistry->add("pythonIntToInt32").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(UDFRuntime::pythonIntToInt32);
-   builtinRegistry->add("pythonDoubleToDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsF64).implementedAs(UDFRuntime::pythonDoubleToDouble);
+   builtinRegistry->add("pythonLongToInt64").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::pythonLongToInt64);
+   builtinRegistry->add("pythonIntToInt32").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::pythonIntToInt32);
+   builtinRegistry->add("pythonDoubleToDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsF64).implementedAs(PythonUDFRuntime::pythonDoubleToDouble);
 
    builtinRegistry->add("AbsInt").handlesInvalid().matchesTypes({RuntimeFunction::intLike}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);
    builtinRegistry->add("AbsDecimal").handlesInvalid().matchesTypes({RuntimeFunction::anyDecimal}, RuntimeFunction::matchesArgument()).implementedAs(absImpl);

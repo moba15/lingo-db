@@ -197,8 +197,6 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          default: throw std::runtime_error("The current return result type is not supported in python UDFs");
       }
 
-      //builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc,  mlir::IntegerType::get(builder.getContext(), 1), "finalyzePythonInterpreter", mlir::ValueRange({})).getResult(0);
-
       return finalResult;
    }
 };
