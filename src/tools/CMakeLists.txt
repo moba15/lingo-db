@@ -17,9 +17,14 @@ set_target_properties(sql PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DI
 target_compile_definitions(sql PRIVATE ${COMPILE_DEFS})
 
 add_executable(sqlite-tester sqlite-tester.cpp)
-target_link_libraries(sqlite-tester runner runtime utility mlir-support scheduler)
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+target_link_libraries(sqlite-tester runner runtime utility mlir-support scheduler Python3::Python)
 set_target_properties(sqlite-tester PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
-target_compile_definitions(sqlite-tester PRIVATE ${COMPILE_DEFS})
+
+target_compile_definitions(sqlite-tester PRIVATE  ${COMPILE_DEFS} )
+
+
+
 
 # mlir-db-opt
 add_executable(mlir-db-opt mlir-opt.cpp)
