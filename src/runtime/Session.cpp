@@ -9,8 +9,8 @@ std::shared_ptr<lingodb::catalog::Catalog> lingodb::runtime::Session::getCatalog
 }
 
 std::shared_ptr<lingodb::runtime::Session> lingodb::runtime::Session::createSession() {
-   return std::make_shared<Session>(catalog::Catalog::createEmpty());
+   return std::make_shared<Session>(catalog::Catalog::createEmpty(), utility::PythonUtility::initialize());
 }
 std::shared_ptr<lingodb::runtime::Session> lingodb::runtime::Session::createSession(std::string dbDir, bool eagerLoading) {
-   return std::make_shared<Session>(catalog::Catalog::create(dbDir, eagerLoading));
+   return std::make_shared<Session>(catalog::Catalog::create(dbDir, eagerLoading), utility::PythonUtility::initialize());
 }
