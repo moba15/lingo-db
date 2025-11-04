@@ -4,6 +4,12 @@
 
 #include <Python.h>
 namespace lingodb::utility {
+struct PythonInitializerGuard {
+   PythonInitializerGuard(PyThreadState* mainThreadState);
+   ~PythonInitializerGuard();
+   private:
+   PyThreadState* mainThreadState;
+};
  PythonInitializerGuard::PythonInitializerGuard(PyThreadState* mainThreadState): mainThreadState(mainThreadState){
 }
 PythonInitializerGuard::~PythonInitializerGuard(){
@@ -12,9 +18,9 @@ PythonInitializerGuard::~PythonInitializerGuard(){
     mainThreadState = nullptr;
     Py_FinalizeEx();
 }
-std::unique_ptr<PythonInitializerGuard> PythonUtility::guard = nullptr;
+std::shared_ptr<PythonInitializerGuard> PythonUtility::guard = nullptr;
 std::string PythonUtility::pythonPath = "";
-std::unique_ptr<PythonInitializerGuard>& PythonUtility::initialize(){
+std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize(){
    if (guard) {
       return guard;
    }
@@ -53,7 +59,7 @@ std::unique_ptr<PythonInitializerGuard>& PythonUtility::initialize(){
    } else {
       throw std::runtime_error("Python is already initialized");
    }
-   guard = std::make_unique<PythonInitializerGuard>(PyEval_SaveThread());
+   guard = std::make_shared<PythonInitializerGuard>(PyEval_SaveThread());
    return guard;
 
 }
