@@ -368,7 +368,7 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
    resultHasher->tsv = tsv;
    queryExecutionConfig->resultProcessor = std::move(resultHasher);
    std::cerr << "executing:" << description << std::endl;
-   utility::PythonUtility::initialize();
+
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), session);
    executer->fromData(query);
    auto task = std::make_unique<execution::QueryExecutionTask>(std::move(executer), [&]() {
@@ -397,13 +397,13 @@ int main(int argc, char** argv) {
       exit(1);
    }
 
-   lingodb::wasm::WASM::initializeWASM();
    std::shared_ptr<runtime::Session> session;
    if (argc == 3) {
       session = runtime::Session::createSession(std::string(argv[2]), true);
    } else {
       session = runtime::Session::createSession();
    }
+   lingodb::wasm::WASM::initializeWASM();
    auto scheduler = scheduler::startScheduler();
    auto lines = filterLines(readTestFile(argv[1]));
    size_t line = 0;

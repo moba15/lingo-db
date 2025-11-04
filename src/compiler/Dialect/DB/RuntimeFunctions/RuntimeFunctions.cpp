@@ -333,6 +333,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
+   builtinRegistry->add("callPythonUdf0").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF0);
    builtinRegistry->add("callPythonUdf1").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF1);
    builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF2);
    builtinRegistry->add("callPythonUdf3").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF3);

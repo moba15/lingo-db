@@ -136,12 +136,8 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    PythonUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
 
    mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
-      auto wasmContext = lingodb::wasm::WASM::context;
+      auto wasmContext = lingodb::wasm::WASM::wasmSession;
       wasm_runtime_init_thread_env();
-      assert(wasmContext);
-      auto results = lingodb::wasm::WASM::call_py_func<char*>(wasmContext->exec_env, wasmContext->module_inst, "Py_GetVersion");
-      std::string python_version{std::bit_cast<char*>(wasm_runtime_addr_app_to_native(wasmContext->module_inst, results[0].of.i32))};
-      std::cout << std::format("Python version: {}\n", python_version);
 
       std::string pythonPath = lingodb::utility::PythonUtility::pythonPath;
       assert(!pythonPath.empty());

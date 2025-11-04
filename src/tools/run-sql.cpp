@@ -31,11 +31,6 @@ int main(int argc, char** argv) {
 
    auto wasmContext = lingodb::wasm::WASM::initializeWASM();
 
-   assert(wasmContext);
-   auto results = lingodb::wasm::WASM::call_py_func<char*>(wasmContext->exec_env, wasmContext->module_inst, "Py_GetVersion");
-   std::string python_version{std::bit_cast<char*>(wasm_runtime_addr_app_to_native(wasmContext->module_inst, results[0].of.i32))};
-   std::cout << std::format("Python version: {}\n", python_version);
-
    auto session = runtime::Session::createSession(directory, eagerLoading.getValue());
 
    lingodb::compiler::support::eval::init();

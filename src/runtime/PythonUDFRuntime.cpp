@@ -1,4 +1,7 @@
 #include "lingodb/runtime/PythonUDFRuntime.h"
+
+#include "lingodb/runtime/WASM.h"
+
 #include <iostream>
 #include <Python.h>
 namespace lingodb::runtime {
@@ -10,6 +13,21 @@ class PyGuard {
    private:
    PyGILState_STATE gstate;
 };
+
+template <unsigned SIZE>
+uint64_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<uint64_t, SIZE> args) {
+   if (wasm_runtime_thread_env_inited()) {
+      auto wasmContext = lingodb::wasm::WASM::wasmSession;
+      auto results = wasmContext->call_py_func<char*>("Py_GetVersion");
+      std::string python_version{std::bit_cast<char*>(wasm_runtime_addr_app_to_native(wasmContext->moduleInst, results[0].of.i32))};
+      std::cout << std::format("Python2 version: {}\n", python_version);
+
+   } else {
+      throw std::runtime_error("WASM not initialized");
+   }
+   return 0;
+}
+
 template <unsigned SIZE>
 uint64_t PythonUDFRuntime::callPythonUDF(std::string fnName, std::array<uint64_t, SIZE> args) {
    PyGuard pyGuard{};
@@ -64,6 +82,10 @@ uint64_t PythonUDFRuntime::callPythonUDF(std::string fnName, std::array<uint64_t
    } else {
       throw std::runtime_error("Python not initialized");
    }
+}
+
+uint64_t PythonUDFRuntime::callPythonUDF0(VarLen32 fnName) {
+   return callPythonUDF<1>(fnName.str(), {});
 }
 
 uint64_t PythonUDFRuntime::callPythonUDF1(VarLen32 fnName, uint64_t arg) {

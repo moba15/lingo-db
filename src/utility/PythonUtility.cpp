@@ -1,8 +1,13 @@
 #include "lingodb/utility/PythonUtility.h"
 
+#include "bh_read_file.h"
+#include "wasm_runtime_common.h"
+
 #include <stdexcept>
 
 #include <Python.h>
+#include <iostream>
+
 namespace lingodb::utility {
 struct PythonInitializerGuard {
    PythonInitializerGuard(PyThreadState* mainThreadState);
@@ -31,6 +36,7 @@ std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize() {
       throw std::runtime_error("Failed to create temporary directory.");
    }
    pythonPath = std::string(dirName);
+
    //Init python
    if (!Py_IsInitialized()) {
       Py_Initialize();
@@ -61,6 +67,10 @@ std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize() {
    }
    guard = std::make_shared<PythonInitializerGuard>(PyEval_SaveThread());
    return guard;
+}
+std::shared_ptr<WASMSession> PythonUtility::wasmSession = nullptr;
+std::weak_ptr<WASMSession> PythonUtility::initializeWithWasm() {
+   throw std::runtime_error("Not impl");
 }
 
 } // namespace lingodb::utility
