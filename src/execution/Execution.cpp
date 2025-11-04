@@ -242,6 +242,8 @@ class DefaultQueryExecuter : public QueryExecuter {
             exit(1);                                                   \
          } else {                                                      \
             error->emit() << e.getMessage();                           \
+            if (phase == "FRONTEND")                                   \
+               error->setErrorType(Error::ErrorType::frontend);        \
             return;                                                    \
          }                                                             \
       }                                                                \

@@ -416,7 +416,11 @@ int main(int argc, char** argv) {
       if (parts[0] == "statement") {
          try {
             runStatement(*session, lines, line, [&](execution::Error& error) {
-               if (parts.size() > 1 && parts[1] == "error") {
+               if (parts.size() > 1 && parts[1] == "frontend-error") {
+                  if (error.getErrorType() != execution::Error::ErrorType::frontend) {
+                     std::cerr << "ERROR: expected frontend error but got '" << error.getMessage() << "'" << std::endl;
+                     std::cerr << "while executing statement: " << lines[line] << std::endl;
+                  }
                   //Error allowed
                   if (parts.size() > 2) {
                      std::string expectedError = parts[2];
