@@ -4,25 +4,29 @@
 
 namespace lingodb::runtime {
 struct PythonUDFRuntime {
-   template<unsigned SIZE>
+   using PyObjectPtr = uint32_t;
+   template <unsigned SIZE>
    static uint64_t callPythonUDF(std::string fnName, std::array<uint64_t, SIZE> args);
+   template <unsigned SIZE>
+   static uint32_t callPythonWASMUDF(std::string fnName, std::array<PyObjectPtr, SIZE> args);
 
-   static uint64_t callPythonUDF1(VarLen32 fnName, uint64_t arg);
-   static uint64_t callPythonUDF2(VarLen32 fnName, uint64_t arg, uint64_t arg1);
-   static uint64_t callPythonUDF3(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2);
-   static uint64_t callPythonUDF4(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3);
-   static uint64_t callPythonUDF5(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4);
-   static uint64_t callPythonUDF6(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5);
-   static uint64_t callPythonUDF7(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6);
-   static uint64_t callPythonUDF8(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7);
-   static uint64_t callPythonUDF9(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t arg8);
-   static uint64_t callPythonUDF10(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t arg8, uint64_t arg9);
+   static uint32_t callPythonUDF0(VarLen32 fnName);
+   static uint32_t callPythonUDF1(VarLen32 fnName, PyObjectPtr arg);
+   static uint32_t callPythonUDF2(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1);
+   static uint32_t callPythonUDF3(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2);
+   static uint32_t callPythonUDF4(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3);
+   static uint32_t callPythonUDF5(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4);
+   static uint32_t callPythonUDF6(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5);
+   static uint32_t callPythonUDF7(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6);
+   static uint32_t callPythonUDF8(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7);
+   static uint32_t callPythonUDF9(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7, PyObjectPtr arg8);
+   static uint32_t callPythonUDF10(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7, PyObjectPtr arg8, PyObjectPtr arg9);
 
-   static uint64_t int64ToPythonLong(int64_t value);
-   static uint64_t int32ToPythonInt(int32_t value);
-   static uint64_t floatToPythonFloat(float value);
-   static uint64_t doubleToPythonDouble(double value);
-   static uint64_t stringToPythonString(VarLen32 value);
+   static PyObjectPtr int64ToPythonLong(int64_t value);
+   static PyObjectPtr int32ToPythonInt(int32_t value);
+   static PyObjectPtr floatToPythonFloat(float value);
+   static PyObjectPtr doubleToPythonDouble(double value);
+   static PyObjectPtr stringToPythonString(VarLen32 value);
 
    /***
     * IMPORTANT: This method call decref on the python object after conversion
@@ -35,7 +39,7 @@ struct PythonUDFRuntime {
    /***
     * IMPORTANT: This method call decref on the python object after conversion
     */
-   static double pythonDoubleToDouble(uint64_t pyObj);
+   static double pythonDoubleToDouble(uint32_t pyObj);
    /***
     * IMPORTANT: This method call decref on the python object after conversion
     */

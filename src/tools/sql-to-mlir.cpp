@@ -8,6 +8,7 @@
 #include "lingodb/compiler/frontend/sql_analyzer.h"
 #include "lingodb/compiler/frontend/sql_mlir_translator.h"
 #include "lingodb/runtime/Session.h"
+#include "lingodb/runtime/WASM.h"
 
 #include "mlir/IR/BuiltinDialect.h"
 
@@ -84,6 +85,7 @@ int main(int argc, char** argv) {
       std::string dbDir = std::string(argv[2]);
       catalog = lingodb::catalog::Catalog::create(dbDir, false);
    }
+   lingodb::wasm::WASM::initializeWASM(catalog);
    std::ifstream istream{filename};
    std::stringstream buffer;
    buffer << istream.rdbuf();

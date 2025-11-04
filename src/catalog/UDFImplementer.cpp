@@ -1,10 +1,12 @@
 #include "lingodb/compiler/frontend/UDFImplementer.h"
 
+#include "bh_read_file.h"
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
+#include "lingodb/runtime/WASM.h"
 #include "lingodb/utility/PythonUtility.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
@@ -119,6 +121,7 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          func = builder.create<mlir::func::FuncOp>(loc, functionName, funcType);
          func.setPrivate();
       }
+
       return builder.create<mlir::func::CallOp>(builder.getUnknownLoc(), func, args).getResult(0);
    }
 };
@@ -135,10 +138,9 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
       std::string pythonPath = lingodb::utility::PythonUtility::pythonPath;
       assert(!pythonPath.empty());
-      pythonPath = pythonPath + "/" + functionName + ".py";
+      pythonPath = pythonPath + "/lingodb_udf_" + functionName + ".py";
       std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
       tempFile << code;
-
 
       std::vector<mlir::Value> pythonArgs;
       pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
@@ -149,23 +151,22 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
             case lingodb::catalog::LogicalTypeId::INT: {
                auto s = mlir::dyn_cast<mlir::IntegerType>(currentArg.getType()).getWidth();
                if (s == 32) {
-                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "int32ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "int32ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
                } else if (s == 64) {
-                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "int64ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
+                  pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "int64ToPythonInt", mlir::ValueRange({currentArg})).getResult(0);
                } else {
                   throw std::runtime_error("The current type is not supported in python UDFs");
                }
                break;
             }
             case lingodb::catalog::LogicalTypeId::DOUBLE: {
-               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
             case lingodb::catalog::LogicalTypeId::STRING: {
-               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "stringToPythonString", mlir::ValueRange({currentArg})).getResult(0);
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "stringToPythonString", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
-
 
             default: throw std::runtime_error("The current type is not supported in python UDFs");
          }
@@ -176,7 +177,7 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
 
       std::string runtimeName = "callPythonUdf";
       runtimeName += std::to_string(argumentTypes.size());
-      auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), runtimeName, pythonArgs).getResult(0);
+      auto pythonResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), runtimeName, pythonArgs).getResult(0);
 
       //Now convert back
       mlir::Value finalResult;

@@ -1,6 +1,10 @@
 #include "lingodb/runtime/PythonUDFRuntime.h"
+
+#include "lingodb/runtime/WASM.h"
+#include "lingodb/runtime/WASM.h"
 #include <iostream>
 #include <Python.h>
+#include <thread>
 namespace lingodb::runtime {
 class PyGuard {
    public:
@@ -10,7 +14,59 @@ class PyGuard {
    private:
    PyGILState_STATE gstate;
 };
-template<unsigned SIZE>
+
+template <unsigned SIZE>
+uint32_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyObjectPtr, SIZE> args) {
+   wasm_runtime_init_thread_env();
+   if (wasm_runtime_thread_env_inited()) {
+      auto wasmSession = lingodb::wasm::WASM::wasmSession;
+      assert(wasmSession);
+      if (!wasmSession->call_py_func2<bool>("Py_IsInitialized")) {
+         throw std::runtime_error{"Py_IsInitialized"};
+      };
+      auto pArgs = wasmSession->call_py_func<PyObjectPtr>("PyTuple_New", args.size()).at(0).of.i32;
+      if (!pArgs) {
+         throw std::runtime_error{"Could not create python tuple"};
+      }
+      for (size_t i = 0; i < SIZE; i++) {
+         if (wasmSession->call_py_func2<int>("PyTuple_SetItem", pArgs, i, args[i]) != 0)  {
+            throw std::runtime_error{"Could not add argument to python tuple"};
+         }
+      }
+      //TODO change to use one buffer instead of recreating every time
+      uint32_t fNameWasmStr = static_cast<uint32_t>(wasmSession->createWasmStringBuffer("lingodb_udf_" + fnName));
+      auto pName = wasmSession->call_py_func2<PyObjectPtr>("PyUnicode_DecodeFSDefault", fNameWasmStr);
+      if (!pName) {
+         wasmSession->call_py_func<void>("PyErr_Print");
+         throw std::runtime_error{"Failed PyUnicode_DecodeFSDefault"};
+      }
+      auto pModule = wasmSession->call_py_func2<PyObjectPtr>("PyImport_Import", pName);
+      if (!pModule) {
+         wasmSession->call_py_func<void>("PyErr_Print");
+         throw std::runtime_error{"Module not found"};
+      }
+      uint32_t fNameWasmStr2 = static_cast<uint32_t>(wasmSession->createWasmStringBuffer(fnName));
+      auto pFunc = wasmSession->call_py_func2<PyObjectPtr>("PyObject_GetAttrString", pModule, fNameWasmStr2);
+      if (!pFunc || !wasmSession->call_py_func2<bool>("PyCallable_Check", pFunc)) {
+         wasmSession->call_py_func<void>("PyErr_Print");
+         throw std::runtime_error{"Function is not callable or null"};
+      }
+
+      PyObjectPtr resultObj = wasmSession->call_py_func2<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs);
+      if (!resultObj) {
+         wasmSession->call_py_func<void>("PyErr_Print");
+         throw std::runtime_error{"Error calling python method"};
+      }
+
+      return resultObj;
+
+   } else {
+      throw std::runtime_error("WASM not initialized");
+   }
+   return 0;
+}
+
+template <unsigned SIZE>
 uint64_t PythonUDFRuntime::callPythonUDF(std::string fnName, std::array<uint64_t, SIZE> args) {
    PyGuard pyGuard{};
    if (Py_IsInitialized()) {
@@ -66,96 +122,95 @@ uint64_t PythonUDFRuntime::callPythonUDF(std::string fnName, std::array<uint64_t
    }
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF1(VarLen32 fnName, uint64_t arg) {
-   return callPythonUDF<1>(fnName.str(), {arg});
+uint32_t PythonUDFRuntime::callPythonUDF0(VarLen32 fnName) {
+   return callPythonWASMUDF<0>(fnName.str(), {});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF2(VarLen32 fnName, uint64_t arg, uint64_t arg1) {
-   return callPythonUDF<2>(fnName.str(), {arg, arg1});
+uint32_t PythonUDFRuntime::callPythonUDF1(VarLen32 fnName, PyObjectPtr arg) {
+   return callPythonWASMUDF<1>(fnName.str(), {arg});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF3(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2) {
-   return callPythonUDF<3>(fnName.str(), {arg, arg1, arg2});
+uint32_t PythonUDFRuntime::callPythonUDF2(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1) {
+   return callPythonWASMUDF<2>(fnName.str(), {arg, arg1});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF4(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3) {
-   return callPythonUDF<4>(fnName.str(), {arg, arg1, arg2, arg3});
+uint32_t PythonUDFRuntime::callPythonUDF3(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2) {
+   return callPythonWASMUDF<3>(fnName.str(), {arg, arg1, arg2});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF5(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4) {
-   return callPythonUDF<5>(fnName.str(), {arg, arg1, arg2, arg3, arg4});
+uint32_t PythonUDFRuntime::callPythonUDF4(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3) {
+   return callPythonWASMUDF<4>(fnName.str(), {arg, arg1, arg2, arg3});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF6(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5) {
-   return callPythonUDF<6>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5});
+uint32_t PythonUDFRuntime::callPythonUDF5(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4) {
+   return callPythonWASMUDF<5>(fnName.str(), {arg, arg1, arg2, arg3, arg4});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF7(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6) {
-   return callPythonUDF<7>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6});
+uint32_t PythonUDFRuntime::callPythonUDF6(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5) {
+   return callPythonWASMUDF<6>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF8(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7) {
-   return callPythonUDF<8>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7});
+uint32_t PythonUDFRuntime::callPythonUDF7(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6) {
+   return callPythonWASMUDF<7>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF9(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t arg8) {
-   return callPythonUDF<9>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8});
+uint32_t PythonUDFRuntime::callPythonUDF8(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7) {
+   return callPythonWASMUDF<8>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7});
 }
 
-uint64_t PythonUDFRuntime::callPythonUDF10(VarLen32 fnName, uint64_t arg, uint64_t arg1, uint64_t arg2, uint64_t arg3, uint64_t arg4, uint64_t arg5, uint64_t arg6, uint64_t arg7, uint64_t arg8, uint64_t arg9) {
-   return callPythonUDF<10>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9});
+uint32_t PythonUDFRuntime::callPythonUDF9(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7, PyObjectPtr arg8) {
+   return callPythonWASMUDF<9>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8});
 }
 
+uint32_t PythonUDFRuntime::callPythonUDF10(VarLen32 fnName, PyObjectPtr arg, PyObjectPtr arg1, PyObjectPtr arg2, PyObjectPtr arg3, PyObjectPtr arg4, PyObjectPtr arg5, PyObjectPtr arg6, PyObjectPtr arg7, PyObjectPtr arg8, PyObjectPtr arg9) {
+   return callPythonWASMUDF<10>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9});
+}
 
-uint64_t PythonUDFRuntime::int64ToPythonLong(int64_t value) {
-   PyGuard pyGuard{};
-   if (Py_IsInitialized()) {
-      PyObject* pyValue = PyLong_FromLongLong(value);
-      if (!pyValue) {
-         throw std::runtime_error("Could not convert long to python int");
-      }
-      return reinterpret_cast<uint64_t>(pyValue);
-   } else {
-      throw std::runtime_error("Python not initialized");
+PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::int64ToPythonLong(int64_t value) {
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func2<PyObjectPtr>("PyLong_FromLongLong", value);
+}
+PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::int32ToPythonInt(int32_t value) {
+   while (!wasm_runtime_thread_env_inited()) {
+      wasm_runtime_init_thread_env();
    }
+   assert(wasm_runtime_thread_env_inited());
+   std::cerr << "ThreadID" << std::this_thread::get_id() << std::endl;
+   auto wasmSession = wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func2<PyObjectPtr>("PyLong_FromLong", value);
 }
-uint64_t PythonUDFRuntime::int32ToPythonInt(int32_t value) {
-   PyGuard pyGuard{};
-   if (Py_IsInitialized()) {
-      PyObject* pyValue = PyLong_FromLong(value);
-      if (!pyValue) {
-         throw std::runtime_error("Could not convert long to python int");
-      }
-      return reinterpret_cast<uint64_t>(pyValue);
-   } else {
-      throw std::runtime_error("Python not initialized");
+PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) {
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func2<PyObjectPtr>("PyFloat_FromDouble", value);
+}
+PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::doubleToPythonDouble(double value) {
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   double x = 845848.2;
+   auto p = wasmSession->call_py_func<PyObjectPtr>("PyFloat_FromDouble", x).at(0).of.i32;
+   if (!p) {
+      throw std::runtime_error("sf");
    }
-}
-uint64_t PythonUDFRuntime::floatToPythonFloat(float value) {
-   PyGuard pyGuard{};
-   if (Py_IsInitialized()) {
-      PyObject* pyValue = PyFloat_FromDouble(value);
-      if (!pyValue) {
-         throw std::runtime_error("Could not convert float to python float");
-      }
-      return reinterpret_cast<uint64_t>(pyValue);
-   } else {
-      throw std::runtime_error("Python not initialized");
+   auto p2 = wasmSession->call_py_func<int64_t>("PyFloat_AsDouble", p).at(0).of.i64;
+   auto e = wasmSession->call_py_func<PyObjectPtr>("PyErr_Occurred");
+   if (e.at(0).of.i32) {
+      std::cerr << "Error";
    }
+   std::cerr << std::bit_cast<double>(p2) << std::endl;
+   return p;
 }
-uint64_t PythonUDFRuntime::doubleToPythonDouble(double value) {
-   PyGuard pyGuard{};
-   if (Py_IsInitialized()) {
-      PyObject* pyValue = PyFloat_FromDouble(value);
-      if (!pyValue) {
-         throw std::runtime_error("Could not convert double to python float");
-      }
-      return reinterpret_cast<uint64_t>(pyValue);
-   } else {
-      throw std::runtime_error("Python not initialized");
-   }
-}
-uint64_t PythonUDFRuntime::stringToPythonString(VarLen32 value) {
+PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::stringToPythonString(VarLen32 value) {
+   throw std::runtime_error("Not impl");
    PyGuard pyGuard{};
    if (!Py_IsInitialized()) {
       throw std::runtime_error("Python not initialized");
@@ -167,58 +222,31 @@ uint64_t PythonUDFRuntime::stringToPythonString(VarLen32 value) {
    return reinterpret_cast<uint64_t>(pyValue);
 }
 
-
-
 uint64_t PythonUDFRuntime::pythonLongToInt64(uint64_t pyObj) {
-   PyGuard pyGuard{};
-   if (!Py_IsInitialized()) {
-      throw std::runtime_error("Python not initialized");
-   }
-   PyObject* pValue = reinterpret_cast<PyObject*>(pyObj);
-   if (PyLong_Check(pValue)) {
-      int64_t value = PyLong_AsLongLong(pValue);
-      Py_DECREF(pValue);
-      return value;
-   } else {
-      Py_DECREF(pValue);
-      throw std::runtime_error("Provided object is not a python long");
-   }
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func2<uint64_t>("PyLong_AsLongLong", pyObj);
 }
 int32_t PythonUDFRuntime::pythonIntToInt32(uint64_t pyObj) {
-   PyGuard pyGuard{};
-   if (!Py_IsInitialized()) {
-      throw std::runtime_error("Python not initialized");
-   }
-   PyObject* pValue = reinterpret_cast<PyObject*>(pyObj);
-   if (PyLong_Check(pValue)) {
-      int32_t value = PyLong_AsLong(pValue);
-      Py_DECREF(pValue);
-      return value;
-   } else {
-      Py_DECREF(pValue);
-      throw std::runtime_error("Provided object is not a python long");
-   }
+
+wasm_runtime_init_thread_env();
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func2<int32_t>("PyLong_AsLong", pyObj);
 }
-double PythonUDFRuntime::pythonDoubleToDouble(uint64_t pyObj) {
-   PyGuard pyGuard{};
-   if (!Py_IsInitialized()) {
-      throw std::runtime_error("Python not initialized");
-   }
-   PyObject* pValue = reinterpret_cast<PyObject*>(pyObj);
-   if (PyFloat_Check(pValue)) {
-      double value = PyFloat_AsDouble(pValue);
-      Py_DECREF(pValue);
-      return value;
-   } else if (PyLong_Check(pValue)) {
-      long value = PyLong_AsLong(pValue);
-      Py_DECREF(pValue);
-      return static_cast<double>(value);
-   } else {
-      Py_DECREF(pValue);
-      throw std::runtime_error("Provided object is not a python double");
-   }
+double PythonUDFRuntime::pythonDoubleToDouble(uint32_t pyObj) {
+   assert(wasm_runtime_thread_env_inited());
+   auto wasmSession = lingodb::wasm::WASM::wasmSession;
+   assert(wasmSession);
+   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   return wasmSession->call_py_func<float64_t>("PyFloat_AsDouble", pyObj).at(0).of.f64;
 }
 VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
+   throw std::runtime_error("Not impl");
    PyGuard pyGuard{};
    if (!Py_IsInitialized()) {
       throw std::runtime_error("Python not initialized");

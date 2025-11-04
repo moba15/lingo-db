@@ -12,8 +12,9 @@
 #include <regex>
 #include <string>
 
-#include "md5.h"
+#include "lingodb/runtime/WASM.h"
 #include "lingodb/utility/PythonUtility.h"
+#include "md5.h"
 
 #include <Python.h>
 namespace {
@@ -367,7 +368,7 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
    resultHasher->tsv = tsv;
    queryExecutionConfig->resultProcessor = std::move(resultHasher);
    std::cerr << "executing:" << description << std::endl;
-   utility::PythonUtility::initialize();
+
    auto executer = execution::QueryExecuter::createDefaultExecuter(std::move(queryExecutionConfig), session);
    executer->fromData(query);
    auto task = std::make_unique<execution::QueryExecutionTask>(std::move(executer), [&]() {
@@ -382,7 +383,6 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
       }
    });
    scheduler::awaitEntryTask(std::move(task));
-
 }
 } // namespace
 int main(int argc, char** argv) {
@@ -391,12 +391,12 @@ int main(int argc, char** argv) {
       return 0;
    }
 
-
    lingodb::compiler::support::eval::init();
    if (argc < 2 || argc > 3) {
       std::cerr << "usage: sqllite-tester file [dataset]" << std::endl;
       exit(1);
    }
+
    std::shared_ptr<runtime::Session> session;
    if (argc == 3) {
       session = runtime::Session::createSession(std::string(argv[2]), true);

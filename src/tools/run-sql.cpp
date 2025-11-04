@@ -2,6 +2,7 @@
 #include "lingodb/compiler/mlir-support/eval.h"
 #include "lingodb/execution/Execution.h"
 #include "lingodb/execution/Timing.h"
+#include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Scheduler.h"
 #include "lingodb/utility/Setting.h"
 
@@ -27,7 +28,9 @@ int main(int argc, char** argv) {
    std::string inputFileName = std::string(argv[1]);
    std::string directory = std::string(argv[2]);
    std::cout << "Loading Database from: " << directory << '\n';
+
    auto session = runtime::Session::createSession(directory, eagerLoading.getValue());
+
 
    lingodb::compiler::support::eval::init();
    execution::ExecutionMode runMode = execution::getExecutionMode();

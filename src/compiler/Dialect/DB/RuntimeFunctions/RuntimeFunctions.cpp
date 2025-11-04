@@ -6,9 +6,9 @@
 #include "lingodb/compiler/runtime/DumpRuntime.h"
 #include "lingodb/compiler/runtime/FloatRuntime.h"
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
+#include "lingodb/compiler/runtime/PythonUDFRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
-#include "lingodb/compiler/runtime/PythonUDFRuntime.h"
 #include "lingodb/runtime/DateRuntime.h"
 #include "lingodb/runtime/PythonUDFRuntime.h"
 
@@ -283,7 +283,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    auto resTypeIsF64 = [](mlir::Type t, mlir::TypeRange) { return t.isF64(); };
    auto resTypeIsBool = [](mlir::Type t, mlir::TypeRange) { return t.isInteger(1); };
    auto resTypeIsIndex = [](mlir::Type t, mlir::TypeRange) { return t.isIndex(); };
-   auto resTypeIsString = [](mlir::Type t, mlir::TypeRange) { return mlir::isa<lingodb::compiler::dialect::db::StringType>(t);};
+   auto resTypeIsString = [](mlir::Type t, mlir::TypeRange) { return mlir::isa<lingodb::compiler::dialect::db::StringType>(t); };
    builtinRegistry->add("Substring").implementedAs(StringRuntime::substr).matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::intLike, RuntimeFunction::intLike}, RuntimeFunction::matchesArgument());
    builtinRegistry->add("StringFind").implementedAs(StringRuntime::findNext).matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::stringLike, RuntimeFunction::intLike}, resTypeIsI64);
    builtinRegistry->add("StringLength").implementedAs(StringRuntime::len).matchesTypes({RuntimeFunction::stringLike}, resTypeIsI64);
@@ -333,21 +333,22 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    builtinRegistry->add("DateAdd").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateAddImpl).folds(dateAddFoldFn);
    builtinRegistry->add("DateSubtract").handlesInvalid().matchesTypes({RuntimeFunction::dateLike, RuntimeFunction::dateInterval}, RuntimeFunction::matchesArgument()).implementedAs(dateSubImpl).folds(dateSubtractFoldFn);
 
-   builtinRegistry->add("callPythonUdf1").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF1);
-   builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF2);
-   builtinRegistry->add("callPythonUdf3").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF3);
-   builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF4);
-   builtinRegistry->add("callPythonUdf5").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF5);
-   builtinRegistry->add("callPythonUdf6").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF6);
-   builtinRegistry->add("callPythonUdf7").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF7);
-   builtinRegistry->add("callPythonUdf8").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF8);
-   builtinRegistry->add("callPythonUdf9").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF9);
-   builtinRegistry->add("callPythonUdf10").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::callPythonUDF10);
+   builtinRegistry->add("callPythonUdf0").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF0);
+   builtinRegistry->add("callPythonUdf1").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF1);
+   builtinRegistry->add("callPythonUdf2").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF2);
+   builtinRegistry->add("callPythonUdf3").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF3);
+   builtinRegistry->add("callPythonUdf4").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF4);
+   builtinRegistry->add("callPythonUdf5").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF5);
+   builtinRegistry->add("callPythonUdf6").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF6);
+   builtinRegistry->add("callPythonUdf7").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF7);
+   builtinRegistry->add("callPythonUdf8").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF8);
+   builtinRegistry->add("callPythonUdf9").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF9);
+   builtinRegistry->add("callPythonUdf10").handlesInvalid().matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType, RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::callPythonUDF10);
 
-   builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::int64ToPythonLong);
-   builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::int32ToPythonInt);
-   builtinRegistry->add("doubleToPythonDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::doubleToPythonDouble);
-   builtinRegistry->add("stringToPythonString").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, resTypeIsI64).implementedAs(PythonUDFRuntime::stringToPythonString);
+   builtinRegistry->add("int64ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::int64ToPythonLong);
+   builtinRegistry->add("int32ToPythonInt").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::int32ToPythonInt);
+   builtinRegistry->add("doubleToPythonDouble").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::doubleToPythonDouble);
+   builtinRegistry->add("stringToPythonString").handlesInvalid().matchesTypes({RuntimeFunction::stringLike}, resTypeIsI32).implementedAs(PythonUDFRuntime::stringToPythonString);
 
    builtinRegistry->add("pythonLongToInt64").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI64).implementedAs(PythonUDFRuntime::pythonLongToInt64);
    builtinRegistry->add("pythonIntToInt32").handlesInvalid().matchesTypes({RuntimeFunction::anyType}, resTypeIsI32).implementedAs(PythonUDFRuntime::pythonIntToInt32);

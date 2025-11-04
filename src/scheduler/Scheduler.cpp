@@ -9,6 +9,8 @@
 #include <thread>
 
 #include "lingodb/scheduler/Scheduler.h"
+
+#include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Task.h"
 
 namespace lingodb::scheduler {
@@ -417,6 +419,8 @@ class Worker {
    using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
    TimePoint startWaitTime = TimePoint::min();
 
+   std::shared_ptr<wasm::WASMSession> wasmSession;
+
    public:
    //for cheaply collecting idle workers
    Worker* nextIdleWorker = nullptr;
@@ -429,6 +433,7 @@ class Worker {
    bool shouldSleep = true;
 
    Worker(Scheduler& scheduler, size_t id) : scheduler(scheduler), fiberAllocator(64), workerId(id) {
+      wasmSession = wasm::WASM::initializeWASM(nullptr).lock();
    }
 
    void wakeupWorker() {
@@ -718,6 +723,10 @@ size_t currentWorkerId() {
    }
    assert(false);
    return std::numeric_limits<size_t>::max();
+}
+Worker* getCurrentWorker() {
+   assert(currentWorker);
+   return currentWorker;
 }
 } // namespace lingodb::scheduler
 
