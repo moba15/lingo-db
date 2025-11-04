@@ -1,10 +1,12 @@
 #include "lingodb/compiler/frontend/UDFImplementer.h"
 
+#include "bh_read_file.h"
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/DB/IR/RuntimeFunctions.h"
 #include "lingodb/execution/Execution.h"
+#include "lingodb/runtime/WASM.h"
 #include "lingodb/utility/PythonUtility.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"
@@ -119,6 +121,7 @@ class CUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
          func = builder.create<mlir::func::FuncOp>(loc, functionName, funcType);
          func.setPrivate();
       }
+
       return builder.create<mlir::func::CallOp>(builder.getUnknownLoc(), func, args).getResult(0);
    }
 };
@@ -133,12 +136,18 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    PythonUDFImplementer(std::string functionName, std::string code, std::vector<lingodb::catalog::Type> argumentTypes, lingodb::catalog::Type returnType) : functionName(std::move(functionName)), code(std::move(code)), argumentTypes(std::move(argumentTypes)), returnType(std::move(returnType)) {}
 
    mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
+      auto wasmContext = lingodb::wasm::WASM::context;
+      wasm_runtime_init_thread_env();
+      assert(wasmContext);
+      auto results = lingodb::wasm::WASM::call_py_func<char*>(wasmContext->exec_env, wasmContext->module_inst, "Py_GetVersion");
+      std::string python_version{std::bit_cast<char*>(wasm_runtime_addr_app_to_native(wasmContext->module_inst, results[0].of.i32))};
+      std::cout << std::format("Python version: {}\n", python_version);
+
       std::string pythonPath = lingodb::utility::PythonUtility::pythonPath;
       assert(!pythonPath.empty());
       pythonPath = pythonPath + "/" + functionName + ".py";
       std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
       tempFile << code;
-
 
       std::vector<mlir::Value> pythonArgs;
       pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
@@ -165,7 +174,6 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
                pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 64), "stringToPythonString", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
-
 
             default: throw std::runtime_error("The current type is not supported in python UDFs");
          }

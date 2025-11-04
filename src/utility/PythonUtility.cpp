@@ -7,20 +7,21 @@ namespace lingodb::utility {
 struct PythonInitializerGuard {
    PythonInitializerGuard(PyThreadState* mainThreadState);
    ~PythonInitializerGuard();
+
    private:
    PyThreadState* mainThreadState;
 };
- PythonInitializerGuard::PythonInitializerGuard(PyThreadState* mainThreadState): mainThreadState(mainThreadState){
+PythonInitializerGuard::PythonInitializerGuard(PyThreadState* mainThreadState) : mainThreadState(mainThreadState) {
 }
-PythonInitializerGuard::~PythonInitializerGuard(){
-    assert(mainThreadState);
-    PyEval_RestoreThread(mainThreadState);
-    mainThreadState = nullptr;
-    Py_FinalizeEx();
+PythonInitializerGuard::~PythonInitializerGuard() {
+   assert(mainThreadState);
+   PyEval_RestoreThread(mainThreadState);
+   mainThreadState = nullptr;
+   Py_FinalizeEx();
 }
 std::shared_ptr<PythonInitializerGuard> PythonUtility::guard = nullptr;
 std::string PythonUtility::pythonPath = "";
-std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize(){
+std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize() {
    if (guard) {
       return guard;
    }
@@ -55,13 +56,11 @@ std::shared_ptr<PythonInitializerGuard>& PythonUtility::initialize(){
       }
       PyConfig_Clear(&config);
 
-
    } else {
       throw std::runtime_error("Python is already initialized");
    }
    guard = std::make_shared<PythonInitializerGuard>(PyEval_SaveThread());
    return guard;
-
 }
 
 } // namespace lingodb::utility

@@ -330,9 +330,6 @@ class DefaultQueryExecuter : public QueryExecuter {
       if (queryExecutionConfig->timingProcessor) {
          queryExecutionConfig->timingProcessor->process();
       }
-
-
-
    }
 };
 

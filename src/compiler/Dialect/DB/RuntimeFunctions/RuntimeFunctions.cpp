@@ -6,9 +6,9 @@
 #include "lingodb/compiler/runtime/DumpRuntime.h"
 #include "lingodb/compiler/runtime/FloatRuntime.h"
 #include "lingodb/compiler/runtime/IntegerRuntime.h"
+#include "lingodb/compiler/runtime/PythonUDFRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
 #include "lingodb/compiler/runtime/Timing.h"
-#include "lingodb/compiler/runtime/PythonUDFRuntime.h"
 #include "lingodb/runtime/DateRuntime.h"
 #include "lingodb/runtime/PythonUDFRuntime.h"
 
@@ -283,7 +283,7 @@ std::shared_ptr<db::RuntimeFunctionRegistry> db::RuntimeFunctionRegistry::getBui
    auto resTypeIsF64 = [](mlir::Type t, mlir::TypeRange) { return t.isF64(); };
    auto resTypeIsBool = [](mlir::Type t, mlir::TypeRange) { return t.isInteger(1); };
    auto resTypeIsIndex = [](mlir::Type t, mlir::TypeRange) { return t.isIndex(); };
-   auto resTypeIsString = [](mlir::Type t, mlir::TypeRange) { return mlir::isa<lingodb::compiler::dialect::db::StringType>(t);};
+   auto resTypeIsString = [](mlir::Type t, mlir::TypeRange) { return mlir::isa<lingodb::compiler::dialect::db::StringType>(t); };
    builtinRegistry->add("Substring").implementedAs(StringRuntime::substr).matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::intLike, RuntimeFunction::intLike}, RuntimeFunction::matchesArgument());
    builtinRegistry->add("StringFind").implementedAs(StringRuntime::findNext).matchesTypes({RuntimeFunction::stringLike, RuntimeFunction::stringLike, RuntimeFunction::intLike}, resTypeIsI64);
    builtinRegistry->add("StringLength").implementedAs(StringRuntime::len).matchesTypes({RuntimeFunction::stringLike}, resTypeIsI64);

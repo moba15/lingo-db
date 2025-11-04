@@ -9,9 +9,7 @@ class PythonUtility {
    static std::shared_ptr<PythonInitializerGuard> guard;
    static std::string pythonPath;
    static std::shared_ptr<PythonInitializerGuard>& initialize();
-
 };
 } // namespace lingodb::utility
-
 
 #endif //LINGODB_PYTHONUTILITY_H

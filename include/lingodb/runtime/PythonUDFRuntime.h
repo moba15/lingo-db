@@ -4,7 +4,7 @@
 
 namespace lingodb::runtime {
 struct PythonUDFRuntime {
-   template<unsigned SIZE>
+   template <unsigned SIZE>
    static uint64_t callPythonUDF(std::string fnName, std::array<uint64_t, SIZE> args);
 
    static uint64_t callPythonUDF1(VarLen32 fnName, uint64_t arg);

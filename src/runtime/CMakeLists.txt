@@ -36,6 +36,17 @@ add_library(runtime OBJECT
         LingoDBHashIndex.cpp
         Session.cpp
         storage/LingoDBTable.cpp
+
+
+        WASM.cpp
+
+        ${UNCOMMON_SHARED_SOURCE}
+)
+target_include_directories(runtime PUBLIC
+        "${WAMR_ROOT_DIR}/core/iwasm/common"
+        "${WAMR_ROOT_DIR}/core/iwasm/include"
+        "${WAMR_ROOT_DIR}/core/shared/platform/include"
+        "${WAMR_ROOT_DIR}/core/shared/utils/include"
 )
 set(COMPILE_DEFS "")
 if (ENABLE_GPU_BACKEND)
@@ -43,10 +54,20 @@ if (ENABLE_GPU_BACKEND)
 else ()
     list(APPEND COMPILE_DEFS "GPU_ENABLED=0")
 endif (ENABLE_GPU_BACKEND)
-
+list(APPEND COMPILE_DEFS "SOURCE_DIR=\"${CMAKE_SOURCE_DIR}\"")
 target_compile_definitions(runtime PUBLIC ${COMPILE_DEFS})
 target_link_libraries(runtime PRIVATE Arrow::arrow_static)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 target_link_libraries(runtime PRIVATE Python3::Python)
 add_subdirectory(GPU)
 target_link_libraries(runtime PUBLIC GPU-rt scheduler)
+target_link_libraries(runtime PUBLIC vmlib -lm)
+
+# Our runtime code depends on reading this file, make sure it exists
+add_custom_target(
+        GeneratePythonAOT ALL
+        DEPENDS "${PYTHON_BUILD_DIR}/python.aot"
+)
+add_dependencies(runtime GeneratePythonAOT)
+
+

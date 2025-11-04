@@ -269,9 +269,7 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
       argumentsStringRepresentation += ")";
 
       //Create method head
-      code = "def " + functionName + ""  + argumentsStringRepresentation + ":\n" + code;
-
-
+      code = "def " + functionName + "" + argumentsStringRepresentation + ":\n" + code;
 
       lingodb::catalog::CreateFunctionDef createFunctionDef(
          functionName,

@@ -10,7 +10,7 @@ class PyGuard {
    private:
    PyGILState_STATE gstate;
 };
-template<unsigned SIZE>
+template <unsigned SIZE>
 uint64_t PythonUDFRuntime::callPythonUDF(std::string fnName, std::array<uint64_t, SIZE> args) {
    PyGuard pyGuard{};
    if (Py_IsInitialized()) {
@@ -106,7 +106,6 @@ uint64_t PythonUDFRuntime::callPythonUDF10(VarLen32 fnName, uint64_t arg, uint64
    return callPythonUDF<10>(fnName.str(), {arg, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9});
 }
 
-
 uint64_t PythonUDFRuntime::int64ToPythonLong(int64_t value) {
    PyGuard pyGuard{};
    if (Py_IsInitialized()) {
@@ -166,8 +165,6 @@ uint64_t PythonUDFRuntime::stringToPythonString(VarLen32 value) {
    }
    return reinterpret_cast<uint64_t>(pyValue);
 }
-
-
 
 uint64_t PythonUDFRuntime::pythonLongToInt64(uint64_t pyObj) {
    PyGuard pyGuard{};
