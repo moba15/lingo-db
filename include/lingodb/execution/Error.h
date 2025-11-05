@@ -5,8 +5,11 @@
 namespace lingodb::execution {
 class Error {
    public:
-   enum ErrorType {
+   enum ErrorPhase {
       frontend,
+      optimizer,
+      tuple_tracking,
+      lowering,
       backend,
       unknown
    };
@@ -14,12 +17,12 @@ class Error {
    private:
    bool present = false;
    std::stringstream message;
-   ErrorType type = unknown;
+   ErrorPhase errorPhase = unknown;
 
    public:
    std::string getMessage() { return message.str(); }
-   ErrorType getErrorType() const { return type; }
-   void setErrorType(ErrorType type) { this->type = type; }
+   ErrorPhase getErrorPhase() const { return errorPhase; }
+   void setErrorPhase(ErrorPhase type) { this->errorPhase = type; }
    operator bool() const {
       return present;
    }

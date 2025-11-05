@@ -415,31 +415,56 @@ int main(int argc, char** argv) {
       }
       if (parts[0] == "statement") {
          try {
+            bool gotError = false;
             runStatement(*session, lines, line, [&](execution::Error& error) {
-               if (parts.size() > 1 && parts[1] == "frontend-error") {
-                  if (error.getErrorType() != execution::Error::ErrorType::frontend) {
-                     std::cerr << "ERROR: expected frontend error but got '" << error.getMessage() << "'" << std::endl;
-                     std::cerr << "while executing statement: " << lines[line] << std::endl;
-                  }
-                  //Error allowed
-                  if (parts.size() > 2) {
-                     std::string expectedError = parts[2];
-                     for (size_t i = 3; i < parts.size(); i++) {
-                        expectedError += " " + parts[i];
-                     }
-                     if (error.getMessage().find(expectedError) == std::string::npos) {
-                        std::cerr << "ERROR: expected error containing '" << expectedError << "' but got '" << error.getMessage() << "'" << std::endl;
+               gotError = true;
+               if (parts.size() > 1) {
+                  std::string expectedError = parts[1];
+                  if (expectedError.starts_with("frontend-error")) {
+                     if (error.getErrorPhase() != execution::Error::ErrorPhase::frontend) {
+                        std::cerr << "ERROR: expected frontend error but got '" << error.getMessage() << "'" << std::endl;
                         std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        exit(1);
+                     }
+
+                  } else if (expectedError.starts_with("backend-error")) {
+                     if (error.getErrorPhase() != execution::Error::ErrorPhase::backend) {
+                        std::cerr << "ERROR: expected backend error but got '" << error.getMessage() << "'" << std::endl;
+                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        exit(1);
+                     }
+
+                  } else if (!expectedError.starts_with("runtime-error") && !expectedError.starts_with("error")) {
+                     //Invalid check type
+                     std::cerr << "ERROR: invalid check type '" << expectedError << "'" << std::endl;
+                     exit(1);
+                  }
+                  if (parts.size() > 2) {
+                     std::string expectedErrorMessage = parts[2];
+                     for (size_t i = 3; i < parts.size(); i++) {
+                        expectedErrorMessage += " " + parts[i];
+                     }
+                     if (error.getMessage().find(expectedErrorMessage) == std::string::npos) {
+                        std::cerr << "ERROR: expected error containing '" << expectedErrorMessage << "' but got '" << error.getMessage() << "'" << std::endl;
+                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        exit(1);
                      }
                   }
+
                } else {
                   std::cerr << "ERROR: " << error.getMessage() << std::endl;
                   std::cerr << "while executing statement: " << lines[line] << std::endl;
                }
             });
+            if (gotError == false && parts.size() > 1 && parts[1] != "ok") {
+               std::cerr << "ERROR: expected error but got success" << std::endl;
+               std::cerr << "while executing statement: " << lines[line] << std::endl;
+               exit(1);
+            }
          } catch (const std::exception& e) {
             std::cerr << "ERROR: " << e.what() << std::endl;
             std::cerr << "while executing statement: " << lines[line] << std::endl;
+            exit(1);
          }
       }
       if (parts[0] == "query") {
