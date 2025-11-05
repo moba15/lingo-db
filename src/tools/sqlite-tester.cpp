@@ -13,7 +13,8 @@
 #include <string>
 
 #include "md5.h"
-
+#define printExecutingStatement() \
+   std::cerr << "while executing statement: " << lines[line - 2] << " at line " << line - 1 << std::endl;
 namespace {
 using namespace lingodb;
 enum SortMode {
@@ -423,20 +424,21 @@ int main(int argc, char** argv) {
                   if (expectedError.starts_with("frontend-error")) {
                      if (error.getErrorPhase() != execution::Error::ErrorPhase::frontend) {
                         std::cerr << "ERROR: expected frontend error but got '" << error.getMessage() << "'" << std::endl;
-                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        printExecutingStatement();
                         exit(1);
                      }
 
                   } else if (expectedError.starts_with("backend-error")) {
                      if (error.getErrorPhase() != execution::Error::ErrorPhase::backend) {
                         std::cerr << "ERROR: expected backend error but got '" << error.getMessage() << "'" << std::endl;
-                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        printExecutingStatement();
                         exit(1);
                      }
 
                   } else if (!expectedError.starts_with("runtime-error") && !expectedError.starts_with("error")) {
                      //Invalid check type
                      std::cerr << "ERROR: invalid check type '" << expectedError << "'" << std::endl;
+                     printExecutingStatement();
                      exit(1);
                   }
                   if (parts.size() > 2) {
@@ -446,24 +448,24 @@ int main(int argc, char** argv) {
                      }
                      if (error.getMessage().find(expectedErrorMessage) == std::string::npos) {
                         std::cerr << "ERROR: expected error containing '" << expectedErrorMessage << "' but got '" << error.getMessage() << "'" << std::endl;
-                        std::cerr << "while executing statement: " << lines[line] << std::endl;
+                        printExecutingStatement();
                         exit(1);
                      }
                   }
 
                } else {
                   std::cerr << "ERROR: " << error.getMessage() << std::endl;
-                  std::cerr << "while executing statement: " << lines[line] << std::endl;
+                  printExecutingStatement();
                }
             });
             if (gotError == false && parts.size() > 1 && parts[1] != "ok") {
                std::cerr << "ERROR: expected error but got success" << std::endl;
-               std::cerr << "while executing statement: " << lines[line] << std::endl;
+               printExecutingStatement();
                exit(1);
             }
          } catch (const std::exception& e) {
             std::cerr << "ERROR: " << e.what() << std::endl;
-            std::cerr << "while executing statement: " << lines[line] << std::endl;
+            printExecutingStatement();
             exit(1);
          }
       }
@@ -476,7 +478,7 @@ int main(int argc, char** argv) {
             runQuery(*session, lines, line);
          } catch (const std::exception& e) {
             std::cerr << "ERROR: " << e.what() << std::endl;
-            std::cerr << "while executing query: " << lines[line] << std::endl;
+            printExecutingStatement();
          }
       }
       if (parts[0] == "hash-threshold") {
