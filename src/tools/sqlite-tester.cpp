@@ -376,11 +376,13 @@ void runQuery(runtime::Session& session, const std::vector<std::string>& lines, 
    auto task = std::make_unique<execution::QueryExecutionTask>(std::move(executer), [&]() {
       std::string result = std::to_string(resultHasherRef.numValues) + " values hashing to " + resultHasherRef.hash + "\n";
       auto resultLines = std::regex_replace(resultHasherRef.lines, std::regex("\\s+\n"), "\n");
+
       if (result != expectedResult && !compareFuzzy(expectedResult, resultLines)) {
          std::cerr << "executing:" << description << std::endl;
          std::cerr << "ERROR: result did not match" << std::endl;
          std::cerr << "RESULT: \"" << result << "\"" << std::endl;
          std::cerr << "LINES: \"" << resultHasherRef.lines << "\"" << std::endl;
+         printExecutingStatement();
          exit(1);
       }
    });
