@@ -15,12 +15,41 @@ class PyGuard {
 };
 
 template <unsigned SIZE>
-uint64_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<uint64_t, SIZE> args) {
+uint64_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyObjectPtr, SIZE> args) {
    if (wasm_runtime_thread_env_inited()) {
-      auto wasmContext = lingodb::wasm::WASM::wasmSession;
-      auto results = wasmContext->call_py_func<char*>("Py_GetVersion");
-      std::string python_version{std::bit_cast<char*>(wasm_runtime_addr_app_to_native(wasmContext->moduleInst, results[0].of.i32))};
-      std::cout << std::format("Python2 version: {}\n", python_version);
+      auto wasmSession = lingodb::wasm::WASM::wasmSession;
+      assert(wasmSession);
+      auto pArgs = wasmSession->call_py_func<PyObjectPtr>("PyTuple_New", args.size()).at(0).of.i32;
+      if (!pArgs) {
+         throw std::runtime_error{"Could not create python tuple"};
+      }
+      for (size_t i = 0; i < SIZE; i++) {
+         if (!wasmSession->call_py_func<int>("PyTuple_SetItem", pArgs, i, args[i])) {
+            throw std::runtime_error{"Could not add argument to python tuple"};
+         }
+         //TODO change to use one buffer instead of recreating every time
+         uint32_t fNameWasmStr = static_cast<uint32_t>(wasmSession->createWasmStringBuffer(fnName));
+         auto pName = wasmSession->call_py_func<PyObjectPtr>("PyUnicode_DecodeFSDefault", fNameWasmStr).at(0).of.i32;
+         if (!pName) {
+            wasmSession->call_py_func<void>("PyErr_Print");
+            throw std::runtime_error{"Failed PyUnicode_DecodeFSDefault"};
+         }
+         auto pModule = wasmSession->call_py_func<PyObjectPtr>("PyImport_Import", pName).at(0).of.i32;
+         if (!pModule) {
+            wasmSession->call_py_func<void>("PyErr_Print");
+            throw std::runtime_error{"Module not found"};
+         }
+         auto pFunc = wasmSession->call_py_func<PyObjectPtr>("PyObject_GetAttrString", pModule, fNameWasmStr).at(0).of.i32;
+         if (!pFunc || wasmSession->call_py_func<bool>("PyCallable_Check", pFunc).at(0).of.i32 == 0) {
+            throw std::runtime_error{"Function is not callable"};
+         }
+
+         PyObjectPtr resultObj = wasmSession->call_py_func<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs).at(0).of.i32;
+         if (!resultObj) {
+            wasmSession->call_py_func<void>("PyErr_Print");
+            throw std::runtime_error{"Error calling python method"};
+         }
+      }
 
    } else {
       throw std::runtime_error("WASM not initialized");

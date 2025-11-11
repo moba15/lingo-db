@@ -403,7 +403,8 @@ int main(int argc, char** argv) {
    } else {
       session = runtime::Session::createSession();
    }
-   lingodb::wasm::WASM::initializeWASM();
+   lingodb::wasm::WASM::initializeWASM(session->getCatalog());
+
    auto scheduler = scheduler::startScheduler();
    auto lines = filterLines(readTestFile(argv[1]));
    size_t line = 0;

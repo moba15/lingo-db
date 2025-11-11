@@ -1,8 +1,10 @@
 #ifndef LINGODB_WASM_H
 #define LINGODB_WASM_H
 
+#include "lingodb/catalog/Catalog.h"
 #include "wasm_c_api_internal.h"
 #include "wasm_export.h"
+
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -37,9 +39,9 @@ class WASMSession {
       return results;
    }
 
-   uint32_t createWasmStringBuffer(std::string str) {
+   uint64_t createWasmStringBuffer(std::string str) {
       void* nativeBufAddr = nullptr;
-      uint32_t instBufAddr = wasm_runtime_module_malloc(moduleInst, strlen(str.c_str()) + 1, &nativeBufAddr);
+      uint64_t instBufAddr = wasm_runtime_module_malloc(moduleInst, strlen(str.c_str()) + 1, &nativeBufAddr);
       if (!nativeBufAddr) {
          throw std::runtime_error("wasm_runtime_module_malloc failed");
       }
@@ -47,7 +49,6 @@ class WASMSession {
       memcpy(nativeCharBuf, str.c_str(), strlen(str.c_str()) + 1);
       return instBufAddr;
    }
-
 
    public:
    private:
@@ -104,7 +105,7 @@ class WASMSession {
 class WASM {
    public:
    static std::shared_ptr<WASMSession> wasmSession;
-   static std::weak_ptr<WASMSession> initializeWASM();
+   static std::weak_ptr<WASMSession> initializeWASM(std::shared_ptr<catalog::Catalog> catalog);
 };
 } // namespace lingodb::wasm
 

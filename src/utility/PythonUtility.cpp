@@ -5,8 +5,8 @@
 
 #include <stdexcept>
 
-#include <Python.h>
 #include <iostream>
+#include <Python.h>
 
 namespace lingodb::utility {
 struct PythonInitializerGuard {

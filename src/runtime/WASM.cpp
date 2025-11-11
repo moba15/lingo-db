@@ -4,6 +4,7 @@
 #include "bh_read_file.h"
 #include "wasm_c_api_internal.h"
 #include "wasm_export.h"
+
 #include <format>
 #include <fstream>
 #include <iostream>
@@ -16,7 +17,7 @@
 namespace lingodb::wasm {
 
 std::shared_ptr<WASMSession> WASM::wasmSession = nullptr;
-std::weak_ptr<WASMSession> WASM::initializeWASM() {
+std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog> catalog) {
    if (wasmSession) {
       return wasmSession;
    }
@@ -39,12 +40,22 @@ std::weak_ptr<WASMSession> WASM::initializeWASM() {
       //TODO Hardcoded
       "/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/cross-build/wasm32-wasip1"};
    //Maps the directories: Required as CPython would not be able to find any modules
+   std::string generatedModulesPath = catalog->getDbDir();
+   if (generatedModulesPath.empty()) {
+      char tempPythonDirTemplate[] = "/tmp/pyUdf_XXXXXX";
+      char* dirName = mkdtemp(tempPythonDirTemplate);
+      if (!dirName) {
+         throw std::runtime_error("Failed to create temporary directory.");
+      }
+      generatedModulesPath = std::string(dirName);
+   }
+   generatedModulesPath = "/generatedModules::" + generatedModulesPath;
    //TODO Hardcoded
    const char* mapDirList[]{
       "/::/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/",
       //Map python path
       "/lib/python3.14::/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/Lib",
-      "/generatedModules::/home/bachmaier/projects/lingo-db/ptest"};
+      generatedModulesPath.c_str()};
    //Set the environment variables (for whatever reason, these are being ignored).
    const char* envList[] = {
       "PYTHONHOME=/generatedModules"};
@@ -76,10 +87,10 @@ std::weak_ptr<WASMSession> WASM::initializeWASM() {
    assert(wasmSession->call_py_func<bool>("Py_IsInitialized").at(0).of.i32);
    /* Add module path for generated udfs */
    const char* script = "import sys; sys.path.append('/generatedModules')";
-   uint32_t instBufAddr = wasmSession->createWasmStringBuffer("import sys; sys.path.append('/generatedModules')");
-   auto result = wasmSession->call_py_func<int>("PyRun_SimpleString",  instBufAddr).at(0).of.i32;
+   uint64_t instBufAddr = wasmSession->createWasmStringBuffer("import sys; sys.path.append('/generatedModules')");
+   auto result = wasmSession->call_py_func<int>("PyRun_SimpleString", instBufAddr).at(0).of.i32;
    if (result != 0) {
-     wasmSession->call_py_func<int>("PyErr_Print");
+      wasmSession->call_py_func<int>("PyErr_Print");
       throw std::runtime_error{"Failed to run sys.path.append script"};
    }
    std::cerr << "Successfully initialize cpython in wasm\n";
