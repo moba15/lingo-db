@@ -1,0 +1,8 @@
+query tsv rowsort
+WITH
+    T0(t00, t01) AS (VALUES(1,1),(1,1))
+SELECT (1)
+FROM T0
+GROUP BY t00;
+----
+1
