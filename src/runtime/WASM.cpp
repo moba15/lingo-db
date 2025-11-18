@@ -93,17 +93,17 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
 
 #endif
    localWasmSessions[id] = std::make_shared<WASMSession>(execEnv, moduleInst);
-   assert(localWasmSessions[id]->call_py_func2<bool>("Py_IsInitialized") == false);
-   localWasmSessions[id]->call_py_func<void>("Py_Initialize");
+   assert(localWasmSessions[id]->callPyFunc2<bool>("Py_IsInitialized") == false);
+   localWasmSessions[id]->callPyFunc<void>("Py_Initialize");
 
    //initializing python
-   assert(localWasmSessions[id]->call_py_func<bool>("Py_IsInitialized").at(0).of.i32);
+   assert(localWasmSessions[id]->callPyFunc<bool>("Py_IsInitialized").at(0).of.i32);
    /* Add module path for generated udfs */
    const char* script = "import sys; sys.path.append('/generatedModules')";
    uint64_t instBufAddr = localWasmSessions[id]->createWasmStringBuffer("import sys; sys.path.append('/generatedModules')");
-   auto result = localWasmSessions[id]->call_py_func<int>("PyRun_SimpleString", instBufAddr).at(0).of.i32;
+   auto result = localWasmSessions[id]->callPyFunc<int>("PyRun_SimpleString", instBufAddr).at(0).of.i32;
    if (result != 0) {
-      localWasmSessions[id]->call_py_func<int>("PyErr_Print");
+      localWasmSessions[id]->callPyFunc<int>("PyErr_Print");
       throw std::runtime_error{"Failed to run sys.path.append script"};
    }
 

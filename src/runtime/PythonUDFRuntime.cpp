@@ -29,40 +29,40 @@ uint32_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyOb
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   if (!wasmSession->call_py_func2<bool>("Py_IsInitialized")) {
+   if (!wasmSession->callPyFunc2<bool>("Py_IsInitialized")) {
       throw std::runtime_error{"Py_IsInitialized"};
    };
-   auto pArgs = wasmSession->call_py_func<PyObjectPtr>("PyTuple_New", args.size()).at(0).of.i32;
+   auto pArgs = wasmSession->callPyFunc<PyObjectPtr>("PyTuple_New", args.size()).at(0).of.i32;
    if (!pArgs) {
       throw std::runtime_error{"Could not create python tuple"};
    }
    for (size_t i = 0; i < SIZE; i++) {
-      if (wasmSession->call_py_func2<int>("PyTuple_SetItem", pArgs, i, args[i]) != 0) {
+      if (wasmSession->callPyFunc2<int>("PyTuple_SetItem", pArgs, i, args[i]) != 0) {
          throw std::runtime_error{"Could not add argument to python tuple"};
       }
    }
    //TODO change to use one buffer instead of recreating every time
    uint32_t fNameWasmStr = static_cast<uint32_t>(wasmSession->createWasmStringBuffer("lingodb_udf_" + fnName));
-   auto pName = wasmSession->call_py_func2<PyObjectPtr>("PyUnicode_DecodeFSDefault", fNameWasmStr);
+   auto pName = wasmSession->callPyFunc2<PyObjectPtr>("PyUnicode_DecodeFSDefault", fNameWasmStr);
    if (!pName) {
-      wasmSession->call_py_func<void>("PyErr_Print");
+      wasmSession->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Failed PyUnicode_DecodeFSDefault"};
    }
-   auto pModule = wasmSession->call_py_func2<PyObjectPtr>("PyImport_Import", pName);
+   auto pModule = wasmSession->callPyFunc2<PyObjectPtr>("PyImport_Import", pName);
    if (!pModule) {
-      wasmSession->call_py_func<void>("PyErr_Print");
+      wasmSession->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Module not found"};
    }
    uint32_t fNameWasmStr2 = static_cast<uint32_t>(wasmSession->createWasmStringBuffer(fnName));
-   auto pFunc = wasmSession->call_py_func2<PyObjectPtr>("PyObject_GetAttrString", pModule, fNameWasmStr2);
-   if (!pFunc || !wasmSession->call_py_func2<bool>("PyCallable_Check", pFunc)) {
-      wasmSession->call_py_func<void>("PyErr_Print");
+   auto pFunc = wasmSession->callPyFunc2<PyObjectPtr>("PyObject_GetAttrString", pModule, fNameWasmStr2);
+   if (!pFunc || !wasmSession->callPyFunc2<bool>("PyCallable_Check", pFunc)) {
+      wasmSession->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Function is not callable or null"};
    }
 
-   PyObjectPtr resultObj = wasmSession->call_py_func2<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs);
+   PyObjectPtr resultObj = wasmSession->callPyFunc2<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs);
    if (!resultObj) {
-      wasmSession->call_py_func<void>("PyErr_Print");
+      wasmSession->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Error calling python method"};
    }
 
@@ -173,35 +173,35 @@ PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::int64ToPythonLong(int64_t value)
    assert(wasm_runtime_thread_env_inited());
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func2<PyObjectPtr>("PyLong_FromLongLong", value);
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc2<PyObjectPtr>("PyLong_FromLongLong", value);
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::int32ToPythonInt(int32_t value) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func2<PyObjectPtr>("PyLong_FromLong", value);
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc2<PyObjectPtr>("PyLong_FromLong", value);
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func2<PyObjectPtr>("PyFloat_FromDouble", value);
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromDouble", value);
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::doubleToPythonDouble(double value) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
    double x = 845848.2;
-   auto p = wasmSession->call_py_func<PyObjectPtr>("PyFloat_FromDouble", x).at(0).of.i32;
+   auto p = wasmSession->callPyFunc<PyObjectPtr>("PyFloat_FromDouble", x).at(0).of.i32;
    if (!p) {
       throw std::runtime_error("sf");
    }
-   auto p2 = wasmSession->call_py_func<int64_t>("PyFloat_AsDouble", p).at(0).of.i64;
-   auto e = wasmSession->call_py_func<PyObjectPtr>("PyErr_Occurred");
+   auto p2 = wasmSession->callPyFunc<int64_t>("PyFloat_AsDouble", p).at(0).of.i64;
+   auto e = wasmSession->callPyFunc<PyObjectPtr>("PyErr_Occurred");
    if (e.at(0).of.i32) {
       std::cerr << "Error";
    }
@@ -225,23 +225,23 @@ uint64_t PythonUDFRuntime::pythonLongToInt64(uint64_t pyObj) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func2<uint64_t>("PyLong_AsLongLong", pyObj);
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc2<uint64_t>("PyLong_AsLongLong", pyObj);
 }
 int32_t PythonUDFRuntime::pythonIntToInt32(uint64_t pyObj) {
    wasm_runtime_init_thread_env();
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func2<int32_t>("PyLong_AsLong", pyObj);
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc2<int32_t>("PyLong_AsLong", pyObj);
 }
 double PythonUDFRuntime::pythonDoubleToDouble(uint32_t pyObj) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized"));
-   return wasmSession->call_py_func<float64_t>("PyFloat_AsDouble", pyObj).at(0).of.f64;
+   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   return wasmSession->callPyFunc<float64_t>("PyFloat_AsDouble", pyObj).at(0).of.f64;
 }
 VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
    throw std::runtime_error("Not impl");
