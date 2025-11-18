@@ -2,10 +2,10 @@
 
 #include "bh_platform.h"
 #include "bh_read_file.h"
+#include "lingodb/scheduler/Scheduler.h"
 #include "lingodb/utility/PythonUtility.h"
 #include "wasm_c_api_internal.h"
 #include "wasm_export.h"
-#include "lingodb/scheduler/Scheduler.h"
 
 #include <format>
 #include <fstream>
@@ -20,10 +20,11 @@
 #define WASM_FILE "/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/cross-build/wasm32-wasip1/python.aot"
 namespace lingodb::wasm {
 
-std::shared_ptr<WASMSession>  WASM::wasmSession = nullptr;
-std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog> catalog) {
-   if (wasmSession) {
-      return wasmSession;
+std::vector<std::shared_ptr<WASMSession>> WASM::localWasmSessions = std::vector<std::shared_ptr<WASMSession>>();
+std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog> catalog, size_t id) {
+
+   if (localWasmSessions[id]) {
+      return localWasmSessions[id];
    }
    char errorBuf[128] = {0};
    uint32 size;
@@ -85,26 +86,31 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
    if (!execEnv) {
       throw std::runtime_error("Create exec env failed");
    }
+#ifdef ASAN_ACTIVE
+   while (!wasm_runtime_thread_env_inited()) {
+      wasm_runtime_init_thread_env();
+   }
 
-   wasmSession = std::make_shared<WASMSession>(execEnv, moduleInst);
-   assert(wasmSession->call_py_func2<bool>("Py_IsInitialized") == false);
-   wasmSession->call_py_func<void>("Py_Initialize");
+#endif
+   localWasmSessions[id] = std::make_shared<WASMSession>(execEnv, moduleInst);
+   assert(localWasmSessions[id]->call_py_func2<bool>("Py_IsInitialized") == false);
+   localWasmSessions[id]->call_py_func<void>("Py_Initialize");
 
    //initializing python
-   assert(wasmSession->call_py_func<bool>("Py_IsInitialized").at(0).of.i32);
+   assert(localWasmSessions[id]->call_py_func<bool>("Py_IsInitialized").at(0).of.i32);
    /* Add module path for generated udfs */
    const char* script = "import sys; sys.path.append('/generatedModules')";
-   uint64_t instBufAddr = wasmSession->createWasmStringBuffer("import sys; sys.path.append('/generatedModules')");
-   auto result = wasmSession->call_py_func<int>("PyRun_SimpleString", instBufAddr).at(0).of.i32;
+   uint64_t instBufAddr = localWasmSessions[id]->createWasmStringBuffer("import sys; sys.path.append('/generatedModules')");
+   auto result = localWasmSessions[id]->call_py_func<int>("PyRun_SimpleString", instBufAddr).at(0).of.i32;
    if (result != 0) {
-      wasmSession->call_py_func<int>("PyErr_Print");
+      localWasmSessions[id]->call_py_func<int>("PyErr_Print");
       throw std::runtime_error{"Failed to run sys.path.append script"};
    }
 
-   std::cerr << "Successfully initialize cpython in wasm: " <<  std::this_thread::get_id() <<"\n";
+   std::cerr << "Successfully initialize cpython in wasm: " << std::this_thread::get_id() << "\n";
 
-   assert(scheduler::getNumWorkers() == 1);
 
-   return wasmSession;
+
+   return localWasmSessions[id];
 }
 } // namespace lingodb::wasm

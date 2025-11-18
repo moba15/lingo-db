@@ -433,7 +433,7 @@ class Worker {
    bool shouldSleep = true;
 
    Worker(Scheduler& scheduler, size_t id) : scheduler(scheduler), fiberAllocator(64), workerId(id) {
-      wasmSession = wasm::WASM::initializeWASM(nullptr).lock();
+      wasmSession = wasm::WASM::initializeWASM(nullptr, id).lock();
    }
 
    void wakeupWorker() {
@@ -574,6 +574,7 @@ void stopCurrentScheduler() {
 
 void Scheduler::start() {
    scheduler = this;
+   wasm::WASM::localWasmSessions.resize(numWorkers);
    for (size_t i = 0; i < numWorkers; i++) {
       workerThreads.emplace_back([this, i] {
 #if defined(__APPLE__) && defined(__arm64__)

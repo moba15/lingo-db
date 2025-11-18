@@ -31,7 +31,6 @@ int main(int argc, char** argv) {
 
    auto session = runtime::Session::createSession(directory, eagerLoading.getValue());
 
-
    lingodb::compiler::support::eval::init();
    execution::ExecutionMode runMode = execution::getExecutionMode();
    auto queryExecutionConfig = execution::createQueryExecutionConfig(runMode, true);

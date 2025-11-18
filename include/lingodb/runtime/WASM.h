@@ -27,7 +27,7 @@ class WASMSession {
          wasm_val_t;
          throw std::runtime_error{std::format("Global '{}' not found in module", obj_name)};
       }
-      return *(uint32_t*)wasm_memory_get_base_address(static_cast<wasm_memory_inst_t>(global_addr));
+      return *(uint32_t*) wasm_memory_get_base_address(static_cast<wasm_memory_inst_t>(global_addr));
    }
 
    // - Outs... must be supplied explicitly
@@ -129,8 +129,8 @@ class WASMSession {
 };
 class WASM {
    public:
-   static  std::shared_ptr<WASMSession> wasmSession;
-   static std::weak_ptr<WASMSession> initializeWASM(std::shared_ptr<catalog::Catalog> catalog);
+   static std::vector<std::shared_ptr<WASMSession>> localWasmSessions;
+   static std::weak_ptr<WASMSession> initializeWASM(std::shared_ptr<catalog::Catalog> catalog, size_t id);
 };
 } // namespace lingodb::wasm
 
