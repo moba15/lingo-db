@@ -61,6 +61,7 @@ uint32_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyOb
    }
 
    PyObjectPtr resultObj = wasmSession->callPyFunc2<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs);
+
    if (!resultObj) {
       wasmSession->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Error calling python method"};
@@ -188,25 +189,20 @@ PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) 
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
    assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
-   return wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromDouble", value);
-}
-PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::doubleToPythonDouble(double value) {
-   initPythonWASMCall();
-   auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
-   assert(wasmSession);
-   assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
-   double x = 845848.2;
-   auto p = wasmSession->callPyFunc<PyObjectPtr>("PyFloat_FromDouble", x).at(0).of.i32;
-   if (!p) {
-      throw std::runtime_error("sf");
+
+   // Workaround: Convert float to string and parse in Python to avoid ABI/bit-width mismatches
+   // (e.g. WASM passing f32 but Python expecting f64)
+   //TODO Find a better solution
+   std::string sVal = std::to_string(value);
+   auto sValWasmPtr = static_cast<uint32_t>(wasmSession->createWasmStringBuffer(sVal));
+
+   auto pStr = wasmSession->callPyFunc2<PyObjectPtr>("PyUnicode_DecodeFSDefault", sValWasmPtr);
+   if (!pStr) {
+      throw std::runtime_error("Failed to create python string for float");
    }
-   auto p2 = wasmSession->callPyFunc<int64_t>("PyFloat_AsDouble", p).at(0).of.i64;
-   auto e = wasmSession->callPyFunc<PyObjectPtr>("PyErr_Occurred");
-   if (e.at(0).of.i32) {
-      std::cerr << "Error";
-   }
-   std::cerr << std::bit_cast<double>(p2) << std::endl;
-   return p;
+   // Use PyFloat_FromString to get a valid float object
+   auto obj = wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromString", pStr);
+   return  obj;
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::stringToPythonString(VarLen32 value) {
    throw std::runtime_error("Not impl");
@@ -236,12 +232,14 @@ int32_t PythonUDFRuntime::pythonIntToInt32(uint64_t pyObj) {
    assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
    return wasmSession->callPyFunc2<int32_t>("PyLong_AsLong", pyObj);
 }
-double PythonUDFRuntime::pythonDoubleToDouble(uint32_t pyObj) {
+float PythonUDFRuntime::pythonFloatToFloat(uint32_t pyObj) {
    initPythonWASMCall();
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
    assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
-   return wasmSession->callPyFunc<float64_t>("PyFloat_AsDouble", pyObj).at(0).of.f64;
+
+
+   return wasmSession->callPyFunc<float>("PyFloat_AsDouble", pyObj).at(0).of.f64 ;
 }
 VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
    throw std::runtime_error("Not impl");

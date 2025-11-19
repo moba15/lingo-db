@@ -159,8 +159,8 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
                }
                break;
             }
-            case lingodb::catalog::LogicalTypeId::DOUBLE: {
-               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "doubleToPythonDouble", mlir::ValueRange({currentArg})).getResult(0);
+            case lingodb::catalog::LogicalTypeId::FLOAT: {
+               pythonArg = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::IntegerType::get(builder.getContext(), 32), "floatToPythonFloat", mlir::ValueRange({currentArg})).getResult(0);
                break;
             }
             case lingodb::catalog::LogicalTypeId::STRING: {
@@ -193,8 +193,8 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
             }
             break;
          }
-         case lingodb::catalog::LogicalTypeId::DOUBLE: {
-            finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::Float64Type::get(builder.getContext()), "pythonDoubleToDouble", mlir::ValueRange({pythonResult})).getResult(0);
+         case lingodb::catalog::LogicalTypeId::FLOAT: {
+            finalResult = builder.create<lingodb::compiler::dialect::db::RuntimeCall>(loc, mlir::Float32Type::get(builder.getContext()), "pythonFloatToFloat", mlir::ValueRange({pythonResult})).getResult(0);
             break;
          }
          case lingodb::catalog::LogicalTypeId::CHAR:

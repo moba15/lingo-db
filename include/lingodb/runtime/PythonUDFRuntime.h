@@ -25,7 +25,6 @@ struct PythonUDFRuntime {
    static PyObjectPtr int64ToPythonLong(int64_t value);
    static PyObjectPtr int32ToPythonInt(int32_t value);
    static PyObjectPtr floatToPythonFloat(float value);
-   static PyObjectPtr doubleToPythonDouble(double value);
    static PyObjectPtr stringToPythonString(VarLen32 value);
 
    /***
@@ -39,7 +38,7 @@ struct PythonUDFRuntime {
    /***
     * IMPORTANT: This method call decref on the python object after conversion
     */
-   static double pythonDoubleToDouble(uint32_t pyObj);
+   static float pythonFloatToFloat(uint32_t pyObj);
    /***
     * IMPORTANT: This method call decref on the python object after conversion
     */

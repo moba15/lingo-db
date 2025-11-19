@@ -85,7 +85,8 @@ int main(int argc, char** argv) {
       std::string dbDir = std::string(argv[2]);
       catalog = lingodb::catalog::Catalog::create(dbDir, false);
    }
-   lingodb::wasm::WASM::initializeWASM(catalog);
+   lingodb::wasm::WASM::localWasmSessions.resize(1);
+   lingodb::wasm::WASM::initializeWASM(catalog, 0);
    std::ifstream istream{filename};
    std::stringstream buffer;
    buffer << istream.rdbuf();

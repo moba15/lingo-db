@@ -958,11 +958,21 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
       return createNode;
 
    } else if (language == "plpython3u") {
+      if (returnType.type.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
+         std::cerr << "Warning: doubles are currently interpreted as floats for python udfs"  << std::endl;
+
+         returnType.type = catalog::Type::f32();
+      }
       auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
       boundCreateFunctionInfo->language = language;
       boundCreateFunctionInfo->code = code;
       for (auto& fArgument : createFunctionInfo->argumentTypes) {
-         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
+         auto type = SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type;
+         if (type.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
+            std::cerr << "Warning: doubles are currently interpreted as floats for python udfs"  << std::endl;
+            type = catalog::Type::f32();
+         }
+         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, type);
       }
       createNode->createInfo = boundCreateFunctionInfo;
       return createNode;
@@ -2791,6 +2801,14 @@ NullableType SQLTypeUtils::getCommonType(NullableType nullableType1, NullableTyp
           type2.getTypeId() == catalog::LogicalTypeId::INT) {
          return NullableType(type1, isNullable);
       }
+      if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL &&
+         type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
+         return NullableType(type2, isNullable);
+         }
+      if (type1.getTypeId() == catalog::LogicalTypeId::INT &&
+         type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
+         return NullableType(type2, isNullable);
+         }
       if ((type1.getTypeId() == catalog::LogicalTypeId::INT || type1.getTypeId() == catalog::LogicalTypeId::DECIMAL) && type2.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
          return NullableType(type2, isNullable);
       }
