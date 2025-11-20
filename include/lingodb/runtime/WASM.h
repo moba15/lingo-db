@@ -73,19 +73,30 @@ class WASMSession {
    void packVal(void* argsVoid, uint32_t& idx, T v)
       requires(std::integral<T> && sizeof(T) == 4)
    {
-      static_cast<wasm_val_t*>(argsVoid)[idx++].of.i32 = static_cast<int32_t>(v);
+
+      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      entry.of.i32 = v;
+      entry.kind = WASM_I32;
    }
    template <typename T>
    void packVal(void* argsVoid, uint32_t& idx, T v)
       requires(std::integral<T> && sizeof(T) == 8)
    {
-      static_cast<wasm_val_t*>(argsVoid)[idx++].of.i64 = static_cast<int64_t>(v);
+      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      entry.of.i64 = static_cast<int64_t>(v);
+      entry.kind = wasm_valkind_enum::WASM_I64;
+
+
    }
    inline void packVal(void* argsVoid, uint32_t& idx, float v) {
-      static_cast<wasm_val_t*>(argsVoid)[idx++].of.f32 = v;
+      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      entry.of.f32 = v;
+      entry.kind=WASM_F32;
    }
    inline void packVal(void* argsVoid, uint32_t& idx, double v) {
-      static_cast<wasm_val_t*>(argsVoid)[idx++].of.f64 = v;
+      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      entry.of.f64 = v;
+      entry.kind=WASM_F64;
    }
 
    // Fallback to produce a clear compile-time error for unsupported types.

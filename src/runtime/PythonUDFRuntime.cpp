@@ -59,7 +59,7 @@ uint32_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyOb
       throw std::runtime_error{"Function is not callable or null"};
    }
 
-   PyObjectPtr resultObj = wasmSession->callPyFunc2<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs);
+   PyObjectPtr resultObj = wasmSession->callPyFunc<PyObjectPtr>("PyObject_CallObject", pFunc, pArgs).at(0).of.i32;
 
    if (!resultObj) {
       wasmSession->callPyFunc<void>("PyErr_Print");
@@ -191,6 +191,10 @@ PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) 
 
    // Workaround: Convert float to string and parse in Python to avoid ABI/bit-width mismatches
    // (e.g. WASM passing f32 but Python expecting f64)
+   double x = 11001.1;
+   auto testObj = wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromDouble",  x);
+
+
    //TODO Find a better solution
    std::string sVal = std::to_string(value);
    auto sValWasmPtr = static_cast<uint32_t>(wasmSession->createWasmStringBuffer(sVal));
@@ -201,7 +205,7 @@ PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) 
    }
    // Use PyFloat_FromString to get a valid float object
    auto obj = wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromString", pStr);
-   return obj;
+   return testObj;
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::stringToPythonString(VarLen32 value) {
    throw std::runtime_error("Not impl");
@@ -236,8 +240,15 @@ float PythonUDFRuntime::pythonFloatToFloat(uint32_t pyObj) {
    auto wasmSession = lingodb::wasm::WASM::localWasmSessions[scheduler::currentWorkerId()];
    assert(wasmSession);
    assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
+   auto result = wasmSession->callPyFunc<double>("PyFloat_AsDouble", pyObj).at(0);
+   switch (result.kind) {
+      case WASM_F64:
+         return result.of.f64;
+         case WASM_F32:
+         return result.of.f32;
+      default: throw (std::runtime_error("Python not initialized"));
+   }
 
-   return wasmSession->callPyFunc<float>("PyFloat_AsDouble", pyObj).at(0).of.f64;
 }
 VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
    throw std::runtime_error("Not impl");

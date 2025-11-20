@@ -138,9 +138,9 @@ class PythonUDFImplementer : public lingodb::catalog::MLIRUDFImplementor {
    mlir::Value callFunction(mlir::ModuleOp& moduleOp, mlir::OpBuilder& builder, mlir::Location loc, mlir::ValueRange args, lingodb::catalog::Catalog* catalog) override {
       std::string pythonPath = lingodb::utility::PythonUtility::pythonPath;
       assert(!pythonPath.empty());
-      pythonPath = pythonPath + "/lingodb_udf_" + functionName + ".py";
+      /*pythonPath = pythonPath + "/lingodb_udf_" + functionName + ".py";
       std::ofstream tempFile(pythonPath, std::ios::out | std::ios::trunc);
-      tempFile << code;
+      tempFile << code;*/
 
       std::vector<mlir::Value> pythonArgs;
       pythonArgs.push_back(builder.create<lingodb::compiler::dialect::db::ConstantOp>(loc, lingodb::compiler::dialect::db::StringType::get(builder.getContext()), builder.getStringAttr(functionName)));
