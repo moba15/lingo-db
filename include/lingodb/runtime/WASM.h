@@ -49,16 +49,19 @@ class WASMSession {
       bool success = wasm_runtime_call_wasm_a(execEnv, func, num_results, results.data(), numArgs, args.data());
       if (!success) {
          /* exception is thrown if call fails */
+
          throw std::runtime_error{wasm_runtime_get_exception(moduleInst)};
       }
       return static_cast<Out>(results.at(0).of.i64);
    }
 
-   uint64_t createWasmStringBuffer(std::string str) {
+      uint64_t createWasmStringBuffer(std::string str) {
       void* nativeBufAddr = nullptr;
-      uint64_t instBufAddr = wasm_runtime_module_malloc(moduleInst, strlen(str.c_str()) + 1, &nativeBufAddr);
+
+      uint64_t instBufAddr = wasm_runtime_module_malloc_internal(moduleInst, execEnv, strlen(str.c_str()) + 1, &nativeBufAddr);
       if (!nativeBufAddr) {
-         throw std::runtime_error("wasm_runtime_module_malloc failed");
+
+         throw std::runtime_error(wasm_runtime_get_exception(moduleInst));
       }
       char* nativeCharBuf = std::bit_cast<char*>(nativeBufAddr);
       memcpy(nativeCharBuf, str.c_str(), strlen(str.c_str()) + 1);
@@ -121,6 +124,8 @@ class WASM {
    public:
    static std::vector<std::shared_ptr<WASMSession>> localWasmSessions;
    static std::weak_ptr<WASMSession> initializeWASM(std::shared_ptr<catalog::Catalog> catalog, size_t id);
+
+   static void createWASMExecEnv();
 };
 } // namespace lingodb::wasm
 

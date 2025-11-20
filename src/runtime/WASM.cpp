@@ -16,7 +16,7 @@
 #include <vector>
 #include <bits/this_thread_sleep.h>
 #define WASM_STACK_SIZE 16777216
-#define WASM_HEAP_SIZE 8092
+#define WASM_HEAP_SIZE (64 * 1024 * 1024)
 #define WASM_FILE "/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/cross-build/wasm32-wasip1/python.aot"
 namespace lingodb::wasm {
 
@@ -40,6 +40,7 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
    if (!module) {
       throw std::runtime_error(errorBuf);
    }
+
    //This sets the CWD
    const char* dirList[] = {
       //TODO Hardcoded
@@ -78,6 +79,7 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
    /* create an instance of the WASM module (WASM linear memory is ready) */
    wasm_module_inst_t moduleInst = wasm_runtime_instantiate(module, WASM_STACK_SIZE, WASM_HEAP_SIZE,
                                                             errorBuf, sizeof(errorBuf));
+
    if (!moduleInst) {
       wasm_runtime_unload(module);
       throw std::runtime_error(errorBuf);
@@ -112,5 +114,8 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
 
 
    return localWasmSessions[id];
+}
+void WASM::createWASMExecEnv(){
+   localWasmSessions[scheduler::currentWorkerId()]->execEnv = wasm_runtime_create_exec_env(localWasmSessions[scheduler::currentWorkerId()]->moduleInst, WASM_STACK_SIZE);
 }
 } // namespace lingodb::wasm

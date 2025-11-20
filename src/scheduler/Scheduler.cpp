@@ -12,6 +12,7 @@
 
 #include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Task.h"
+#include "wasm_memory.h"
 
 namespace lingodb::scheduler {
 class Worker;
@@ -107,13 +108,16 @@ class Fiber {
 
    struct LocalAllocator {
       Fiber* fiber = nullptr;
-
+      void* sp = nullptr;
+      size_t size = 0;
       boost::context::stack_context allocate() {
          assert(!fiber->stackAllocated);
          boost::context::stack_context sctx;
          sctx.size = stackSize;
          sctx.sp = fiber->stackSpace + stackSize;
          fiber->stackAllocated = true;
+         sp = sctx.sp;
+         size = sctx.size;
          return sctx;
       }
 
@@ -143,9 +147,13 @@ class Fiber {
       this->task = taskWrapper;
       done = false;
       isRunning = true;
-      fiber = boost::context::fiber{std::allocator_arg, LocalAllocator{this}, [&](boost::context::fiber&& boostSink) {
+      LocalAllocator allocator{this};
+      fiber = boost::context::fiber{std::allocator_arg, allocator, [&](boost::context::fiber&& boostSink) {
                                        sink = std::move(boostSink);
                                        setup();
+                                       assert(allocator.sp && wasm::WASM::localWasmSessions[currentWorkerId()] && wasm::WASM::localWasmSessions[currentWorkerId()]->execEnv);
+                                       uint8_t* stack_boundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;
+                                       wasm_runtime_set_native_stack_boundary(wasm::WASM::localWasmSessions[currentWorkerId()]->execEnv, stack_boundary);
                                        f();
                                        teardown();
                                        isRunning = false;

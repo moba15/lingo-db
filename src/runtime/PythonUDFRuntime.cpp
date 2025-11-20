@@ -8,11 +8,12 @@ namespace lingodb::runtime {
 /// This method handles all necessary steps before python functions can be called
 void inline initPythonWASMCall() {
 #ifdef ASAN_ACTIVE
+
+
+#endif
    while (!wasm_runtime_thread_env_inited()) {
       wasm_runtime_init_thread_env();
    }
-
-#endif
 
 }
 class PyGuard {
