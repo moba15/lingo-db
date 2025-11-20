@@ -32,6 +32,7 @@ jobs:
         run: |
           mkdir -p /ccache
           make clean
+          ./tools/scripts/build_cpython_wasm.sh
           make build-${{ matrix.build_type }}
         env:
           CCACHE_DIR: /ccache
