@@ -22,7 +22,6 @@ namespace lingodb::wasm {
 
 std::vector<std::shared_ptr<WASMSession>> WASM::localWasmSessions = std::vector<std::shared_ptr<WASMSession>>();
 std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog> catalog, size_t id) {
-
    if (localWasmSessions[id]) {
       return localWasmSessions[id];
    }
@@ -108,14 +107,6 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
       localWasmSessions[id]->callPyFunc<int>("PyErr_Print");
       throw std::runtime_error{"Failed to run sys.path.append script"};
    }
-
-   std::cerr << "Successfully initialize cpython in wasm: " << std::this_thread::get_id() << "\n";
-
-
-
    return localWasmSessions[id];
-}
-void WASM::createWASMExecEnv(){
-   localWasmSessions[scheduler::currentWorkerId()]->execEnv = wasm_runtime_create_exec_env(localWasmSessions[scheduler::currentWorkerId()]->moduleInst, WASM_STACK_SIZE);
 }
 } // namespace lingodb::wasm

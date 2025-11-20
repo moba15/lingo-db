@@ -9,12 +9,10 @@ namespace lingodb::runtime {
 void inline initPythonWASMCall() {
 #ifdef ASAN_ACTIVE
 
-
 #endif
    while (!wasm_runtime_thread_env_inited()) {
       wasm_runtime_init_thread_env();
    }
-
 }
 class PyGuard {
    public:
@@ -203,7 +201,7 @@ PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::floatToPythonFloat(float value) 
    }
    // Use PyFloat_FromString to get a valid float object
    auto obj = wasmSession->callPyFunc2<PyObjectPtr>("PyFloat_FromString", pStr);
-   return  obj;
+   return obj;
 }
 PythonUDFRuntime::PyObjectPtr PythonUDFRuntime::stringToPythonString(VarLen32 value) {
    throw std::runtime_error("Not impl");
@@ -239,8 +237,7 @@ float PythonUDFRuntime::pythonFloatToFloat(uint32_t pyObj) {
    assert(wasmSession);
    assert(wasmSession->callPyFunc2<bool>("Py_IsInitialized"));
 
-
-   return wasmSession->callPyFunc<float>("PyFloat_AsDouble", pyObj).at(0).of.f64 ;
+   return wasmSession->callPyFunc<float>("PyFloat_AsDouble", pyObj).at(0).of.f64;
 }
 VarLen32 PythonUDFRuntime::pythonStringToString(uint64_t pyObj) {
    throw std::runtime_error("Not impl");

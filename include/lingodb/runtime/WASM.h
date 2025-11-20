@@ -55,12 +55,11 @@ class WASMSession {
       return static_cast<Out>(results.at(0).of.i64);
    }
 
-      uint64_t createWasmStringBuffer(std::string str) {
+   uint64_t createWasmStringBuffer(std::string str) {
       void* nativeBufAddr = nullptr;
 
       uint64_t instBufAddr = wasm_runtime_module_malloc_internal(moduleInst, execEnv, strlen(str.c_str()) + 1, &nativeBufAddr);
       if (!nativeBufAddr) {
-
          throw std::runtime_error(wasm_runtime_get_exception(moduleInst));
       }
       char* nativeCharBuf = std::bit_cast<char*>(nativeBufAddr);
@@ -124,8 +123,6 @@ class WASM {
    public:
    static std::vector<std::shared_ptr<WASMSession>> localWasmSessions;
    static std::weak_ptr<WASMSession> initializeWASM(std::shared_ptr<catalog::Catalog> catalog, size_t id);
-
-   static void createWASMExecEnv();
 };
 } // namespace lingodb::wasm
 

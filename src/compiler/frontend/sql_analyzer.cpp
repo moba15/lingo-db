@@ -959,7 +959,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
 
    } else if (language == "plpython3u") {
       if (returnType.type.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
-         std::cerr << "Warning: doubles are currently interpreted as floats for python udfs"  << std::endl;
+         std::cerr << "Warning: doubles are currently interpreted as floats for python udfs" << std::endl;
 
          returnType.type = catalog::Type::f32();
       }
@@ -969,7 +969,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
       for (auto& fArgument : createFunctionInfo->argumentTypes) {
          auto type = SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type;
          if (type.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
-            std::cerr << "Warning: doubles are currently interpreted as floats for python udfs"  << std::endl;
+            std::cerr << "Warning: doubles are currently interpreted as floats for python udfs" << std::endl;
             type = catalog::Type::f32();
          }
          boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, type);
@@ -2802,13 +2802,13 @@ NullableType SQLTypeUtils::getCommonType(NullableType nullableType1, NullableTyp
          return NullableType(type1, isNullable);
       }
       if (type1.getTypeId() == catalog::LogicalTypeId::DECIMAL &&
-         type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
+          type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
          return NullableType(type2, isNullable);
-         }
+      }
       if (type1.getTypeId() == catalog::LogicalTypeId::INT &&
-         type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
+          type2.getTypeId() == catalog::LogicalTypeId::FLOAT) {
          return NullableType(type2, isNullable);
-         }
+      }
       if ((type1.getTypeId() == catalog::LogicalTypeId::INT || type1.getTypeId() == catalog::LogicalTypeId::DECIMAL) && type2.getTypeId() == catalog::LogicalTypeId::DOUBLE) {
          return NullableType(type2, isNullable);
       }
