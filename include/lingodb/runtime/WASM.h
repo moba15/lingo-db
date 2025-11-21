@@ -38,23 +38,6 @@ class WASMSession {
       return results;
    }
 
-   template <typename Out, typename... Ins>
-   Out callPyFunc2(std::string_view funcName, Ins&&... ins) {
-      wasm_function_inst_t func = getPyFunc(funcName.data());
-      std::vector<wasm_val_t> args(sizeof...(Ins));
-      uint32_t numArgs = 0, num_results = 0;
-      serializeArgs<Out>(args.data(), numArgs, num_results, ins...);
-      std::vector<wasm_val_t> results(num_results);
-      assert(numArgs == sizeof...(Ins));
-      bool success = wasm_runtime_call_wasm_a(execEnv, func, num_results, results.data(), numArgs, args.data());
-      if (!success) {
-         /* exception is thrown if call fails */
-
-         throw std::runtime_error{wasm_runtime_get_exception(moduleInst)};
-      }
-      return static_cast<Out>(results.at(0).of.i64);
-   }
-
    uint64_t createWasmStringBuffer(std::string str) {
       void* nativeBufAddr = nullptr;
 
@@ -84,9 +67,7 @@ class WASMSession {
    {
       auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.i64 = static_cast<int64_t>(v);
-      entry.kind = wasm_valkind_enum::WASM_I64;
-
-
+      //entry.kind = WASM_I64;
    }
    inline void packVal(void* argsVoid, uint32_t& idx, float v) {
       auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];

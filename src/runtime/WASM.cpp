@@ -94,7 +94,7 @@ std::weak_ptr<WASMSession> WASM::initializeWASM(std::shared_ptr<catalog::Catalog
 
 #endif
    localWasmSessions[id] = std::make_shared<WASMSession>(execEnv, moduleInst);
-   assert(localWasmSessions[id]->callPyFunc2<bool>("Py_IsInitialized") == false);
+   assert(localWasmSessions[id]->callPyFunc<bool>("Py_IsInitialized").at(0).of.i32 == false);
    localWasmSessions[id]->callPyFunc<void>("Py_Initialize");
 
    //initializing python
