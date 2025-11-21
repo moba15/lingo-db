@@ -67,7 +67,7 @@ class WASMSession {
    {
       auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.i64 = static_cast<int64_t>(v);
-      //entry.kind = WASM_I64;
+      entry.kind = WASM_I64;
    }
    inline void packVal(void* argsVoid, uint32_t& idx, float v) {
       auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];

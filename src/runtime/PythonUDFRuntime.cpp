@@ -35,7 +35,7 @@ uint32_t PythonUDFRuntime::callPythonWASMUDF(std::string fnName, std::array<PyOb
    if (!pArgs) {
       throw std::runtime_error{"Could not create python tuple"};
    }
-   for (size_t i = 0; i < SIZE; i++) {
+   for (uint32_t i = 0; i < SIZE; i++) {
       if (wasmSession->callPyFunc<int>("PyTuple_SetItem", pArgs, i, args[i]).at(0).of.i32 != 0) {
          throw std::runtime_error{"Could not add argument to python tuple"};
       }
