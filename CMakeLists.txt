@@ -150,6 +150,12 @@ add_custom_command(
         COMMENT "Generating python.aot from python.wasm using wamrc"
 )
 
+# Our runtime code depends on reading this file, make sure it exists
+add_custom_target(
+        GeneratePythonAOT ALL
+        DEPENDS "${PYTHON_BUILD_DIR}/python.aot"
+)
+
 
 add_subdirectory(include)
 add_subdirectory(tools/build-tools)

@@ -63,11 +63,7 @@ add_subdirectory(GPU)
 target_link_libraries(runtime PUBLIC GPU-rt scheduler)
 target_link_libraries(runtime PUBLIC vmlib -lm)
 
-# Our runtime code depends on reading this file, make sure it exists
-add_custom_target(
-        GeneratePythonAOT ALL
-        DEPENDS "${PYTHON_BUILD_DIR}/python.aot"
-)
+
 add_dependencies(runtime GeneratePythonAOT)
 
 
