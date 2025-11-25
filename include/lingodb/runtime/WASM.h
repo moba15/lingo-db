@@ -1,10 +1,13 @@
 #ifndef LINGODB_WASM_H
 #define LINGODB_WASM_H
 
-#include "lingodb/catalog/Catalog.h"
-#include "wasm_c_api_internal.h"
 #include "wasm_export.h"
+#include "lingodb/catalog/Catalog.h"
+#include "wasm-micro-runtime/core/iwasm/common/wasm_runtime_common.h"
 
+
+
+#include <assert.h>
 #include <format>
 #include <fstream>
 #include <iostream>

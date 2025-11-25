@@ -1,6 +1,6 @@
 #include "lingodb/compiler/frontend/UDFImplementer.h"
 
-#include "bh_read_file.h"
+
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 #include "lingodb/catalog/MLIRTypes.h"
 #include "lingodb/catalog/TableCatalogEntry.h"

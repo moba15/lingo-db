@@ -1,7 +1,5 @@
 #include "lingodb/utility/PythonUtility.h"
 
-#include "bh_read_file.h"
-#include "wasm_runtime_common.h"
 
 #include <stdexcept>
 

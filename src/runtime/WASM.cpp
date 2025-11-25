@@ -29,7 +29,6 @@ WASMSession WASM::initializeWASM() {
    /* initialize the wasm runtime by default configuration */
    wasm_runtime_init();
    /* read WASM file to memory buffer */
-   //TODO Hardcoded
    uint8_t* buffer = reinterpret_cast<uint8_t*>(bh_read_file_to_buffer(WASM_FILE, &size));
    if (!buffer) {
       throw std::runtime_error("Failed to read WASM file");

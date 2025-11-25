@@ -55,10 +55,7 @@ target_link_libraries(runtime PRIVATE Arrow::arrow_static)
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
 target_link_libraries(runtime PRIVATE Python3::Python)
 add_subdirectory(GPU)
-target_link_libraries(runtime PUBLIC GPU-rt scheduler)
+target_link_libraries(runtime PUBLIC GPU-rt scheduler cpython-wasm)
 target_link_libraries(runtime PUBLIC vmlib -lm)
-
-
-add_dependencies(runtime GeneratePythonAOT)
 
 

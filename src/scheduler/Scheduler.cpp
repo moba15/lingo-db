@@ -12,7 +12,6 @@
 
 #include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Task.h"
-#include "wasm_memory.h"
 #include "lingodb/runtime/ExecutionContext.h"
 
 namespace lingodb::scheduler {
