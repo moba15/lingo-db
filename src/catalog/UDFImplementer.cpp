@@ -8,7 +8,6 @@
 #include "lingodb/compiler/runtime/PythonRuntime.h"
 #include "lingodb/execution/Execution.h"
 
-#include "lingodb/runtime/WASM.h"
 #include "lingodb/utility/PythonUtility.h"
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/utility/Setting.h"

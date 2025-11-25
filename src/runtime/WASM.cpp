@@ -17,7 +17,9 @@
 #include <bits/this_thread_sleep.h>
 #define WASM_STACK_SIZE 16777216
 #define WASM_HEAP_SIZE (16777216)
-#define WASM_FILE "/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/cross-build/wasm32-wasip1/python.aot"
+#ifndef CPYTHON_WASM_SOURCE_DIR
+#error CPYTHON_WASM_SOURCE_DIR not defined
+#endif
 namespace lingodb::wasm {
 
 WASMSession WASM::initializeWASM() {
@@ -29,7 +31,7 @@ WASMSession WASM::initializeWASM() {
    /* initialize the wasm runtime by default configuration */
    wasm_runtime_init();
    /* read WASM file to memory buffer */
-   uint8_t* buffer = reinterpret_cast<uint8_t*>(bh_read_file_to_buffer(WASM_FILE, &size));
+   uint8_t* buffer = reinterpret_cast<uint8_t*>(bh_read_file_to_buffer(CPYTHON_WASM_AOT_FILE, &size));
    if (!buffer) {
       throw std::runtime_error("Failed to read WASM file");
    }
@@ -38,26 +40,26 @@ WASMSession WASM::initializeWASM() {
       throw std::runtime_error(errorBuf);
    }
 
-   //This sets the CWD
-   const char* dirList[] = {
-      //TODO Hardcoded
-      "/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/cross-build/wasm32-wasip1"};
-   //Maps the directories: Required as CPython would not be able to find any modules
+   /* --- 1. Setup 'dir_list' (for --dir=.) --- */
+   // This sets the CWD for python.aot (This is correct)
+   std::array dirList{
+      CPYTHON_WASM_BUILD_DIR};
 
+   /* --- 2. Setup 'map_dir_list' (for --map-dir=...) --- */
+   std::array mapDirList{
+      "/::" CPYTHON_WASM_SOURCE_DIR,
+      "/lib/python3.14::" CPYTHON_WASM_SOURCE_DIR "/Lib",
+   };
 
-   //TODO Hardcoded
-   const char* mapDirList[]{
-      "/::/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/",
-      //Map python path
-      "/lib/python3.14::/home/bachmaier/projects/lingo-db/build/cpython-wasm/Python-3.14.0/Lib"};
-   //Set the environment variables (for whatever reason, these are being ignored).
-   char* argv[] = {"./python.aot"};
+   // spoof fake program name (since CPython uses it to load relativ libs)
+   std::string programName = "./python.aot";
+   std::array wasmArgs{programName.data()};
 
    wasm_runtime_set_wasi_args(module,
-                              dirList, 1,
-                              mapDirList, 2,
+                              dirList.data(), dirList.size(),
+                              mapDirList.data(), mapDirList.size(),
                               nullptr, 0,
-                              argv, 1);
+                              wasmArgs.data(), wasmArgs.size());
 
    /* create an instance of the WASM module (WASM linear memory is ready) */
    wasm_module_inst_t moduleInst = wasm_runtime_instantiate(module, WASM_STACK_SIZE, WASM_HEAP_SIZE,

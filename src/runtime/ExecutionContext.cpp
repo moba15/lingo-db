@@ -1,5 +1,6 @@
 #include "lingodb/runtime/ExecutionContext.h"
 
+#include "wasm_export.h"
 #include "lingodb/runtime/WASM.h"
 
 #include <cassert>

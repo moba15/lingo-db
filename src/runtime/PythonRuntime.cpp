@@ -5,6 +5,7 @@
 #include <iostream>
 #include <thread>
 #include <Python.h>
+
 namespace lingodb::runtime {
 /// This method handles all necessary steps before python functions can be called
 class PyGuard {
@@ -66,7 +67,7 @@ PythonRuntime::PyObjectPtr PythonRuntime::createModule(runtime::VarLen32 modname
       }
    }
    auto res = wasmSession.callPyFunc<PyObjectPtr>("PyRun_String", sourceWasmStr, Py_file_input, globals, globals).at(0).of.i32;
-   if (res) {
+   if (!res) {
       throw_python_error(wasmSession);
       assert(false);
    }
