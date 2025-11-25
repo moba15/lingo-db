@@ -50,4 +50,6 @@ target_link_libraries(run-sql PUBLIC runner runtime utility mlir-support schedul
 set_target_properties(run-sql PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 target_compile_definitions(run-sql PRIVATE ${COMPILE_DEFS})
 
-
+# cpython-wasm-test
+add_executable(cpython-wasm-test cpython-wasm-test.cpp ${UNCOMMON_SHARED_SOURCE})
+target_link_libraries(cpython-wasm-test PUBLIC cpython-wasm)
