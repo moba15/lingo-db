@@ -27,7 +27,7 @@ add_library(runtime OBJECT
         ExecutionContext.cpp
         RelationHelper.cpp
         EntryLock.cpp
-        PythonUDFRuntime.cpp
+        PythonRuntime.cpp
         #Database.cpp
         #ArrowDirDatabase.cpp
         #ExternalArrowDatabase.cpp
@@ -42,12 +42,7 @@ add_library(runtime OBJECT
 
         ${UNCOMMON_SHARED_SOURCE}
 )
-target_include_directories(runtime PUBLIC
-        "${WAMR_ROOT_DIR}/core/iwasm/common"
-        "${WAMR_ROOT_DIR}/core/iwasm/include"
-        "${WAMR_ROOT_DIR}/core/shared/platform/include"
-        "${WAMR_ROOT_DIR}/core/shared/utils/include"
-)
+
 set(COMPILE_DEFS "")
 if (ENABLE_GPU_BACKEND)
     list(APPEND COMPILE_DEFS "GPU_ENABLED=1")

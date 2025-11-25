@@ -13,6 +13,7 @@
 #include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Task.h"
 #include "wasm_memory.h"
+#include "lingodb/runtime/ExecutionContext.h"
 
 namespace lingodb::scheduler {
 class Worker;
@@ -103,6 +104,7 @@ class Fiber {
 };
 
 #else
+thread_local uint8_t* stackBoundary =0;
 class Fiber {
    static constexpr size_t stackSize = 1 << 20;
 
@@ -137,6 +139,7 @@ class Fiber {
    boost::context::fiber sink;
    Worker* worker = nullptr;
    std::shared_ptr<TaskWrapper> task = nullptr;
+   LocalAllocator allocator;
 
    public:
    void setup();
@@ -147,13 +150,11 @@ class Fiber {
       this->task = taskWrapper;
       done = false;
       isRunning = true;
-      LocalAllocator allocator{this};
+      allocator = LocalAllocator{this};
       fiber = boost::context::fiber{std::allocator_arg, allocator, [&](boost::context::fiber&& boostSink) {
                                        sink = std::move(boostSink);
+                                       stackBoundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;
                                        setup();
-                                       assert(allocator.sp && wasm::WASM::localWasmSessions[currentWorkerId()] && wasm::WASM::localWasmSessions[currentWorkerId()]->execEnv);
-                                       uint8_t* stack_boundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;
-                                       wasm_runtime_set_native_stack_boundary(wasm::WASM::localWasmSessions[currentWorkerId()]->execEnv, stack_boundary);
                                        f();
                                        teardown();
                                        isRunning = false;
@@ -176,7 +177,9 @@ class Fiber {
       assert(!isRunning);
       assert(!done);
       isRunning = true;
+      stackBoundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;;
       setup();
+
       fiber = std::move(fiber).resume();
       teardown();
       return done;
@@ -427,8 +430,6 @@ class Worker {
    using TimePoint = std::chrono::time_point<std::chrono::system_clock>;
    TimePoint startWaitTime = TimePoint::min();
 
-   std::shared_ptr<wasm::WASMSession> wasmSession;
-
    public:
    //for cheaply collecting idle workers
    Worker* nextIdleWorker = nullptr;
@@ -441,7 +442,6 @@ class Worker {
    bool shouldSleep = true;
 
    Worker(Scheduler& scheduler, size_t id) : scheduler(scheduler), fiberAllocator(64), workerId(id) {
-      wasmSession = wasm::WASM::initializeWASM(nullptr, id).lock();
    }
 
    void wakeupWorker() {
@@ -582,7 +582,6 @@ void stopCurrentScheduler() {
 
 void Scheduler::start() {
    scheduler = this;
-   wasm::WASM::localWasmSessions.resize(numWorkers);
    for (size_t i = 0; i < numWorkers; i++) {
       workerThreads.emplace_back([this, i] {
 #if defined(__APPLE__) && defined(__arm64__)
@@ -733,6 +732,12 @@ size_t currentWorkerId() {
    assert(false);
    return std::numeric_limits<size_t>::max();
 }
+#if !ASAN_ACTIVE
+uint8_t* getStackBoundary(){
+   return stackBoundary;
+}
+#endif
+
 Worker* getCurrentWorker() {
    assert(currentWorker);
    return currentWorker;

@@ -257,25 +257,16 @@ void SQLMlirTranslator::translateCreateFunction(mlir::OpBuilder& builder, std::s
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
 
    } else if (language == "plpython3u") {
-      std::string argumentsStringRepresentation = "(";
+      std::vector<catalog::Type> standaloneArgumentTypes;
+      standaloneArgumentTypes.reserve(boundCreateFunctionInfo->argumentTypes.size());
       for (size_t i = 0; i < boundCreateFunctionInfo->argumentTypes.size(); i++) {
          standaloneArgumentTypes.emplace_back(boundCreateFunctionInfo->argumentTypes[i].second);
-         auto functionArgument = boundCreateFunctionInfo->argumentTypes[i];
-         argumentsStringRepresentation += functionArgument.first;
-         if (i + 1 < boundCreateFunctionInfo->argumentTypes.size()) {
-            argumentsStringRepresentation += ", ";
-         }
       }
-      argumentsStringRepresentation += ")";
-
-      //Create method head
-      code = "def " + functionName + "" + argumentsStringRepresentation + ":\n" + code;
-
       lingodb::catalog::CreateFunctionDef createFunctionDef(
          functionName,
          boundCreateFunctionInfo->language,
          code,
-         returnType.type, standaloneArgumentTypes);
+         returnType.type, std::move(standaloneArgumentTypes));
       auto descriptionValue = createStringValue(builder, utility::serializeToHexString(createFunctionDef));
       compiler::runtime::RelationHelper::createFunction(builder, builder.getUnknownLoc())(mlir::ValueRange({descriptionValue}));
    } else {

@@ -7,9 +7,16 @@
 
 #include "ConcurrentMap.h"
 #include "Session.h"
+
+
+
 #include <lingodb/scheduler/Scheduler.h>
+namespace lingodb::wasm {
+struct WASMSession;
+} // namespace lingodb::wasm
 namespace lingodb::runtime {
 class Database;
+
 //some state required for query processing;
 struct State {
    void* ptr = nullptr;
@@ -61,11 +68,15 @@ class ExecutionContext {
    std::vector<std::unordered_map<size_t, State>> allocators;
    std::vector<Arena> stringArenas;
    Session& session;
+   std::vector<std::pair<void*,void*>> wasmEnvironments;
+
 
    public:
    ExecutionContext(Session& session) : session(session) {
       allocators.resize(lingodb::scheduler::getNumWorkers());
       stringArenas.resize(lingodb::scheduler::getNumWorkers());
+      wasmEnvironments.resize(lingodb::scheduler::getNumWorkers(), {nullptr, nullptr});
+
    }
    Session& getSession() {
       return session;
@@ -92,6 +103,7 @@ class ExecutionContext {
    uint8_t* allocString(size_t bytes) {
       return stringArenas[lingodb::scheduler::currentWorkerId()].alloc(bytes);
    }
+
    static void setResult(uint32_t id, uint8_t* ptr);
    static uint8_t* allocStateRaw(size_t size);
    static void clearResult(uint32_t id);
@@ -102,6 +114,9 @@ class ExecutionContext {
    State& getAllocator(size_t group) {
       return allocators[lingodb::scheduler::currentWorkerId()][group];
    }
+   void setupWasm();
+   void teardownWasm();
+   wasm::WASMSession getWasmSession();
    ~ExecutionContext();
 };
 
