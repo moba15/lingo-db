@@ -1,20 +1,18 @@
 #ifndef LINGODB_WASM_H
 #define LINGODB_WASM_H
 
-
-
 #include "lingodb/catalog/Catalog.h"
 
 #include "wasm_c_api_internal.h"
 #include "wasm_export.h"
 
-#include <assert.h>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
+#include <assert.h>
 
 namespace lingodb::wasm {
 struct WASMSession {
@@ -68,8 +66,7 @@ struct WASMSession {
    void packVal(void* argsVoid, uint32_t& idx, T v)
       requires(std::integral<T> && sizeof(T) == 4)
    {
-
-      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      auto& entry = static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.i32 = v;
       entry.kind = WASM_I32;
    }
@@ -77,19 +74,19 @@ struct WASMSession {
    void packVal(void* argsVoid, uint32_t& idx, T v)
       requires(std::integral<T> && sizeof(T) == 8)
    {
-      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      auto& entry = static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.i64 = static_cast<int64_t>(v);
       entry.kind = WASM_I64;
    }
    inline void packVal(void* argsVoid, uint32_t& idx, float v) {
-      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      auto& entry = static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.f32 = v;
-      entry.kind=WASM_F32;
+      entry.kind = WASM_F32;
    }
    inline void packVal(void* argsVoid, uint32_t& idx, double v) {
-      auto& entry=static_cast<wasm_val_t*>(argsVoid)[idx++];
+      auto& entry = static_cast<wasm_val_t*>(argsVoid)[idx++];
       entry.of.f64 = v;
-      entry.kind=WASM_F64;
+      entry.kind = WASM_F64;
    }
 
    // Fallback to produce a clear compile-time error for unsupported types.

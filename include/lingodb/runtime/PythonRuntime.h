@@ -3,7 +3,6 @@
 
 #include "lingodb/runtime/helpers.h"
 
-
 namespace lingodb::runtime {
 struct PythonRuntime {
    using PyObjectPtr = uint32_t;

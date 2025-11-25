@@ -1,7 +1,7 @@
 #include "lingodb/runtime/ExecutionContext.h"
 
-#include "wasm_export.h"
 #include "lingodb/runtime/WASM.h"
+#include "wasm_export.h"
 
 #include <cassert>
 
@@ -49,18 +49,16 @@ void lingodb::runtime::ExecutionContext::setupWasm() {
       env.first = session.execEnv;
       env.second = session.moduleInst;
    } else {
-
    }
 }
-void lingodb::runtime::ExecutionContext::teardownWasm(){
+void lingodb::runtime::ExecutionContext::teardownWasm() {
    //TODO teardown
 }
-lingodb::wasm::WASMSession lingodb::runtime::ExecutionContext::getWasmSession(){
+lingodb::wasm::WASMSession lingodb::runtime::ExecutionContext::getWasmSession() {
    auto workerId = scheduler::currentWorkerId();
    auto& env = wasmEnvironments[workerId];
    assert(env.first && env.second);
    return wasm::WASMSession(static_cast<wasm_exec_env_t>(env.first), static_cast<wasm_module_inst_t>(env.second));
-
 }
 
 namespace {

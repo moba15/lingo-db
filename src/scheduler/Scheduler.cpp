@@ -10,9 +10,9 @@
 
 #include "lingodb/scheduler/Scheduler.h"
 
+#include "lingodb/runtime/ExecutionContext.h"
 #include "lingodb/runtime/WASM.h"
 #include "lingodb/scheduler/Task.h"
-#include "lingodb/runtime/ExecutionContext.h"
 
 namespace lingodb::scheduler {
 class Worker;
@@ -103,7 +103,7 @@ class Fiber {
 };
 
 #else
-thread_local uint8_t* stackBoundary =0;
+thread_local uint8_t* stackBoundary = 0;
 class Fiber {
    static constexpr size_t stackSize = 1 << 20;
 
@@ -176,7 +176,8 @@ class Fiber {
       assert(!isRunning);
       assert(!done);
       isRunning = true;
-      stackBoundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;;
+      stackBoundary = static_cast<uint8_t*>(allocator.sp) - allocator.size;
+      ;
       setup();
 
       fiber = std::move(fiber).resume();
@@ -732,7 +733,7 @@ size_t currentWorkerId() {
    return std::numeric_limits<size_t>::max();
 }
 #if !ASAN_ACTIVE
-uint8_t* getStackBoundary(){
+uint8_t* getStackBoundary() {
    return stackBoundary;
 }
 #endif

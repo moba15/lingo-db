@@ -8,8 +8,6 @@
 #include "ConcurrentMap.h"
 #include "Session.h"
 
-
-
 #include <lingodb/scheduler/Scheduler.h>
 namespace lingodb::wasm {
 struct WASMSession;
@@ -68,15 +66,13 @@ class ExecutionContext {
    std::vector<std::unordered_map<size_t, State>> allocators;
    std::vector<Arena> stringArenas;
    Session& session;
-   std::vector<std::pair<void*,void*>> wasmEnvironments;
-
+   std::vector<std::pair<void*, void*>> wasmEnvironments;
 
    public:
    ExecutionContext(Session& session) : session(session) {
       allocators.resize(lingodb::scheduler::getNumWorkers());
       stringArenas.resize(lingodb::scheduler::getNumWorkers());
       wasmEnvironments.resize(lingodb::scheduler::getNumWorkers(), {nullptr, nullptr});
-
    }
    Session& getSession() {
       return session;

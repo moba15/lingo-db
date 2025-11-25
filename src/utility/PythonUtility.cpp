@@ -1,6 +1,5 @@
 #include "lingodb/utility/PythonUtility.h"
 
-
 #include <stdexcept>
 
 #include <iostream>

@@ -25,7 +25,7 @@ wasm_function_inst_t get_py_func(wasm_module_inst_t module_inst, const char* fun
 
 template <typename T>
 void pack_val(void* args_void, uint32_t& idx, T v)
-requires (std::is_same_v<T, PyObjectRef>)
+   requires(std::is_same_v<T, PyObjectRef>)
 {
    static_cast<wasm_val_t*>(args_void)[idx++].of.i32 = static_cast<int32_t>(v);
 }
@@ -73,7 +73,7 @@ void serialize_args(wasm_val_t* args, uint32_t& num_args, uint32_t& num_results,
 }
 
 class WasmRuntime {
-public:
+   public:
    WasmRuntime() {
       wasm_runtime_init();
    }
@@ -83,7 +83,7 @@ public:
 };
 
 class CPythonModule {
-public:
+   public:
    CPythonModule(std::unique_ptr<WasmRuntime> runtime) : runtime{std::move(runtime)} {
       /* read WASM file into a memory buffer */
       uint32_t bufSize;
@@ -106,14 +106,14 @@ public:
 
    wasm_module_t module;
 
-private:
+   private:
    std::unique_ptr<WasmRuntime> runtime;
 };
 
 class CPythonInst {
-public:
+   public:
    constexpr static uint32 stackSize = 1677721600; // 16MB
-   constexpr static uint32 heapSize = 8092;    // 8KB
+   constexpr static uint32 heapSize = 8092; // 8KB
 
    CPythonInst(std::unique_ptr<CPythonModule> cpythonModule) : cpythonModule{std::move(cpythonModule)} {
       char errorBuf[128] = {0};
@@ -139,7 +139,7 @@ public:
                                  nullptr, 0,
                                  wasmArgs.data(), wasmArgs.size());
       moduleInst = wasm_runtime_instantiate(this->cpythonModule->module, stackSize, heapSize,
-                                                               errorBuf, sizeof(errorBuf));
+                                            errorBuf, sizeof(errorBuf));
       if (!moduleInst) {
          throw std::runtime_error{std::format("Failed to instantiate CPython module: {}", errorBuf)};
       }
@@ -150,12 +150,13 @@ public:
    }
 
    wasm_module_inst_t moduleInst;
-private:
-     std::unique_ptr<CPythonModule> cpythonModule;
+
+   private:
+   std::unique_ptr<CPythonModule> cpythonModule;
 };
 
 class PyEnv {
-public:
+   public:
    // - Outs... must be supplied explicitly
    // - Ins... are deduced from the provided inputs.
    template <typename... Outs, typename... Ins>
@@ -198,7 +199,8 @@ public:
 
    // for conveniance
    wasm_module_inst_t moduleInst;
-private:
+
+   private:
    std::unique_ptr<CPythonInst> cpythonInst;
 };
 
@@ -223,9 +225,9 @@ static PyObjectRef importModule(const std::string& moduleName, std::shared_ptr<P
 
    memcpy(nativeCharBuf, moduleName.c_str(), moduleName.size() + 1);
    // pName = PyUnicode_DecodeFSDefault(moduleName);
-   auto pName =  pyEnv->callPyFunc<PyObjectRef>("PyUnicode_DecodeFSDefault", wasmBuf).at(0).of.i32;
+   auto pName = pyEnv->callPyFunc<PyObjectRef>("PyUnicode_DecodeFSDefault", wasmBuf).at(0).of.i32;
    //pModule = PyImport_Import(pName);
-   auto pModule =  pyEnv->callPyFunc<PyObjectRef>("PyImport_Import", pName).at(0).of.i32;
+   auto pModule = pyEnv->callPyFunc<PyObjectRef>("PyImport_Import", pName).at(0).of.i32;
    if (!pModule) {
       pyEnv->callPyFunc<void>("PyErr_Print");
       throw std::runtime_error{"Module not found"};
