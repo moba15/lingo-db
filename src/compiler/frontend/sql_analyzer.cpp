@@ -17,7 +17,7 @@
 #include <ranges>
 #include <sys/resource.h>
 namespace lingodb::analyzer {
-using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
+
 
 StackGuardNormal::StackGuardNormal() {
 #ifdef ASAN_ACTIVE
@@ -695,7 +695,7 @@ std::shared_ptr<ast::AstNode> SQLQueryAnalyzer::canonicalizeAndAnalyze(std::shar
       return transformed;
    }
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, SQLContext::SQLContext::ResolverScope& resolverScope) {
    switch (rootNode->nodeType) {
       case ast::NodeType::PIPE_OP: {
          auto pipeOp = std::static_pointer_cast<ast::PipeOperator>(rootNode);
@@ -884,7 +884,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
    }
 }
 
-std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<ast::CreateFunctionInfo> createFunctionInfo, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<ast::CreateFunctionInfo> createFunctionInfo, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    auto logicalTypeToCTypeString = [createNode](ast::LogicalTypeWithMods& type) -> std::string {
       switch (type.logicalTypeId) {
          case catalog::LogicalTypeId::INT: {
@@ -961,7 +961,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
    }
 }
 
-std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundInsertNode> SQLQueryAnalyzer::analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::SQLContext::ResolverScope& resolverScope) {
    auto maybeRel = context->catalog->getTypedEntry<catalog::TableCatalogEntry>(insertNode->tableName);
    if (!maybeRel.has_value()) {
       error("Table " << insertNode->tableName << " does not exist", insertNode->loc);
@@ -1016,7 +1016,7 @@ std::shared_ptr<ast::SetNode> SQLQueryAnalyzer::analyzeSetNode(std::shared_ptr<a
    }
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, SQLContext::ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;
    switch (pipeOperator->pipeOpType) {
       case ast::PipeOperatorType::SELECT: {
@@ -1411,7 +1411,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
    return pipeOperator;
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    if (stackGuard->newStackNeeded()) {
       boost::context::fixedsize_stack salloc(1024 * 1024);
       boost::context::stack_context sctx = salloc.allocate();
@@ -1492,7 +1492,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeTableRef(std::share
    }
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeBaseTableRef(std::shared_ptr<ast::BaseTableRef> baseTableRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeBaseTableRef(std::shared_ptr<ast::BaseTableRef> baseTableRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    auto catalogEntry = catalog->getTypedEntry<catalog::TableCatalogEntry>(baseTableRef->tableName);
    //Add to current scope
    auto sqlScopeName = baseTableRef->alias.empty() ? baseTableRef->tableName : baseTableRef->alias;
@@ -1535,7 +1535,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeBaseTableRef(std::s
    }
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeInnerJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeInnerJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    std::shared_ptr<ast::TableProducer> left, right;
    std::shared_ptr<SQLScope> leftScope, rightScope;
 
@@ -1590,7 +1590,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeInnerJoin(std::shar
 
    return boundJoin;
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeLeftOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeLeftOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    std::shared_ptr<ast::TableProducer> left, right;
    std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> mapping{};
    std::shared_ptr<SQLScope> leftScope, rightScope;
@@ -1645,9 +1645,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeLeftOuterJoin(std::
             columnReference->displayName = x.second->displayName;
             outerJoinMapping.push_back({x.second, columnReference});
             remapped.insert({x.second, columnReference});
-            context->mapAttribute(resolverScope, x.first, columnReference);
+            context->replace2(resolverScope, x.first, x.second, columnReference);
+            //context->mapAttribute(resolverScope, x.first, columnReference);
          } else {
-            context->mapAttribute(resolverScope, x.first, it->second);
+            context->replace2(resolverScope, x.first, x.second, it->second);
+            //context->mapAttribute(resolverScope, x.first, it->second);
          }
       }
    }
@@ -1658,7 +1660,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeLeftOuterJoin(std::
    boundJoin->rightScope = rightScope;
    return boundJoin;
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeFullOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeFullOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    std::shared_ptr<ast::TableProducer> left, right;
    std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> mapping;
    std::shared_ptr<SQLScope> leftScope, rightScope;
@@ -1737,7 +1739,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeFullOuterJoin(std::
    boundJoin->rightScope = rightScope;
    return boundJoin;
 }
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeJoinRef(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeJoinRef(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    switch (join->type) {
       case ast::JoinType::INNER: {
          return analyzeInnerJoin(join, context, resolverScope);
@@ -1817,7 +1819,7 @@ std::shared_ptr<ast::BoundResultModifier> SQLQueryAnalyzer::analyzeResultModifie
    }
 }
 
-std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(std::shared_ptr<ast::ExpressionListRef> expressionListRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(std::shared_ptr<ast::ExpressionListRef> expressionListRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    if (expressionListRef->values.empty() || expressionListRef->values[0].empty()) {
       error("Expression list is empty", expressionListRef->loc);
    }
@@ -1865,7 +1867,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(s
 /*
 * Expressions
  */
-std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    if (stackGuard->newStackNeeded()) {
       boost::context::fixedsize_stack salloc(1024 * 1024);
       boost::context::stack_context sctx = salloc.allocate();
@@ -2132,7 +2134,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
    }
 }
 
-std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeOperatorExpression(std::shared_ptr<ast::OperatorExpression> operatorExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeOperatorExpression(std::shared_ptr<ast::OperatorExpression> operatorExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    if (operatorExpr->type == ast::ExpressionType::OPERATOR_UNKNOWN) {
       operatorExpr->type = stringToExpressionType(operatorExpr->opString);
       if (operatorExpr->type == ast::ExpressionType::OPERATOR_UNKNOWN) {
@@ -2204,7 +2206,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeOperatorExpressio
    return drv.nf.node<ast::BoundOperatorExpression>(operatorExpr->loc, operatorExpr->type, resultType, operatorExpr->alias, boundChildren);
 }
 
-std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeWindowExpression(std::shared_ptr<ast::WindowExpression> windowExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeWindowExpression(std::shared_ptr<ast::WindowExpression> windowExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    std::vector<std::shared_ptr<ast::BoundExpression>> boundPartitions;
    std::optional<std::shared_ptr<ast::BoundOrderByModifier>> boundOrderByModifier;
    std::shared_ptr<ast::BoundFunctionExpression> boundFunction;
@@ -2311,7 +2313,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeWindowExpression(
    return boundWindowExpression;
 }
 
-std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(std::shared_ptr<ast::CastExpression> castExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(std::shared_ptr<ast::CastExpression> castExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    auto boundChild = analyzeExpression(castExpr->child, context, resolverScope);
    if (!castExpr->logicalTypeWithMods.has_value()) {
       error("Cast expression must have logicalType", castExpr->loc);
@@ -2395,7 +2397,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(st
    }
 }
 
-std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope) {
+std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope) {
    std::vector<std::shared_ptr<ast::BoundExpression>> boundArguments{};
    std::string upperCaseFName = function->functionName;
    std::ranges::transform(upperCaseFName, upperCaseFName.begin(), ::toupper);

@@ -3,7 +3,7 @@
 #include "lingodb/compiler/frontend/frontend_error.h"
 
 namespace lingodb::analyzer {
-using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
+
 ASTTransformContext::ASTTransformContext() : currentScope(std::make_shared<ASTTransformScope>()) {
    scopeStack.push(currentScope);
 }
@@ -35,7 +35,7 @@ void SQLContext::popCurrentScope() {
    currentScope = currentScope->parent;
    scopes.pop_back();
 }
-ResolverScope SQLContext::createResolverScope() {
+SQLContext::ResolverScope SQLContext::createResolverScope() {
    return ResolverScope(resolver);
 }
 
@@ -48,7 +48,35 @@ std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> SQLCo
 }
 void SQLContext::mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<ast::ColumnReference> columnInfo) {
    definedAttributes.top().push_back({name, columnInfo});
-   resolver.insertIntoScope(&scope, name, columnInfo);
+   std::set<std::shared_ptr<ast::ColumnReference>, Cmp> currentEntries = resolver.lookup(name);
+   currentEntries.insert(columnInfo);
+   std::vector<std::shared_ptr<ast::ColumnReference>> debug{currentEntries.begin(), currentEntries.end()};
+   if (currentEntries.size() >= 2) {
+      size_t i = 0;
+      for (auto& c : currentEntries) {
+         size_t j = 0;
+         for (auto& c2: currentEntries) {
+            if (i==j) {
+               continue;
+            }
+            if (Cmp()(c,c2)) {
+               assert(false);
+            }
+            j++;
+         }
+         i++;
+      }
+   }
+
+   if (name == "ps_supplycost") {
+      std::cout << std::endl;
+      assert( currentEntries.size() < 2 );
+   }
+   scope.
+
+
+   resolver.insertIntoScope(&scope, name, {currentEntries});
+
 }
 
 std::vector<std::shared_ptr<ast::ColumnReference>> SQLContext::mapAttribute(ResolverScope& scope, std::string sqlScopeName, std::string uniqueScope, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry) {
@@ -80,7 +108,13 @@ std::shared_ptr<ast::ColumnReference> SQLContext::getColumnReference(location lo
       throw FrontendError("Could not resolve '" + name + "'", loc);
    }
    const auto res = resolver.lookup(name);
-   return res;
+   if (res.empty()) {
+      throw FrontendError("Could not resolve '" + name + "'", loc);
+   }
+   if (res.size() > 1) {
+      throw FrontendError("Ambig for " + name, loc);
+   }
+   return *res.begin();
 }
 
 void SQLContext::replace(ResolverScope& scope, std::shared_ptr<ast::ColumnReference> old, std::shared_ptr<ast::ColumnReference> value) {
