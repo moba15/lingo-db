@@ -35,6 +35,8 @@ SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, catalog::Catalog* 
    moduleOp.getContext()->getLoadedDialect<util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
 }
 std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& builder, std::shared_ptr<ast::AstNode> astNode, std::shared_ptr<analyzer::SQLContext> context) {
+   context->definedAttributes =  std::stack<std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>>>();
+
    auto* mlirContext = builder.getContext();
    auto location = getLocationFromBison(astNode->loc, mlirContext);
 
@@ -1187,15 +1189,19 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
          if (baseTableRef->columnReferenceEntries.empty()) {
             translatorError("Table " << baseTableRef->relationName << " not found", baseTableRef->loc);
          }
-         auto rel = baseTableRef->columnReferenceEntries;
+         auto& rel = baseTableRef->columnReferenceEntries;
          std::string uniqueScope = baseTableRef->mlirScope;
 
          std::vector<mlir::NamedAttribute> columns{};
          for (auto& info : rel) {
+            if (info.use_count() <= 1) {
+               continue;
+            }
             auto attrDef = info->createDef(builder, attrManager);
             attrDef.getColumn().type = info->resultType.toMlirType(mlirContext);
             columns.push_back(builder.getNamedAttr(info->name, attrDef));
          }
+
          return builder.create<relalg::BaseTableOp>(location, tuples::TupleStreamType::get(mlirContext), relation, builder.getDictionaryAttr(columns));
       }
       case ast::TableReferenceType::CROSS_PRODUCT: {
