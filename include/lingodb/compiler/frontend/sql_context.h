@@ -78,7 +78,6 @@ class DefineScope {
  *    - store/lookup CTE nodes
  */
 class SQLContext {
-   using ResolverImpl = llvm::ScopedHashTable<std::string, std::vector<std::shared_ptr<ast::ColumnReference>>, StringInfo>;
    public:
    SQLContext() : definedAttributes(), resolver() {
       definedAttributes.push({});
@@ -94,22 +93,10 @@ class SQLContext {
    std::unordered_map<std::string, std::pair<ast::TargetInfo, std::shared_ptr<ast::BoundCTENode>>> ctes;
 
    std::unordered_map<std::string, mlir::Value> translatedCtes;
-   struct Cmp {
-      bool operator()(const std::shared_ptr<ast::ColumnReference>& a, const std::shared_ptr<ast::ColumnReference>& b) const {
-         if (!a || !b) {
-            return !b; // Handle null pointers consistently
-         }
-         // Assumes 'scope' and 'name' uniquely identify a column reference
-         return std::tie(a->scope, a->name) < std::tie(b->scope, b->name);
-      }
-   };
-   llvm::ScopedHashTable<std::string, std::set<std::shared_ptr<ast::ColumnReference>, Cmp>, StringInfo> resolver;
-   class ResolverScope : public llvm::ScopedHashTableScope<std::string, std::vector<std::shared_ptr<ast::ColumnReference>>, StringInfo> {
-      public:
-      explicit ResolverScope(ResolverImpl& HT)
-          : llvm::ScopedHashTableScope<std::string, std::vector<std::shared_ptr<ast::ColumnReference>>, StringInfo>(HT) {}
-      ResolverImpl* getHT() { return this->HT; }
-   };
+
+   llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo> resolver;
+   using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
+
    std::unordered_map<std::string, size_t> scopeUnifier;
 
    void pushNewScope();
@@ -120,34 +107,13 @@ class SQLContext {
 
    DefineScope createDefineScope();
 
-   std::vector<std::pair<std::string,std::shared_ptr<ast::ColumnReference>>> getTopDefinedColumns();
+   std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> getTopDefinedColumns();
 
    void mapAttribute(ResolverScope& scope, std::string name, std::shared_ptr<ast::ColumnReference> columnInfo);
    std::vector<std::shared_ptr<ast::ColumnReference>> mapAttribute(ResolverScope& scope, std::string sqlScopeName, std::string uniqueScope, std::shared_ptr<catalog::TableCatalogEntry> tableCatalogEntry);
    void mapAttribute(ResolverScope& scope, std::string name, std::vector<std::shared_ptr<ast::ColumnReference>> targetInfos);
    std::shared_ptr<ast::ColumnReference> getColumnReference(location loc, std::string name);
    void replace(ResolverScope& scope, std::shared_ptr<ast::ColumnReference> old, std::shared_ptr<ast::ColumnReference> value);
-
-   void replace2(ResolverScope& scope, std::string key, std::shared_ptr<ast::ColumnReference> old, std::shared_ptr<ast::ColumnReference> value) {
-      std::vector<std::pair<std::string, std::shared_ptr<ast::ColumnReference>>> toReplace;
-      std::ranges::copy_if(definedAttributes.top(), std::back_inserter(toReplace), [&](auto& p) { return p.second == old; });
-      for (auto& c : toReplace) {
-         mapAttribute(scope, c.first, value);
-      }
-      auto x = resolver.lookup(key);
-
-      if (!x.empty()) {
-         std::set<std::shared_ptr<ast::ColumnReference>, Cmp> y{};
-         for (auto& c : x) {
-            if (c == old) {
-               y.insert(value);
-            } else {
-               y.insert(c);
-            }
-         }
-         resolver.insertIntoScope(&scope, key, {y});
-      }
-   }
 
    std::string getUniqueScope(std::string base);
 };

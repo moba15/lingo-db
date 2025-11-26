@@ -15,7 +15,7 @@
 #include <functional>
 #include <sys/resource.h>
 namespace lingodb::analyzer {
-
+using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
 #define error(message, loc)              \
    {                                     \
       std::ostringstream s{};            \
@@ -134,9 +134,9 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::AstNode> canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context);
 
    private:
-   std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::CreateNode> analyzeCreateNode(std::shared_ptr<ast::CreateNode> createNode);
-   std::shared_ptr<ast::CreateNode> analyzeFunctionCreate(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<ast::CreateFunctionInfo> createFunctionInfo, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::CreateNode> analyzeFunctionCreate(std::shared_ptr<ast::CreateNode> createNode, std::shared_ptr<ast::CreateFunctionInfo> createFunctionInfo, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundInsertNode> analyzeInsertNode(std::shared_ptr<ast::InsertNode> insertNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
    std::shared_ptr<ast::SetNode> analyzeSetNode(std::shared_ptr<ast::SetNode> setNode);
    /**
@@ -151,7 +151,7 @@ class SQLQueryAnalyzer {
     * @return A bound TableProducer representing the analyzed operator
     * @throws FrontendError on semantic or type errors (e.g., non-boolean WHERE)
     */
-   std::shared_ptr<ast::TableProducer> analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope);
    /**
    * Analyzes a TableRef
    * @param tableRef The table reference to analyze
@@ -160,13 +160,13 @@ class SQLQueryAnalyzer {
    * @return A bound TableProducer representing the analyzed table reference
    * @throws FrontendError on semantic or type errors
    */
-   std::shared_ptr<ast::TableProducer> analyzeTableRef(std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeExpressionListRef(std::shared_ptr<ast::ExpressionListRef> expressionListRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeJoinRef(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeBaseTableRef(std::shared_ptr<ast::BaseTableRef> baseTableRef, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeInnerJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeLeftOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::TableProducer> analyzeFullOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeTableRef(std::shared_ptr<ast::TableRef> tableRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeExpressionListRef(std::shared_ptr<ast::ExpressionListRef> expressionListRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeJoinRef(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeBaseTableRef(std::shared_ptr<ast::BaseTableRef> baseTableRef, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeInnerJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeLeftOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::TableProducer> analyzeFullOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    /**
   * Analyzes a result modifier like order by or limit
   * @param resultModifier The result modifier to analyze
@@ -188,11 +188,11 @@ class SQLQueryAnalyzer {
     * @return A bound expression representing the analyzed operator
     * @throws FrontendError on semantic or type errors (e.g., non-boolean conjunction)
     */
-   std::shared_ptr<ast::BoundExpression> analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::BoundExpression> analyzeOperatorExpression(std::shared_ptr<ast::OperatorExpression> operatorExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::BoundExpression> analyzeWindowExpression(std::shared_ptr<ast::WindowExpression> windowExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::BoundExpression> analyzeCastExpression(std::shared_ptr<ast::CastExpression> castExpr, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
-   std::shared_ptr<ast::BoundExpression> analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, SQLContext::ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExpression> analyzeExpression(std::shared_ptr<ast::ParsedExpression> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExpression> analyzeOperatorExpression(std::shared_ptr<ast::OperatorExpression> operatorExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExpression> analyzeWindowExpression(std::shared_ptr<ast::WindowExpression> windowExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExpression> analyzeCastExpression(std::shared_ptr<ast::CastExpression> castExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExpression> analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundColumnRefExpression> analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context, bool ignoreAvailabilityChecks = false);
 
    ast::ExpressionType stringToExpressionType(const std::string& parserStr) {
