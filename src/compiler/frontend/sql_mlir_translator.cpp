@@ -83,7 +83,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
             context->popCurrentScope();
             context->translatedCtes.insert({name, tree});
          }
-
+         auto finalTargetInfos = context->currentScope->targetInfo.getTargetColumns();
          auto tree = translateTableProducer(builder, tableProducer, context);
 
          std::vector<mlir::Attribute> attrs;
@@ -92,7 +92,7 @@ std::optional<mlir::Value> SQLMlirTranslator::translateStart(mlir::OpBuilder& bu
          std::vector<mlir::Attribute> colTypes;
          auto& memberManager = mlirContext->getLoadedDialect<subop::SubOperatorDialect>()->getMemberManager();
 
-         for (auto& named : context->currentScope->targetInfo.targetColumns) {
+         for (auto& named : finalTargetInfos) {
             names.push_back(builder.getStringAttr(named->displayName));
 
             members.push_back(memberManager.createMember(named->name.empty() ? "unnamed" : named->name, named->resultType.toMlirType(mlirContext)));
@@ -291,8 +291,8 @@ void SQLMlirTranslator::translateInsertNode(mlir::OpBuilder& builder, std::share
       std::vector<mlir::Attribute> createdCols;
       auto mapName = attrManager.getUniqueScope("map");
       for (size_t i = 0; i < insertNode->columnsToInsert.size(); i++) {
-         auto attrRef = context->currentScope->targetInfo.targetColumns[i]->createRef(builder, attrManager);
-         auto currentType = context->currentScope->targetInfo.targetColumns[i]->resultType;
+         auto attrRef = context->currentScope->targetInfo.getTargetColumn(i)->createRef(builder, attrManager);
+         auto currentType = context->currentScope->targetInfo.getTargetColumn(i)->resultType;
          auto tableType = insertNode->allColumnsAndTypes.at(insertNode->columnsToInsert[i]);
          mlir::Value expr = mapBuilder.create<tuples::GetColumnOp>(location, attrRef.getColumn().type, attrRef, tuple);
          if (currentType != tableType) {
@@ -300,7 +300,7 @@ void SQLMlirTranslator::translateInsertNode(mlir::OpBuilder& builder, std::share
             attrDef.getColumn().type = tableType.toMlirType(mlirContext);
 
             createdCols.push_back(attrDef);
-            mlir::Value casted = tableType.castValueToThisType(mapBuilder, expr, context->currentScope->targetInfo.targetColumns[i]->resultType.isNullable); // SQLTypeInference::castValueToType(mapBuilder, expr, tableType);
+            mlir::Value casted = tableType.castValueToThisType(mapBuilder, expr, context->currentScope->targetInfo.getTargetColumn(i)->resultType.isNullable); // SQLTypeInference::castValueToType(mapBuilder, expr, tableType);
 
             createdValues.push_back(casted);
             columnNameToCreatedValue[insertNode->columnsToInsert[i]] = casted;
@@ -446,7 +446,7 @@ mlir::Value SQLMlirTranslator::translatePipeOperator(mlir::OpBuilder& builder, s
          auto selectList = std::static_pointer_cast<ast::BoundTargetList>(pipeOperator->node);
          if (selectList->distinct) {
             std::vector<mlir::Attribute> columns;
-            for (auto x : context->currentScope->targetInfo.targetColumns) {
+            for (auto x : context->currentScope->targetInfo.getTargetColumns()) {
                columns.push_back(x->createRef(builder, attrManager));
             }
             tree = builder.create<relalg::ProjectionOp>(location, relalg::SetSemantic::distinct, tree, builder.getArrayAttr(columns));
@@ -1357,6 +1357,7 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
 }
 
 mlir::Value SQLMlirTranslator::translateSetOperation(mlir::OpBuilder& builder, std::shared_ptr<ast::BoundSetOperationNode> boundSetOp, std::shared_ptr<analyzer::SQLContext> context) {
+   auto test = context->currentScope->targetInfo.getTargetColumns();
    auto* mlirContext = builder.getContext();
    auto location = getLocationFromBison(boundSetOp->loc, mlirContext);
    auto rightLocation = getLocationFromBison(boundSetOp->boundRight->loc, mlirContext);
@@ -1387,10 +1388,10 @@ mlir::Value SQLMlirTranslator::translateSetOperation(mlir::OpBuilder& builder, s
    mlir::Value rightTuple = rightMapBlock->getArgument(0);
    std::vector<mlir::Value> leftMapResults;
    std::vector<mlir::Value> rightMapResults;
-   for (size_t i = 0; i < boundSetOp->leftScope->targetInfo.targetColumns.size(); i++) {
-      auto leftResult = boundSetOp->leftScope->targetInfo.targetColumns[i];
-      auto rightResult = boundSetOp->rightScope->targetInfo.targetColumns[i];
-      auto commonType = context->currentScope->targetInfo.targetColumns[i]->resultType;
+   for (size_t i = 0; i < boundSetOp->leftScope->targetInfo.size(); i++) {
+      auto leftResult = boundSetOp->leftScope->targetInfo.getTargetColumn(i);
+      auto rightResult = boundSetOp->rightScope->targetInfo.getTargetColumn(i);
+      auto commonType = context->currentScope->targetInfo.getTargetColumn(i)->resultType;
       if (rightResult->resultType != commonType) {
          auto attrDef = attrManager.createDef(rightMapScope, std::string("set_op") + std::to_string(i));
          auto attrRef = rightResult->createRef(builder, attrManager);
@@ -1418,7 +1419,7 @@ mlir::Value SQLMlirTranslator::translateSetOperation(mlir::OpBuilder& builder, s
 
       auto newType = commonType.toMlirType(mlirContext);
       auto newColName = leftResult->name;
-      auto newColDef = context->currentScope->targetInfo.targetColumns[i]->createDef(builder, attrManager, builder.getArrayAttr({leftResult->createRef(builder, attrManager), rightResult->createRef(builder, attrManager)}));
+      auto newColDef = context->currentScope->targetInfo.getTargetColumn(i)->createDef(builder, attrManager, builder.getArrayAttr({leftResult->createRef(builder, attrManager), rightResult->createRef(builder, attrManager)}));
       auto* newCol = &newColDef.getColumn();
       newCol->type = newType;
       attributes.push_back(newColDef);

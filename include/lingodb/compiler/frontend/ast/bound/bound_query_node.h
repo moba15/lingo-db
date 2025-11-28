@@ -18,6 +18,8 @@ class BoundSetOperationNode : public QueryNode {
    std::shared_ptr<analyzer::SQLScope> leftScope;
    std::shared_ptr<analyzer::SQLScope> rightScope;
 
+   std::vector<std::shared_ptr<ColumnReference>> newTargetInfos;
+
    std::shared_ptr<ColumnReference> leftMapping;
    std::shared_ptr<ColumnReference> rightMapping;
 };
