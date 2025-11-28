@@ -48,4 +48,4 @@ class EliminateUnnecessaryColumns : public mlir::PassWrapper<EliminateUnnecessar
 };
 } // end anonymous namespace
 
-std::unique_ptr<mlir::Pass> relalg::createEliminateUnnecessaryColumnsPass() { return std::make_unique<EliminateUnnecessaryColumns>(); }
+
