@@ -1136,7 +1136,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
             }
          }
 
-         auto boundAggrNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, boundAggregationExpressions, toMap, mapName, evalBeforeAggr);
+         auto boundAggrNode = drv.nf.node<ast::BoundAggregationNode>(pipeOperator->loc, boundGroupByNode, std::vector<std::vector<std::shared_ptr<ast::BoundFunctionExpression>>>{boundAggregationExpressions}, toMap, mapName, evalBeforeAggr);
          boundAstNode = boundAggrNode;
          /**
           * Handle grouping sets
@@ -1149,8 +1149,11 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                std::vector<std::shared_ptr<ast::ColumnReference>> localGroupBy{};
                std::vector<std::shared_ptr<ast::ColumnReference>> mapToNull{};
                std::vector<std::shared_ptr<ast::ColumnReference>> notAvailable{};
+               std::vector<std::shared_ptr<ast::BoundFunctionExpression>> localFunctions;
                int present = 0;
-
+               /*
+                * Get localGroupBy, mapToNull and notAvailable ColumnReferences
+                */
                for (size_t j = 0; j < aggregationNode->groupByNode->groupByExpressions.size(); j++) {
                   if (groupingSet.contains(j)) {
                      localGroupBy.emplace_back(groupColumnReferences[j]);
@@ -1167,13 +1170,21 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   }
                }
 
-               std::vector<std::shared_ptr<ast::ColumnReference>> aggregationColumnReferences{};
-               for (auto& aggr : boundAggrNode->aggregations) {
+
+               std::vector<std::shared_ptr<ast::ColumnReference>> localAggregationColumnReferences{};
+               for (auto& aggr : boundAggrNode->aggregations[0]) {
                   auto columnReferenceAggr = std::make_shared<ast::ColumnReference>("groupingSetAgg_" + std::to_string(groupingSetId), aggr->columnReference.value()->resultType, aggr->columnReference.value()->name);
                   columnReferenceAggr->displayName = aggr->columnReference.value()->displayName;
-                  aggregationColumnReferences.emplace_back(columnReferenceAggr);
+                  localAggregationColumnReferences.emplace_back(columnReferenceAggr);
+
+                  auto localFunction = std::make_shared<ast::BoundFunctionExpression>(*aggr.get());
+                  localFunction->columnReference = columnReferenceAggr;
+                  localFunctions.push_back(localFunction);
+
+
                }
-               boundAggrNode->groupByNode->localAggregationColumnReferences.emplace_back(std::move(aggregationColumnReferences));
+               boundAggrNode->aggregations.resize(groupingSets.size());
+               boundAggrNode->aggregations.at(i) = localFunctions;
 
                boundAggrNode->groupByNode->localGroupByColumnReferences.emplace_back(std::move(localGroupBy));
                boundAggrNode->groupByNode->localMapToNullColumnReferences.emplace_back(std::move(mapToNull));
@@ -1225,8 +1236,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                auto newN = boundAggrNode->groupByNode->unionColumnReferences.back().at(i);
                context->replace(resolverScope, old, newN);
             }
-            for (size_t i = 0; i < boundAggrNode->aggregations.size(); i++) {
-               auto old = boundAggrNode->aggregations[i]->columnReference.value();
+            for (size_t i = 0; i < boundAggrNode->aggregations.back().size(); i++) {
+               auto old = boundAggrNode->aggregations.back()[i]->columnReference.value();
                auto newN = boundAggrNode->groupByNode->unionColumnReferences.back().at(boundAggrNode->groupByNode->groupByColumnReferences.size() + i);
                context->replace(resolverScope, old, newN);
             }

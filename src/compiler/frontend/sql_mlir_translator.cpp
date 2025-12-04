@@ -1700,12 +1700,12 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
          std::vector<std::shared_ptr<ast::ColumnReference>> notAvailable = aggregation->groupByNode->localNotAvailableColumnReferences.at(i);
          std::vector<std::shared_ptr<ast::ColumnReference>> computed;
 
-         for (size_t j = 0; j < aggregation->aggregations.size(); j++) {
-            aggregation->aggregations.at(j)->columnReference = aggregation->groupByNode->localAggregationColumnReferences.at(i).at(j);
+         for (size_t j = 0; j < aggregation->aggregations.at(i).size(); j++) {
+            aggregation->aggregations.at(i).at(j)->columnReference = aggregation->groupByNode->localAggregationColumnReferences.at(i).at(j);
             computed.emplace_back(aggregation->groupByNode->localAggregationColumnReferences.at(i).at(j));
          }
 
-         auto tree2 = translateGroupByAttributesAndAggregate(builder, tree, location, localGroupByAttrs, aggregation->aggregations, aggregation->mapName);
+         auto tree2 = translateGroupByAttributesAndAggregate(builder, tree, location, localGroupByAttrs, aggregation->aggregations.at(i), aggregation->mapName);
          tree2 = mapToNull(builder, notAvailable, tree2);
          tree2 = mapToNullable(builder, localGroupByAttrs, localGroupByAttrsNullable, tree2);
 
@@ -1749,7 +1749,7 @@ mlir::Value SQLMlirTranslator::translateAggregation(mlir::OpBuilder& builder, st
       auto aggregations = aggregation->aggregations;
       std::string mapName = aggregation->mapName;
 
-      return translateGroupByAttributesAndAggregate(builder, tree, location, groupColumnReferences, aggregations, mapName);
+      return translateGroupByAttributesAndAggregate(builder, tree, location, groupColumnReferences, aggregations.front(), mapName);
    }
 
    return tree;
