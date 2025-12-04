@@ -1142,8 +1142,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
           * Handle grouping sets
           */
          if (aggregationNode->groupByNode && !aggregationNode->groupByNode->groupingSet.empty()) {
+            auto originalAggrFunctions =  boundAggrNode->aggregations.front();
             static size_t groupingSetId = 0;
             auto groupingSets = aggregationNode->groupByNode->groupingSet;
+            boundAggrNode->aggregations.resize(groupingSets.size());
             for (size_t i = 0; i < groupingSets.size(); i++) {
                auto groupingSet = groupingSets[i];
                std::vector<std::shared_ptr<ast::ColumnReference>> localGroupBy{};
@@ -1183,8 +1185,9 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
 
 
                }
-               boundAggrNode->aggregations.resize(groupingSets.size());
+
                boundAggrNode->aggregations.at(i) = localFunctions;
+
 
                boundAggrNode->groupByNode->localGroupByColumnReferences.emplace_back(std::move(localGroupBy));
                boundAggrNode->groupByNode->localMapToNullColumnReferences.emplace_back(std::move(mapToNull));
@@ -1202,9 +1205,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                                      boundAggrNode->groupByNode->localNotAvailableColumnReferences.at(0).begin(),
                                      boundAggrNode->groupByNode->localNotAvailableColumnReferences.at(0).end());
 
-            currentAttributes.insert(currentAttributes.end(),
-                                     boundAggrNode->groupByNode->localAggregationColumnReferences.at(0).begin(),
-                                     boundAggrNode->groupByNode->localAggregationColumnReferences.at(0).end());
+            for (auto& f: boundAggrNode->aggregations.front()) {
+               currentAttributes.emplace_back(f->columnReference.value());
+            }
+
             currentAttributes.emplace_back(boundAggrNode->groupByNode->localPresentIntval.at(0).second);
             for (size_t i = 1; i < boundAggrNode->groupByNode->localGroupByColumnReferences.size(); i++) {
                auto rollUpUnionName = context->getUniqueScope("rollupUnion");
@@ -1214,9 +1218,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                currentLocalAttributes.insert(currentLocalAttributes.end(),
                                              boundAggrNode->groupByNode->localNotAvailableColumnReferences.at(i).begin(),
                                              boundAggrNode->groupByNode->localNotAvailableColumnReferences.at(i).end());
-               currentLocalAttributes.insert(currentLocalAttributes.end(),
-                                             boundAggrNode->groupByNode->localAggregationColumnReferences.at(i).begin(),
-                                             boundAggrNode->groupByNode->localAggregationColumnReferences.at(i).end());
+               for (auto& f: boundAggrNode->aggregations[i]) {
+                  currentLocalAttributes.emplace_back(f->columnReference.value());
+               }
+
                currentLocalAttributes.emplace_back(boundAggrNode->groupByNode->localPresentIntval.at(i).second);
 
                std::vector<std::shared_ptr<ast::ColumnReference>> unionColumnReferences{};
@@ -1236,8 +1241,8 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                auto newN = boundAggrNode->groupByNode->unionColumnReferences.back().at(i);
                context->replace(resolverScope, old, newN);
             }
-            for (size_t i = 0; i < boundAggrNode->aggregations.back().size(); i++) {
-               auto old = boundAggrNode->aggregations.back()[i]->columnReference.value();
+            for (size_t i = 0; i < originalAggrFunctions.size(); i++) {
+               auto old = originalAggrFunctions[i]->columnReference.value();
                auto newN = boundAggrNode->groupByNode->unionColumnReferences.back().at(boundAggrNode->groupByNode->groupByColumnReferences.size() + i);
                context->replace(resolverScope, old, newN);
             }
