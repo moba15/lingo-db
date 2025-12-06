@@ -280,6 +280,30 @@ class VarLen32Filter : public lingodb::runtime::Filter {
    }
 };
 template <class T>
+class BitMapFilter : public lingodb::runtime::Filter {
+   size_t* bitMap;
+   public:
+   BitMapFilter(size_t* bitMap) {}
+   size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+      const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
+      auto* writer = nextSelVec;
+      for (size_t i = 0; i < len; i++) {
+         size_t index0 = currSelVec[i];
+         auto index = std::hash<T>{}(data[index0]) % 64;
+         //Check if bit at index in bitMap is set 0000000000000010
+         auto toCheck = *bitMap;
+         toCheck >> index;
+         toCheck << (64 - index);
+         if (toCheck >= 0) {
+            *writer = index0;
+            writer++;
+         }
+      }
+      return writer - nextSelVec;
+   }
+};
+
+template <class T>
 std::unique_ptr<lingodb::runtime::Filter> createSimpleTypeSimpleFilters(lingodb::runtime::FilterOp op, T value) {
    switch (op) {
       case lingodb::runtime::FilterOp::LT:

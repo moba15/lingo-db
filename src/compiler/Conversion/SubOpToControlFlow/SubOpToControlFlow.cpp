@@ -4664,3 +4664,14 @@ void subop::registerSubOpToControlFlowConversionPasses() {
       "",
       subop::createLowerSubOpPipeline);
 }
+
+class CreateBloomFilterLowering : public OpConversionPattern<subop::CreateBloomFilterOp> {
+   public:
+   using OpConversionPattern::OpConversionPattern;
+
+   mlir::LogicalResult
+   matchAndRewrite(subop::CreateBloomFilterOp op, OpAdaptor adaptor,
+                   ConversionPatternRewriter& rewriter) const override {
+      return mlir::success();
+   }
+};
