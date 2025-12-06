@@ -122,6 +122,7 @@ class SubOpLoweringStep : public LoweringStep {
          optSubOpPm.addPass(subop::createReuseLocalPass());
       optSubOpPm.addPass(subop::createSpecializeSubOpPass(enabledPasses.contains("Specialize")));
       optSubOpPm.addPass(subop::createNormalizeSubOpPass());
+      optSubOpPm.addPass(subop::createSIPPass());
       if (enabledPasses.contains("PullGatherUp"))
          optSubOpPm.addPass(subop::createPullGatherUpPass());
       optSubOpPm.addPass(subop::createEnforceOrderPass());
