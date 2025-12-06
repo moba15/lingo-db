@@ -16,6 +16,7 @@
 #include "lingodb/compiler/runtime/ArrowTable.h"
 #include "lingodb/compiler/runtime/Buffer.h"
 #include "lingodb/compiler/runtime/DataSourceIteration.h"
+#include "lingodb/compiler/runtime/SIP.h"
 #include "lingodb/compiler/runtime/EntryLock.h"
 #include "lingodb/compiler/runtime/ExecutionContext.h"
 #include "lingodb/compiler/runtime/GrowingBuffer.h"
@@ -3780,6 +3781,16 @@ class CreateHashIndexedViewLowering : public SubOpConversionPattern<subop::Creat
       return success();
    }
 };
+      class CreateSIPFilterLowering : public SubOpConversionPattern<subop::CreateSIPFilterOp> {
+      using SubOpConversionPattern<subop::CreateSIPFilterOp>::SubOpConversionPattern;
+      LogicalResult matchAndRewrite(subop::CreateSIPFilterOp op, OpAdaptor adaptor, SubOpRewriter& rewriter) const override {
+         // Convert the SIP name attribute (string) into a VarLen32 runtime value
+         mlir::Value sipNameVal = rewriter.create<util::CreateConstVarLen>(op->getLoc(), util::VarLen32Type::get(rewriter.getContext()), op.getSipNameAttr());
+         auto result = rt::SIP::createSIP(rewriter, op->getLoc())(mlir::ValueRange{adaptor.getHashView(), sipNameVal})[0];
+         rewriter.replaceOp(op, result);
+          return success();
+      }
+      };
 class CreateContinuousViewLowering : public SubOpConversionPattern<subop::CreateContinuousView> {
    using SubOpConversionPattern<subop::CreateContinuousView>::SubOpConversionPattern;
    LogicalResult matchAndRewrite(subop::CreateContinuousView createOp, OpAdaptor adaptor, SubOpRewriter& rewriter) const override {
@@ -4249,6 +4260,7 @@ class LockLowering : public SubOpTupleStreamConsumerConversionPattern<subop::Loc
       rt::EntryLock::unlock(rewriter, lockOp->getLoc())({lockPtr});
    }
 };
+
 }; // namespace
 namespace {
 PatternList getCPUPatternList(TypeConverter& typeConverter, mlir::MLIRContext* ctxt) {
@@ -4307,6 +4319,7 @@ PatternList getCPUPatternList(TypeConverter& typeConverter, mlir::MLIRContext* c
    patterns.insertPattern<CreateHashIndexedViewLowering>(typeConverter, ctxt);
    patterns.insertPattern<LookupHashIndexedViewLowering>(typeConverter, ctxt);
    patterns.insertPattern<ScanListLowering>(typeConverter, ctxt);
+   patterns.insertPattern<CreateSIPFilterLowering>(typeConverter, ctxt);
    //ContinuousView
    patterns.insertPattern<CreateContinuousViewLowering>(typeConverter, ctxt);
    patterns.insertPattern<ScanRefsContinuousViewLowering>(typeConverter, ctxt);
@@ -4364,6 +4377,9 @@ void handleExecutionStepCPU(PatternList& patternList, subop::ExecutionStepOp ste
    // llvm::dbgs() << "[CPU] HANDLING STEP " << step << "\n";
    SubOpRewriter rewriter(patternList, step, mapping);
 
+   //SIP
+   rewriter.insertPattern<CreateSIPFilterLowering>(typeConverter, ctxt);
+
    for (auto [param, arg, isThreadLocal] : llvm::zip(step.getInputs(), step.getSubOps().front().getArguments(), step.getIsThreadLocal())) {
       mlir::Value input = mapping.lookup(param);
       if (!mlir::cast<mlir::BoolAttr>(isThreadLocal).getValue()) {
@@ -4390,6 +4406,7 @@ void handleExecutionStepCPU(PatternList& patternList, subop::ExecutionStepOp ste
    for (auto [i, o] : llvm::zip(returnOp.getInputs(), step.getResults())) {
       mapping.map(o, rewriter.getMapped(i));
    }
+
    rewriter.cleanup();
 }
 } // namespace
@@ -4607,3 +4624,14 @@ void subop::registerSubOpToControlFlowConversionPasses() {
       "",
       subop::createLowerSubOpPipeline);
 }
+
+class CreateBloomFilterLowering : public OpConversionPattern<subop::CreateBloomFilterOp> {
+   public:
+   using OpConversionPattern::OpConversionPattern;
+
+   mlir::LogicalResult
+   matchAndRewrite(subop::CreateBloomFilterOp op, OpAdaptor adaptor,
+                   ConversionPatternRewriter& rewriter) const override {
+      return mlir::success();
+   }
+};
