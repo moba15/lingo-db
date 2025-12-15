@@ -1,11 +1,17 @@
+#include "lingodb/compiler/Dialect/DB/IR/DBDialect.h"
+#include "lingodb/compiler/Dialect/DB/IR/DBOps.h"
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorDialect.h"
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorOps.h"
 #include "lingodb/compiler/Dialect/SubOperator/Transforms/ColumnCreationAnalysis.h"
 #include "lingodb/compiler/Dialect/SubOperator/Transforms/ColumnUsageAnalysis.h"
 #include "lingodb/compiler/Dialect/SubOperator/Transforms/Passes.h"
+#include "lingodb/compiler/Dialect/SubOperator/Transforms/StateUsageTransformer.h"
 #include "lingodb/compiler/Dialect/SubOperator/Transforms/SubOpDependencyAnalysis.h"
+#include "lingodb/compiler/Dialect/SubOperator/Utils.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamDialect.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
+#include "lingodb/compiler/Dialect/util/UtilDialect.h"
+#include "lingodb/compiler/Dialect/util/UtilOps.h"
 #include "lingodb/compiler/helper.h"
 
 #include "llvm/ADT/SmallVector.h"
@@ -14,9 +20,20 @@
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
 
 #include <llvm/Support/Debug.h>
+#include <algorithm>
+#include <lingodb/compiler/Dialect/DB/IR/DBOps.h.inc>
+#include <string>
+
 #define DEBUG_TYPE "subop-sip"
 namespace {
 using namespace lingodb::compiler::dialect;
+
+static inline std::string trim(const std::string& s) {
+   size_t a = s.find_first_not_of(" \t\n\r");
+   if (a == std::string::npos) return "";
+   size_t b = s.find_last_not_of(" \t\n\r");
+   return s.substr(a, b - a + 1);
+}
 
 class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::ModuleOp>> {
    public:
@@ -30,79 +47,47 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       auto& created = getAnalysis<subop::ColumnCreationAnalysis>();
       auto& used = getAnalysis<subop::ColumnUsageAnalysis>();
 
-      getOperation()->walk([&](subop::ExecutionGroupOp eg) {
-         llvm::SmallVector<subop::GetExternalOp> tables;
-         llvm::SmallVector<subop::ScanRefsOp> scans;
-         llvm::SmallVector<subop::LookupOp> lookups;
-         llvm::SmallVector<subop::CreateHashIndexedView> hashViews;
-
-         eg.walk([&](subop::GetExternalOp op) { tables.push_back(op); });
-         eg.walk([&](subop::ScanRefsOp op) { scans.push_back(op); });
-         eg.walk([&](subop::LookupOp op) { lookups.push_back(op); });
-         eg.walk([&](subop::CreateHashIndexedView op) { hashViews.push_back(op); });
-         llvm::dbgs() << "[SIP] ExecutionGroup at " << eg.getLoc() << "\n";
-
-         // Tables accessed
-         for (auto t : tables) {
-            // GetExternalOp stores its description in the 'descr' property
-            llvm::dbgs() << "  table: descr=" << t.getDescr() << " type=" << t.getResult().getType() << "\n";
+      getOperation()->walk([&](mlir::Operation* op) {
+         if (auto scan = mlir::dyn_cast_or_null<subop::ScanOp>(op)) {
+            llvm::dbgs() << "Found scan op: " << scan << "\n";
+            llvm::dbgs() << "  State: " << scan.getState() << " of type " << scan.getState().getType() << "\n";
+            llvm::dbgs() << "  Mapping: " << scan.getMapping() << "\n";
+            auto usedCols = used.getUsedColumnsForOp(scan);
          }
-
-         // Scan outputs (potential build/probe sources)
-         for (auto scan : scans) {
-            llvm::dbgs() << "  scan_refs " << scan.getOperation() << " creates: ";
-            for (auto* col : created.getCreatedColumns(scan.getOperation())) {
-               llvm::dbgs() << col->type << " ";
+         if (auto map = mlir::dyn_cast_or_null<subop::MapOp>(op)) {
+            map.dump();
+            auto usedCols = used.getUsedColumnsForOp(map);
+            llvm::dbgs() << "  Used columns:\n";
+            for (auto* col : usedCols) {
+               llvm::dbgs() << col->type << "\n";
             }
-            llvm::dbgs() << "\n";
-         }
-
-         // Hash table layouts (what gets stored)
-         for (auto hv : hashViews) {
-            // CreateHashIndexedView has a source operand and attributes for hash/link members.
-            llvm::dbgs() << "  hash_view source=" << hv.getSource() << " hashMember=" << hv.getHashMember().getMember() << " linkMember=" << hv.getLinkMember().getMember() << " layout=" << hv.getResult().getType() << "\n";
-         }
-
-         // Lookup keys and their producers (join keys)
-         for (auto lookup : lookups) {
-            llvm::dbgs() << "  lookup " << lookup.getOperation() << " uses columns: ";
-            for (auto* col : used.getUsedColumns(lookup.getOperation())) {
-               mlir::Operation* producer = created.getColumnCreator(col);
-               if (producer)
-                  llvm::dbgs() << col->type << " (producer=" << producer->getName() << ") ";
-               else
-                  llvm::dbgs() << col->type << " (producer=null) ";
-            }
-            llvm::dbgs() << "\n";
-         }
-
-         // Structured summary: for each hash view, print linked lookups and probe producers
-         for (auto hv : hashViews) {
-            llvm::dbgs() << "  [SIP-SUMMARY] view=" << hv << " source=" << hv.getSource() << " hashMember=" << hv.getHashMember().getMember() << " valueMembers=[";
-            auto written = hv.getWrittenMembers();
-            auto& memberManager = hv.getContext()->getOrLoadDialect<subop::SubOperatorDialect>()->getMemberManager();
-            for (size_t i = 0; i < written.size(); ++i) {
-               llvm::dbgs() << memberManager.getName(written[i]);
-               if (i + 1 < written.size()) llvm::dbgs() << ",";
-            }
-            llvm::dbgs() << "]\n";
-
-            // find lookups that reference this view (operand match)
-            for (auto lk : lookups) {
-               // lookup operand 1 is the view
-               if (lk.getOperand(1) == hv.getResult()) {
-                  llvm::dbgs() << "    lookup=" << lk << " uses probe columns: ";
-                  for (auto* col : used.getUsedColumns(lk.getOperation())) {
-                     mlir::Operation* producer = created.getColumnCreator(col);
-                     if (producer)
-                        llvm::dbgs() << col->type << " (producer=" << producer->getName() << ") ";
-                     else
-                        llvm::dbgs() << col->type << " (producer=null) ";
-                  }
-                  llvm::dbgs() << "\n";
+            map.walk([&](mlir::Operation* op) {
+               if (auto hash = mlir::dyn_cast_or_null<db::Hash>(op)) {
+                  llvm::dbgs() << "  Hash: " << "\n";
+                  hash->dumpPretty();
+                  hash.getOperands()[0].dump();
                }
-            }
+            });
          }
+         if (auto genericCreateOp = mlir::dyn_cast_or_null<subop::GenericCreateOp>(op)) {
+            if (genericCreateOp.getRes().getType().isa<subop::BufferType>()) {
+               auto type = genericCreateOp.getRes().getType();
+
+               auto buffer = mlir::dyn_cast_or_null<subop::BufferType>(type);
+               assert(buffer);
+               ;
+
+
+            }
+
+         }
+         if (auto createHashIndexView = mlir::dyn_cast_or_null<subop::CreateHashIndexedView>(op)) {
+            createHashIndexView.dump();
+         }
+
+
+
+
       });
    }
 };

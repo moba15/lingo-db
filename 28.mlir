@@ -24,7 +24,6 @@ module {
         %14 = db.hash %arg0 : i64 loc(#loc7)
         tuples.return %14 : index loc(#loc7)
       } loc(#loc7)
-      
       //Add some kind of selection???????? here or where
       %9 = subop.lookup %8%7 [@hj_u_2::@hash] : !subop.hash_indexed_view<[hash$0 : index], [member$0 : i64, member$1 : i64, member$2 : !db.string], false> @lookup_u_3::@list({type = !subop.list<!subop.lookup_entry_ref<!subop.hash_indexed_view<[hash$0 : index], [member$0 : i64, member$1 : i64, member$2 : !db.string], false>>>}) loc(#loc8)
       %10 = subop.nested_map %9 [@lookup_u_3::@list] (%arg0, %arg1) {
@@ -40,6 +39,7 @@ module {
         %20 = subop.combine_tuple %19, %arg0 loc(#loc14)
         tuples.return %20 : !tuples.tuplestream loc(#loc15)
       } loc(#loc9)
+      //Make nullable again for s.matrnr
       %11 = subop.map %10 computes : [@s::@matrnr({type = !db.nullable<i64>})] input : [@s::@matrnr__notnull] (%arg0: i64){
         %14 = db.as_nullable %arg0 : i64 -> <i64> loc(#loc17)
         tuples.return %14 : !db.nullable<i64> loc(#loc18)
