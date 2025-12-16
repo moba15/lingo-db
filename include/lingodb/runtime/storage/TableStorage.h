@@ -7,10 +7,10 @@
 #include <memory>
 #include <variant>
 
+#include "lingodb/utility/Serialization.h"
 #include <arrow/type_fwd.h>
-
 namespace lingodb::runtime {
-enum class FilterOp {
+enum class FilterOp : uint8_t {
    EQ,
    NEQ,
    LT,
@@ -32,6 +32,19 @@ struct FilterDescription {
          columnId == other.columnId &&
          op == other.op &&
          value == other.value && values == other.values;
+   }
+   void serialize(lingodb::utility::Serializer& serializer) {
+      serializer.writeProperty(0, columnName);
+      serializer.writeProperty(1, columnId);
+      serializer.writeProperty(2, op);
+      serializer.writeProperty(3, value.index());
+      std::visit([&](auto const& v) {
+         serializer.writeProperty(4, v);
+      }, value);
+      serializer.writeProperty(5, values.index());
+      std::visit([&](auto const& v) {
+         serializer.writeProperty(6, v);
+      }, values);
    }
 };
 struct ScanConfig {

@@ -13,9 +13,56 @@
 #include <queue>
 
 using namespace mlir;
+namespace llvm {
+hash_code hash_value(const lingodb::DatasourceProperty datasource) {
+   return datasource.hash();
+
+}
+}
 
 namespace {
 using namespace lingodb::compiler::dialect;
+
+// cpp
+mlir::Attribute convertToAttribute(MLIRContext* ctx, const lingodb::DatasourceProperty datasource) {
+   assert(ctx && "MLIRContext must not be null");
+
+   // Serialize datasource into raw bytes using the same utility used in printing.
+   lingodb::utility::SimpleByteWriter simpleByteWriter{};
+   lingodb::utility::Serializer s{simpleByteWriter};
+   // Note: DatasourceProperty::serialize writes restrictions and filterDescription.
+   const_cast<lingodb::DatasourceProperty&>(datasource).serialize(s); // datasource is passed by value; const_cast is safe here
+
+   const std::byte* data = simpleByteWriter.data();
+   size_t len = simpleByteWriter.size();
+
+   // Convert to hex string (uppercase) to match BaseTableOp::print output
+   static const char hexChars[] = "0123456789ABCDEF";
+   std::string hex;
+   hex.reserve(len * 2);
+   for (size_t i = 0; i < len; ++i) {
+      unsigned char v = std::to_integer<unsigned char>(data[i]);
+      hex.push_back(hexChars[v >> 4]);
+      hex.push_back(hexChars[v & 0x0F]);
+   }
+
+   return mlir::StringAttr::get(ctx, hex);
+}
+
+
+mlir::LogicalResult convertFromAttribute(const lingodb::DatasourceProperty& datasource, mlir::Attribute attr,
+                                         std::function<mlir::InFlightDiagnostic()> emitError) {
+   std::cerr << "Not impl conv";
+   return mlir::failure();
+}
+
+void writeToMlirBytecode(mlir::DialectBytecodeWriter& writer,const lingodb::DatasourceProperty& datasource) {
+   std::cerr << "Not impl";
+
+}
+mlir::LogicalResult readFromMlirBytecode(mlir::DialectBytecodeReader& reader, const lingodb::DatasourceProperty & datasource) {
+   return mlir::failure(); //todo
+}
 
 tuples::ColumnManager& getColumnManager(::mlir::OpAsmParser& parser) {
    return parser.getBuilder().getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager();
@@ -273,6 +320,10 @@ ParseResult relalg::BaseTableOp::parse(OpAsmParser& parser, OperationState& resu
       break;
    }
    result.addAttribute("columns", mlir::DictionaryAttr::get(parser.getBuilder().getContext(), columns));
+   if (parser.parseKeyword("datasource") || parser.parseColon()) return failure();
+   std::string hex;
+   if (parser.parseString(&hex)) { return failure(); }
+
    return parser.addTypeToList(tuples::TupleStreamType::get(parser.getBuilder().getContext()), result.types);
 }
 void relalg::BaseTableOp::print(OpAsmPrinter& p) {
@@ -293,6 +344,25 @@ void relalg::BaseTableOp::print(OpAsmPrinter& p) {
       printCustDef(p, *this, relationDefAttr);
    }
    p << "}";
+   p << " datasource: \"";
+   utility::SimpleByteWriter simpleByteWriter{};
+   utility::Serializer s{simpleByteWriter};
+   getDatasource().serialize(s);
+   const std::byte* data = simpleByteWriter.data();
+
+   size_t len = simpleByteWriter.size();
+
+   static const char hexChars[] = "0123456789ABCDEF";
+   std::string hex;
+   hex.reserve(len * 2);
+
+   for (size_t i = 0; i < len; ++i) {
+      unsigned char v = std::to_integer<unsigned char>(data[i]);
+      hex.push_back(hexChars[v >> 4]);
+      hex.push_back(hexChars[v & 0x0F]);
+   }
+   p << hex << "\"";
+
 }
 
 ::mlir::LogicalResult relalg::MapOp::verify() {
