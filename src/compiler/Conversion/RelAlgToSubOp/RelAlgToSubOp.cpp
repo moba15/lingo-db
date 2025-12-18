@@ -124,7 +124,23 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
             defMapping.push_back({member, attrDef});
          }
       }
-      scanDescription += "}, \"restrictions\": " + restrictions + "}";
+      lingodb::utility::SimpleByteWriter simpleByteWriter{};
+      lingodb::utility::Serializer s{simpleByteWriter};
+
+      baseTableOp.getDatasource().serialize(s);
+
+      const std::byte* data = simpleByteWriter.data();
+      size_t len = simpleByteWriter.size();
+
+      static const char hexChars[] = "0123456789ABCDEF";
+      std::string hex;
+      hex.reserve(len * 2);
+      for (size_t i = 0; i < len; ++i) {
+         unsigned char v = std::to_integer<unsigned char>(data[i]);
+         hex.push_back(hexChars[v >> 4]);
+         hex.push_back(hexChars[v & 0x0F]);
+      }
+      scanDescription += "}, \"datasource\": \"" + hex + "\"}";
       auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), baseTableOp->hasAttr("restriction"));
       mlir::Value tableRef = rewriter.create<subop::GetExternalOp>(baseTableOp->getLoc(), tableRefType, rewriter.getStringAttr(scanDescription));
       rewriter.replaceOpWithNewOp<subop::ScanOp>(baseTableOp, tableRef, createColumnDefMemberMappingAttr(rewriter.getContext(), defMapping));
@@ -1153,6 +1169,7 @@ static mlir::Value translateINLJ(mlir::Value left, mlir::Value right, mlir::Arra
    auto valueStateMembers = createStateMembersAttr(ctxt, valMembers);
 
    auto externalHashIndexType = subop::ExternalHashIndexType::get(rewriter.getContext(), keyStateMembers, valueStateMembers);
+   //TODO
    mlir::Value externalHashIndex = rewriter.create<subop::GetExternalOp>(loc, externalHashIndexType, externalIndexDescription);
    // Erase table scan
    rewriter.eraseOp(rightScan->getOperand(0).getDefiningOp());

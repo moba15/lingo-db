@@ -13,30 +13,21 @@
 #include <queue>
 
 using namespace mlir;
-namespace llvm {
-hash_code hash_value(const lingodb::DatasourceProperty datasource) {
-   return datasource.hash();
-
-}
-}
 
 namespace {
 using namespace lingodb::compiler::dialect;
 
-// cpp
 mlir::Attribute convertToAttribute(MLIRContext* ctx, const lingodb::DatasourceProperty datasource) {
    assert(ctx && "MLIRContext must not be null");
 
-   // Serialize datasource into raw bytes using the same utility used in printing.
    lingodb::utility::SimpleByteWriter simpleByteWriter{};
    lingodb::utility::Serializer s{simpleByteWriter};
-   // Note: DatasourceProperty::serialize writes restrictions and filterDescription.
-   const_cast<lingodb::DatasourceProperty&>(datasource).serialize(s); // datasource is passed by value; const_cast is safe here
+
+   const_cast<lingodb::DatasourceProperty&>(datasource).serialize(s);
 
    const std::byte* data = simpleByteWriter.data();
    size_t len = simpleByteWriter.size();
 
-   // Convert to hex string (uppercase) to match BaseTableOp::print output
    static const char hexChars[] = "0123456789ABCDEF";
    std::string hex;
    hex.reserve(len * 2);
@@ -49,18 +40,16 @@ mlir::Attribute convertToAttribute(MLIRContext* ctx, const lingodb::DatasourcePr
    return mlir::StringAttr::get(ctx, hex);
 }
 
-
 mlir::LogicalResult convertFromAttribute(const lingodb::DatasourceProperty& datasource, mlir::Attribute attr,
                                          std::function<mlir::InFlightDiagnostic()> emitError) {
    std::cerr << "Not impl conv";
    return mlir::failure();
 }
 
-void writeToMlirBytecode(mlir::DialectBytecodeWriter& writer,const lingodb::DatasourceProperty& datasource) {
+void writeToMlirBytecode(mlir::DialectBytecodeWriter& writer, const lingodb::DatasourceProperty& datasource) {
    std::cerr << "Not impl";
-
 }
-mlir::LogicalResult readFromMlirBytecode(mlir::DialectBytecodeReader& reader, const lingodb::DatasourceProperty & datasource) {
+mlir::LogicalResult readFromMlirBytecode(mlir::DialectBytecodeReader& reader, const lingodb::DatasourceProperty& datasource) {
    return mlir::failure(); //todo
 }
 
@@ -323,6 +312,15 @@ ParseResult relalg::BaseTableOp::parse(OpAsmParser& parser, OperationState& resu
    if (parser.parseKeyword("datasource") || parser.parseColon()) return failure();
    std::string hex;
    if (parser.parseString(&hex)) { return failure(); }
+   std::vector<std::byte> data;
+   for (size_t i = 0; i < hex.size(); i += 2) {
+      std::string byteString = hex.substr(i, 2);
+      char byte = strtol(byteString.c_str(), nullptr, 16);
+      data.emplace_back(std::byte(byte));
+   }
+   utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
+   utility::Deserializer s{simpleByteReader};
+   result.getOrAddProperties<Properties>().datasource = DatasourceProperty::deserialize(s);;
 
    return parser.addTypeToList(tuples::TupleStreamType::get(parser.getBuilder().getContext()), result.types);
 }
@@ -362,7 +360,6 @@ void relalg::BaseTableOp::print(OpAsmPrinter& p) {
       hex.push_back(hexChars[v & 0x0F]);
    }
    p << hex << "\"";
-
 }
 
 ::mlir::LogicalResult relalg::MapOp::verify() {

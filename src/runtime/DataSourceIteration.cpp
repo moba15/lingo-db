@@ -1,6 +1,7 @@
 #include "lingodb/runtime/DataSourceIteration.h"
 #include "json.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
+#include "lingodb/compiler/Dialect/RelAlg/DatasourceProperty.h"
 #include "lingodb/runtime/storage/TableStorage.h"
 #include "lingodb/scheduler/Scheduler.h"
 #include "lingodb/scheduler/Tasks.h"
@@ -56,8 +57,25 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
    std::string tableName = descr["table"];
    std::unordered_set<FilterDescription> uniqueRestrictions;
    std::vector<FilterDescription> restrictions;
-   if (descr.contains("restrictions")) {
-      for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
+   if (descr.contains("datasource")) {
+      std::string dataSourceRaw = descr["datasource"];
+      std::vector<std::byte> data;
+      for (size_t i = 0; i < dataSourceRaw.size(); i += 2) {
+         std::string byteString = dataSourceRaw.substr(i, 2);
+         char byte = strtol(byteString.c_str(), nullptr, 16);
+         data.emplace_back(std::byte(byte));
+      }
+      utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
+      utility::Deserializer s{simpleByteReader};
+      auto dataSource = DatasourceProperty::deserialize(s);
+      for (auto& filterDesc : dataSource.filterDescription) {
+         if (uniqueRestrictions.contains(filterDesc)) {
+            continue;
+         }
+         uniqueRestrictions.insert(filterDesc);
+         restrictions.push_back(filterDesc);
+      }
+      /*for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
          FilterDescription filterDesc;
          filterDesc.columnName = r["column"].get<std::string>();
          std::string op = r["cmp"].get<std::string>();
@@ -120,7 +138,7 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
          }
          uniqueRestrictions.insert(filterDesc);
          restrictions.push_back(filterDesc);
-      }
+      }*/
    }
    auto& session = executionContext->getSession();
    if (auto maybeRelation = session.getCatalog()->getTypedEntry<catalog::TableCatalogEntry>(tableName)) {

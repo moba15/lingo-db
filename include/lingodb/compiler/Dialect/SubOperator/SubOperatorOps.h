@@ -11,6 +11,7 @@
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOpsAttributes.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOpsTypes.h"
 
+
 #include "mlir/Dialect/Func/IR/FuncOps.h"
 #include "mlir/IR/Builders.h"
 #include "mlir/IR/Dialect.h"

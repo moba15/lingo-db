@@ -227,6 +227,10 @@ class Deserializer {
    T read() {
       return reader.read<T>();
    }
+   template <std::same_as<int64_t> T>
+   T read() {
+      return reader.read<T>();
+   }
    template <std::same_as<std::string> T>
    T read() {
       size_t length = read<size_t>();
