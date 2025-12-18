@@ -7,46 +7,33 @@ struct ExternalDatasourceProperty {
    struct Mapping {
       std::string memberName;
       std::string identifier;
-
+      void serialize(lingodb::utility::Serializer& serializer) const {
+         serializer.writeProperty(0, memberName);
+         serializer.writeProperty(1, identifier);
+      }
+      static Mapping deserialize(lingodb::utility::Deserializer& deserializer) {
+         Mapping map{};
+         map.memberName = deserializer.readProperty<std::string>(0);
+         map.identifier = deserializer.readProperty<std::string>(1);
+         return map;
+      }
    };
    std::string tableName;
    std::vector<Mapping> mapping;
    ;
    std::vector<runtime::FilterDescription> filterDescriptions;
 
-   void serialize(lingodb::utility::Serializer& serializer) {
+   void serialize(lingodb::utility::Serializer& serializer) const {
       serializer.writeProperty(0, tableName);
-      serializer.writeProperty(1, mapping.size());
-      size_t idx = 2;
-      for (auto& map : mapping) {
-         serializer.writeProperty(idx, map.memberName);
-         serializer.writeProperty(idx + 1, map.identifier);
-         idx += 2;
-      }
-      serializer.writeProperty(idx, filterDescriptions.size());
-      idx++;
-      for (auto& filterDescription : filterDescriptions) {
-         filterDescription.serialize(serializer, idx);
-      }
-
+      serializer.writeProperty(1, mapping);
+      serializer.writeProperty(2, filterDescriptions);
    }
 
    static ExternalDatasourceProperty deserialize(lingodb::utility::Deserializer& deserializer) {
       ExternalDatasourceProperty prop{};
       prop.tableName = deserializer.readProperty<std::string>(0);
-      size_t mappingCount = deserializer.readProperty<size_t>(1);
-      size_t propIdx = 2;
-      for (size_t i = 0; i < mappingCount; ++i) {
-         prop.mapping.emplace_back(deserializer.readProperty<std::string>(propIdx), deserializer.readProperty<std::string>(propIdx + 1));
-         propIdx += 2;
-      }
-      size_t filterCount = deserializer.readProperty<size_t>(propIdx);
-      propIdx++;
-
-      for (size_t i = 0; i < filterCount; ++i) {
-         prop.filterDescriptions.emplace_back(runtime::FilterDescription::deserialize(deserializer, propIdx));
-      }
-
+      prop.mapping = deserializer.readProperty<std::vector<Mapping>>(1);
+      prop.filterDescriptions = deserializer.readProperty<std::vector<runtime::FilterDescription>>(2);
 
       return prop;
    }

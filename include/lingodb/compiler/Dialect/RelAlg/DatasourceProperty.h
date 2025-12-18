@@ -14,20 +14,12 @@ struct DatasourceProperty {
    }
 
    void serialize(lingodb::utility::Serializer& serializer) {
-      serializer.writeProperty(0, filterDescription.size());
-      size_t offset = 1;
-      for (auto& filter : filterDescription) {
-         filter.serialize(serializer, offset);
-      }
+      serializer.writeProperty(0, filterDescription);
+
    }
 
    static DatasourceProperty deserialize(lingodb::utility::Deserializer& deserializer) {
-      size_t filterCount = deserializer.readProperty<size_t>(0);
-      std::vector<runtime::FilterDescription> filters{filterCount};
-      size_t offset = 1;
-      for (size_t i = 0; i < filterCount; ++i) {
-         filters[i] = (runtime::FilterDescription::deserialize(deserializer, offset));
-      }
+      std::vector<runtime::FilterDescription> filters = deserializer.readProperty<std::vector<runtime::FilterDescription>>(0);;
       return DatasourceProperty{.filterDescription = filters};
    }
 

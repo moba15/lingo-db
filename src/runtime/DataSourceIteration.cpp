@@ -75,7 +75,7 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
          }
          uniqueRestrictions.insert(filterDesc);
          restrictions.push_back(filterDesc);
-         std::cerr << "Filter for: " << filterDesc.columnName << std::endl;
+         std::cerr << "Filter for: " << filterDesc.columnName <<  " with op:" << std::to_string(static_cast<uint8_t>(filterDesc.op)) << std::endl;
       }
       /*for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
          FilterDescription filterDesc;
