@@ -2,6 +2,7 @@
 #include "json.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/RelAlg/DatasourceProperty.h"
+#include "lingodb/runtime/ExternalDataSourceProperty.h"
 #include "lingodb/runtime/storage/TableStorage.h"
 #include "lingodb/scheduler/Scheduler.h"
 #include "lingodb/scheduler/Tasks.h"
@@ -67,13 +68,14 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
       }
       utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
       utility::Deserializer s{simpleByteReader};
-      auto dataSource = DatasourceProperty::deserialize(s);
-      for (auto& filterDesc : dataSource.filterDescription) {
+      auto dataSource = ExternalDatasourceProperty::deserialize(s);
+      for (auto& filterDesc : dataSource.filterDescriptions) {
          if (uniqueRestrictions.contains(filterDesc)) {
             continue;
          }
          uniqueRestrictions.insert(filterDesc);
          restrictions.push_back(filterDesc);
+         std::cerr << "Filter for: " << filterDesc.columnName << std::endl;
       }
       /*for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
          FilterDescription filterDesc;

@@ -8,6 +8,8 @@
 #include <variant>
 
 #include "lingodb/utility/Serialization.h"
+
+#include <iostream>
 #include <arrow/type_fwd.h>
 namespace lingodb::runtime {
 enum class FilterOp : uint8_t {
@@ -33,47 +35,51 @@ struct FilterDescription {
          op == other.op &&
          value == other.value && values == other.values;
    }
-   void serialize(lingodb::utility::Serializer& serializer) {
-      serializer.writeProperty(0, columnName);
-      serializer.writeProperty(1, columnId);
-      serializer.writeProperty(2, op);
-      serializer.writeProperty(3, value.index());
+   void serialize(lingodb::utility::Serializer& serializer, size_t& offset) {
+      serializer.writeProperty(offset, columnName);
+      std::cerr << columnName  <<  ":" << columnId << std::endl;
+      serializer.writeProperty(offset+1, columnId);
+      serializer.writeProperty(offset+2, op);
+      serializer.writeProperty(offset+3, value.index());
       std::visit([&](auto const& v) {
-         serializer.writeProperty(4, v);
+         serializer.writeProperty(offset+4, v);
       },
                  value);
-      serializer.writeProperty(5, values.index());
+      serializer.writeProperty(offset+5, values.index());
       std::visit([&](auto const& v) {
-         serializer.writeProperty(6, v);
+         serializer.writeProperty(offset+6, v);
       },
                  values);
+      offset+=7;
    }
 
-   static FilterDescription deserialize(lingodb::utility::Deserializer& deserializer) {
+   static FilterDescription deserialize(lingodb::utility::Deserializer& deserializer, size_t& offset) {
       FilterDescription desc{};
-      desc.columnName = deserializer.readProperty<std::string>(0);
-      desc.columnId = deserializer.readProperty<size_t>(1);
-      desc.op = deserializer.readProperty<FilterOp>(2);
-      switch (deserializer.readProperty<size_t>(3)) {
+      desc.columnName = deserializer.readProperty<std::string>(offset+0);
+      std::cerr << desc.columnName << std::endl;
+      desc.columnId = deserializer.readProperty<size_t>(offset+1);
+      desc.op = deserializer.readProperty<FilterOp>(offset+2);
+      switch (deserializer.readProperty<size_t>(offset+3)) {
          case 0:
-            desc.value = deserializer.readProperty<std::string>(4);
+            desc.value = deserializer.readProperty<std::string>(offset+4);
             break;
          case 1:
-            desc.value = deserializer.readProperty<int64_t>(4);
+            desc.value = deserializer.readProperty<int64_t>(offset+4);
             break;
          default:
-            desc.value = deserializer.readProperty<double>(4);
+            desc.value = deserializer.readProperty<double>(offset+4);
       }
-      switch (deserializer.readProperty<size_t>(5)) {
+      switch (deserializer.readProperty<size_t>(offset+5)) {
          case 0:
-            desc.values = deserializer.readProperty<std::vector<std::string>>(6);
+            desc.values = deserializer.readProperty<std::vector<std::string>>(offset+6);
             break;
          case 1:
-            desc.values = deserializer.readProperty<std::vector<int64_t>>(6);
+            desc.values = deserializer.readProperty<std::vector<int64_t>>(offset+6);
             break;
          default:
-            desc.values = deserializer.readProperty<std::vector<double>>(6);
+            desc.values = deserializer.readProperty<std::vector<double>>(offset+6);
       }
+      offset+=7;
       return desc;
    }
 };

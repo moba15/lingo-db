@@ -13,6 +13,7 @@
 #include "lingodb/compiler/Dialect/util/FunctionHelper.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
 #include "lingodb/compiler/Dialect/util/UtilOps.h"
+#include "lingodb/runtime/ExternalDataSourceProperty.h"
 
 #include "mlir/Dialect/Arith/IR/Arith.h"
 #include "mlir/Dialect/Async/IR/Async.h"
@@ -106,7 +107,18 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
          restrictions = mlir::cast<mlir::StringAttr>(baseTableOp->getAttr("restriction")).getValue().str();
       }
       std::string tableName = mlir::cast<mlir::StringAttr>(baseTableOp->getAttr("table_identifier")).str();
+
       std::string scanDescription = R"({ "table": ")" + tableName + R"(", "mapping": { )";
+      auto x = baseTableOp.getDatasource().filterDescription;
+      lingodb::ExternalDatasourceProperty externalDatasourceProperty{.tableName = tableName};
+      externalDatasourceProperty.filterDescriptions = x;
+      for (auto namedAttr : baseTableOp.getColumns().getValue()) {
+         auto identifier = namedAttr.getName();
+         auto attr = namedAttr.getValue();
+         auto attrDef = mlir::dyn_cast_or_null<tuples::ColumnDefAttr>(attr);
+         auto member = createMember(rewriter.getContext(), identifier.str(), attrDef.getColumn().type);
+         externalDatasourceProperty.mapping.emplace_back(memberManager.getName(member), identifier.str());
+      }
       bool first = true;
       for (auto namedAttr : baseTableOp.getColumns().getValue()) {
          auto identifier = namedAttr.getName();
@@ -126,8 +138,10 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
       }
       lingodb::utility::SimpleByteWriter simpleByteWriter{};
       lingodb::utility::Serializer s{simpleByteWriter};
-
-      baseTableOp.getDatasource().serialize(s);
+      externalDatasourceProperty.serialize(s);
+      lingodb::utility::SimpleByteReader reader{simpleByteWriter.data(), simpleByteWriter.size()};
+      lingodb::utility::Deserializer deserializer{reader};
+      auto test = lingodb::ExternalDatasourceProperty::deserialize(deserializer);
 
       const std::byte* data = simpleByteWriter.data();
       size_t len = simpleByteWriter.size();
@@ -141,6 +155,12 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
          hex.push_back(hexChars[v & 0x0F]);
       }
       scanDescription += "}, \"datasource\": \"" + hex + "\"}";
+
+
+
+
+
+
       auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), baseTableOp->hasAttr("restriction"));
       mlir::Value tableRef = rewriter.create<subop::GetExternalOp>(baseTableOp->getLoc(), tableRefType, rewriter.getStringAttr(scanDescription));
       rewriter.replaceOpWithNewOp<subop::ScanOp>(baseTableOp, tableRef, createColumnDefMemberMappingAttr(rewriter.getContext(), defMapping));

@@ -4,10 +4,11 @@
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamDialect.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOpsAttributes.h"
+#include "lingodb/utility/Serialization.h"
 #include "mlir/IR/DialectImplementation.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/IR/OpImplementation.h"
-#include "lingodb/compiler/Dialect/SubOperator/ExternalDatasourceProperty.h"
+
 #include <llvm/ADT/TypeSwitch.h>
 
 #include <iostream>
@@ -17,47 +18,6 @@ using namespace mlir;
 using namespace lingodb::compiler::dialect;
 
 namespace {
-
-mlir::Attribute convertToAttribute(MLIRContext* ctx, const lingodb::ExternalDatasourceProperty datasource) {
-   assert(ctx && "MLIRContext must not be null");
-
-
-   lingodb::utility::SimpleByteWriter simpleByteWriter{};
-   lingodb::utility::Serializer s{simpleByteWriter};
-   const_cast<lingodb::ExternalDatasourceProperty&>(datasource).serialize(s);
-
-   const std::byte* data = simpleByteWriter.data();
-   size_t len = simpleByteWriter.size();
-
-
-   static const char hexChars[] = "0123456789ABCDEF";
-   std::string hex;
-   hex.reserve(len * 2);
-   for (size_t i = 0; i < len; ++i) {
-      unsigned char v = std::to_integer<unsigned char>(data[i]);
-      hex.push_back(hexChars[v >> 4]);
-      hex.push_back(hexChars[v & 0x0F]);
-   }
-
-   return mlir::StringAttr::get(ctx, hex);
-}
-
-
-mlir::LogicalResult convertFromAttribute(const lingodb::ExternalDatasourceProperty& datasource, mlir::Attribute attr,
-                                         std::function<mlir::InFlightDiagnostic()> emitError) {
-   std::cerr << "Not impl conv";
-   return mlir::failure();
-}
-
-void writeToMlirBytecode(mlir::DialectBytecodeWriter& writer,const lingodb::ExternalDatasourceProperty& datasource) {
-   std::cerr << "Not impl";
-
-}
-mlir::LogicalResult readFromMlirBytecode(mlir::DialectBytecodeReader& reader, const lingodb::ExternalDatasourceProperty & datasource) {
-   return mlir::failure(); //todo
-}
-
-
 
 tuples::ColumnManager& getColumnManager(::mlir::OpAsmParser& parser) {
    return parser.getBuilder().getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager();
