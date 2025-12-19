@@ -39,55 +39,122 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
    public:
    MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(SIPPass)
    virtual llvm::StringRef getArgument() const override { return "subop-sip-pass"; }
+
+   // Generic helper to identify build/probe sides of a hash join
+   struct HashJoinInfo {
+      mlir::Value buildSideRoot; // Root scan/table operation for build side
+      mlir::Value probeSideRoot; // Root scan/table operation for probe side
+      subop::CreateHashIndexedView hashView; // The hash indexed view
+      subop::LookupOp lookupOp; // The lookup operation
+      llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns; // Columns used for hash key on build side
+      llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns; // Columns used for hash key on probe side
+   };
+
+   mlir::Operation* walkToFindSourceScan(mlir::Operation* op) {
+      mlir::Operation* current = op;
+      while (current->getNumOperands() > 0) {
+         if (auto scan = mlir::dyn_cast_or_null<subop::ScanOp>(current)) {
+            return scan;
+         } else {
+            current = current->getOperand(0).getDefiningOp();
+         }
+      }
+   }
+
+   mlir::Operation* findSourceScanFromCreateHashIndexedView(subop::CreateHashIndexedView createHashIndexedView) {
+      auto users = createHashIndexedView.getOperand().getUsers();
+      for (auto* user : users) {
+         if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(user)) {
+            return walkToFindSourceScan(mat);
+         }
+      }
+
+      return nullptr;
+   }
+
+   std::optional<HashJoinInfo> identifyHashJoinTables(subop::LookupOp lookupOp) {
+      mlir::Value stateValue = lookupOp.getState();
+      auto* stateDefOp = stateValue.getDefiningOp();
+      auto createHashView = mlir::dyn_cast_or_null<subop::CreateHashIndexedView>(stateDefOp);
+      if (!createHashView) return std::nullopt;
+      //First get Build/Input side
+      auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView);
+      if (!buildScan) {
+         return std::nullopt;
+      }
+      //Get probe side
+      auto probeScan = walkToFindSourceScan(lookupOp.getStream().getDefiningOp());
+      if (!probeScan) {
+         return std::nullopt;
+      }
+
+      // Extract key columns from build side: find the MapOp that feeds into materialize
+      llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns;
+      auto bufferUsers = createHashView.getOperand().getUsers();
+      for (auto* user : bufferUsers) {
+         if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(user)) {
+            mlir::Value streamBeforeMat = mat->getOperand(0);
+            if (auto mapOp = mlir::dyn_cast_or_null<subop::MapOp>(streamBeforeMat.getDefiningOp())) {
+               mapOp.dump();
+               // Extract the input columns attribute from the map operation
+               auto inputAttr = mapOp.getInputColsAttr();
+               for (auto input : inputAttr) {
+                  if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
+                     buildKeyColumns.push_back(colRef);
+                     colRef.dump();
+                  }
+               }
+            }
+         }
+      }
+      std::cerr << buildKeyColumns.size() << std::endl;
+
+      // Extract key columns from probe side: find the MapOp before lookup
+      llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns;
+      mlir::Operation* probeStream = lookupOp.getStream().getDefiningOp();
+      if (auto probeMapOp = mlir::dyn_cast_or_null<subop::MapOp>(probeStream)) {
+         auto inputAttr = probeMapOp.getInputColsAttr();
+         for (auto input : inputAttr) {
+            if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
+               probeKeyColumns.push_back(colRef);
+
+               colRef.dump();
+            }
+         }
+      }
+
+      return HashJoinInfo{.buildSideRoot = buildScan->getResult(0),
+                          .probeSideRoot = probeScan->getResult(0),
+                          .hashView = createHashView,
+                          .lookupOp = lookupOp,
+                          .buildKeyColumns = buildKeyColumns,
+                          .probeKeyColumns = probeKeyColumns};
+   }
+
    void runOnOperation() override {
-      // SIP-oriented walk: per execution group, collect
-      //  - tables touched
-      //  - scan outputs (build/probe candidates)
-      //  - hash join use: lookup keys, producing ops, and hash-table layout
       auto& created = getAnalysis<subop::ColumnCreationAnalysis>();
       auto& used = getAnalysis<subop::ColumnUsageAnalysis>();
 
-      getOperation()->walk([&](mlir::Operation* op) {
-         if (auto scan = mlir::dyn_cast_or_null<subop::ScanOp>(op)) {
-            llvm::dbgs() << "Found scan op: " << scan << "\n";
-            llvm::dbgs() << "  State: " << scan.getState() << " of type " << scan.getState().getType() << "\n";
-            llvm::dbgs() << "  Mapping: " << scan.getMapping() << "\n";
-            auto usedCols = used.getUsedColumnsForOp(scan);
-         }
-         if (auto map = mlir::dyn_cast_or_null<subop::MapOp>(op)) {
-            map.dump();
-            auto usedCols = used.getUsedColumnsForOp(map);
-            llvm::dbgs() << "  Used columns:\n";
-            for (auto* col : usedCols) {
-               llvm::dbgs() << col->type << "\n";
+      getOperation()->walk([&](subop::LookupOp lookupOp) {
+         auto joinInfo = identifyHashJoinTables(lookupOp);
+         if (joinInfo) {
+            llvm::dbgs() << "Hash Join Found:\n";
+            llvm::dbgs() << "  Build Side Root: " << joinInfo->buildSideRoot << "\n";
+            llvm::dbgs() << "  Probe Side Root: " << joinInfo->probeSideRoot << "\n";
+            llvm::dbgs() << "  Hash View: " << joinInfo->probeKeyColumns.size() << "\n";
+            llvm::dbgs() << "Build side key inputs: \n";
+            for (auto& in : joinInfo->buildKeyColumns) {
+               llvm::dbgs() << " - ";
+               in.dump();
             }
-            map.walk([&](mlir::Operation* op) {
-               if (auto hash = mlir::dyn_cast_or_null<db::Hash>(op)) {
-                  llvm::dbgs() << "  Hash: " << "\n";
-                  hash->dumpPretty();
-                  hash.getOperands()[0].dump();
-               }
-            });
-         }
-         if (auto genericCreateOp = mlir::dyn_cast_or_null<subop::GenericCreateOp>(op)) {
-            if (genericCreateOp.getRes().getType().isa<subop::BufferType>()) {
-               auto type = genericCreateOp.getRes().getType();
-
-               auto buffer = mlir::dyn_cast_or_null<subop::BufferType>(type);
-               assert(buffer);
-               ;
-
-
+            llvm::dbgs() << "Probe side key inputs: \n";
+            for (auto& in : joinInfo->probeKeyColumns) {
+               llvm::dbgs() << " - ";
+               in.dump();
+               in.getName().getRootReference().dump();
             }
-
+            // Process build and probe sides separately
          }
-         if (auto createHashIndexView = mlir::dyn_cast_or_null<subop::CreateHashIndexedView>(op)) {
-            createHashIndexView.dump();
-         }
-
-
-
-
       });
    }
 };
