@@ -161,7 +161,8 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
 
 
 
-      auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), baseTableOp->hasAttr("restriction"));
+      bool hasFilters = !externalDatasourceProperty.filterDescriptions.empty();
+      auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), hasFilters);
       mlir::Value tableRef = rewriter.create<subop::GetExternalOp>(baseTableOp->getLoc(), tableRefType, rewriter.getStringAttr(scanDescription));
       rewriter.replaceOpWithNewOp<subop::ScanOp>(baseTableOp, tableRef, createColumnDefMemberMappingAttr(rewriter.getContext(), defMapping));
       return success();
