@@ -57,7 +57,6 @@ struct FilterDescription {
       desc.columnName = deserializer.readProperty<std::string>(0);
       desc.columnId = deserializer.readProperty<size_t>(1);
       desc.op = deserializer.readProperty<FilterOp>(2);
-      std::cerr << "Op: " << std::to_string(static_cast<uint8_t>(desc.op)) << std::endl;
       switch (deserializer.readProperty<size_t>(3)) {
          case 0:
             desc.value = deserializer.readProperty<std::string>(4);
