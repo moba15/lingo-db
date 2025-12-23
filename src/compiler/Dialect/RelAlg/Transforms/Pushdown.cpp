@@ -286,6 +286,7 @@ class Pushdown : public mlir::PassWrapper<Pushdown, mlir::OperationPass<mlir::fu
                lingodb::runtime::FilterDescription desc{.columnName = columnName, .columnId = 0, .op = lingodb::runtime::FilterOp::NOTNULL, .value = 0, .values = {}};
                appendRestrictions(baseTableOp, {desc});
             }
+
             lingodb::runtime::FilterDescription desc{.columnName = columnName, .columnId = 0, .op = betweenOp.getLowerInclusive() ? lingodb::runtime::FilterOp::GTE : lingodb::runtime::FilterOp::GT, .value = lowerConst, .values = {}};
             lingodb::runtime::FilterDescription desc2{.columnName = columnName, .columnId = 0, .op = betweenOp.getUpperInclusive() ? lingodb::runtime::FilterOp::LTE : lingodb::runtime::FilterOp::LT, .value = upperConst, .values = {}};
             appendRestrictions(baseTableOp, {desc, desc2});

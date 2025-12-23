@@ -142,6 +142,15 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
       }*/
    }
    auto& session = executionContext->getSession();
+  /* if (!restrictions.empty()) {
+      std::cerr << "DataSourceIteration: table=" << tableName
+                << " restrictions_count=" << restrictions.size() << "\n";
+      for (const auto &r : restrictions) {
+         // print column name and op (op printed as integer for safety)
+         std::cerr << "  restriction: column=" << r.columnName
+                   << " op=" << static_cast<int>(r.op) << "\n";
+      }
+   }*/
    if (auto maybeRelation = session.getCatalog()->getTypedEntry<catalog::TableCatalogEntry>(tableName)) {
       auto relation = maybeRelation.value();
       std::unordered_map<std::string, std::string> memberToColumn;
