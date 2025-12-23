@@ -287,7 +287,7 @@ class Pushdown : public mlir::PassWrapper<Pushdown, mlir::OperationPass<mlir::fu
                appendRestrictions(baseTableOp, {desc});
             }
             lingodb::runtime::FilterDescription desc{.columnName = columnName, .columnId = 0, .op = betweenOp.getLowerInclusive() ? lingodb::runtime::FilterOp::GTE : lingodb::runtime::FilterOp::GT, .value = lowerConst, .values = {}};
-            lingodb::runtime::FilterDescription desc2{.columnName = columnName, .columnId = 0, .op = betweenOp.getLowerInclusive() ? lingodb::runtime::FilterOp::LTE : lingodb::runtime::FilterOp::LT, .value = upperConst, .values = {}};
+            lingodb::runtime::FilterDescription desc2{.columnName = columnName, .columnId = 0, .op = betweenOp.getUpperInclusive() ? lingodb::runtime::FilterOp::LTE : lingodb::runtime::FilterOp::LT, .value = upperConst, .values = {}};
             appendRestrictions(baseTableOp, {desc, desc2});
             return true;
          }
@@ -300,22 +300,22 @@ class Pushdown : public mlir::PassWrapper<Pushdown, mlir::OperationPass<mlir::fu
          for (auto val : inOp.getVals()) {
             std::variant<std::string, int64_t, double> constVal;
             if (!getConstant(val, constVal)) return false;
-            std::visit([&](auto const& vec) {
-               using T = std::decay_t<decltype(vec)>;
+            std::visit([&](auto const& val) {
+               using T = std::decay_t<decltype(val)>;
                if constexpr (std::is_same_v<T, std::string>) {
-                  if (!std::holds_alternative<std::string>(constVal)) constVal = std::string{};
-                  vec.push_back(std::get<std::string>(constVal));
+                  if (!std::holds_alternative<std::vector<std::string>>(vals)) vals = std::vector<std::string>{};
+                  std::get<0>(vals).push_back(val);
                }
                if constexpr (std::is_same_v<T, int64_t>) {
-                  if (!std::holds_alternative<int64_t>(constVal)) constVal = 0;
-                  vec.push_back(std::get<int64_t>(constVal));
+                  if (!std::holds_alternative<std::vector<int64_t>>(vals)) vals = std::vector<int64_t>{};
+                  std::get<1>(vals).push_back(val);
                }
                if constexpr (std::is_same_v<T, double>) {
-                  if (!std::holds_alternative<double>(constVal)) constVal = 0;
-                  vec.push_back(std::get<double>(constVal));
+                  if (!std::holds_alternative<std::vector<double>>(vals)) vals = std::vector<double>{};
+                  std::get<2>(vals).push_back(val);
                }
             },
-                       vals);
+                       constVal);
          }
          if (colNullable) {
             lingodb::runtime::FilterDescription desc{.columnName = columnName, .columnId = 0, .op = lingodb::runtime::FilterOp::NOTNULL, .value = 0, .values = {}};

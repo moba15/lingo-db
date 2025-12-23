@@ -1185,7 +1185,6 @@ static mlir::Value translateINLJ(mlir::Value left, mlir::Value right, mlir::Arra
    auto valueStateMembers = createStateMembersAttr(ctxt, valMembers);
 
    auto externalHashIndexType = subop::ExternalHashIndexType::get(rewriter.getContext(), keyStateMembers, valueStateMembers);
-   //TODO
    mlir::Value externalHashIndex = rewriter.create<subop::GetExternalOp>(loc, externalHashIndexType, externalIndexDescription);
    // Erase table scan
    rewriter.eraseOp(rightScan->getOperand(0).getDefiningOp());
