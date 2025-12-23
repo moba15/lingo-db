@@ -1013,6 +1013,24 @@ def NestedExecutionGroupReturnOp : SubOperator_Op<"nested_execution_group_return
 
         let arguments = (ins TupleStream : $stream, BloomFilter: $filter, ArrayAttr : $columns);
        let assemblyFormat = [{ $stream `,` $filter `:` type($filter) `on` custom<CustRefArr>($columns) attr-dict-with-keyword }];
-    }
+ }
+def SipId : SubOperator_Type<"SipId", "sip_id"> {
+  let summary = "string identifier for SIP filtering";
+  let assemblyFormat = "";
+}
+def CreateSIPFilterOp : SubOperator_Op<"create_sip_filter", [SubOperator]> {
+    let summary = "Creates a id which can be used for SIP filtering.";
+    let arguments = (ins HashIndexedView:$hashView, AnyType:$datasource);
+    let results = (outs I1:$res);
+
+    let assemblyFormat = [{  $hashView `:` type($hashView) `,` `data` $datasource `:` type($datasource)  `->` type($res)  attr-dict }];
+
+}
+
+def SIPFilterOp : SubOperator_Op<"sip_filter", [SubOperator]> {
+    let arguments = (ins TupleStream:$state, ArrayAttr:$keys, StrAttr:$sipId);
+    let results = (outs TupleStream:$res);
+    let assemblyFormat = [{  $state `:` type($state) `on` custom<CustRefArr>($keys) `using` `sip` $sipId attr-dict }];
+}
 
 #endif // LINGODB_DIALECT_SubOperator_IR_OPS

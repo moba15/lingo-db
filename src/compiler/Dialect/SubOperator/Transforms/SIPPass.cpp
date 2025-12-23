@@ -23,6 +23,7 @@
 #include <algorithm>
 #include <lingodb/compiler/Dialect/DB/IR/DBOps.h.inc>
 #include <string>
+#include <mlir/Dialect/Arith/IR/Arith.h>
 
 #define DEBUG_TYPE "subop-sip"
 namespace {
@@ -48,6 +49,8 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       subop::LookupOp lookupOp; // The lookup operation
       llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns; // Columns used for hash key on build side
       llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns; // Columns used for hash key on probe side
+
+      subop::GetExternalOp externalOp;
    };
 
    mlir::Operation* walkToFindSourceScan(mlir::Operation* op) {
@@ -86,6 +89,14 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       auto probeScan = walkToFindSourceScan(lookupOp.getStream().getDefiningOp());
       if (!probeScan) {
          return std::nullopt;
+      }
+
+      //Get get_external op from scan
+      subop::GetExternalOp externalOp;
+      if (auto scanOp = mlir::dyn_cast_or_null<subop::ScanOp>(probeScan)) {
+         std::cerr << "Test" << std::endl;
+         externalOp = mlir::dyn_cast_or_null<subop::GetExternalOp>(scanOp.getState().getDefiningOp());
+         if (!externalOp) return std::nullopt;
       }
 
       // Extract key columns from build side: find the MapOp that feeds into materialize
@@ -128,18 +139,20 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                           .hashView = createHashView,
                           .lookupOp = lookupOp,
                           .buildKeyColumns = buildKeyColumns,
-                          .probeKeyColumns = probeKeyColumns};
+                          .probeKeyColumns = probeKeyColumns,
+                          .externalOp = externalOp};
    }
 
    void runOnOperation() override {
       auto& created = getAnalysis<subop::ColumnCreationAnalysis>();
       auto& used = getAnalysis<subop::ColumnUsageAnalysis>();
-
+      std::optional<HashJoinInfo> joinInfo;
       getOperation()->walk([&](subop::LookupOp lookupOp) {
-         auto joinInfo = identifyHashJoinTables(lookupOp);
+         joinInfo = identifyHashJoinTables(lookupOp);
          if (joinInfo) {
             llvm::dbgs() << "Hash Join Found:\n";
             llvm::dbgs() << "  Build Side Root: " << joinInfo->buildSideRoot << "\n";
+            llvm::dbgs() << "  Build Side get external" << joinInfo->externalOp << "\n";
             llvm::dbgs() << "  Probe Side Root: " << joinInfo->probeSideRoot << "\n";
             llvm::dbgs() << "  Hash View: " << joinInfo->probeKeyColumns.size() << "\n";
             llvm::dbgs() << "Build side key inputs: \n";
@@ -151,9 +164,17 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             for (auto& in : joinInfo->probeKeyColumns) {
                llvm::dbgs() << " - ";
                in.dump();
-               in.getName().getRootReference().dump();
             }
-            // Process build and probe sides separately
+
+            if (joinInfo->probeKeyColumns.size() != 1) {
+               return;
+            }
+            //Do SIP
+            auto module = getOperation();
+            mlir::Location loc = joinInfo->hashView->getLoc();
+            mlir::OpBuilder b(joinInfo->hashView);
+            b.setInsertionPointAfter(joinInfo->hashView);
+            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult());
          }
       });
    }
