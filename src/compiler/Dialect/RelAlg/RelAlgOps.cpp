@@ -320,9 +320,10 @@ ParseResult relalg::BaseTableOp::parse(OpAsmParser& parser, OperationState& resu
    }
    utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
    utility::Deserializer s{simpleByteReader};
-   auto dataSource =  DatasourceProperty::deserialize(s);
-   std::cerr << "Number of filters: " << dataSource.filterDescription.size() <<std::endl;
-   result.getOrAddProperties<Properties>().datasource = dataSource;;
+   auto dataSource = DatasourceProperty::deserialize(s);
+   std::cerr << "Number of filters: " << dataSource.filterDescription.size() << std::endl;
+   result.getOrAddProperties<Properties>().datasource = dataSource;
+   ;
 
    return parser.addTypeToList(tuples::TupleStreamType::get(parser.getBuilder().getContext()), result.types);
 }

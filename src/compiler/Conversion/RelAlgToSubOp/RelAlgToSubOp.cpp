@@ -156,11 +156,6 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
       }
       scanDescription += "}, \"datasource\": \"" + hex + "\"}";
 
-
-
-
-
-
       bool hasFilters = !externalDatasourceProperty.filterDescriptions.empty();
       auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), hasFilters);
       mlir::Value tableRef = rewriter.create<subop::GetExternalOp>(baseTableOp->getLoc(), tableRefType, rewriter.getStringAttr(scanDescription));

@@ -49,7 +49,6 @@ struct FilterDescription {
          serializer.writeProperty(6, v);
       },
                  values);
-
    }
 
    static FilterDescription deserialize(lingodb::utility::Deserializer& deserializer) {

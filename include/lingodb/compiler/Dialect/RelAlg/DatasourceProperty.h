@@ -15,11 +15,11 @@ struct DatasourceProperty {
 
    void serialize(lingodb::utility::Serializer& serializer) {
       serializer.writeProperty(0, filterDescription);
-
    }
 
    static DatasourceProperty deserialize(lingodb::utility::Deserializer& deserializer) {
-      std::vector<runtime::FilterDescription> filters = deserializer.readProperty<std::vector<runtime::FilterDescription>>(0);;
+      std::vector<runtime::FilterDescription> filters = deserializer.readProperty<std::vector<runtime::FilterDescription>>(0);
+      ;
       return DatasourceProperty{.filterDescription = filters};
    }
 

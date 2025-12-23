@@ -12,21 +12,16 @@ struct ExternalDatasourceProperty {
    }
 
    void serialize(lingodb::utility::Serializer& serializer) {
-
    }
 
    inline llvm::hash_code hash() const {
       return llvm::hash_combine(restrictions);
    }
-
-
-
 };
 } // namespace lingodb
 namespace llvm {
-inline hash_code hash_value(const lingodb::ExternalDatasourceProperty &datasource) {
+inline hash_code hash_value(const lingodb::ExternalDatasourceProperty& datasource) {
    return datasource.hash();
-
 }
 } // namespace llvm
 
