@@ -3833,14 +3833,16 @@ class CreateHashIndexedViewLowering : public SubOpConversionPattern<subop::Creat
       return success();
    }
 };
-   class CreateSIPFilterLowering : public SubOpConversionPattern<subop::CreateSIPFilterOp> {
+      class CreateSIPFilterLowering : public SubOpConversionPattern<subop::CreateSIPFilterOp> {
       using SubOpConversionPattern<subop::CreateSIPFilterOp>::SubOpConversionPattern;
       LogicalResult matchAndRewrite(subop::CreateSIPFilterOp op, OpAdaptor adaptor, SubOpRewriter& rewriter) const override {
-         auto result = rt::SIP::get(rewriter, op->getLoc())({adaptor.getDatasource()})[0];
+         // Convert the SIP name attribute (string) into a VarLen32 runtime value
+         mlir::Value sipNameVal = rewriter.create<util::CreateConstVarLen>(op->getLoc(), util::VarLen32Type::get(rewriter.getContext()), op.getSipNameAttr());
+         auto result = rt::SIP::createSIP(rewriter, op->getLoc())(mlir::ValueRange{adaptor.getDatasource(), adaptor.getHashView(), sipNameVal})[0];
          rewriter.replaceOp(op, result);
-         return success();
+          return success();
       }
-   };
+      };
 class CreateContinuousViewLowering : public SubOpConversionPattern<subop::CreateContinuousView> {
    using SubOpConversionPattern<subop::CreateContinuousView>::SubOpConversionPattern;
    LogicalResult matchAndRewrite(subop::CreateContinuousView createOp, OpAdaptor adaptor, SubOpRewriter& rewriter) const override {

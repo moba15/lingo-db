@@ -1,5 +1,7 @@
 #include "lingodb/runtime/storage/Restrictions.h"
 #include "lingodb/runtime/ArrowView.h"
+#include "lingodb/runtime/LazyJoinHashtable.h"
+#include "lingodb/runtime/SIP.h"
 
 #include <cstddef>
 #include <cstring>
@@ -304,6 +306,26 @@ class BitMapFilter : public lingodb::runtime::Filter {
 };
 
 template <class T>
+class HashViewFilter : public lingodb::runtime::Filter {
+   lingodb::runtime::HashIndexedView* view;
+   public:
+   HashViewFilter(lingodb::runtime::HashIndexedView* view ) :view(view) {}
+   size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+      const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
+      auto* writer = nextSelVec;
+      for (size_t i = 0; i < len; i++) {
+         size_t index0 = currSelVec[i];
+         
+
+         *writer = index0;
+         writer++;
+      }
+
+      return writer - nextSelVec;
+   }
+};
+
+template <class T>
 std::unique_ptr<lingodb::runtime::Filter> createSimpleTypeSimpleFilters(lingodb::runtime::FilterOp op, T value) {
    switch (op) {
       case lingodb::runtime::FilterOp::LT:
@@ -339,6 +361,10 @@ std::unique_ptr<lingodb::runtime::Filter> createSimpleTypeFilter(lingodb::runtim
          std::vector<T> values;
          for (auto v : valuesPt) values.push_back(v);
          return std::make_unique<SimpleTypeInFilter<T>>(values);
+      }
+      case lingodb::runtime::FilterOp::SIP: {
+         return std::make_unique<HashViewFilter<T>>(lingodb::runtime::SIP::filters[std::get<std::string>(filterDesc.value)]);
+
       }
       default:
          throw std::runtime_error("unsupported filter op");

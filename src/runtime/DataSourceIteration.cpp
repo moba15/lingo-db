@@ -79,6 +79,9 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
             filterDesc.op = FilterOp::NOTNULL;
          } else if (op == "in") {
             filterDesc.op = FilterOp::IN;
+         } else if (op == "sip") {
+               filterDesc.op = FilterOp::SIP;
+
          } else {
             throw std::runtime_error("unsupported filter op");
          }

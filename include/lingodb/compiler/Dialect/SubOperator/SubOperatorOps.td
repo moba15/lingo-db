@@ -1020,17 +1020,14 @@ def SipId : SubOperator_Type<"SipId", "sip_id"> {
 }
 def CreateSIPFilterOp : SubOperator_Op<"create_sip_filter", [SubOperator]> {
     let summary = "Creates a id which can be used for SIP filtering.";
-    let arguments = (ins HashIndexedView:$hashView, AnyType:$datasource);
-    let results = (outs I1:$res);
+    let arguments = (ins HashIndexedView:$hashView, AnyType:$datasource, StrAttr:$sip_name);
+    let results = (outs SipId:$res);
 
     let assemblyFormat = [{  $hashView `:` type($hashView) `,` `data` $datasource `:` type($datasource)  `->` type($res)  attr-dict }];
 
 }
 
-def SIPFilterOp : SubOperator_Op<"sip_filter", [SubOperator]> {
-    let arguments = (ins TupleStream:$state, ArrayAttr:$keys, StrAttr:$sipId);
-    let results = (outs TupleStream:$res);
-    let assemblyFormat = [{  $state `:` type($state) `on` custom<CustRefArr>($keys) `using` `sip` $sipId attr-dict }];
-}
+
+
 
 #endif // LINGODB_DIALECT_SubOperator_IR_OPS

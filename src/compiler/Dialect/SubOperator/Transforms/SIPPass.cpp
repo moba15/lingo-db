@@ -1,3 +1,4 @@
+#include "json.h"
 #include "lingodb/compiler/Dialect/DB/IR/DBDialect.h"
 #include "lingodb/compiler/Dialect/DB/IR/DBOps.h"
 #include "lingodb/compiler/Dialect/SubOperator/SubOperatorDialect.h"
@@ -91,7 +92,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
          return std::nullopt;
       }
 
-      //Get get_external op from scan
+      //Get get_external op from probe scan
       subop::GetExternalOp externalOp;
       if (auto scanOp = mlir::dyn_cast_or_null<subop::ScanOp>(probeScan)) {
          std::cerr << "Test" << std::endl;
@@ -174,7 +175,32 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             mlir::Location loc = joinInfo->hashView->getLoc();
             mlir::OpBuilder b(joinInfo->hashView);
             b.setInsertionPointAfter(joinInfo->hashView);
-            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult());
+            // Create a SIP filter named "test" for testing purposes.
+            std::string jsonRaw = joinInfo->externalOp.getDescr().str();
+            nlohmann::json descr = nlohmann::json::parse(jsonRaw);
+            if (descr.contains("restrictions")) {
+               //Add restrictions to JSON
+               nlohmann::json restrictionJson;
+               // Get probe-side key column name (use root::leaf if root is present)
+               auto probeColRef = joinInfo->probeKeyColumns[0];
+               if (auto sym = probeColRef.getName()) {
+                  auto root = sym.getRootReference();
+                  auto leaf = sym.getLeafReference();
+                  std::string colName;
+
+                  colName = leaf.str();
+                  restrictionJson["column"] = colName;
+               } else {
+                  restrictionJson["column"] = "";
+               }
+               restrictionJson["cmp"] = "sip";
+               restrictionJson["value"] = "test";
+               descr["restrictions"].push_back(restrictionJson);
+            }
+            //descr to string
+            std::string updatedDescr = descr.dump();
+            joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
+            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr("test"));
          }
       });
    }
