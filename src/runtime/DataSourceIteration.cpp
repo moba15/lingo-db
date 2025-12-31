@@ -54,109 +54,36 @@ lingodb::runtime::DataSourceIteration::DataSourceIteration(DataSource* dataSourc
 
 lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime::VarLen32 description) {
    lingodb::runtime::ExecutionContext* executionContext = lingodb::runtime::getCurrentExecutionContext();
-   nlohmann::json descr = nlohmann::json::parse(description.str());
-   std::string tableName = descr["table"];
+   std::string tableName;
+   std::unordered_map<std::string, std::string> memberToColumn;
    std::unordered_set<FilterDescription> uniqueRestrictions;
    std::vector<FilterDescription> restrictions;
-   if (descr.contains("datasource")) {
-      std::string dataSourceRaw = descr["datasource"];
-      std::vector<std::byte> data;
-      for (size_t i = 0; i < dataSourceRaw.size(); i += 2) {
-         std::string byteString = dataSourceRaw.substr(i, 2);
-         char byte = strtol(byteString.c_str(), nullptr, 16);
-         data.emplace_back(std::byte(byte));
+
+   std::string dataSourceRaw = description.str();
+   std::vector<std::byte> data;
+   for (size_t i = 0; i < dataSourceRaw.size(); i += 2) {
+      std::string byteString = dataSourceRaw.substr(i, 2);
+      char byte = strtol(byteString.c_str(), nullptr, 16);
+      data.emplace_back(std::byte(byte));
+   }
+   utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
+   utility::Deserializer s{simpleByteReader};
+   auto dataSource = ExternalDatasourceProperty::deserialize(s);
+   tableName = dataSource.tableName;
+   for (auto& filterDesc : dataSource.filterDescriptions) {
+      if (uniqueRestrictions.contains(filterDesc)) {
+         continue;
       }
-      utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
-      utility::Deserializer s{simpleByteReader};
-      auto dataSource = ExternalDatasourceProperty::deserialize(s);
-      for (auto& filterDesc : dataSource.filterDescriptions) {
-         if (uniqueRestrictions.contains(filterDesc)) {
-            continue;
-         }
-         uniqueRestrictions.insert(filterDesc);
-         restrictions.push_back(filterDesc);
-      }
-      /*for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
-         FilterDescription filterDesc;
-         filterDesc.columnName = r["column"].get<std::string>();
-         std::string op = r["cmp"].get<std::string>();
-         if (op == "<") {
-            filterDesc.op = FilterOp::LT;
-         } else if (op == "<=") {
-            filterDesc.op = FilterOp::LTE;
-         } else if (op == ">") {
-            filterDesc.op = FilterOp::GT;
-         } else if (op == ">=") {
-            filterDesc.op = FilterOp::GTE;
-         } else if (op == "=") {
-            filterDesc.op = FilterOp::EQ;
-         } else if (op == "!=") {
-            filterDesc.op = FilterOp::NEQ;
-         } else if (op == "isnotnull") {
-            filterDesc.op = FilterOp::NOTNULL;
-         } else if (op == "in") {
-            filterDesc.op = FilterOp::IN;
-         } else {
-            throw std::runtime_error("unsupported filter op");
-         }
-         if (filterDesc.op != FilterOp::IN) {
-            if (r["value"].is_string()) {
-               filterDesc.value = r["value"].get<std::string>();
-            } else if (r["value"].is_number_integer()) {
-               filterDesc.value = r["value"].get<int64_t>();
-            } else if (r["value"].is_number_float()) {
-               filterDesc.value = r["value"].get<double>();
-            } else {
-               throw std::runtime_error("unsupported filter value type");
-            }
-         } else {
-            std::vector<std::string> valuesStr;
-            std::vector<int64_t> valuesInt;
-            std::vector<double> valuesDouble;
-            for (auto v : r["values"]) {
-               if (v.is_string()) {
-                  valuesStr.push_back(v.get<std::string>());
-               } else if (v.is_number_integer()) {
-                  valuesInt.push_back(v.get<int64_t>());
-               } else if (v.is_number_float()) {
-                  valuesDouble.push_back(v.get<double>());
-               } else {
-                  throw std::runtime_error("unsupported filter value type");
-               }
-            }
-            if (!valuesStr.empty()) {
-               assert(valuesInt.empty() && valuesDouble.empty());
-               filterDesc.values = valuesStr;
-            } else if (!valuesInt.empty()) {
-               assert(valuesDouble.empty());
-               filterDesc.values = valuesInt;
-            } else {
-               filterDesc.values = valuesDouble;
-            }
-         }
-         if (uniqueRestrictions.contains(filterDesc)) {
-            continue;
-         }
-         uniqueRestrictions.insert(filterDesc);
-         restrictions.push_back(filterDesc);
-      }*/
+      uniqueRestrictions.insert(filterDesc);
+      restrictions.push_back(filterDesc);
+   }
+   for (auto& mapping : dataSource.mapping) {
+      memberToColumn[mapping.memberName] = mapping.identifier;
    }
    auto& session = executionContext->getSession();
-  /* if (!restrictions.empty()) {
-      std::cerr << "DataSourceIteration: table=" << tableName
-                << " restrictions_count=" << restrictions.size() << "\n";
-      for (const auto &r : restrictions) {
-         // print column name and op (op printed as integer for safety)
-         std::cerr << "  restriction: column=" << r.columnName
-                   << " op=" << static_cast<int>(r.op) << "\n";
-      }
-   }*/
    if (auto maybeRelation = session.getCatalog()->getTypedEntry<catalog::TableCatalogEntry>(tableName)) {
       auto relation = maybeRelation.value();
-      std::unordered_map<std::string, std::string> memberToColumn;
-      for (auto m : descr["mapping"].get<nlohmann::json::object_t>()) {
-         memberToColumn[m.first] = m.second.get<std::string>();
-      }
+
       auto* ts = new TableSource(relation->getTableStorage(), memberToColumn, restrictions);
       getCurrentExecutionContext()->registerState({ts, [](void* ptr) { delete reinterpret_cast<TableSource*>(ptr); }});
       return ts;

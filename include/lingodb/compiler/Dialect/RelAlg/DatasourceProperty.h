@@ -6,11 +6,10 @@
 
 namespace lingodb {
 struct DatasourceProperty {
-   std::string restrictions{""};
    std::vector<runtime::FilterDescription> filterDescription;
 
    inline bool operator==(const DatasourceProperty& other) const noexcept {
-      return restrictions == other.restrictions && filterDescription == other.filterDescription;
+      return filterDescription == other.filterDescription;
    }
 
    void serialize(lingodb::utility::Serializer& serializer) {
@@ -19,12 +18,25 @@ struct DatasourceProperty {
 
    static DatasourceProperty deserialize(lingodb::utility::Deserializer& deserializer) {
       std::vector<runtime::FilterDescription> filters = deserializer.readProperty<std::vector<runtime::FilterDescription>>(0);
-      ;
       return DatasourceProperty{.filterDescription = filters};
    }
 
    inline llvm::hash_code hash() const {
-      return llvm::hash_combine(restrictions);
+      DatasourceProperty tmp = *this;
+      lingodb::utility::SimpleByteWriter writer{};
+      lingodb::utility::Serializer s{writer};
+      tmp.serialize(s);
+
+      const std::byte* data = writer.data();
+      size_t len = writer.size();
+
+      std::string bytes;
+      bytes.reserve(len);
+      for (size_t i = 0; i < len; ++i) {
+         bytes.push_back(static_cast<char>(std::to_integer<unsigned char>(data[i])));
+      }
+
+      return llvm::hash_value(bytes);
    }
 };
 } // namespace lingodb
