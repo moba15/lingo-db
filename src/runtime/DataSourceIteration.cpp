@@ -1,4 +1,5 @@
 #include "lingodb/runtime/DataSourceIteration.h"
+//TODO remove
 #include "json.h"
 #include "lingodb/catalog/TableCatalogEntry.h"
 #include "lingodb/compiler/Dialect/RelAlg/DatasourceProperty.h"
@@ -40,6 +41,7 @@ void lingodb::runtime::DataSourceIteration::end(DataSourceIteration* iteration) 
 }
 
 lingodb::runtime::DataSourceIteration* lingodb::runtime::DataSourceIteration::init(DataSource* dataSource, lingodb::runtime::VarLen32 rawMembers) {
+   //TODO remove init
    nlohmann::json descr = nlohmann::json::parse(rawMembers.str());
    std::vector<std::string> members;
    for (std::string c : descr.get<nlohmann::json::array_t>()) {

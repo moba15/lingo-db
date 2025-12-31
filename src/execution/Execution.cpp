@@ -19,7 +19,6 @@
 #include "mlir/InitAllPasses.h"
 #include "mlir/Pass/PassManager.h"
 
-#include "json.h"
 #include "lingodb/runtime/ExternalDataSourceProperty.h"
 #include "lingodb/compiler/frontend/frontend_error.h"
 #include "lingodb/compiler/helper.h"

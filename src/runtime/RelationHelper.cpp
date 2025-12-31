@@ -1,6 +1,5 @@
 #include "lingodb/runtime/RelationHelper.h"
 
-#include "json.h"
 #include "lingodb/catalog/FunctionCatalogEntry.h"
 
 #include "lingodb/catalog/IndexCatalogEntry.h"
@@ -10,6 +9,7 @@
 #include "lingodb/utility/Serialization.h"
 #include "lingodb/runtime/ExternalDataSourceProperty.h"
 
+#include <filesystem>
 #include <arrow/builder.h>
 #include <arrow/csv/api.h>
 #include <arrow/io/api.h>
@@ -204,7 +204,7 @@ HashIndexAccess* RelationHelper::accessHashIndex(lingodb::runtime::VarLen32 desc
       for (auto& m : dataSource.mapping) {
          cols.push_back(m.identifier);
       }
-     
+
       auto* access = new HashIndexAccess(*hashIndex, cols);
       context->registerState({access, [&](void* ptr) { delete static_cast<HashIndexAccess*>(ptr); }});
       return access;
