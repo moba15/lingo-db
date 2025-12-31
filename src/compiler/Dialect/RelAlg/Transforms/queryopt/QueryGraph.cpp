@@ -5,7 +5,6 @@
 
 #include <iostream>
 
-#include "json.h"
 #include <arrow/record_batch.h>
 namespace {
 std::unique_ptr<lingodb::compiler::support::eval::expr> buildConstant(mlir::Type type, std::variant<int64_t, double, std::string> parseArg) {

@@ -24,7 +24,7 @@ struct ExternalDatasourceProperty {
    };
    std::string tableName;
    std::vector<Mapping> mapping;
-   std::vector<runtime::FilterDescription> filterDescriptions;
+   std::vector<runtime::FilterDescription> filterDescriptions{};
    std::string index;
    std::string indexType;
 

@@ -13,8 +13,6 @@
 #include "lingodb/compiler/Dialect/TupleStream/TupleStreamOps.h"
 #include "mlir/IR/IRMapping.h"
 #include "mlir/Transforms/GreedyPatternRewriteDriver.h"
-
-#include "json.h"
 namespace {
 lingodb::utility::GlobalSetting<bool> pushdownRestrictions("system.opt.pushdown_restrictions", true);
 using namespace lingodb::compiler::dialect;

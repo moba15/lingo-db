@@ -108,7 +108,6 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
       }
       std::string tableName = mlir::cast<mlir::StringAttr>(baseTableOp->getAttr("table_identifier")).str();
 
-
       auto x = baseTableOp.getDatasource().filterDescription;
       lingodb::ExternalDatasourceProperty externalDatasourceProperty{.tableName = tableName};
       externalDatasourceProperty.filterDescriptions = x;
@@ -122,29 +121,13 @@ class BaseTableLowering : public OpConversionPattern<relalg::BaseTableOp> {
          if (required.contains(&attrDef.getColumn())) {
             defMapping.push_back({member, attrDef});
          }
-
       }
-
 
       lingodb::utility::SimpleByteWriter simpleByteWriter{};
       lingodb::utility::Serializer s{simpleByteWriter};
       externalDatasourceProperty.serialize(s);
-      lingodb::utility::SimpleByteReader reader{simpleByteWriter.data(), simpleByteWriter.size()};
-      lingodb::utility::Deserializer deserializer{reader};
-      auto test = lingodb::ExternalDatasourceProperty::deserialize(deserializer);
 
-      const std::byte* data = simpleByteWriter.data();
-      size_t len = simpleByteWriter.size();
-
-      static const char hexChars[] = "0123456789ABCDEF";
-      std::string hex;
-      hex.reserve(len * 2);
-      for (size_t i = 0; i < len; ++i) {
-         unsigned char v = std::to_integer<unsigned char>(data[i]);
-         hex.push_back(hexChars[v >> 4]);
-         hex.push_back(hexChars[v & 0x0F]);
-      }
-      std::string scanDescription = hex;
+      std::string scanDescription = simpleByteWriter.toHexString();
 
       bool hasFilters = !externalDatasourceProperty.filterDescriptions.empty();
       auto tableRefType = subop::TableType::get(rewriter.getContext(), createStateMembersAttr(rewriter.getContext(), members), hasFilters);
@@ -1149,9 +1132,10 @@ static mlir::Value translateINLJ(mlir::Value left, mlir::Value right, mlir::Arra
    DefMappingCollector mapping;
 
    // Create description for external index get operation
-   lingodb::ExternalDatasourceProperty externalDatasourceProperty{.index =  op->getAttrOfType<mlir::StringAttr>("index").str(),
-                                                               .tableName = tableName,
-                                                               .mapping = {}, .indexType = "hash"};
+   lingodb::ExternalDatasourceProperty externalDatasourceProperty{.tableName = tableName,
+                                                                  .mapping = {},
+                                                                  .index = op->getAttrOfType<mlir::StringAttr>("index").str(),
+                                                                  .indexType = "hash"};
 
    for (auto mappingEntry : rightScan.getMapping().getMapping()) {
       auto attrDef = mappingEntry.second;
@@ -1176,20 +1160,8 @@ static mlir::Value translateINLJ(mlir::Value left, mlir::Value right, mlir::Arra
    externalDatasourceProperty.serialize(s);
    lingodb::utility::SimpleByteReader reader{simpleByteWriter.data(), simpleByteWriter.size()};
    lingodb::utility::Deserializer deserializer{reader};
-   auto test = lingodb::ExternalDatasourceProperty::deserialize(deserializer);
 
-   const std::byte* data = simpleByteWriter.data();
-   size_t len = simpleByteWriter.size();
-
-   static const char hexChars[] = "0123456789ABCDEF";
-   std::string hex;
-   hex.reserve(len * 2);
-   for (size_t i = 0; i < len; ++i) {
-      unsigned char v = std::to_integer<unsigned char>(data[i]);
-      hex.push_back(hexChars[v >> 4]);
-      hex.push_back(hexChars[v & 0x0F]);
-   }
-   std::string externalIndexDescription = hex;
+   std::string externalIndexDescription = simpleByteWriter.toHexString();
 
    auto externalHashIndexType = subop::ExternalHashIndexType::get(rewriter.getContext(), keyStateMembers, valueStateMembers);
    mlir::Value externalHashIndex = rewriter.create<subop::GetExternalOp>(loc, externalHashIndexType, externalIndexDescription);

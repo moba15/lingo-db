@@ -25,32 +25,23 @@ mlir::Attribute convertToAttribute(MLIRContext* ctx, const lingodb::DatasourcePr
 
    const_cast<lingodb::DatasourceProperty&>(datasource).serialize(s);
 
-   const std::byte* data = simpleByteWriter.data();
-   size_t len = simpleByteWriter.size();
-
-   static const char hexChars[] = "0123456789ABCDEF";
-   std::string hex;
-   hex.reserve(len * 2);
-   for (size_t i = 0; i < len; ++i) {
-      unsigned char v = std::to_integer<unsigned char>(data[i]);
-      hex.push_back(hexChars[v >> 4]);
-      hex.push_back(hexChars[v & 0x0F]);
-   }
-
-   return mlir::StringAttr::get(ctx, hex);
+   return mlir::StringAttr::get(ctx, simpleByteWriter.toHexString());
 }
 
 mlir::LogicalResult convertFromAttribute(const lingodb::DatasourceProperty& datasource, mlir::Attribute attr,
                                          std::function<mlir::InFlightDiagnostic()> emitError) {
-   std::cerr << "Not impl conv";
+   //TODO
+   std::cerr << "Not impleted";
    return mlir::failure();
 }
 
 void writeToMlirBytecode(mlir::DialectBytecodeWriter& writer, const lingodb::DatasourceProperty& datasource) {
-   std::cerr << "Not impl";
+   //TODO
+   std::cerr << "Not impleted";
 }
 mlir::LogicalResult readFromMlirBytecode(mlir::DialectBytecodeReader& reader, const lingodb::DatasourceProperty& datasource) {
-   return mlir::failure(); //todo
+   //TODO
+   return mlir::failure();
 }
 
 tuples::ColumnManager& getColumnManager(::mlir::OpAsmParser& parser) {
@@ -321,9 +312,7 @@ ParseResult relalg::BaseTableOp::parse(OpAsmParser& parser, OperationState& resu
    utility::SimpleByteReader simpleByteReader{data.data(), data.size()};
    utility::Deserializer s{simpleByteReader};
    auto dataSource = DatasourceProperty::deserialize(s);
-   std::cerr << "Number of filters: " << dataSource.filterDescription.size() << std::endl;
    result.getOrAddProperties<Properties>().datasource = dataSource;
-   ;
 
    return parser.addTypeToList(tuples::TupleStreamType::get(parser.getBuilder().getContext()), result.types);
 }
@@ -349,20 +338,8 @@ void relalg::BaseTableOp::print(OpAsmPrinter& p) {
    utility::SimpleByteWriter simpleByteWriter{};
    utility::Serializer s{simpleByteWriter};
    getDatasource().serialize(s);
-   const std::byte* data = simpleByteWriter.data();
 
-   size_t len = simpleByteWriter.size();
-
-   static const char hexChars[] = "0123456789ABCDEF";
-   std::string hex;
-   hex.reserve(len * 2);
-
-   for (size_t i = 0; i < len; ++i) {
-      unsigned char v = std::to_integer<unsigned char>(data[i]);
-      hex.push_back(hexChars[v >> 4]);
-      hex.push_back(hexChars[v & 0x0F]);
-   }
-   p << hex << "\"";
+   p << simpleByteWriter.toHexString() << "\"";
 }
 
 ::mlir::LogicalResult relalg::MapOp::verify() {
