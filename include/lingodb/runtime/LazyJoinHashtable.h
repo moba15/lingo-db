@@ -28,6 +28,12 @@ class HashIndexedView {
    public:
    static HashIndexedView* build(GrowingBuffer* buffer);
    static void destroy(HashIndexedView*);
+   size_t getHtMask() {
+      return htMask;
+   }
+   Entry** getHashTable() {
+      return ht;
+   }
    ~HashIndexedView();
 };
 } // end namespace lingodb::runtime

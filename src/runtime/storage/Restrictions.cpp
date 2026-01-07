@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <cstring>
+#include <iostream>
 #include <regex>
 
 #include <arrow/table.h>
@@ -307,19 +308,48 @@ class BitMapFilter : public lingodb::runtime::Filter {
 
 template <class T>
 class HashViewFilter : public lingodb::runtime::Filter {
-   lingodb::runtime::HashIndexedView* view;
+   std::string sipId;
+   static inline uint64_t hashValue(int64_t index) {
+      int64_t k = (int64_t)-7046029254386353067LL;
+      int64_t prod = k * index;
+      uint64_t uprod = (uint64_t)prod;
+      uint64_t swapped = __builtin_bswap64(uprod);
+      return uprod ^ swapped;
+   }
    public:
-   HashViewFilter(lingodb::runtime::HashIndexedView* view ) :view(view) {}
+   HashViewFilter(std::string sipId) :sipId(sipId) {
+
+   }
    size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+      auto view = lingodb::runtime::SIP::filters[sipId];
+     //TODO What happens if view is null? currently this happen but should this happen?
+      size_t filtered = 0;
       const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
       auto* writer = nextSelVec;
       for (size_t i = 0; i < len; i++) {
          size_t index0 = currSelVec[i];
-         
+         auto d = data[index0];
+         if (!view) {
+            *writer = index0;
+            writer++;
+            continue;
+         }
+         auto hashed = hashValue(static_cast<int64_t>(d));
+         assert(view);
+         auto ht = view->getHashTable();
+         auto bucket = view->getHashTable()[hashed&view->getHtMask()];
 
-         *writer = index0;
-         writer++;
+         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : false;
+         if (matches) {
+            //Keep value
+            *writer = index0;
+            writer++;
+         } else {
+            filtered++;
+         }
       }
+
+      std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
 
       return writer - nextSelVec;
    }
@@ -363,7 +393,8 @@ std::unique_ptr<lingodb::runtime::Filter> createSimpleTypeFilter(lingodb::runtim
          return std::make_unique<SimpleTypeInFilter<T>>(values);
       }
       case lingodb::runtime::FilterOp::SIP: {
-         return std::make_unique<HashViewFilter<T>>(lingodb::runtime::SIP::filters[std::get<std::string>(filterDesc.value)]);
+         std::cerr << "Creating SIP restriction for value: " << std::get<std::string>(filterDesc.value) << std::endl;
+         return std::make_unique<HashViewFilter<T>>(std::get<std::string>(filterDesc.value));
 
       }
       default:
