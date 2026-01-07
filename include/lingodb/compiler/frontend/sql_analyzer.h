@@ -133,6 +133,7 @@ class SQLQueryAnalyzer {
    std::shared_ptr<StackGuard> stackGuard = std::make_shared<StackGuardNormal>();
 
    std::shared_ptr<ast::AstNode> canonicalizeAndAnalyze(std::shared_ptr<ast::AstNode> rootNode, std::shared_ptr<SQLContext> context);
+   std::shared_ptr<ast::TableProducer> analyzeQueryNode(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope, std::shared_ptr<ast::QueryNode> queryNode);
 
    private:
    std::shared_ptr<ast::TableProducer> analyzeTableProducer(std::shared_ptr<ast::TableProducer> rootNode, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
@@ -169,6 +170,7 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::TableProducer> analyzeInnerJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::TableProducer> analyzeLeftOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::TableProducer> analyzeFullOuterJoin(std::shared_ptr<ast::JoinRef> join, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
+   std::shared_ptr<ast::BoundExtendNode> analyzeExtendNode(std::shared_ptr<ast::ExtendNode> extendNode, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope);
    /**
   * Analyzes a result modifier like order by or limit
   * @param resultModifier The result modifier to analyze
