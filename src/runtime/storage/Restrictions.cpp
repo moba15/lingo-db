@@ -348,9 +348,9 @@ class HashViewFilter : public lingodb::runtime::Filter {
             filtered++;
          }
       }
-
+#if 1
       std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
-
+#endif
       return writer - nextSelVec;
    }
 };
@@ -426,7 +426,7 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
    for (auto& filterDesc : filterDescs) {
       size_t colId = schema.GetFieldIndex(filterDesc.columnName);
       if (colId == static_cast<size_t>(-1)) {
-         throw std::runtime_error("unknown column in filter");
+         throw std::runtime_error("unknown column in filter: " + filterDesc.columnName + " table");
       }
       if (filterDesc.op == FilterOp::NOTNULL) {
          if (restrictions->filters.empty()) { //todo: this can go wrong if data is already prefiltered

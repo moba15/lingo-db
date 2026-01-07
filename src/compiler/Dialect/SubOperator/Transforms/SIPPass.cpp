@@ -95,7 +95,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       //Get get_external op from probe scan
       subop::GetExternalOp externalOp;
       if (auto scanOp = mlir::dyn_cast_or_null<subop::ScanOp>(probeScan)) {
-         std::cerr << "Test" << std::endl;
          externalOp = mlir::dyn_cast_or_null<subop::GetExternalOp>(scanOp.getState().getDefiningOp());
          if (!externalOp) return std::nullopt;
       }
@@ -143,7 +142,20 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                           .probeKeyColumns = probeKeyColumns,
                           .externalOp = externalOp};
    }
+   std::string gen_random(const int len) {
+      static const char alphanum[] =
+         "0123456789"
+         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+         "abcdefghijklmnopqrstuvwxyz";
+      std::string tmp_s;
+      tmp_s.reserve(len);
 
+      for (int i = 0; i < len; ++i) {
+         tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+      }
+
+      return tmp_s;
+   }
    void runOnOperation() override {
       auto& created = getAnalysis<subop::ColumnCreationAnalysis>();
       auto& used = getAnalysis<subop::ColumnUsageAnalysis>();
@@ -151,6 +163,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       getOperation()->walk([&](subop::LookupOp lookupOp) {
          joinInfo = identifyHashJoinTables(lookupOp);
          if (joinInfo) {
+#if 0
             llvm::dbgs() << "Hash Join Found:\n";
             llvm::dbgs() << "  Build Side Root: " << joinInfo->buildSideRoot << "\n";
             llvm::dbgs() << "  Build Side get external" << joinInfo->externalOp << "\n";
@@ -170,6 +183,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             if (joinInfo->probeKeyColumns.size() != 1) {
                return;
             }
+#endif
             //Do SIP
             auto module = getOperation();
             mlir::Location loc = joinInfo->hashView->getLoc();
@@ -178,11 +192,13 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             // Create a SIP filter named "test" for testing purposes.
             std::string jsonRaw = joinInfo->externalOp.getDescr().str();
             nlohmann::json descr = nlohmann::json::parse(jsonRaw);
+            std::string sipName = gen_random(10);
+            auto probeColRef = joinInfo->probeKeyColumns[0];
             if (descr.contains("restrictions")) {
                //Add restrictions to JSON
                nlohmann::json restrictionJson;
                // Get probe-side key column name (use root::leaf if root is present)
-               auto probeColRef = joinInfo->probeKeyColumns[0];
+
                if (auto sym = probeColRef.getName()) {
                   auto root = sym.getRootReference();
                   auto leaf = sym.getLeafReference();
@@ -191,16 +207,27 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   colName = leaf.str();
                   restrictionJson["column"] = colName;
                } else {
+                  assert(false);
                   restrictionJson["column"] = "";
                }
                restrictionJson["cmp"] = "sip";
-               restrictionJson["value"] = "test";
+               restrictionJson["value"] = sipName;
                descr["restrictions"].push_back(restrictionJson);
             }
+            {
+               if (auto sym = probeColRef.getName()) {
+                  auto root = sym.getRootReference();
+                  auto leaf = sym.getLeafReference();
+                  std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
+               }
+
+
+            }
+
             //descr to string
             std::string updatedDescr = descr.dump();
             joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
-            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr("test"));
+            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr(sipName));
          }
       });
    }
