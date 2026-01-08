@@ -58,7 +58,6 @@ lingodb::runtime::DataSource* lingodb::runtime::DataSource::get(lingodb::runtime
    std::unordered_set<FilterDescription> uniqueRestrictions;
    std::vector<FilterDescription> restrictions;
    if (descr.contains("restrictions")) {
-      std::cerr << description.str() << std::endl;
       for (auto r : descr["restrictions"].get<nlohmann::json::array_t>()) {
          FilterDescription filterDesc;
          filterDesc.columnName = r["column"].get<std::string>();

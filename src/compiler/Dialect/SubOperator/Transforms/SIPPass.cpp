@@ -106,19 +106,16 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
          if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(user)) {
             mlir::Value streamBeforeMat = mat->getOperand(0);
             if (auto mapOp = mlir::dyn_cast_or_null<subop::MapOp>(streamBeforeMat.getDefiningOp())) {
-               mapOp.dump();
                // Extract the input columns attribute from the map operation
                auto inputAttr = mapOp.getInputColsAttr();
                for (auto input : inputAttr) {
                   if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
                      buildKeyColumns.push_back(colRef);
-                     colRef.dump();
                   }
                }
             }
          }
       }
-      std::cerr << buildKeyColumns.size() << std::endl;
 
       // Extract key columns from probe side: find the MapOp before lookup
       llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns;
@@ -128,8 +125,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
          for (auto input : inputAttr) {
             if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
                probeKeyColumns.push_back(colRef);
-
-               colRef.dump();
             }
          }
       }
@@ -218,15 +213,15 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                if (auto sym = probeColRef.getName()) {
                   auto root = sym.getRootReference();
                   auto leaf = sym.getLeafReference();
-                  std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
+                 // std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
                }
 
 
             }
 
             //descr to string
-            std::string updatedDescr = descr.dump();
-            joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
+            std::string updatedDescr = to_string(descr);
+            //joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
             b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr(sipName));
          }
       });

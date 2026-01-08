@@ -348,7 +348,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
             filtered++;
          }
       }
-#if 1
+#if 0
       std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
 #endif
       return writer - nextSelVec;
