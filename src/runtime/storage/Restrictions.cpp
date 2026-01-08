@@ -309,12 +309,10 @@ class BitMapFilter : public lingodb::runtime::Filter {
 template <class T>
 class HashViewFilter : public lingodb::runtime::Filter {
    std::string sipId;
-   static inline uint64_t hashValue(int64_t index) {
-      int64_t k = (int64_t)-7046029254386353067LL;
-      int64_t prod = k * index;
-      uint64_t uprod = (uint64_t)prod;
-      uint64_t swapped = __builtin_bswap64(uprod);
-      return uprod ^ swapped;
+   static inline uint64_t hashValue(size_t val) {
+      size_t p1=11400714819323198549ull;
+      size_t m1=val*p1;
+      return m1 ^ __builtin_bswap64(m1);
    }
    public:
    HashViewFilter(std::string sipId) :sipId(sipId) {
@@ -339,7 +337,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
          auto ht = view->getHashTable();
          auto bucket = view->getHashTable()[hashed&view->getHtMask()];
 
-         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : false;
+         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : true;
          if (matches) {
             //Keep value
             *writer = index0;

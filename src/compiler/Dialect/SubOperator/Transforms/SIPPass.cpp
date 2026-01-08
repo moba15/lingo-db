@@ -221,7 +221,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
 
             //descr to string
             std::string updatedDescr = to_string(descr);
-            //joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
+            joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
             b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr(sipName));
          }
       });
