@@ -213,7 +213,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                if (auto sym = probeColRef.getName()) {
                   auto root = sym.getRootReference();
                   auto leaf = sym.getLeafReference();
-                 // std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
+                  std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
                }
 
 
