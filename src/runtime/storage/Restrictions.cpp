@@ -342,12 +342,9 @@ class HashViewFilter : public lingodb::runtime::Filter {
          bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : false;
          if (matches) {
             //Keep value
-
             *writer = index0;
             writer++;
          } else {
-            if (d==7)
-               std::cerr << "Filteredout: " << d << std::endl;
             filtered++;
          }
       }
