@@ -319,15 +319,17 @@ class HashViewFilter : public lingodb::runtime::Filter {
 
    }
    size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
-      auto view = lingodb::runtime::SIP::filters[sipId];
-     //TODO What happens if view is null? currently this happen but should this happen?
+      auto view = lingodb::runtime::SIP::getFilter(sipId);
+        //TODO What happens if view is null? currently this happen but should this happen?
       size_t filtered = 0;
       const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
       auto* writer = nextSelVec;
       for (size_t i = 0; i < len; i++) {
          size_t index0 = currSelVec[i];
          auto d = data[index0];
-         if (!view) {
+         // If the view is not yet available/finished, treat it as no-filter
+         // (keep values) to avoid races with an in-progress build.
+         if (!view || !view->isFinished()) {
             *writer = index0;
             writer++;
             continue;
@@ -337,16 +339,20 @@ class HashViewFilter : public lingodb::runtime::Filter {
          auto ht = view->getHashTable();
          auto bucket = view->getHashTable()[hashed&view->getHtMask()];
 
-         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : true;
+         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : false;
          if (matches) {
             //Keep value
+
             *writer = index0;
             writer++;
          } else {
+            if (d==7)
+               std::cerr << "Filteredout: " << d << std::endl;
             filtered++;
          }
       }
-#if 0
+#if 1
+      if (filtered)
       std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
 #endif
       return writer - nextSelVec;

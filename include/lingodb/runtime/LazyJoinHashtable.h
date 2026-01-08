@@ -2,6 +2,7 @@
 #define LINGODB_RUNTIME_LAZYJOINHASHTABLE_H
 #include "lingodb/runtime/Buffer.h"
 #include "lingodb/runtime/helpers.h"
+#include <atomic>
 namespace lingodb::runtime {
 class GrowingBuffer;
 class HashIndexedView {
@@ -12,6 +13,7 @@ class HashIndexedView {
    };
    Entry** ht;
    size_t htMask; //NOLINT(clang-diagnostic-unused-private-field)
+   std::atomic<bool> finished{false};
    HashIndexedView(size_t htSize, size_t htMask);
    static uint64_t nextPow2(uint64_t v) {
       v--;
@@ -33,6 +35,9 @@ class HashIndexedView {
    }
    Entry** getHashTable() {
       return ht;
+   }
+   bool isFinished() const {
+      return finished.load(std::memory_order_acquire);
    }
    ~HashIndexedView();
 };

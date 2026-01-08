@@ -189,6 +189,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             nlohmann::json descr = nlohmann::json::parse(jsonRaw);
             std::string sipName = gen_random(10);
             auto probeColRef = joinInfo->probeKeyColumns[0];
+            auto buildColRef = joinInfo->buildKeyColumns[0];
             if (descr.contains("restrictions")) {
                //Add restrictions to JSON
                nlohmann::json restrictionJson;
@@ -210,10 +211,16 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                descr["restrictions"].push_back(restrictionJson);
             }
             {
-               if (auto sym = probeColRef.getName()) {
-                  auto root = sym.getRootReference();
-                  auto leaf = sym.getLeafReference();
-                  std::cerr << "Adding SIP for column " << root.str() << ":" << leaf.str() << std::endl;
+               if (auto buildSym = buildColRef.getName()) {
+                  auto buildroot = buildSym.getRootReference();
+                  auto buildleaf = buildSym.getLeafReference();
+                  if (auto probeSym = probeColRef.getName()) {
+                     auto proberoot = probeSym.getRootReference();
+                     auto probeleaf = probeSym.getLeafReference();
+                     std::cerr << "Adding SIP for column from " << buildroot.str() << ":" << buildleaf.str() <<  " to  "<< proberoot.str() << ":" << probeleaf.str() <<   std::endl;
+                  } else {
+                     assert(false);
+                  }
                }
 
 

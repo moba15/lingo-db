@@ -7,13 +7,24 @@
 
 namespace lingodb::runtime {
 std::unordered_map<std::string, lingodb::runtime::HashIndexedView*> SIP::filters{};
+std::shared_mutex SIP::filtersMutex{};
 VarLen32 SIP::createSIP(DataSource* description, lingodb::runtime::HashIndexedView* hash, VarLen32  sipName) {
    // Create a hash based on the DataSource pointer so we get a stable identifier
    // for this DataSource instance. Use uintptr_t to avoid narrowing.
    std::uintptr_t key = reinterpret_cast<std::uintptr_t>(description);
    std::size_t h = std::hash<std::uintptr_t>()(key);
+   {
+      std::unique_lock lock(filtersMutex);
    filters.emplace(sipName.str(), hash);
+   }
 
    return VarLen32::fromString(sipName.str());
+}
+
+lingodb::runtime::HashIndexedView* SIP::getFilter(const std::string& sipName) {
+   std::shared_lock lock(filtersMutex);
+   auto it = filters.find(sipName);
+   if (it == filters.end()) return nullptr;
+   return it->second;
 }
 } // namespace lingodb::runtime
