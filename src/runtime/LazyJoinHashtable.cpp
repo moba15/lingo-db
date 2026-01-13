@@ -16,8 +16,10 @@ lingodb::runtime::HashIndexedView* lingodb::runtime::HashIndexedView::build(ling
    size_t htSize = std::max(nextPow2(values.getLen() * 1.25), static_cast<uint64_t>(1));
    size_t htMask = htSize - 1;
    auto* htView = new HashIndexedView(htSize, htMask);
+   std::cerr << "BUILD: " << (buffer) << "\n";
    values.iterateParallel([&](uint8_t* ptr) {
       auto* entry = (Entry*) ptr;
+
       size_t hash = (size_t) entry->hashValue;
       auto pos = hash & htMask;
       std::atomic_ref<Entry*> slot(htView->ht[pos]);
@@ -28,8 +30,9 @@ lingodb::runtime::HashIndexedView* lingodb::runtime::HashIndexedView::build(ling
          newEntry = lingodb::runtime::tag(entry, current, hash);
       } while (!slot.compare_exchange_weak(current, newEntry));
    });
+   std::cerr << "Finish " << buffer << "\n";
    // Mark view as finished and register for cleanup only after the build completed.
-   htView->finished.store(true, std::memory_order_release);
+   htView->finished.store(true);
    executionContext->registerState({htView, [](void* ptr) { delete reinterpret_cast<lingodb::runtime::HashIndexedView*>(ptr); }});
    trace.stop();
    return htView;

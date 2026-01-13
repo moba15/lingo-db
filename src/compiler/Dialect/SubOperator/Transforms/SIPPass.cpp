@@ -39,6 +39,7 @@ static inline std::string trim(const std::string& s) {
 
 class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::ModuleOp>> {
    public:
+
    MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(SIPPass)
    virtual llvm::StringRef getArgument() const override { return "subop-sip-pass"; }
 
@@ -179,6 +180,14 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                return;
             }
 #endif
+            if (joinInfo->probeKeyColumns.size() != 1 || joinInfo->buildKeyColumns.size() != 1) {
+               return;
+            }
+            static int count = 0;
+            if (count) {
+               return;
+            }
+            count++;
             //Do SIP
             auto module = getOperation();
             mlir::Location loc = joinInfo->hashView->getLoc();

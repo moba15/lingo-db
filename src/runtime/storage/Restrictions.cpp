@@ -320,6 +320,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
    }
    size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
       auto view = lingodb::runtime::SIP::getFilter(sipId);
+      bool finished = view ? view->isFinished() : false;
         //TODO What happens if view is null? currently this happen but should this happen?
       size_t filtered = 0;
       const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
@@ -329,29 +330,31 @@ class HashViewFilter : public lingodb::runtime::Filter {
          auto d = data[index0];
          // If the view is not yet available/finished, treat it as no-filter
          // (keep values) to avoid races with an in-progress build.
-         if (!view || !view->isFinished()) {
+         if ( !finished) {
             *writer = index0;
             writer++;
             continue;
          }
-         auto hashed = hashValue(static_cast<int64_t>(d));
+         auto hashed = hashValue(d);
          assert(view);
          auto ht = view->getHashTable();
+
+         std::atomic_ref<lingodb::runtime::HashIndexedView::Entry*> slot(view->ht[hashed&view->getHtMask()]);
+         lingodb::runtime::HashIndexedView::Entry* current = slot.load();
+
          auto bucket = view->getHashTable()[hashed&view->getHtMask()];
 
-         bool matches = bucket ? lingodb::runtime::matchesTag(bucket, hashed) : false;
+         bool matches = bucket ? lingodb::runtime::matchesTag(current, hashed) : false;
          if (matches) {
-            //Keep value
+            //Keep value (NOT IN filter logic - keep if not found in hash table)
             *writer = index0;
             writer++;
          } else {
             filtered++;
          }
       }
-#if 1
       if (filtered)
-      std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
-#endif
+         std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values." << std::endl;
       return writer - nextSelVec;
    }
 };

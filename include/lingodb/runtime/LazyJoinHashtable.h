@@ -6,6 +6,7 @@
 namespace lingodb::runtime {
 class GrowingBuffer;
 class HashIndexedView {
+   public:
    struct Entry {
       Entry* next;
       uint64_t hashValue;
