@@ -1020,10 +1020,10 @@ def SipId : SubOperator_Type<"SipId", "sip_id"> {
 }
 def CreateSIPFilterOp : SubOperator_Op<"create_sip_filter", [SubOperator]> {
     let summary = "Creates a id which can be used for SIP filtering.";
-    let arguments = (ins HashIndexedView:$hashView, AnyType:$datasource, StrAttr:$sip_name);
+    let arguments = (ins HashIndexedView:$hashView, StrAttr:$sip_name);
     let results = (outs SipId:$res);
 
-    let assemblyFormat = [{  $hashView `:` type($hashView) `,` `data` $datasource `:` type($datasource)  `->` type($res)  attr-dict }];
+    let assemblyFormat = [{  $hashView `:` type($hashView) `->` type($res)  attr-dict }];
 
 }
 

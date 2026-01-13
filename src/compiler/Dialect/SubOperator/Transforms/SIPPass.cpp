@@ -39,7 +39,6 @@ static inline std::string trim(const std::string& s) {
 
 class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::ModuleOp>> {
    public:
-
    MLIR_DEFINE_EXPLICIT_INTERNAL_INLINE_TYPE_ID(SIPPass)
    virtual llvm::StringRef getArgument() const override { return "subop-sip-pass"; }
 
@@ -51,8 +50,8 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       subop::LookupOp lookupOp; // The lookup operation
       llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns; // Columns used for hash key on build side
       llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns; // Columns used for hash key on probe side
-
       subop::GetExternalOp externalOp;
+      bool isPositiveJoin; // True for IN/all_true joins, false for NOT IN/none_true joins
    };
 
    mlir::Operation* walkToFindSourceScan(mlir::Operation* op) {
@@ -64,6 +63,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             current = current->getOperand(0).getDefiningOp();
          }
       }
+      return nullptr;
    }
 
    mlir::Operation* findSourceScanFromCreateHashIndexedView(subop::CreateHashIndexedView createHashIndexedView) {
@@ -129,6 +129,19 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             }
          }
       }
+      // Detect if this is a positive (IN/all_true) or negative (NOT IN/none_true) join
+      //TODO detection may be hardly simplified
+      //TODO einmal selber machen
+      bool isPositiveJoin = true;
+      for (auto* user : lookupOp->getUsers()) {
+         if (auto nestedMap = mlir::dyn_cast_or_null<subop::NestedMapOp>(user)) {
+            nestedMap.walk([&](subop::FilterOp filter) {
+               if (filter.getFilterSemantic() == subop::FilterSemantic::none_true) {
+                  isPositiveJoin = false;
+               }
+            });
+         }
+      }
 
       return HashJoinInfo{.buildSideRoot = buildScan->getResult(0),
                           .probeSideRoot = probeScan->getResult(0),
@@ -136,7 +149,8 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                           .lookupOp = lookupOp,
                           .buildKeyColumns = buildKeyColumns,
                           .probeKeyColumns = probeKeyColumns,
-                          .externalOp = externalOp};
+                          .externalOp = externalOp,
+                          .isPositiveJoin = isPositiveJoin};
    }
    std::string gen_random(const int len) {
       static const char alphanum[] =
@@ -184,10 +198,12 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                return;
             }
             static int count = 0;
-            if (count) {
+
+
+            count++;
+            if (count == 1) {
                return;
             }
-            count++;
             //Do SIP
             auto module = getOperation();
             mlir::Location loc = joinInfo->hashView->getLoc();
@@ -215,7 +231,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   assert(false);
                   restrictionJson["column"] = "";
                }
-               restrictionJson["cmp"] = "sip";
+               restrictionJson["cmp"] = joinInfo->isPositiveJoin ? "sip" : "n_sip";
                restrictionJson["value"] = sipName;
                descr["restrictions"].push_back(restrictionJson);
             }
@@ -226,19 +242,20 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   if (auto probeSym = probeColRef.getName()) {
                      auto proberoot = probeSym.getRootReference();
                      auto probeleaf = probeSym.getLeafReference();
-                     std::cerr << "Adding SIP for column from " << buildroot.str() << ":" << buildleaf.str() <<  " to  "<< proberoot.str() << ":" << probeleaf.str() <<   std::endl;
+                     if (std::getenv("LINGODB_SIP_DEBUG")) {
+                        std::cerr << "Adding SIP for column from " << buildroot.str() << ":" << buildleaf.str() << " to  " << proberoot.str() << ":" << probeleaf.str() << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
+                     }
+
                   } else {
                      assert(false);
                   }
                }
-
-
             }
 
             //descr to string
             std::string updatedDescr = to_string(descr);
             joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
-            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), joinInfo->externalOp.getResult(), b.getStringAttr(sipName));
+            b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), b.getStringAttr(sipName));
          }
       });
    }

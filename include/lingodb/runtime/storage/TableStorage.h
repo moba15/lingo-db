@@ -19,7 +19,9 @@ enum class FilterOp {
    GTE,
    NOTNULL,
    IN,
-   SIP
+   SIP,
+   NSIP,
+   NS
 
 };
 struct FilterDescription {
