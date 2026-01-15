@@ -67,6 +67,11 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             return scan;
          } else if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(current)) {
             current = mat->getOperand(0).getDefiningOp();
+         } else if (auto lookup = mlir::dyn_cast_or_null<subop::LookupOp>(current)) {
+            if (debug)
+               current->dump();
+            current = lookup->getOperand(0).getDefiningOp();
+            return nullptr;
          } else {
             if (current->getNumOperands() > 1) {
                if (debug) {
@@ -74,8 +79,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   std::cerr << "No scan for found last current: " << std::endl;
                   current->dump();
                }
-
-
             }
             current = current->getOperand(0).getDefiningOp();
          }
@@ -101,6 +104,10 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       if (!createHashView) return std::nullopt;
       //First get Build/Input side
       auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView, false);
+      if (debug) {
+         std::cerr << "found buildscan " << std::endl;
+         buildScan->dump();
+      }
       if (!buildScan) {
          return std::nullopt;
       }
@@ -220,14 +227,11 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             if (joinInfo->probeKeyColumns.size() != 1 || joinInfo->buildKeyColumns.size() != 1) {
                return;
             }
+
             static int count = 0;
 
             count++;
-            if (count!=5) {
-               return;
-            }
 
-            identifyHashJoinTables(lookupOp, true);
 
             //Do SIP
             auto module = getOperation();

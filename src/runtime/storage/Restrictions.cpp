@@ -437,6 +437,12 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
    for (auto& filterDesc : filterDescs) {
       size_t colId = schema.GetFieldIndex(filterDesc.columnName);
       if (colId == static_cast<size_t>(-1)) {
+         if (filterDesc.op == FilterOp::SIP || filterDesc.op == FilterOp::NSIP) {
+            //sips can be on columns not in the current table (e.g. join keys)
+            //skip adding the filter here
+            std::cerr << "Skipping SIP/NSIP filter on unknown column: " << filterDesc.columnName << std::endl;
+            continue;
+         }
          throw std::runtime_error("unknown column in filter: " + filterDesc.columnName + " table");
       }
       if (filterDesc.op == FilterOp::NOTNULL) {
@@ -551,6 +557,11 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
                   restrictions->filters.push_back({std::make_unique<VarLen32FilterIn>(values), colId});
                   break;
                }
+               case lingodb::runtime::FilterOp::SIP:
+               case lingodb::runtime::FilterOp::NSIP:
+                  std::cerr << "SIP currently not supported for strings\n";
+                  break;
+
                default:
                   throw std::runtime_error("unsupported filter op for string");
             }
