@@ -285,6 +285,7 @@ class VarLen32Filter : public lingodb::runtime::Filter {
 template <class T>
 class BitMapFilter : public lingodb::runtime::Filter {
    size_t* bitMap;
+
    public:
    BitMapFilter(size_t* bitMap) {}
    size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
@@ -311,19 +312,19 @@ class HashViewFilter : public lingodb::runtime::Filter {
    std::string sipId;
    bool positive;
    static inline uint64_t hashValue(size_t val) {
-      size_t p1=11400714819323198549ull;
-      size_t m1=val*p1;
+      size_t p1 = 11400714819323198549ull;
+      size_t m1 = val * p1;
       return m1 ^ __builtin_bswap64(m1);
    }
-   public:
-   HashViewFilter(std::string sipId, bool positive) :sipId(sipId), positive(positive) {
 
+   public:
+   HashViewFilter(std::string sipId, bool positive) : sipId(sipId), positive(positive) {
    }
    size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
       auto view = lingodb::runtime::SIP::getFilter(sipId);
-   //   std::cerr << "Current HashViewFilter for sipID: " << sipId << " view: " << view << std::endl;
+      //   std::cerr << "Current HashViewFilter for sipID: " << sipId << " view: " << view << std::endl;
       bool finished = view ? view->isFinished() : false;
-        //TODO What happens if view is null? currently this happen but should this happen?
+      //TODO What happens if view is null? currently this happen but should this happen?
       size_t filtered = 0;
       const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
       auto* writer = nextSelVec;
@@ -332,7 +333,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
          auto d = data[index0];
          // If the view is not yet available/finished, treat it as no-filter
          // (keep values) to avoid races with an in-progress build.
-         if ( !finished || !positive) {
+         if (!finished || !positive) {
             *writer = index0;
             writer++;
             continue;
@@ -341,10 +342,10 @@ class HashViewFilter : public lingodb::runtime::Filter {
          assert(view);
          auto ht = view->getHashTable();
 
-         std::atomic_ref<lingodb::runtime::HashIndexedView::Entry*> slot(view->ht[hashed&view->getHtMask()]);
+         std::atomic_ref<lingodb::runtime::HashIndexedView::Entry*> slot(view->ht[hashed & view->getHtMask()]);
          lingodb::runtime::HashIndexedView::Entry* current = slot.load();
 
-         auto bucket = view->getHashTable()[hashed&view->getHtMask()];
+         auto bucket = view->getHashTable()[hashed & view->getHtMask()];
 
          bool matches = bucket ? lingodb::runtime::matchesTag(current, hashed) : false;
          if (matches == positive) {
@@ -357,7 +358,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
       }
       if (std::getenv("LINGODB_SIP_DEBUG")) {
          if (filtered)
-            std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values for sip:" << sipId <<  std::endl;
+            std::cerr << "HashViewFilter filtered " << filtered << " out of " << len << " values for sip:" << sipId << std::endl;
       }
 
       return writer - nextSelVec;
@@ -406,7 +407,6 @@ std::unique_ptr<lingodb::runtime::Filter> createSimpleTypeFilter(lingodb::runtim
          bool positive = op == lingodb::runtime::FilterOp::SIP;
          //std::cerr << "Creating SIP restriction for value: " << std::get<std::string>(filterDesc.value) << std::endl;
          return std::make_unique<HashViewFilter<T>>(std::get<std::string>(filterDesc.value), positive);
-
       }
       default:
          throw std::runtime_error("unsupported filter op");

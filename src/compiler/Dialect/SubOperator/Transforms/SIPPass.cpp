@@ -50,45 +50,68 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       subop::LookupOp lookupOp; // The lookup operation
       llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns; // Columns used for hash key on build side
       llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns; // Columns used for hash key on probe side
-      subop::GetExternalOp externalOp;
+      subop::GetExternalOp externalProbeOp;
       bool isPositiveJoin; // True for IN/all_true joins, false for NOT IN/none_true joins
    };
 
-   mlir::Operation* walkToFindSourceScan(mlir::Operation* op) {
+   mlir::Operation* walkToFindSourceScan(mlir::Operation* op, bool debug = false) {
       mlir::Operation* current = op;
       while (current->getNumOperands() > 0) {
+         if (debug) {
+            if (debug) {
+               std::cerr << "Walking op: " << current->getName().getStringRef().str() << std::endl;
+               current->dump();
+            }
+         }
          if (auto scan = mlir::dyn_cast_or_null<subop::ScanOp>(current)) {
             return scan;
+         } else if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(current)) {
+            current = mat->getOperand(0).getDefiningOp();
          } else {
+            if (current->getNumOperands() > 1) {
+               if (debug) {
+                  std::cerr << "should not happen" << std::endl;
+                  std::cerr << "No scan for found last current: " << std::endl;
+                  current->dump();
+               }
+
+
+            }
             current = current->getOperand(0).getDefiningOp();
          }
       }
       return nullptr;
    }
 
-   mlir::Operation* findSourceScanFromCreateHashIndexedView(subop::CreateHashIndexedView createHashIndexedView) {
+   mlir::Operation* findSourceScanFromCreateHashIndexedView(subop::CreateHashIndexedView createHashIndexedView, bool debug) {
       auto users = createHashIndexedView.getOperand().getUsers();
       for (auto* user : users) {
          if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(user)) {
-            return walkToFindSourceScan(mat);
+            return walkToFindSourceScan(mat, debug);
          }
       }
 
       return nullptr;
    }
 
-   std::optional<HashJoinInfo> identifyHashJoinTables(subop::LookupOp lookupOp) {
+   std::optional<HashJoinInfo> identifyHashJoinTables(subop::LookupOp lookupOp, bool debug = false) {
       mlir::Value stateValue = lookupOp.getState();
       auto* stateDefOp = stateValue.getDefiningOp();
       auto createHashView = mlir::dyn_cast_or_null<subop::CreateHashIndexedView>(stateDefOp);
       if (!createHashView) return std::nullopt;
       //First get Build/Input side
-      auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView);
+      auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView, false);
       if (!buildScan) {
          return std::nullopt;
       }
       //Get probe side
-      auto probeScan = walkToFindSourceScan(lookupOp.getStream().getDefiningOp());
+      if (debug) {
+         lookupOp.getStream().getDefiningOp()->dump();
+      }
+      auto probeScan = walkToFindSourceScan(lookupOp.getStream().getDefiningOp(), debug);
+      if (debug) {
+         probeScan->dump();
+      }
       if (!probeScan) {
          return std::nullopt;
       }
@@ -149,7 +172,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                           .lookupOp = lookupOp,
                           .buildKeyColumns = buildKeyColumns,
                           .probeKeyColumns = probeKeyColumns,
-                          .externalOp = externalOp,
+                          .externalProbeOp = externalOp,
                           .isPositiveJoin = isPositiveJoin};
    }
    std::string gen_random(const int len) {
@@ -176,7 +199,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
 #if 0
             llvm::dbgs() << "Hash Join Found:\n";
             llvm::dbgs() << "  Build Side Root: " << joinInfo->buildSideRoot << "\n";
-            llvm::dbgs() << "  Build Side get external" << joinInfo->externalOp << "\n";
+            llvm::dbgs() << "  Build Side get external" << joinInfo->externalProbeOp << "\n";
             llvm::dbgs() << "  Probe Side Root: " << joinInfo->probeSideRoot << "\n";
             llvm::dbgs() << "  Hash View: " << joinInfo->probeKeyColumns.size() << "\n";
             llvm::dbgs() << "Build side key inputs: \n";
@@ -199,18 +222,20 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             }
             static int count = 0;
 
-
             count++;
-            if (count == 1) {
+            if (count!=5) {
                return;
             }
+
+            identifyHashJoinTables(lookupOp, true);
+
             //Do SIP
             auto module = getOperation();
             mlir::Location loc = joinInfo->hashView->getLoc();
             mlir::OpBuilder b(joinInfo->hashView);
             b.setInsertionPointAfter(joinInfo->hashView);
             // Create a SIP filter named "test" for testing purposes.
-            std::string jsonRaw = joinInfo->externalOp.getDescr().str();
+            std::string jsonRaw = joinInfo->externalProbeOp.getDescr().str();
             nlohmann::json descr = nlohmann::json::parse(jsonRaw);
             std::string sipName = gen_random(10);
             auto probeColRef = joinInfo->probeKeyColumns[0];
@@ -243,7 +268,9 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                      auto proberoot = probeSym.getRootReference();
                      auto probeleaf = probeSym.getLeafReference();
                      if (std::getenv("LINGODB_SIP_DEBUG")) {
-                        std::cerr << "Adding SIP for column from " << buildroot.str() << ":" << buildleaf.str() << " to  " << proberoot.str() << ":" << probeleaf.str() << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
+                        std::cerr << "Adding SIP for column from(build) " << buildroot.str() << ":" << buildleaf.str() << " to(probe)  " << proberoot.str() << ":" << probeleaf.str() << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
+                        std::cerr << "Probe: " << std::endl;
+                        joinInfo->externalProbeOp->dump();
                      }
 
                   } else {
@@ -254,7 +281,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
 
             //descr to string
             std::string updatedDescr = to_string(descr);
-            joinInfo->externalOp.setDescr(b.getStringAttr(updatedDescr));
+            joinInfo->externalProbeOp.setDescr(b.getStringAttr(updatedDescr));
             b.create<subop::CreateSIPFilterOp>(loc, joinInfo->hashView.getResult(), b.getStringAttr(sipName));
          }
       });
