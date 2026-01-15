@@ -49,7 +49,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       subop::CreateHashIndexedView hashView; // The hash indexed view
       subop::LookupOp lookupOp; // The lookup operation
       llvm::SmallVector<tuples::ColumnRefAttr> buildKeyColumns; // Columns used for hash key on build side
-      llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns; // Columns used for hash key on probe side
+      llvm::SmallVector<std::string> probeKeyColumnsNames; // Columns used for hash key on probe side
       subop::GetExternalOp externalProbeOp;
       bool isPositiveJoin; // True for IN/all_true joins, false for NOT IN/none_true joins
    };
@@ -144,19 +144,49 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                      buildKeyColumns.push_back(colRef);
                   }
                }
+
             }
          }
       }
 
       // Extract key columns from probe side: find the MapOp before lookup
-      llvm::SmallVector<tuples::ColumnRefAttr> probeKeyColumns;
+
+      llvm::SmallVector<std::string> probeKeyColumnsNames;
       mlir::Operation* probeStream = lookupOp.getStream().getDefiningOp();
       if (auto probeMapOp = mlir::dyn_cast_or_null<subop::MapOp>(probeStream)) {
          auto inputAttr = probeMapOp.getInputColsAttr();
-         for (auto input : inputAttr) {
-            if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
-               probeKeyColumns.push_back(colRef);
+
+         // Find the ScanOp that produces the MapOp's input
+         auto current = probeMapOp.getOperand().getDefiningOp();
+         while (current) {
+            if (auto scanOp = mlir::dyn_cast_or_null<subop::ScanOp>(current)) {
+               // Get the column manager from the scan mapping
+               auto scanMapping = scanOp.getMapping();
+               auto& colManager = scanMapping.getMapping()[0].second.getColumn().type.getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager();
+
+               // For each column used by the MapOp, find its original definition in the scan
+               for (auto input : inputAttr) {
+                  if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
+                     auto* refColumnPtr = &colRef.getColumn();
+                     // Find matching column definition in scan mapping
+                     for (auto& [member, columnDef] : scanMapping.getMapping()) {
+                        if (&columnDef.getColumn() == refColumnPtr) {
+                           // Found the original column definition
+                           columnDef.dump();
+
+                           std::string name = member.internal->name;
+
+                           name.erase(name.end() - 2, name.end());
+                           std::cerr << name<<std::endl;
+                           probeKeyColumnsNames.push_back(name);
+                           break;
+                        }
+                     }
+                  }
+               }
+               break;
             }
+            current = current->getNumOperands() > 0 ? current->getOperand(0).getDefiningOp() : nullptr;
          }
       }
       // Detect if this is a positive (IN/all_true) or negative (NOT IN/none_true) join
@@ -178,7 +208,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                           .hashView = createHashView,
                           .lookupOp = lookupOp,
                           .buildKeyColumns = buildKeyColumns,
-                          .probeKeyColumns = probeKeyColumns,
+                          .probeKeyColumnsNames = probeKeyColumnsNames,
                           .externalProbeOp = externalOp,
                           .isPositiveJoin = isPositiveJoin};
    }
@@ -224,14 +254,13 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                return;
             }
 #endif
-            if (joinInfo->probeKeyColumns.size() != 1 || joinInfo->buildKeyColumns.size() != 1) {
+            if (joinInfo->probeKeyColumnsNames.size() != 1 || joinInfo->buildKeyColumns.size() != 1) {
                return;
             }
 
             static int count = 0;
 
             count++;
-
 
             //Do SIP
             auto module = getOperation();
@@ -242,24 +271,14 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             std::string jsonRaw = joinInfo->externalProbeOp.getDescr().str();
             nlohmann::json descr = nlohmann::json::parse(jsonRaw);
             std::string sipName = gen_random(10);
-            auto probeColRef = joinInfo->probeKeyColumns[0];
+            auto probeColRef = joinInfo->probeKeyColumnsNames[0];
             auto buildColRef = joinInfo->buildKeyColumns[0];
             if (descr.contains("restrictions")) {
                //Add restrictions to JSON
                nlohmann::json restrictionJson;
                // Get probe-side key column name (use root::leaf if root is present)
+               restrictionJson["column"] = probeColRef;
 
-               if (auto sym = probeColRef.getName()) {
-                  auto root = sym.getRootReference();
-                  auto leaf = sym.getLeafReference();
-                  std::string colName;
-
-                  colName = leaf.str();
-                  restrictionJson["column"] = colName;
-               } else {
-                  assert(false);
-                  restrictionJson["column"] = "";
-               }
                restrictionJson["cmp"] = joinInfo->isPositiveJoin ? "sip" : "n_sip";
                restrictionJson["value"] = sipName;
                descr["restrictions"].push_back(restrictionJson);
@@ -268,18 +287,11 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                if (auto buildSym = buildColRef.getName()) {
                   auto buildroot = buildSym.getRootReference();
                   auto buildleaf = buildSym.getLeafReference();
-                  if (auto probeSym = probeColRef.getName()) {
-                     auto proberoot = probeSym.getRootReference();
-                     auto probeleaf = probeSym.getLeafReference();
-                     if (std::getenv("LINGODB_SIP_DEBUG")) {
-                        std::cerr << "Adding SIP for column from(build) " << buildroot.str() << ":" << buildleaf.str() << " to(probe)  " << proberoot.str() << ":" << probeleaf.str() << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
-                        std::cerr << "Probe: " << std::endl;
-                        joinInfo->externalProbeOp->dump();
-                     }
-
-                  } else {
-                     assert(false);
-                  }
+                  if (std::getenv("LINGODB_SIP_DEBUG")) {
+                      std::cerr << "Adding SIP for column from(build) " << buildroot.str() << ":" << buildleaf.str() << " to(probe)  "  << ":" << probeColRef << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
+                      std::cerr << "Probe: " << std::endl;
+                      joinInfo->externalProbeOp->dump();
+                   }
                }
             }
 
