@@ -23,6 +23,7 @@
 #include <llvm/Support/Debug.h>
 #include <algorithm>
 #include <lingodb/compiler/Dialect/DB/IR/DBOps.h.inc>
+#include <queue>
 #include <string>
 #include <mlir/Dialect/Arith/IR/Arith.h>
 
@@ -54,8 +55,8 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       bool isPositiveJoin; // True for IN/all_true joins, false for NOT IN/none_true joins
    };
 
-   mlir::Operation* walkToFindSourceScan(mlir::Operation* op, bool debug = false) {
-      mlir::Operation* current = op;
+   mlir::Operation* walkToFindSourceScan(mlir::Operation* op, std::vector<tuples::ColumnRefAttr> keys, bool debug = false) {
+      /* mlir::Operation* current = op;
       while (current->getNumOperands() > 0) {
          if (debug) {
             if (debug) {
@@ -83,15 +84,132 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             current = current->getOperand(0).getDefiningOp();
          }
       }
+      return nullptr;*/
+      //Implement a breath first search using fifo que
+      assert(op);
+      assert(!keys.empty());
+      if (debug) {
+         std::cerr << "--------------walkToFindSourceScan--------------\n";
+      }
+      std::queue<mlir::Operation*> queue;
+      queue.push(op);
+      while (!queue.empty()) {
+         auto current = queue.front();
+         queue.pop();
+         if (debug) {
+            std::cerr << "Current " << std::endl;
+            current->dump();
+         }
+         if (auto scan = mlir::dyn_cast_or_null<subop::ScanOp>(current)) {
+            bool found = false;
+            // For ScanOp, check if any of the keys match the columns defined by the scan, to decide if we have the correct scan operator
+            for (auto mappingAttr : scan.getMapping().getMappingList()) {
+               auto defAttr = mlir::dyn_cast_or_null<tuples::ColumnDefAttr>(mappingAttr.second);
+               if (defAttr) {
+                  // Check if this column definition matches any of the keys
+                  //TODO is this correct
+                  for (const auto& key : keys) {
+                     if (&defAttr.getColumn() == &key.getColumn()) {
+                        found = true;
+                        break;
+                     }
+                  }
+                  if (found) break;
+               }
+            }
+            if (!found) {
+               if (debug)
+                  std::cerr << "No matching key found\n";
+               continue;
+            }
+
+            if (debug) {
+               std::cerr << "Found: \n";
+               scan.dump();
+               std::cerr << "--------------walkToFindSourceScan--------------\n";
+            }
+            return scan;
+         }
+         std::vector<mlir::Operation*> toAdd;
+         for (auto operand : current->getOperands()) {
+            if (auto* defOp = operand.getDefiningOp()) {
+               queue.push(defOp);
+            }
+         }
+      }
+
+      if (debug) {
+         std::cerr << "None found \n";
+         std::cerr << "--------------walkToFindSourceScan--------------\n";
+      }
+
       return nullptr;
    }
 
+   //Finds source scan for the build side
    mlir::Operation* findSourceScanFromCreateHashIndexedView(subop::CreateHashIndexedView createHashIndexedView, bool debug) {
       auto users = createHashIndexedView.getOperand().getUsers();
       for (auto* user : users) {
          if (auto mat = mlir::dyn_cast_or_null<subop::MaterializeOp>(user)) {
-            return walkToFindSourceScan(mat, debug);
+            mlir::Value streamBeforeMat = mat->getOperand(0);
+            std::vector<tuples::ColumnRefAttr> buildKeyColumns;
+            if (auto mapOp = mlir::dyn_cast_or_null<subop::MapOp>(streamBeforeMat.getDefiningOp())) {
+               // Extract the input columns attribute from the map operation
+               auto inputAttr = mapOp.getInputColsAttr();
+               for (auto input : inputAttr) {
+                  if (auto colRef = mlir::dyn_cast<tuples::ColumnRefAttr>(input)) {
+                     buildKeyColumns.push_back(colRef);
+                  }
+               }
+            }
+
+            if (debug) {
+               std::cerr << "--------------findSourceScanFromCreateHashIndexedView--------------\n";
+               std::cerr << "find table scan for: " << std::endl;
+               mat->dump();
+               std::cerr << " using keys:\n";
+               for (auto keyCol : buildKeyColumns) {
+                  keyCol.dump();
+               }
+               std::cerr << "-------------findSourceScanFromCreateHashIndexedView---------------\n";
+            }
+            if (buildKeyColumns.size() > 1) {
+               std::cerr << "Unsupported key size: " << buildKeyColumns.size() << std::endl;
+            }
+            return walkToFindSourceScan(mat, buildKeyColumns, debug);
          }
+      }
+
+      return nullptr;
+   }
+
+   //Finds source scan for the probe side
+   mlir::Operation* findSourceScanFromMap(mlir::Operation* op, bool debug) {
+      if (debug) {
+         std::cerr << "--------------findSourceScanFromMap--------------\n";
+         std::cerr << "Search probe side scan with start: \n";
+         op->dump();
+      }
+      if (auto map = mlir::dyn_cast_or_null<subop::MapOp>(op)) {
+         std::vector<tuples::ColumnRefAttr> keys;
+         for (auto attr : map.getInputColsAttr()) {
+            if (debug) {
+               std::cerr << "Using key column: \n";
+               attr.dump();
+            }
+            if (auto columRef = mlir::dyn_cast_or_null<tuples::ColumnRefAttr>(attr)) {
+               keys.push_back(columRef);
+            }
+         }
+         return walkToFindSourceScan(map, keys, debug);
+      } else {
+         if (debug) {
+            std::cerr << "Is no map at start\n";
+         }
+      }
+
+      if (debug) {
+         std::cerr << "--------------findSourceScanFromMap--------------\n";
       }
 
       return nullptr;
@@ -103,10 +221,13 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       auto createHashView = mlir::dyn_cast_or_null<subop::CreateHashIndexedView>(stateDefOp);
       if (!createHashView) return std::nullopt;
       //First get Build/Input side
-      auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView, false);
+      auto buildScan = findSourceScanFromCreateHashIndexedView(createHashView, debug);
       if (debug) {
          std::cerr << "found buildscan " << std::endl;
-         buildScan->dump();
+         if (buildScan)
+            buildScan->dump();
+         else
+            std::cerr << "nullptr\n";
       }
       if (!buildScan) {
          return std::nullopt;
@@ -115,7 +236,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       if (debug) {
          lookupOp.getStream().getDefiningOp()->dump();
       }
-      auto probeScan = walkToFindSourceScan(lookupOp.getStream().getDefiningOp(), debug);
+      auto probeScan = findSourceScanFromMap(lookupOp.getStream().getDefiningOp(), debug);
       if (debug) {
          probeScan->dump();
       }
@@ -144,7 +265,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                      buildKeyColumns.push_back(colRef);
                   }
                }
-
             }
          }
       }
@@ -172,12 +292,13 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                      for (auto& [member, columnDef] : scanMapping.getMapping()) {
                         if (&columnDef.getColumn() == refColumnPtr) {
                            // Found the original column definition
-                           columnDef.dump();
+
 
                            std::string name = member.internal->name;
 
                            name.erase(name.end() - 2, name.end());
-                           std::cerr << name<<std::endl;
+                           if (debug)
+                              std::cerr << name << std::endl;
                            probeKeyColumnsNames.push_back(name);
                            break;
                         }
@@ -231,7 +352,10 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       auto& used = getAnalysis<subop::ColumnUsageAnalysis>();
       std::optional<HashJoinInfo> joinInfo;
       getOperation()->walk([&](subop::LookupOp lookupOp) {
-         joinInfo = identifyHashJoinTables(lookupOp);
+         static int count = 0;
+         count++;
+
+         joinInfo = identifyHashJoinTables(lookupOp, std::getenv("LINGODB_SIP_DEBUG"));
          if (joinInfo) {
 #if 0
             llvm::dbgs() << "Hash Join Found:\n";
@@ -257,10 +381,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             if (joinInfo->probeKeyColumnsNames.size() != 1 || joinInfo->buildKeyColumns.size() != 1) {
                return;
             }
-
-            static int count = 0;
-
-            count++;
 
             //Do SIP
             auto module = getOperation();
@@ -288,10 +408,10 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   auto buildroot = buildSym.getRootReference();
                   auto buildleaf = buildSym.getLeafReference();
                   if (std::getenv("LINGODB_SIP_DEBUG")) {
-                      std::cerr << "Adding SIP for column from(build) " << buildroot.str() << ":" << buildleaf.str() << " to(probe)  "  << ":" << probeColRef << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
-                      std::cerr << "Probe: " << std::endl;
-                      joinInfo->externalProbeOp->dump();
-                   }
+                     std::cerr << "Adding SIP for column from(build) " << buildroot.str() << ":" << buildleaf.str() << " to(probe)  " << ":" << probeColRef << " for sipId: " << sipName << " positive: " << joinInfo->isPositiveJoin << std::endl;
+                     std::cerr << "Probe: " << std::endl;
+                     joinInfo->externalProbeOp->dump();
+                  }
                }
             }
 

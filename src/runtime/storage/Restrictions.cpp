@@ -441,7 +441,7 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
             //sips can be on columns not in the current table (e.g. join keys)
             //skip adding the filter here
             std::cerr << "Skipping SIP/NSIP filter on unknown column: " << filterDesc.columnName << std::endl;
-            continue;
+            //continue;
          }
          throw std::runtime_error("unknown column in filter: " + filterDesc.columnName + " table");
       }
@@ -488,6 +488,10 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
             break;
          }
          case arrow::Type::DATE32: {
+            if (filterDesc.op == FilterOp::SIP || filterDesc.op == FilterOp::NSIP) {
+               std::cerr << "SIP/NSIP filters not supported for DATE32 columns\n";
+               break;
+            }
             if (filterDesc.op == FilterOp::IN) {
                std::vector<int32_t> values;
                for (auto strVal : std::get<std::vector<std::string>>(filterDesc.values)) {
