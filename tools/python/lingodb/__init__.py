@@ -34,7 +34,7 @@ def create_create_table_stmt(name, table: pa.Table):
         elif t == pa.float16() or t == pa.float32() or t == pa.float64():
             res += f"{colname} {float_type(t.bit_width, field.nullable)}"
         else:
-            raise "Unsupported Type"
+            raise TypeError(f"Unsupported Type: {t}")
     res += ");"
     return res
 
