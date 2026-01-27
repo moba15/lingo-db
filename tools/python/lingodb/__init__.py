@@ -29,7 +29,9 @@ def create_create_table_stmt(name, table: pa.Table):
         lt = None
         if t == pa.int8() or t == pa.int16() or t == pa.int32() or t == pa.int64():
             res += f"{colname} {int_type(t.bit_width, field.nullable)}"
-        elif t == pa.string() or t == pa.utf8():
+        elif t == pa.uint8() or t == pa.uint16() or t == pa.uint32() or t == pa.uint64():
+            res += f"{colname} {int_type(t.bit_width, field.nullable)}"
+        elif t == pa.string() or t == pa.utf8() or t == pa.large_string():
             res += f"{colname} {string_type(field.nullable)}"
         elif t == pa.float16() or t == pa.float32() or t == pa.float64():
             res += f"{colname} {float_type(t.bit_width, field.nullable)}"
