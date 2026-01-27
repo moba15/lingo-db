@@ -57,6 +57,15 @@ class Connection:
         return self.native_con.mlir_no_result(module)
 
     def append_table(self, name, table):
+        # Normalize the table schema to match what was created in SQL
+        # Convert large_string to string
+        new_schema = []
+        for field in table.schema:
+            if field.type == pa.large_string():
+                new_schema.append(pa.field(field.name, pa.string(), field.nullable))
+            else:
+                new_schema.append(field)
+        table = table.cast(pa.schema(new_schema))
         self.native_con.append(name, table)
 
     def add_table(self, name, table):
