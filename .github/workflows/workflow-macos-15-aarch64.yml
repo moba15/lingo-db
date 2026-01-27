@@ -2,6 +2,7 @@ name: build+test (macOS 15 aarch64)
 
 on:
   pull_request:
+  push:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -42,8 +43,14 @@ jobs:
       - name: Install dependencies with Homebrew
         run: |
           brew update
-          brew install ccache cmake ninja llvm@20 catch2 lit bzip2 libffi libedit libxml2 brotli zlib apache-arrow boost flex bison
-          brew link --force ccache cmake ninja llvm@20 catch2 lit bzip2 libffi libedit libxml2 brotli zlib apache-arrow boost flex bison
+          if ! brew tap | grep -q "local-versions"; then
+            brew tap-new $USER/local-versions
+          fi
+          brew tap homebrew/core --force
+          brew extract --force --version=22.0.0 apache-arrow $USER/local-versions
+          
+          brew install $USER/local-versions/apache-arrow@22.0.0 ccache cmake ninja llvm@20 catch2 lit bzip2 libffi libedit libxml2 brotli zlib boost flex bison
+          brew link --force ccache cmake ninja llvm@20 catch2 lit bzip2 libffi libedit libxml2 brotli zlib apache-arrow@22.0.0 boost flex bison
 
       - name: Build
         env:
