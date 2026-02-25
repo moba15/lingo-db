@@ -184,7 +184,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                std::cerr << "-------------findSourceScanFromCreateHashIndexedView---------------\n";
             }*/
             if (buildKeyColumns.size() > 1) {
-               std::cerr << "Unsupported key size: " << buildKeyColumns.size() << std::endl;
             } else if (!isValid) {
                return {nullptr, {}};
             }
