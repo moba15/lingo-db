@@ -173,7 +173,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                }
             }
 
-            if (debug) {
+            /* if (debug) {
                std::cerr << "--------------findSourceScanFromCreateHashIndexedView--------------\n";
                std::cerr << "find table scan for: " << std::endl;
                mat->dump();
@@ -182,7 +182,7 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   keyCol.dump();
                }
                std::cerr << "-------------findSourceScanFromCreateHashIndexedView---------------\n";
-            }
+            }*/
             if (buildKeyColumns.size() > 1) {
                std::cerr << "Unsupported key size: " << buildKeyColumns.size() << std::endl;
             } else if (!isValid) {
@@ -283,8 +283,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       }
 
       // Detect if this is a positive (IN/all_true) or negative (NOT IN/none_true) join
-      //TODO detection may be hardly simplified
-      //TODO einmal selber machen
       bool isAntiJoin = false;
       bool hasMarkerState = false;
       bool markerIsFiltered = false;
@@ -339,20 +337,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
          .externalProbeOp = externalOp,
       };
    }
-   std::string genRandom(const int len) {
-      static const char alphanum[] =
-         "0123456789"
-         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-         "abcdefghijklmnopqrstuvwxyz";
-      std::string tmpS;
-      tmpS.reserve(len);
-
-      for (int i = 0; i < len; ++i) {
-         tmpS += alphanum[rand() % (sizeof(alphanum) - 1)];
-      }
-
-      return tmpS;
-   }
 
    protected:
    void runOnOperation() override {
@@ -360,32 +344,9 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
       getOperation()->walk([&](subop::LookupOp lookupOp) {
          joinInfo = identifyHashJoinTables(lookupOp, std::getenv("LINGODB_SIP_DEBUG"));
          if (joinInfo) {
-#if 0
-            llvm::dbgs() << "Hash Join Found:\n";
-            llvm::dbgs() << "  Build Side Root: " << joinInfo->buildSideScan << "\n";
-            llvm::dbgs() << "  Build Side get external" << joinInfo->externalProbeOp << "\n";
-            llvm::dbgs() << "  Probe Side Root: " << joinInfo->probeSideRoot << "\n";
-            llvm::dbgs() << "  Hash View: " << joinInfo->probeKeyColumns.size() << "\n";
-            llvm::dbgs() << "Build side key inputs: \n";
-            for (auto& in : joinInfo->buildKeyColumns) {
-               llvm::dbgs() << " - ";
-               in.dump();
-            }
-            llvm::dbgs() << "Probe side key inputs: \n";
-            for (auto& in : joinInfo->probeKeyColumns) {
-               llvm::dbgs() << " - ";
-               in.dump();
-            }
-
-            if (joinInfo->probeKeyColumns.size() != 1) {
-               return;
-            }
-#endif
             if (joinInfo->probeKeyColumnsNames.size() != 1 || joinInfo->buildKeyColumnNames.size() != 1) {
                return;
             }
-            static int64_t count = 0;
-            count++;
 
             //Do SIP
             mlir::Location loc = joinInfo->hashView->getLoc();
@@ -396,25 +357,8 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
             std::string descrRaw = joinInfo->externalProbeOp.getDescr().str();
             auto externalDataSourceProp = lingodb::utility::deserializeFromHexString<lingodb::runtime::ExternalDatasourceProperty>(descrRaw);
 
-            if (!lookupOp->hasAttr("rows")) {
-               return;
-            }
-            auto rows = mlir::dyn_cast<mlir::FloatAttr>(lookupOp->getAttr("rows")).getValue().convertToDouble();
-            //If join is not restrictive enough we skip
-            if (rows > 0.5) {
-               if (rows >= 0.8) {
-                  return;
-               }
-               if (externalDataSourceProp.filterDescriptions.empty()) {
-                  return;
-               }
-            }
-
-            /*auto last = externalDataSourceProp.filterDescriptions[externalDataSourceProp.filterDescriptions.size() - 1];
-            if (last.op == lingodb::runtime::FilterOp::SIP) {
-               externalDataSourceProp.filterDescriptions.pop_back();
-            }*/
-            std::string sipName = genRandom(10);
+            static int64_t count = 0;
+            count++;
             auto probeColRef = joinInfo->probeKeyColumnsNames[0];
             auto buildColRef = joinInfo->buildKeyColumnNames[0];
 
@@ -434,7 +378,6 @@ class SIPPass : public mlir::PassWrapper<SIPPass, mlir::OperationPass<mlir::Modu
                   for (auto& in : joinInfo->probeKeyColumnsNames) {
                      std::cerr << " - " << in;
                   }
-                  std::cerr << "SEL: " << rows << std::endl;
                   std::cerr << "\nSIP Name: " << count << std::endl;
                   std::cerr << "----------------SIP Info----------------\n";
 

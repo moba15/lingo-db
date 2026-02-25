@@ -608,7 +608,6 @@ std::unique_ptr<lingodb::runtime::Restrictions> lingodb::runtime::Restrictions::
          }
          case arrow::Type::DATE32: {
             if (filterDesc.op == FilterOp::SIP) {
-               std::cerr << "SIP for Date32 not yet supported" << std::endl;
                // restrictions->filters.push_back({std::make_unique<HashViewFilter<int32_t>>(std::get<std::string>(filterDesc.value)), colId});
             } else if (filterDesc.op == FilterOp::IN) {
                std::vector<int32_t> values;
