@@ -3,6 +3,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <deque>
 #include <limits>
 
 #include "lingodb/runtime/ArrowView.h"
@@ -17,6 +18,11 @@
 namespace lingodb::runtime {
 class ParquetBatchesWorkerResvState {
    public:
+   struct PrefetchedRowGroup {
+      int rowGroupId{-1};
+      arrow::Future<> ready = arrow::Future<>::MakeFinished();
+   };
+
    class WorkInfo {
       public:
       size_t ownChunkId; //The current chunk the work is alloacated to
@@ -40,9 +46,11 @@ class ParquetBatchesWorkerResvState {
    std::atomic<bool> fullyExhausted{false};
 
    long unitAmount{0};
+   bool noMoreRowGroups{false};
 
    std::unique_ptr<arrow::RecordBatchReader> rowGroupRecordBatchReader;
    arrow::Future<> buffering = arrow::Future<>::MakeFinished();
+   std::deque<PrefetchedRowGroup> prefetchedRowGroups;
 
    bool hasMoreWork();
    /**
@@ -55,11 +63,12 @@ class ParquetBatchesWorkerResvState {
     * @param localReader reader of the current thread
     * @return pair of local chunk id and reservation id. reservation id is -1 if no more work could be found, otherwise it is the id of the reservation
     */
-   WorkInfo fetchAndNextOwn(size_t splitSize, std::vector<std::deque<LingoDBTable::TableChunk>>* queryLifetimeChunks, std::atomic<int>& rgIdstartIndex, int numberOfRowGroups, std::vector<int>& colIds, std::unique_ptr<parquet::arrow::FileReader>& localReader);
+   WorkInfo fetchAndNextOwn(size_t splitSize, size_t prefetchDepth, std::vector<std::deque<LingoDBTable::TableChunk>>* queryLifetimeChunks, std::atomic<int>& rgIdstartIndex, int numberOfRowGroups, std::vector<int>& colIds, std::unique_ptr<parquet::arrow::FileReader>& localReader);
    std::pair<size_t, int> fetchAndNext();
 
    private:
-   void initNewRowGroup(int rowGroup, std::vector<int>& colIds, std::unique_ptr<parquet::arrow::FileReader>& localReader);
+   void initNewRowGroup(int rowGroup, std::unique_ptr<parquet::arrow::FileReader>& localReader);
+   void refillPrefetchQueue(size_t prefetchDepth, std::atomic<int>& rgIdstartIndex, int numberOfRowGroups, std::vector<int>& colIds, std::unique_ptr<parquet::arrow::FileReader>& localReader);
 };
 class ScanParquetFileTask : public scheduler::TaskWithImplicitContext {
    std::string filePath;
@@ -82,6 +91,7 @@ class ScanParquetFileTask : public scheduler::TaskWithImplicitContext {
 
    std::vector<std::unique_ptr<ParquetBatchesWorkerResvState>> workerResvs;
    size_t splitSize{20000};
+   size_t prefetchDepth{4};
 
    public:
    ScanParquetFileTask(std::string filePath, std::vector<int> colids, std::function<void(BatchView*)> cb, std::unique_ptr<Restrictions> restrictions);
