@@ -12,11 +12,13 @@
 
 #include <arrow/util/decimal.h>
 
+#include "lingodb/utility/Tracer.h"
 #include <cstring>
 #include <optional>
 #include <regex>
 #include <arrow/util/value_parsing.h>
 namespace lingodb::runtime {
+static utility::Tracer::Event processMorsel("TableScan", "morsel", false);
 
 namespace {
 int32_t parseDate32(std::string str) {
@@ -325,11 +327,14 @@ ScanParquetFileTask::ScanParquetFileTask(std::string filePath, std::vector<int> 
 arrow::Status ScanParquetFileTask::init(std::vector<FilterDescription>& filterDescriptions) {
    const size_t numWorkers = lingodb::scheduler::getNumWorkers();
    queryLifetimeChunks = new std::vector<std::deque<std::shared_ptr<ParquetBatchesWorkerResvState::ChunkWorkEntry>>>(numWorkers);
+#if KEEP_IN_MEMEORY
    //Keep in memory until query is finished
-   //Joins for instance do not copy data and only refernces them and therefore the lifetime of the TableChunks has to exceed this table scan
-   /* lingodb::runtime::getCurrentExecutionContext()->registerState({queryLifetimeChunks, [](void* ptr) {
-                                                                     delete reinterpret_cast<std::vector<std::deque<LingoDBTable::TableChunk>>*>(ptr);
-                                                                  }});*/
+   //Joins for instance do not copy data and only references them, and therefore the lifetime of the TableChunks has to exceed this table scan
+   getCurrentExecutionContext()->registerState({queryLifetimeChunks, [](void* ptr) {
+                                                   delete reinterpret_cast<std::vector<std::deque<std::shared_ptr<ParquetBatchesWorkerResvState::ChunkWorkEntry>>>*>(ptr);
+                                                }});
+#endif
+
    std::shared_ptr<arrow::io::RandomAccessFile> input;
    ARROW_ASSIGN_OR_RAISE(input, arrow::io::ReadableFile::Open(filePath));
    std::shared_ptr<arrow::Schema> parquetSchema;
@@ -521,7 +526,6 @@ void ScanParquetFileTask::unitRun(LingoDBTable::TableChunk& chunk) {
    batchView.offset = begin;
    batchView.selectionVector = BatchView::defaultSelectionVector.data();
    batchView.length = std::min(static_cast<size_t>(chunk.getNumRows() - begin), len);
-   //TODO trace
    for (size_t i = 0; i < colIds.size(); i++) {
       batchView.arrays[i] = chunk.getArrayView(colIds[i]);
    }
@@ -531,6 +535,7 @@ void ScanParquetFileTask::unitRun(LingoDBTable::TableChunk& chunk) {
    batchView.length = newLen;
    batchView.selectionVector = selVec;
    if (batchView.length > 0) {
+      utility::Tracer::Trace trace(processMorsel);
       cb(&batchView);
    }
 }
