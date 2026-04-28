@@ -373,13 +373,14 @@ void SQLMlirTranslator::translateCopyNode(mlir::OpBuilder& builder, std::shared_
    std::string tableName = copyStmt->copyInfo->table;
    std::string delimiter = ",";
    std::string escape = "";
+
    bool header = false;
    for (auto [optionName, optionValue] : copyStmt->copyInfo->options) {
       if (optionName == "DELIMITER") {
          delimiter = optionValue;
       } else if (optionName == "ESCAPE") {
          escape = optionValue;
-      } else if (optionName == "FORMAT") {
+      } else if (optionName == "FORMAT" || optionName == "format") {
          std::string format = optionValue;
          if (format != "csv") {
             throw std::runtime_error("copy only supports csv");
@@ -389,7 +390,7 @@ void SQLMlirTranslator::translateCopyNode(mlir::OpBuilder& builder, std::shared_
       } else if (optionName == "HEADER") {
          header = optionValue == "true";
       } else {
-         translatorError(optionName << "option not implemented", copyStmt->loc);
+         translatorError(optionName << " option not implemented", copyStmt->loc);
       }
    }
    auto tableNameValue = createStringValue(builder, tableName);
@@ -397,7 +398,11 @@ void SQLMlirTranslator::translateCopyNode(mlir::OpBuilder& builder, std::shared_
    auto delimiterValue = createStringValue(builder, delimiter);
    auto escapeValue = createStringValue(builder, escape);
    auto headerValue = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), header ? 1 : 0, 1);
-   compiler::runtime::RelationHelper::copyFromIntoTable(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, escapeValue, headerValue});
+   if (copyStmt->copyInfo->isFrom) {
+      compiler::runtime::RelationHelper::copyFromIntoTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, escapeValue, headerValue});
+   } else {
+      compiler::runtime::RelationHelper::copyToFromTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, headerValue});
+   }
 }
 
 catalog::CreateTableDef SQLMlirTranslator::translateTableElements(mlir::OpBuilder& builder, std::vector<std::shared_ptr<ast::TableElement>> tableElements, std::shared_ptr<analyzer::SQLContext> context) {

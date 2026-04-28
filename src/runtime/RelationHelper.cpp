@@ -13,6 +13,8 @@
 #include <arrow/builder.h>
 #include <arrow/csv/api.h>
 #include <arrow/io/api.h>
+#include <arrow/ipc/api.h>
+#include "lingodb/runtime/storage/LingoDBTable.h"
 #include <dlfcn.h>
 #include <lingodb/catalog/Defs.h>
 namespace lingodb::runtime {
@@ -76,7 +78,7 @@ void RelationHelper::appendTableFromResult(lingodb::runtime::VarLen32 tableName,
       appendToTable(session, tableName.str(), resultTable.value()->get());
    }
 }
-void RelationHelper::copyFromIntoTable(lingodb::runtime::VarLen32 tableName, lingodb::runtime::VarLen32 fileName, lingodb::runtime::VarLen32 delimiter, lingodb::runtime::VarLen32 escape, bool header) {
+void RelationHelper::copyFromIntoTableCSV(lingodb::runtime::VarLen32 tableName, lingodb::runtime::VarLen32 fileName, lingodb::runtime::VarLen32 delimiter, lingodb::runtime::VarLen32 escape, bool header) {
    auto* context = getCurrentExecutionContext();
    auto& session = context->getSession();
    auto catalog = session.getCatalog();
@@ -174,6 +176,55 @@ void RelationHelper::copyFromIntoTable(lingodb::runtime::VarLen32 tableName, lin
 
       appendToTable(session, tableName.str(), table);
       catalog->persist();
+   } else {
+      throw std::runtime_error("copy failed: no such table");
+   }
+}
+void RelationHelper::copyToFromTableCSV(runtime::VarLen32 tableName, runtime::VarLen32 fileName, runtime::VarLen32 delimiter, bool header) {
+   auto* context = getCurrentExecutionContext();
+   auto& session = context->getSession();
+   auto catalog = session.getCatalog();
+   if (auto relation = catalog->getTypedEntry<lingodb::catalog::TableCatalogEntry>(tableName)) {
+      std::shared_ptr<arrow::io::FileOutputStream> outfile;
+      // Ensure the table is loaded into memory and export from the in-memory representation
+      relation.value()->ensureFullyLoaded();
+      auto* lingoTable = dynamic_cast<lingodb::runtime::LingoDBTable*>(&relation.value()->getTableStorage());
+      if (!lingoTable) {
+         throw std::runtime_error("copy failed: unsupported table storage");
+      }
+
+      lingoTable->ensureLoaded();
+      std::vector<std::shared_ptr<arrow::RecordBatch>> batches;
+      for (const auto& chunk : *lingoTable->getTableChunks()) {
+         batches.push_back(chunk.data());
+      }
+      if (batches.empty()) {
+        throw std::runtime_error("copy failed: no data to export");
+      }
+      auto table = arrow::Table::FromRecordBatches(batches).ValueOrDie();
+
+      if (!table) {
+         // empty table -> create empty Arrow table with schema from storage
+         auto schema = relation.value()->getSample().getSampleData() ? relation.value()->getSample().getSampleData()->schema() : nullptr;
+         if (!schema) {
+            throw std::runtime_error("copy failed: no data to export");
+         }
+         table = arrow::Table::FromRecordBatches({}).ValueOrDie();
+      }
+
+      auto openResult = arrow::io::FileOutputStream::Open(fileName.str());
+      if (!openResult.ok()) {
+         throw std::runtime_error("Error opening file" + openResult.status().ToString());
+      }
+      outfile = openResult.ValueOrDie();
+      auto write_options = arrow::csv::WriteOptions::Defaults();
+      write_options.delimiter = delimiter.str().front();
+      write_options.include_header = header;
+      auto status = arrow::csv::WriteCSV(*table, write_options, outfile.get());
+      if (!status.ok()) {
+         throw std::runtime_error("copy failed");
+      }
+
    } else {
       throw std::runtime_error("copy failed: no such table");
    }
