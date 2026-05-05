@@ -371,37 +371,64 @@ void SQLMlirTranslator::translateSetNode(mlir::OpBuilder& builder, std::shared_p
 void SQLMlirTranslator::translateCopyNode(mlir::OpBuilder& builder, std::shared_ptr<ast::CopyNode> copyStmt, std::shared_ptr<analyzer::SQLContext> context) {
    std::string fileName = copyStmt->copyInfo->fromFileName;
    std::string tableName = copyStmt->copyInfo->table;
-   std::string delimiter = ",";
-   std::string escape = "";
+   std::string format = "";
 
    bool header = false;
    for (auto [optionName, optionValue] : copyStmt->copyInfo->options) {
-      if (optionName == "DELIMITER") {
-         delimiter = optionValue;
-      } else if (optionName == "ESCAPE") {
-         escape = optionValue;
-      } else if (optionName == "FORMAT" || optionName == "format") {
-         std::string format = optionValue;
-         if (format != "csv") {
-            throw std::runtime_error("copy only supports csv");
-         }
-
-      } else if (optionName == "NULL") {
-      } else if (optionName == "HEADER") {
-         header = optionValue == "true";
-      } else {
-         translatorError(optionName << " option not implemented", copyStmt->loc);
+      if (optionName == "FORMAT" || optionName == "format") {
+         format = optionValue;
+         break;
       }
    }
    auto tableNameValue = createStringValue(builder, tableName);
    auto fileNameValue = createStringValue(builder, fileName);
-   auto delimiterValue = createStringValue(builder, delimiter);
-   auto escapeValue = createStringValue(builder, escape);
-   auto headerValue = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), header ? 1 : 0, 1);
-   if (copyStmt->copyInfo->isFrom) {
-      compiler::runtime::RelationHelper::copyFromIntoTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, escapeValue, headerValue});
+   if (format == "csv") {
+      //---CSV---
+      std::string delimiter = ",";
+      std::string escape = "";
+      for (auto [optionName, optionValue] : copyStmt->copyInfo->options) {
+         if (optionName == "DELIMITER") {
+            delimiter = optionValue;
+         } else if (optionName == "ESCAPE") {
+            escape = optionValue;
+         } else if (optionName == "NULL") {
+         } else if (optionName == "HEADER") {
+            header = optionValue == "true";
+         } else if (optionName != "FORMAT" && optionName != "format") {
+            translatorError(optionName << " option not implemented", copyStmt->loc);
+         }
+      }
+      auto delimiterValue = createStringValue(builder, delimiter);
+      auto escapeValue = createStringValue(builder, escape);
+      auto headerValue = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), header ? 1 : 0, 1);
+      if (copyStmt->copyInfo->isFrom) {
+         compiler::runtime::RelationHelper::copyFromIntoTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, escapeValue, headerValue});
+      } else {
+         compiler::runtime::RelationHelper::copyToFromTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, headerValue});
+      }
+
+   } else if (format == "parquet") {
+      std::string compression = "SNAPPY";
+      for (auto [optionName, optionValue] : copyStmt->copyInfo->options) {
+         if (optionName == "compression") {
+            compression = optionValue;
+            std::transform(compression.begin(), compression.end(), compression.begin(), ::toupper);
+         } else if (optionName != "FORMAT" && optionName != "format") {
+            translatorError(optionName << " option not implemented", copyStmt->loc);
+         }
+      }
+
+      auto compressionValue = createStringValue(builder, compression);
+
+      //---PARQUET---
+      if (copyStmt->copyInfo->isFrom) {
+         translatorError("Parquet copy not implemented", copyStmt->loc);
+      } else {
+         compiler::runtime::RelationHelper::copyToFromTableParquet(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, compressionValue});
+      }
+
    } else {
-      compiler::runtime::RelationHelper::copyToFromTableCSV(builder, builder.getUnknownLoc())(mlir::ValueRange{tableNameValue, fileNameValue, delimiterValue, headerValue});
+      translatorError("Format " << format << " not supported", copyStmt->loc);
    }
 }
 
