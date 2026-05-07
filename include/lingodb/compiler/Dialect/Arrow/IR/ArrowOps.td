@@ -70,10 +70,10 @@ def Arrow_AppendFixedSizedOp : Arrow_Op<"array_builder.append_fixed_sized"> {
 }
 
 def Arrow_AppendNullOp : Arrow_Op<"array_builder.append_null"> {
-    let summary = "Appends a fixed sized value to an Arrow array builder.";
+    let summary = "Appends a null value to an Arrow array builder.";
     let description = [{
-        This operation appends a fixed sized value to an Arrow array builder, optionally with a validity flag.
-        It can be used for any fixed sized type, such as integers, floats, decimals, dates, and timestamps.
+        This operation appends a null/none value to an Arrow array builder.
+
     }];
     let arguments = (ins Arrow_ArrayBuilder:$builder);
     let assemblyFormat = " $builder attr-dict";
