@@ -170,7 +170,6 @@ bool ParquetBatchesWorkerResvState::rowGroupPassesMetadataFilters(int rowGroup, 
 
       std::shared_ptr<parquet::Statistics> stats = columnMetadata->statistics();
       if (!filter || !filter->apply(stats)) {
-         std::cerr << "Filter\n";
          return false;
       }
    }
@@ -199,8 +198,8 @@ void ParquetBatchesWorkerResvState::initNewRowGroup(int rowGroup, size_t splitSi
    std::vector<int> newRgIds = {rowGroup};
    auto newlocalRowGroupReaderUncertain = localReader->GetRecordBatchReader(newRgIds, colIds);
    if (!newlocalRowGroupReaderUncertain.ok()) {
-      //TODO handle error
       std::cerr << "Should not happen" << std::endl;
+      std::cerr << newlocalRowGroupReaderUncertain.status().ToString() << std::endl;
    }
    std::swap(rowGroupRecordBatchReader, newlocalRowGroupReaderUncertain.ValueOrDie());
    rgId = rowGroup;
@@ -439,8 +438,6 @@ arrow::Status ScanParquetFileTask::init(std::vector<FilterDescription>& filterDe
    for (size_t i = 0; i < numWorkers; i++) {
       batchInfos[i].arrays = arrayViewPtrs[i].data();
       selVecs[i] = std::make_pair(new uint16_t[splitSize], new uint16_t[splitSize]);
-
-      auto parquetFileReader = parquet::ParquetFileReader::Open(input);
 
       std::unique_ptr<parquet::arrow::FileReader> reader;
 

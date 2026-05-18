@@ -16,13 +16,12 @@
 #include <shared_mutex>
 #include <arrow/dataset/file_parquet.h>
 #include <parquet/statistics.h>
-#ifndef KEEP_IN_MEMEORY
-#define KEEP_IN_MEMEORY 1
+#ifndef KEEP_IN_MEMORY
+#define KEEP_IN_MEMORY 1
 #endif
 
-// Backward-compatible alias.
-#ifndef KEEP_IN_MEMORY
-#define KEEP_IN_MEMORY KEEP_IN_MEMEORY
+#ifndef KEEP_IN_MEMEORY
+#define KEEP_IN_MEMEORY KEEP_IN_MEMORY
 #endif
 namespace lingodb::runtime {
 struct MetadataFilter {
