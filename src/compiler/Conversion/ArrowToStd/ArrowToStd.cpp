@@ -244,6 +244,25 @@ class BuilderAppendVariableSizeBinaryLowering : public OpConversionPattern<arrow
    }
 };
 
+class BuilderAppendListLowering : public OpConversionPattern<arrow::AppendListOp> {
+   public:
+   using OpConversionPattern<arrow::AppendListOp>::OpConversionPattern;
+   LogicalResult matchAndRewrite(arrow::AppendListOp op, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
+      auto loc = op.getLoc();
+      auto builderVal = adaptor.getBuilder();
+      auto isValid = adaptor.getValid();
+      if (!isValid) {
+         isValid = rewriter.create<mlir::arith::ConstantIntOp>(loc, 1, 1);
+      }
+      auto val = adaptor.getValue();
+
+      rt::ArrowColumnBuilder::addList(rewriter, loc)({builderVal, isValid});
+      rewriter.eraseOp(op);
+
+      return success();
+   }
+};
+
 } // end anonymous namespace
 template <class Op>
 class SimpleTypeConversionPattern : public ConversionPattern {
@@ -341,6 +360,7 @@ void ArrowToStdLoweringPass::runOnOperation() {
    patterns.insert<BuilderAppendFixedSizedLowering>(typeConverter, &getContext());
    patterns.insert<BuilderAppendBoolLowering>(typeConverter, &getContext());
    patterns.insert<BuilderAppendVariableSizeBinaryLowering>(typeConverter, &getContext());
+   patterns.insert<BuilderAppendListLowering>(typeConverter, &getContext());
    if (failed(applyFullConversion(module, target, std::move(patterns))))
       signalPassFailure();
 }
