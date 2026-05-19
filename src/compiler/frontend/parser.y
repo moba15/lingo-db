@@ -232,7 +232,7 @@
 
 %type<std::shared_ptr<lingodb::ast::ParsedExpression>>  having_clause target_el a_expr c_expr b_expr  where_clause group_by_item group_by_item_with_alias
                                                         func_arg_expr select_limit_value case_expr case_default cast_expr offset_clause 
-                                                        select_offset_value array_expr
+                                                        select_offset_value list_expr
 
 %type<std::shared_ptr<lingodb::ast::ConjunctionExpression>> and_a_expr or_a_expr
 
@@ -1620,9 +1620,9 @@ c_expr:
         $$ = subquery;
     }
     //TODO | ARRAY select_with_parens
-    | ARRAY array_expr 
+    | list_expr 
     {
-        $$ = $array_expr;
+        $$ = $list_expr;
     }
     //TODO | explicit_row
     //TODO | implicit_row
@@ -1898,7 +1898,7 @@ func_arg_expr:
     | param_name GREATER_EQUAL a_expr
     ;
 
-array_expr: 
+list_expr: 
     LB expr_list RB
     {
         $$ = mkNode<lingodb::ast::ListExpression>(@$, $expr_list);
@@ -1907,7 +1907,7 @@ array_expr:
     {
         $$ = mkNode<lingodb::ast::ListExpression>(@$, std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>());
     }
-    //TODO | LB array_expr_list RB
+    //TODO | LB list_expr_list RB
 
 //TODO missing rules
 /*

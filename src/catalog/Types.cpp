@@ -249,7 +249,6 @@ std::shared_ptr<ListTypeInfo> ListTypeInfo::deserialize(utility::Deserializer& d
 }
 std::string ListTypeInfo::toString() {
    return "list<" + elementType.toString() + ">";
-
 }
 Type Type::makeIntType(size_t width, bool isSigned) {
    return Type(LogicalTypeId::INT, std::make_shared<IntTypeInfo>(isSigned, width));
