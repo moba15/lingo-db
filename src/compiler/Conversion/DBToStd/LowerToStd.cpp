@@ -209,6 +209,46 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
 };
 
 class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
+   private:
+   std::string arrowDescrFromType(mlir::Type type) const {
+      if (type.isIndex()) {
+         return "int[64]";
+      } else if (isIntegerType(type, 1)) {
+         return "bool";
+      } else if (auto intWidth = getIntegerWidth(type, false)) {
+         return "int[" + std::to_string(intWidth) + "]";
+      } else if (auto uIntWidth = getIntegerWidth(type, true)) {
+         return "uint[" + std::to_string(uIntWidth) + "]";
+      } else if (auto floatType = mlir::dyn_cast_or_null<mlir::FloatType>(type)) {
+         return "float[" + std::to_string(floatType.getWidth()) + "]";
+      } else if (auto decimalType = mlir::dyn_cast_or_null<db::DecimalType>(type)) {
+         auto prec = std::min(decimalType.getP(), 38);
+         return "decimal[" + std::to_string(prec) + "," + std::to_string(decimalType.getS()) + "]";
+      } else if (auto dateType = mlir::dyn_cast_or_null<db::DateType>(type)) {
+         return dateType.getUnit() == db::DateUnitAttr::day ? "date[32]" : "date[64]";
+      } else if (auto timestampType = mlir::dyn_cast_or_null<db::TimestampType>(type)) {
+         return "timestamp[" + std::to_string(static_cast<uint32_t>(timestampType.getUnit())) + "]";
+      } else if (auto intervalType = mlir::dyn_cast_or_null<db::IntervalType>(type)) {
+         if (intervalType.getUnit() == db::IntervalUnitAttr::months) {
+            return "interval_months";
+         } else {
+            return "interval_daytime";
+         }
+      } else if (mlir::isa<db::StringType>(type)) {
+         return "string";
+      } else if (auto charType = mlir::dyn_cast_or_null<db::CharType>(type)) {
+         if (charType.getLen() <= 1) {
+            return "fixed_sized[4]";
+         } else {
+            return "string";
+         }
+      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
+         return "list[" + arrowDescrFromType(listType.getElementType()) + "]";
+      }
+      assert(false);
+      return "";
+   }
+
    public:
    using OpConversionPattern<db::AppendArrowOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(db::AppendArrowOp appendArrowOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
@@ -290,7 +330,10 @@ class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
             rewriter.create<lingodb::compiler::dialect::arrow::AppendVariableSizeBinaryOp>(loc, builder, value, valid);
          }
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
-         rewriter.create<lingodb::compiler::dialect::arrow::AppendListOp>(loc, builder, value, valid);
+         //Get element type
+
+         rewriter.create<lingodb::compiler::dialect::arrow::AppendListOp>(loc, builder, value, listType.getElementType(), valid);
+
       } else {
          return failure();
       }
@@ -1179,7 +1222,7 @@ class ListAppendLowering : public OpConversionPattern<db::ListAppendOp> {
    LogicalResult matchAndRewrite(db::ListAppendOp listAppendOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
       mlir::Value ptr = rt::List::append(rewriter, listAppendOp.getLoc())({adaptor.getList()})[0];
       ptr = rewriter.create<util::GenericMemrefCastOp>(listAppendOp.getLoc(), util::RefType::get(rewriter.getContext(), typeConverter->convertType(listAppendOp.getElement().getType())), ptr);
-      rewriter.create<util::StoreOp>(listAppendOp.getLoc(), adaptor.getElement(), ptr, mlir::Value());
+      rewriter.create<util::StoreOp>(listAppendOp.getLoc(), listAppendOp.getElement(), ptr, mlir::Value());
       rewriter.eraseOp(listAppendOp);
       return success();
    }

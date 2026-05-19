@@ -1,6 +1,5 @@
 #ifndef LINGODB_CATALOG_MLIRTYPES_H
 #define LINGODB_CATALOG_MLIRTYPES_H
-#include "Types.h"
 
 #include <memory>
 namespace mlir {
@@ -16,6 +15,7 @@ class CharTypeInfo;
 class TimestampTypeInfo;
 class DateTypeInfo;
 class IntervalTypeInfo;
+class ListTypeInfo;
 class MLIRTypeCreator {
    public:
    virtual mlir::Type createType(mlir::MLIRContext* context) = 0;
@@ -31,7 +31,7 @@ std::shared_ptr<MLIRTypeCreator> createTimestampTypeCreator(std::shared_ptr<cata
 std::shared_ptr<MLIRTypeCreator> createIntervalTypeCreator(std::shared_ptr<catalog::IntervalTypeInfo> info);
 std::shared_ptr<MLIRTypeCreator> createCharTypeCreator(std::shared_ptr<catalog::CharTypeInfo> info);
 std::shared_ptr<MLIRTypeCreator> createStringTypeCreator(std::shared_ptr<catalog::StringTypeInfo> info);
-std::shared_ptr<MLIRTypeCreator> createListTypeCreator(std::shared_ptr<ListTypeInfo> info);
+std::shared_ptr<MLIRTypeCreator> createListTypeCreator(std::shared_ptr<catalog::ListTypeInfo> info);
 /**
  * Used for NULL constant types
  * @return MLIRTypeCreator for none types
