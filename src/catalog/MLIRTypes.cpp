@@ -83,6 +83,7 @@ class ListTypeCreator : public lingodb::catalog::MLIRTypeCreator {
    mlir::Type createType(mlir::MLIRContext* context) override {
       return lingodb::compiler::dialect::db::ListType::get(context, info->getElementType().getMLIRTypeCreator()->createType(context));
    }
+
    private:
    std::shared_ptr<lingodb::catalog::ListTypeInfo> info;
 };

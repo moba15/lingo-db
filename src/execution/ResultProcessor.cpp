@@ -46,12 +46,15 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
    options.indent_size = 0;
    options.window = 100;
    options.element_size_limit = 10000;
+   options.container_window = 100;
    std::cout << "|";
    std::string rowSep = "-";
    std::vector<bool> convertHex;
+
    for (auto c : table->columns()) {
+      auto typeId = table->schema()->field(positions.size())->type()->id();
       std::cout << std::setw(30) << table->schema()->field(positions.size())->name() << "  |";
-      convertHex.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::FIXED_SIZE_BINARY);
+      convertHex.push_back(typeId == arrow::Type::FIXED_SIZE_BINARY);
       rowSep += std::string(33, '-');
       std::string str;
       arrow::PrettyPrint(*c.get(), options, &str); //NOLINT (clang-diagnostic-unused-result)
@@ -60,31 +63,69 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
    }
    std::cout << std::endl
              << rowSep << std::endl;
+
+   // Track the nesting depth of brackets per column
+   std::vector<int> bracketDepth(columnReps.size(), 0);
+
    bool cont = true;
    while (cont) {
       cont = false;
-      bool skipNL = false;
+
+      // Buffer to hold exactly one horizontal row of cells
+      std::vector<std::string> rowCells(columnReps.size());
+      bool rowHasData = false;
+
       for (size_t column = 0; column < columnReps.size(); column++) {
+         // Keep the outer loop alive as long as ANY column has characters left
+         if (positions[column] < columnReps[column].size()) {
+            cont = true;
+         }
+
          char32_t currChar = U'\0';
          uint8_t currCharSize = 0;
-
-         bool first = true;
          std::stringstream out;
+
          while (positions[column] < columnReps[column].size()) {
-            cont = true;
             char curr = columnReps[column][positions[column]];
-            char next = columnReps[column][positions[column] + 1];
+
+            // 1. Bracket tracking
+            if (curr == '[') bracketDepth[column]++;
+            bool isStructural = (bracketDepth[column] <= 2) && (curr == '[' || curr == ']');
+            if (curr == ']') bracketDepth[column]--;
             positions[column]++;
-            if (first && (curr == '[' || curr == ']' || curr == ',')) {
+
+            // 2. CRITICAL: Skip leading structural spaces so they don't trigger fake cells
+            if (out.str().empty() && curr == ' ') {
                continue;
             }
-            if (curr == ',' && next == '\n') {
+
+            // 3. Skip structural array wrappers & commas
+            if (isStructural) {
                continue;
             }
+            if (curr == ',' && bracketDepth[column] <= 2) {
+               continue;
+            }
+
+            // 4. Handle newlines
             if (curr == '\n') {
-               break;
+               // Inside a list/array value
+               if (bracketDepth[column] > 2) {
+                  // Eat indentation spaces following the inner newline
+                  while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
+                     positions[column]++;
+                  }
+                  continue;
+               } else {
+                  // If we are at the structural level
+                  if (out.str().empty()) {
+                     continue; // This was just padding, keep looking for data
+                  } else {
+                     break; // Real table cell ended
+                  }
+               }
             } else {
-               first = false;
+               // 5. Value Processing (Unicode/Hex logic)
                if (convertHex[column] && isxdigit(curr)) {
                   if (currCharSize % 2 == 0)
                      currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
@@ -109,6 +150,7 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
                }
             }
          }
+
          if (currChar != U'\0') {
             for (size_t i = 0; i < currCharSize / 2; i++) {
                const char slice = reinterpret_cast<char*>(&currChar)[i];
@@ -117,16 +159,20 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
                }
             }
          }
-         if (first) {
-            skipNL = true;
-         } else {
-            if (column == 0) {
-               std::cout << "|";
-            }
-            std::cout << std::setw(30) << out.str() << "  |";
+
+         // Store the extracted text into the buffer
+         rowCells[column] = out.str();
+         if (!rowCells[column].empty()) {
+            rowHasData = true; // Flag that this row actually contains printable text
          }
       }
-      if (!skipNL) {
+
+      // 6. Print the completely synchronized row
+      if (rowHasData) {
+         std::cout << "|";
+         for (size_t column = 0; column < columnReps.size(); column++) {
+            std::cout << std::setw(30) << rowCells[column] << "  |";
+         }
          std::cout << "\n";
       }
    }

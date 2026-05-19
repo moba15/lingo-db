@@ -2342,13 +2342,13 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             return analyzeExpression(child, context, resolverScope);
          });
          //Check if all boundValues have common type
-          std::vector<NullableType> types{};
-          std::ranges::transform(boundValues, std::back_inserter(types), [](auto& child) {
-             if (!child->resultType.has_value()) {
-                error("List expression has child with invalid type", child->loc);
-             }
-             return child->resultType.value();
-          });
+         std::vector<NullableType> types{};
+         std::ranges::transform(boundValues, std::back_inserter(types), [](auto& child) {
+            if (!child->resultType.has_value()) {
+               error("List expression has child with invalid type", child->loc);
+            }
+            return child->resultType.value();
+         });
          auto commonType = SQLTypeUtils::getCommonBaseType(types);
          catalog::Type resultType = catalog::Type::listType(commonType.type);
          return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, resultType, listExpr->alias);
