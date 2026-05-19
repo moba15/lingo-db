@@ -174,6 +174,7 @@ boolean [fF][aA][lL][sS][eE]
 AGGREGATE   { MAKE_KEYWORD(AGGREGATE); }
 ALL         { MAKE_KEYWORD(ALL); }
 AND         { MAKE_KEYWORD(AND); }
+ARRAY       { MAKE_KEYWORD(ARRAY); }
 AS          { MAKE_KEYWORD(AS); }
 ASC         { MAKE_KEYWORD(ASC); }
 ANY         { MAKE_KEYWORD(ANY); }

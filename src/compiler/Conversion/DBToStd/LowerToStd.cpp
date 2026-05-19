@@ -289,6 +289,8 @@ class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
          } else {
             rewriter.create<lingodb::compiler::dialect::arrow::AppendVariableSizeBinaryOp>(loc, builder, value, valid);
          }
+      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
+         rewriter.create<lingodb::compiler::dialect::arrow::AppendListOp>(loc, builder, value, valid);
       } else {
          return failure();
       }
@@ -1450,6 +1452,11 @@ class MemoryPromoteToGlobalLowering : public OpConversionPattern<db::MemoryPromo
       auto charType = mlir::dyn_cast<db::CharType>(t);
       if (mlir::isa<db::StringType>(t) || (charType && charType.getLen() > 1)) {
          rewriter.replaceOp(promoteOp, rt::StringRuntime::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
+         return success();
+      }
+      if (mlir::isa<db::ListType>(t)) {
+         rt::List::addUse(rewriter, loc)({adaptor.getValue()});
+         rewriter.replaceOp(promoteOp, adaptor.getValue());
          return success();
       }
       return failure();
