@@ -986,11 +986,10 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             values.push_back(translateExpression(builder, child, context));
          }
          mlir::Type type = boundList->resultType->toMlirType(builder.getContext());
-         auto list =  builder.create<db::CreateListOp>(builder.getUnknownLoc(), type);
+         auto list = builder.create<db::CreateListOp>(builder.getUnknownLoc(), type);
          for (auto value : values) {
             builder.create<db::ListAppendOp>(builder.getUnknownLoc(), list, value);
          }
-
 
          return list;
       }

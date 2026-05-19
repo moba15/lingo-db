@@ -183,7 +183,6 @@ class BoundSetColumnExpression : public BoundExpression {
    std::vector<std::shared_ptr<BoundExpression>> sets;
 };
 
-
 class BoundListExpression : public BoundExpression {
    public:
    static constexpr const ExpressionClass cType = ExpressionClass::BOUND_LIST;

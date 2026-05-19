@@ -195,9 +195,9 @@ class ListTypeInfo : public TypeInfo {
    static std::shared_ptr<ListTypeInfo> deserialize(utility::Deserializer& deserializer);
    std::string toString();
    auto getElementType() { return elementType; }
+
    private:
    Type elementType;
-
 };
 } //end namespace lingodb::catalog
 #endif //LINGODB_CATALOG_TYPES_H

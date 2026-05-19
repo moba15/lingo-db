@@ -2,6 +2,8 @@
 #include "lingodb/compiler/Conversion/UtilToLLVM/Passes.h"
 #include "lingodb/compiler/Dialect/Arrow/IR/ArrowDialect.h"
 #include "lingodb/compiler/Dialect/Arrow/IR/ArrowOps.h"
+#include "lingodb/compiler/Dialect/DB/IR/DBDialect.h"
+#include "lingodb/compiler/Dialect/DB/IR/DBOps.h"
 #include "lingodb/compiler/Dialect/PyInterp/PyInterpDialect.h"
 #include "lingodb/compiler/Dialect/util/UtilDialect.h"
 #include "lingodb/compiler/Dialect/util/UtilOps.h"
@@ -25,10 +27,10 @@
 #include <mlir/IR/BuiltinTypes.h>
 
 #include "lingodb/compiler/runtime/ExecutionContext.h"
-
 #include <lingodb/compiler/runtime/ArrowColumn.h>
 using namespace mlir;
 namespace arrow = lingodb::compiler::dialect::arrow;
+namespace db = lingodb::compiler::dialect::db;
 namespace util = lingodb::compiler::dialect::util;
 namespace rt = lingodb::compiler::runtime;
 
@@ -245,6 +247,46 @@ class BuilderAppendVariableSizeBinaryLowering : public OpConversionPattern<arrow
 };
 
 class BuilderAppendListLowering : public OpConversionPattern<arrow::AppendListOp> {
+   private:
+   std::string arrowDescrFromType(mlir::Type type) const {
+      if (type.isIndex()) {
+         return "int[64]";
+      } else if (isIntegerType(type, 1)) {
+         return "bool";
+      } else if (auto intWidth = getIntegerWidth(type, false)) {
+         return "int[" + std::to_string(intWidth) + "]";
+      } else if (auto uIntWidth = getIntegerWidth(type, true)) {
+         return "uint[" + std::to_string(uIntWidth) + "]";
+      } else if (auto floatType = mlir::dyn_cast_or_null<mlir::FloatType>(type)) {
+         return "float[" + std::to_string(floatType.getWidth()) + "]";
+      } else if (auto decimalType = mlir::dyn_cast_or_null<db::DecimalType>(type)) {
+         auto prec = std::min(decimalType.getP(), 38);
+         return "decimal[" + std::to_string(prec) + "," + std::to_string(decimalType.getS()) + "]";
+      } else if (auto dateType = mlir::dyn_cast_or_null<db::DateType>(type)) {
+         return dateType.getUnit() == db::DateUnitAttr::day ? "date[32]" : "date[64]";
+      } else if (auto timestampType = mlir::dyn_cast_or_null<db::TimestampType>(type)) {
+         return "timestamp[" + std::to_string(static_cast<uint32_t>(timestampType.getUnit())) + "]";
+      } else if (auto intervalType = mlir::dyn_cast_or_null<db::IntervalType>(type)) {
+         if (intervalType.getUnit() == db::IntervalUnitAttr::months) {
+            return "interval_months";
+         } else {
+            return "interval_daytime";
+         }
+      } else if (mlir::isa<db::StringType>(type)) {
+         return "string";
+      } else if (auto charType = mlir::dyn_cast_or_null<db::CharType>(type)) {
+         if (charType.getLen() <= 1) {
+            return "fixed_sized[4]";
+         } else {
+            return "string";
+         }
+      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
+         return "list[" + arrowDescrFromType(listType.getElementType()) + "]";
+      }
+      assert(false);
+      return "";
+   }
+
    public:
    using OpConversionPattern<arrow::AppendListOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(arrow::AppendListOp op, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
@@ -255,8 +297,10 @@ class BuilderAppendListLowering : public OpConversionPattern<arrow::AppendListOp
          isValid = rewriter.create<mlir::arith::ConstantIntOp>(loc, 1, 1);
       }
       auto val = adaptor.getValue();
+      auto elementType = op.getElementType();
+      mlir::Value elementTypeDescr = rewriter.create<util::CreateConstVarLen>(loc, util::VarLen32Type::get(getContext()), arrowDescrFromType(elementType));
 
-      rt::ArrowColumnBuilder::addList(rewriter, loc)({builderVal, isValid});
+      rt::ArrowColumnBuilder::addList(rewriter, loc)({builderVal, isValid, val, elementTypeDescr});
       rewriter.eraseOp(op);
 
       return success();

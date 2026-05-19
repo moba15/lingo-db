@@ -85,8 +85,8 @@ def Arrow_AppendListOp : Arrow_Op<"array_builder.append_list"> {
         This operation appends a list to an Arrow array builder, optionally with a validity flag.
     }];
 
-    let arguments = (ins Arrow_ArrayBuilder:$builder, AnyType: $value, Optional<I1>: $valid);
-    let assemblyFormat = " $builder `,` $value `:` type($value) ( `,` $valid^ )? attr-dict";
+    let arguments = (ins Arrow_ArrayBuilder:$builder, AnyType: $value, TypeAttr:$elementType,  Optional<I1>: $valid);
+    let assemblyFormat = " $builder `,` $value `:` type($value) `,` $elementType ( `,` $valid^ )? attr-dict";
 }
 
 def Arrow_BuilderFromPtr : Arrow_Op<"array_builder.from_ptr", [Pure] > {
