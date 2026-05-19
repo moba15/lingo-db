@@ -38,6 +38,9 @@ Type::Type(lingodb::catalog::LogicalTypeId id, std::shared_ptr<TypeInfo> infoInp
       case LogicalTypeId::STRING:
          mlirTypeCreator = lingodb::catalog::createStringTypeCreator(std::dynamic_pointer_cast<StringTypeInfo>(info));
          break;
+      case LogicalTypeId::LIST:
+         mlirTypeCreator = lingodb::catalog::createListTypeCreator(std::dynamic_pointer_cast<ListTypeInfo>(info));
+         break;
       case LogicalTypeId::NONE:
          mlirTypeCreator = lingodb::catalog::createNoneTypeCreator();
          break;
@@ -237,6 +240,17 @@ std::string IntervalTypeInfo::toString() {
    res += ">";
    return res;
 }
+void ListTypeInfo::serializeConcrete(utility::Serializer& serializer) const {
+   serializer.writeProperty(0, elementType);
+}
+std::shared_ptr<ListTypeInfo> ListTypeInfo::deserialize(utility::Deserializer& deserializer) {
+   auto elementType = deserializer.readProperty<Type>(0);
+   return std::make_shared<ListTypeInfo>(elementType);
+}
+std::string ListTypeInfo::toString() {
+   return "list<" + elementType.toString() + ">";
+
+}
 Type Type::makeIntType(size_t width, bool isSigned) {
    return Type(LogicalTypeId::INT, std::make_shared<IntTypeInfo>(isSigned, width));
 }
@@ -258,6 +272,9 @@ Type Type::intervalDaytime() {
 }
 Type Type::intervalMonths() {
    return Type(LogicalTypeId::INTERVAL, std::make_shared<IntervalTypeInfo>(IntervalTypeInfo::IntervalUnit::MONTH));
+}
+Type Type::listType(Type elementType) {
+   return Type(LogicalTypeId::LIST, std::make_shared<ListTypeInfo>(elementType));
 }
 Type Type::noneType() {
    return Type(LogicalTypeId::NONE, nullptr);

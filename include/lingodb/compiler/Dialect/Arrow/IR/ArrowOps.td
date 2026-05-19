@@ -79,6 +79,16 @@ def Arrow_AppendVariableSizeBinaryOp : Arrow_Op<"array_builder.append_variable_s
     let assemblyFormat = " $builder `,` $value   ( `,` $valid^ )? attr-dict";
 }
 
+def Arrow_AppendListOp : Arrow_Op<"array_builder.append_list"> {
+    let summary = "Appends a list to an Arrow array builder.";
+    let description = [{
+        This operation appends a list to an Arrow array builder, optionally with a validity flag.
+    }];
+
+    let arguments = (ins Arrow_ArrayBuilder:$builder, AnyType: $value, Optional<I1>: $valid);
+    let assemblyFormat = " $builder `,` $value `:` type($value) ( `,` $valid^ )? attr-dict";
+}
+
 def Arrow_BuilderFromPtr : Arrow_Op<"array_builder.from_ptr", [Pure] > {
     let summary = "Creates a builder value from a pointer to an ArrowColumn builder that is managed in the runtime";
     let arguments = (ins RefType:$ptr);

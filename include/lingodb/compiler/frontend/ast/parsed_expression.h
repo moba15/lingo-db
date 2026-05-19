@@ -104,7 +104,7 @@ enum class ExpressionType : uint8_t {
    VALUE_TUPLE = 77,
    VALUE_TUPLE_ADDRESS = 78,
    VALUE_NULL = 79,
-   VALUE_VECTOR = 80,
+   VALUE_LIST = 80,
    VALUE_SCALAR = 81,
    VALUE_DEFAULT = 82,
 
@@ -209,6 +209,7 @@ enum class ExpressionClass : uint8_t {
    POSITIONAL_REFERENCE = 18,
    BETWEEN = 19,
    LAMBDA_REF = 20,
+   LIST = 21,
    //===--------------------------------------------------------------------===//
    // Bound Expressions
    //===--------------------------------------------------------------------===//
@@ -231,6 +232,7 @@ enum class ExpressionClass : uint8_t {
    BOUND_LAMBDA = 41,
    BOUND_LAMBDA_REF = 42,
    BOUND_STAR = 43,
+   BOUND_LIST = 44,
    //===--------------------------------------------------------------------===//
    // Miscellaneous
    //===--------------------------------------------------------------------===//
@@ -552,6 +554,14 @@ class SetColumnExpression : public ParsedExpression {
 
    std::vector<std::pair<std::shared_ptr<ColumnRefExpression>, std::shared_ptr<ParsedExpression>>> sets;
    // Custom hash and equality operators are not needed since SetColumnExpression cannot appear in GROUP BY clauses
+};
+
+class ListExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass cType = ExpressionClass::LIST;
+   ListExpression(std::vector<std::shared_ptr<ParsedExpression>> values) : ParsedExpression(ExpressionType::VALUE_LIST, cType), values(std::move(values)) {}
+
+   std::vector<std::shared_ptr<ParsedExpression>> values;
 };
 
 } // namespace lingodb::ast

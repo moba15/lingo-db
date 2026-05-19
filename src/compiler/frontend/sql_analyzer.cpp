@@ -632,6 +632,14 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
 
          return constantExpr;
       }
+      case ast::ExpressionClass::LIST: {
+         auto listExpression = std::static_pointer_cast<ast::ListExpression>(rootNode);
+         if (extend) {
+            return extendExpr(listExpression);
+         }
+
+         return listExpression;
+      }
       case ast::ExpressionClass::BETWEEN: {
          auto betweenExpr = std::static_pointer_cast<ast::BetweenExpression>(rootNode);
          betweenExpr->input = canonicalizeParsedExpression(betweenExpr->input, context, false, extendNode);
@@ -1145,6 +1153,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                case ast::ExpressionClass::BOUND_BETWEEN:
                case ast::ExpressionClass::BOUND_COMPARISON:
                case ast::ExpressionClass::BOUND_CONSTANT:
+               case ast::ExpressionClass::BOUND_LIST:
                case ast::ExpressionClass::BOUND_OPERATOR:
                case ast::ExpressionClass::BOUND_CAST:
                case ast::ExpressionClass::BOUND_SUBQUERY:
@@ -2325,6 +2334,24 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
       case ast::ExpressionClass::WINDOW: {
          auto windowExpr = std::static_pointer_cast<ast::WindowExpression>(rootNode);
          return analyzeWindowExpression(windowExpr, context, resolverScope);
+      }
+      case ast::ExpressionClass::LIST: {
+         auto listExpr = std::static_pointer_cast<ast::ListExpression>(rootNode);
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundValues;
+         std::ranges::transform(listExpr->values, std::back_inserter(boundValues), [&](auto& child) {
+            return analyzeExpression(child, context, resolverScope);
+         });
+         //Check if all boundValues have common type
+          std::vector<NullableType> types{};
+          std::ranges::transform(boundValues, std::back_inserter(types), [](auto& child) {
+             if (!child->resultType.has_value()) {
+                error("List expression has child with invalid type", child->loc);
+             }
+             return child->resultType.value();
+          });
+         auto commonType = SQLTypeUtils::getCommonBaseType(types);
+         catalog::Type resultType = catalog::Type::listType(commonType.type);
+         return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, resultType, listExpr->alias);
       }
       default: error("Expression type not implemented", rootNode->loc);
    }

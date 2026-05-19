@@ -7,7 +7,6 @@
 namespace lingodb::ast {
 enum class ConstantType : uint8_t {
    INT = 1,
-
    UINT = 2,
    FLOAT = 3,
    STRING = 4,
@@ -15,6 +14,7 @@ enum class ConstantType : uint8_t {
    NULL_P = 6,
    BOOLEAN = 7,
    DATE = 8,
+   LIST = 9,
 
    INVALID = 99,
 

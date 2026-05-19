@@ -979,6 +979,21 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          }
          return translateWhenChecks(builder, boundCase, caseExprTranslated, boundCase->caseChecks, boundCase->elseExpr, context);
       }
+      case ast::ExpressionClass::BOUND_LIST: {
+         auto boundList = std::static_pointer_cast<ast::BoundListExpression>(expression);
+         std::vector<mlir::Value> values;
+         for (auto& child : boundList->values) {
+            values.push_back(translateExpression(builder, child, context));
+         }
+         mlir::Type type = boundList->resultType->toMlirType(builder.getContext());
+         auto list =  builder.create<db::CreateListOp>(builder.getUnknownLoc(), type);
+         for (auto value : values) {
+            builder.create<db::ListAppendOp>(builder.getUnknownLoc(), list, value);
+         }
+
+
+         return list;
+      }
 
       default: translatorError("Expression not implemented", expression->loc);
    }
