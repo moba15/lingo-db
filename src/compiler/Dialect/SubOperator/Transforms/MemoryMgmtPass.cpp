@@ -104,6 +104,32 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
                builder.create<mlir::func::ReturnOp>(loc);
             }
             elementFn = mlir::SymbolRefAttr::get(builder.getContext(), name);
+         } else if (mlir::isa<db::ListType>(listType.getElementType())) {
+            // Nested lists clean up their direct elements, but the element is
+            // itself a managed list value, so the inner cleanup uses the plain
+            // list cleanup path rather than recursing into leaf elements.
+            auto loc = insertBeforeOp->getLoc();
+            std::string name = "_cleanup_list_list";
+            auto moduleOp = insertBeforeOp->getParentOfType<mlir::ModuleOp>();
+            mlir::func::FuncOp cleanupFn = moduleOp.lookupSymbol<mlir::func::FuncOp>(name);
+            if (!cleanupFn) {
+               auto fnType = builder.getFunctionType({listType}, {});
+               mlir::OpBuilder::InsertionGuard guard(builder);
+               builder.setInsertionPointToStart(moduleOp.getBody());
+               cleanupFn = builder.create<mlir::func::FuncOp>(loc, name, fnType);
+               builder.setInsertionPointToStart(cleanupFn.addEntryBlock());
+               mlir::Value list = cleanupFn.getArgument(0);
+               auto zero = builder.create<mlir::arith::ConstantIndexOp>(loc, 0);
+               auto len = builder.create<db::ListLengthOp>(loc, list);
+               auto step = builder.create<mlir::arith::ConstantIndexOp>(loc, 1);
+               builder.create<mlir::scf::ForOp>(loc, zero, len, step, std::nullopt, [&](mlir::OpBuilder& b, mlir::Location loc, mlir::Value idx, mlir::ValueRange) {
+                  mlir::Value element = b.create<db::ListGetOp>(loc, listType.getElementType(), list, idx);
+                  b.create<db::MemoryCleanupUse>(loc, element, mlir::SymbolRefAttr());
+                  b.create<mlir::scf::YieldOp>(loc);
+               });
+               builder.create<mlir::func::ReturnOp>(loc);
+            }
+            elementFn = mlir::SymbolRefAttr::get(builder.getContext(), name);
          } else {
             assert(!typeNeedsManagement(listType.getElementType()));
          }
