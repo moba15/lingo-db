@@ -246,9 +246,6 @@ void ArrowColumnBuilder::addList(bool isValid, List* list, VarLen32 type) {
             throw std::runtime_error("unknown list element type");
          }
       }
-
-
-
    }
 }
 ArrowColumn* ArrowColumnBuilder::finish() {

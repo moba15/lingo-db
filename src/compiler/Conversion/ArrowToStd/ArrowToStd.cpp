@@ -286,6 +286,7 @@ class BuilderAppendListLowering : public OpConversionPattern<arrow::AppendListOp
       assert(false);
       return "";
    }
+
    public:
    using OpConversionPattern<arrow::AppendListOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(arrow::AppendListOp op, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
@@ -299,7 +300,7 @@ class BuilderAppendListLowering : public OpConversionPattern<arrow::AppendListOp
       auto elementType = op.getElementType();
       mlir::Value elementTypeDescr = rewriter.create<util::CreateConstVarLen>(loc, util::VarLen32Type::get(getContext()), arrowDescrFromType(elementType));
 
-      rt::ArrowColumnBuilder::addList(rewriter, loc)({builderVal, isValid, val, elementTypeDescr });
+      rt::ArrowColumnBuilder::addList(rewriter, loc)({builderVal, isValid, val, elementTypeDescr});
       rewriter.eraseOp(op);
 
       return success();

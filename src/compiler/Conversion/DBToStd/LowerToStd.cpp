@@ -248,6 +248,7 @@ class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
       assert(false);
       return "";
    }
+
    public:
    using OpConversionPattern<db::AppendArrowOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(db::AppendArrowOp appendArrowOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
