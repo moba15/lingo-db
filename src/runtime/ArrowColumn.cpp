@@ -172,80 +172,95 @@ void ArrowColumnBuilder::addBinary(bool isValid, lingodb::runtime::VarLen32 stri
       handleStatus(typedBuilder->Append(string.getPtr(), string.getLen()));
    }
 }
+
+void addListRecursive(arrow::ListBuilder* typedBuilder, class List* list, std::shared_ptr<arrow::DataType> arrowType) {
+   switch (arrowType->id()) {
+      case arrow::Type::STRING: {
+         auto* valueBuilder = reinterpret_cast<arrow::BinaryBuilder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            auto& varlen = *reinterpret_cast<VarLen32*>(ptr);
+            handleStatus(valueBuilder->Append(varlen.getPtr(), varlen.getLen()));
+         }
+         break;
+      }
+      case arrow::Type::INT32: {
+         auto* valueBuilder = reinterpret_cast<arrow::Int32Builder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            handleStatus(valueBuilder->Append(*reinterpret_cast<int32_t*>(ptr)));
+         }
+         break;
+      }
+      case arrow::Type::DECIMAL128: {
+         auto* valueBuilder = reinterpret_cast<arrow::Decimal128Builder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            __int128 val = *reinterpret_cast<__int128*>(ptr);
+            arrow::Decimal128 arrow_val(static_cast<int64_t>(val >> 64), static_cast<uint64_t>(val));
+            handleStatus(valueBuilder->Append(arrow_val));
+         }
+         break;
+      }
+      case arrow::Type::DATE32: {
+         auto* valueBuilder = reinterpret_cast<arrow::Date32Builder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            handleStatus(valueBuilder->Append(*reinterpret_cast<int32_t*>(ptr)));
+         }
+         break;
+      }
+      case arrow::Type::INT64: {
+         auto* valueBuilder = reinterpret_cast<arrow::Int64Builder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            handleStatus(valueBuilder->Append(*reinterpret_cast<int64_t*>(ptr)));
+         }
+         break;
+      }
+      case arrow::Type::INT8: {
+         auto* valueBuilder = reinterpret_cast<arrow::Int8Builder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            handleStatus(valueBuilder->Append(*reinterpret_cast<int8_t*>(ptr)));
+         }
+         break;
+      }
+      case arrow::Type::FIXED_SIZE_BINARY: {
+         auto* valueBuilder = reinterpret_cast<arrow::FixedSizeBinaryBuilder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            handleStatus(valueBuilder->Append(ptr));
+         }
+         break;
+      }
+      case arrow::Type::LIST: {
+         auto listType = std::static_pointer_cast<arrow::ListType>(arrowType);
+         auto childElementType = listType->value_type();
+
+         auto* innerListBuilder = reinterpret_cast<arrow::ListBuilder*>(typedBuilder->value_builder());
+         for (size_t i = 0; i < list->size(); ++i) {
+            uint8_t* ptr = list->at(i);
+            auto* childList = *reinterpret_cast<List**>(ptr);
+            handleStatus(innerListBuilder->Append());
+            addListRecursive(innerListBuilder, childList, childElementType);
+         }
+         break;
+      }
+      default: {
+         throw std::runtime_error("unknown list element type");
+      }
+   }
+}
 void ArrowColumnBuilder::addList(bool isValid, List* list, VarLen32 type) {
    next();
    auto* typedBuilder = reinterpret_cast<arrow::ListBuilder*>(builder);
    if (!isValid || !list) {
       handleStatus(typedBuilder->AppendNull());
    } else {
-      handleStatus(typedBuilder->Append());
-      auto* child = getChildBuilder();
       auto arrowType = parseType(type.str());
-      switch (arrowType->id()) {
-         case arrow::Type::STRING: {
-            auto* valueBuilder = reinterpret_cast<arrow::BinaryBuilder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               auto& varlen = *reinterpret_cast<VarLen32*>(ptr);
-               handleStatus(valueBuilder->Append(varlen.getPtr(), varlen.getLen()));
-            }
-            break;
-         }
-         case arrow::Type::INT32: {
-            auto* valueBuilder = reinterpret_cast<arrow::Int32Builder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               handleStatus(valueBuilder->Append(*reinterpret_cast<int32_t*>(ptr)));
-            }
-            break;
-         }
-         case arrow::Type::DECIMAL128: {
-            auto decimalType = std::static_pointer_cast<arrow::Decimal128Type>(arrowType);
-            auto* valueBuilder = reinterpret_cast<arrow::Decimal128Builder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               __int128 val = *reinterpret_cast<__int128*>(ptr);
-               arrow::Decimal128 arrow_val(static_cast<int64_t>(val >> 64), static_cast<uint64_t>(val));
-               handleStatus(valueBuilder->Append(arrow_val));
-            }
-            break;
-         }
-         case arrow::Type::DATE32: {
-            auto* valueBuilder = reinterpret_cast<arrow::Date32Builder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               handleStatus(valueBuilder->Append(*reinterpret_cast<int32_t*>(ptr)));
-            }
-            break;
-         }
-         case arrow::Type::INT64: {
-            auto* valueBuilder = reinterpret_cast<arrow::Int64Builder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               handleStatus(valueBuilder->Append(*reinterpret_cast<int64_t*>(ptr)));
-            }
-            break;
-         }
-         case arrow::Type::INT8: {
-            auto* valueBuilder = reinterpret_cast<arrow::Int8Builder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               handleStatus(valueBuilder->Append(*reinterpret_cast<int8_t*>(ptr)));
-            }
-            break;
-         }
-         case arrow::Type::FIXED_SIZE_BINARY: {
-            auto* valueBuilder = reinterpret_cast<arrow::FixedSizeBinaryBuilder*>(typedBuilder->value_builder());
-            for (size_t i = 0; i < list->size(); ++i) {
-               uint8_t* ptr = list->at(i);
-               handleStatus(valueBuilder->Append(ptr));
-            }
-            break;
-         }
-         default: {
-            throw std::runtime_error("unknown list element type");
-         }
-      }
+      handleStatus(typedBuilder->Append());
+      addListRecursive(typedBuilder, list, arrowType);
    }
 }
 ArrowColumn* ArrowColumnBuilder::finish() {
