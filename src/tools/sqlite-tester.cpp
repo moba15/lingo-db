@@ -56,6 +56,7 @@ struct ResultHasher : public execution::ResultProcessor {
       options.element_size_limit = 10000;
       std::vector<bool> convertHex;
       std::vector<bool> isFloat;
+      std::vector<int> bracketDepth;
       for (auto c : table->columns()) {
          convertHex.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::FIXED_SIZE_BINARY);
          isFloat.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::DOUBLE);
@@ -63,12 +64,21 @@ struct ResultHasher : public execution::ResultProcessor {
          arrow::PrettyPrint(*c.get(), options, &sstr); //NOLINT (clang-diagnostic-unused-result)
          columnReps.push_back(sstr.str());
          positions.push_back(0);
+         bracketDepth.push_back(0);
       }
 
       bool cont = true;
       while (cont) {
          cont = false;
+
+         std::vector<std::string> rowCells(columnReps.size());
+         bool rowHasData = false;
+
          for (size_t column = 0; column < columnReps.size(); column++) {
+            if (positions[column] < columnReps[column].size()) {
+               cont = true;
+            }
+
             char32_t currChar = U'\0';
             uint8_t currCharSize = 0;
 
@@ -77,18 +87,38 @@ struct ResultHasher : public execution::ResultProcessor {
             size_t digits = 0;
             std::stringstream out;
             while (positions[column] < columnReps[column].size()) {
-               cont = true;
                char curr = columnReps[column][positions[column]];
-               char next = columnReps[column][positions[column] + 1];
+
+               if (curr == '[') {
+                  bracketDepth[column]++;
+               }
+               bool isStructural = (bracketDepth[column] <= 2) && (curr == '[' || curr == ']');
+               if (curr == ']') {
+                  bracketDepth[column]--;
+               }
                positions[column]++;
-               if (first && (curr == '[' || curr == ']' || curr == ',')) {
+
+               if (out.str().empty() && curr == ' ') {
                   continue;
                }
-               if (curr == ',' && next == '\n') {
+
+               if (isStructural) {
                   continue;
                }
                if (curr == '\n') {
+                  if (bracketDepth[column] > 2) {
+                     while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
+                        positions[column]++;
+                     }
+                     continue;
+                  }
+                  if (out.str().empty()) {
+                     continue;
+                  }
                   break;
+               }
+               if (curr == ',' && bracketDepth[column] <= 2) {
+                  continue;
                } else {
                   if (isFloat[column]) {
                      if (std::isdigit(curr)) {
@@ -129,8 +159,17 @@ struct ResultHasher : public execution::ResultProcessor {
                assert(currChar <= 0xFF && "Only ASCII characters supported for sqlite testing");
                out << static_cast<char>(currChar);
             }
-            if (!first) {
-               toHash.push_back(out.str());
+            rowCells[column] = out.str();
+            if (!rowCells[column].empty()) {
+               rowHasData = true;
+            }
+         }
+
+         if (rowHasData) {
+            for (auto& cell : rowCells) {
+               if (!cell.empty()) {
+                  toHash.push_back(cell);
+               }
             }
          }
       }
@@ -171,16 +210,10 @@ struct ResultHasher : public execution::ResultProcessor {
       numValues = toHash.size();
       std::string linesRes = "";
       if (toHash.size() < 1000 || tsv) {
-         if (tsv) {
-            size_t i = 0;
-            for (auto x : toHash) {
-               linesRes += x + ((((i + 1) % numColumns) == 0) ? "\n" : "\t");
-               i++;
-            }
-         } else {
-            for (auto x : toHash) {
-               linesRes += x + "\n";
-            }
+         size_t i = 0;
+         for (auto x : toHash) {
+            linesRes += x + ((((i + 1) % numColumns) == 0) ? "\n" : "\t");
+            i++;
          }
       }
       lines = linesRes;
