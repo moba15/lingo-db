@@ -2349,7 +2349,14 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             }
             return child->resultType.value();
          });
+         if (types.size() == 0) {
+            //Empty list, set type to int
+            types.push_back(catalog::Type::int8());
+         }
          auto commonType = SQLTypeUtils::getCommonBaseType(types);
+         if (commonType.type.getTypeId() == catalog::LogicalTypeId::CHAR) {
+            commonType.type = catalog::Type::stringType();
+         }
          catalog::Type resultType = catalog::Type::listType(commonType.type);
          return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, resultType, listExpr->alias);
       }
