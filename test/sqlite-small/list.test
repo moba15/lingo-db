@@ -1,0 +1,16 @@
+# Test List Types
+statement ok
+CREATE TABLE integers(i INTEGER);
+
+statement ok
+INSERT INTO integers VALUES (1), (2), (3), (NULL);
+
+query tsv
+select [23, 24], [42.42], ['Hello', 'Hello ' || 'World'], [ [['Super']], [['Nested']],  [['List']], [[]] ]
+----
+[23,24]	[42.42]	["Hello","Hello World"]	[[["Super"]],[["Nested"]],[["List"]],[[]]]
+
+query tsv
+select [23, 24][2], [42.42][1], ['Hello', 'Hello ' || 'World'][2]
+----
+24	42.42	Hello World
