@@ -308,7 +308,8 @@
 
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt CreateFunctionStmt
 %type<bool> OptTemp opt_varying
-%type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type CharacterWithoutLength character Bit ConstCharacter Character CharacterWithLength ConstDatetime Typename ConstTypename Numeric_with_opt_lenghth ConstInterval
+%type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type ListType CharacterWithoutLength character Bit ConstCharacter Character CharacterWithLength ConstDatetime Typename ConstTypename Numeric_with_opt_lenghth ConstInterval
+
 %type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement TableConstraint
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
 %type<std::shared_ptr<lingodb::ast::Constraint>> ColConstraint ColConstraintElem ConstraintElem
@@ -3066,11 +3067,33 @@ opt_column_storage:
 
 //TODO add missing rules
 Type:
-    SimpleType //opt_array_bounds
+    SimpleType 
     {
-        $$ = $SimpleType;
+        auto type = $SimpleType;
+        $$ = type;
+    }
+    | ListType 
+    {
+        $$ = $ListType;
     }
     ;
+ListType:
+    SimpleType LB RB
+    {
+        auto listType = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::LIST);
+        listType.elementType = std::make_shared<lingodb::ast::LogicalTypeWithMods>($SimpleType);;
+        $$ = listType;
+
+
+    }
+    | ListType[list] LB RB
+    {
+        auto listType = lingodb::ast::LogicalTypeWithMods(catalog::LogicalTypeId::LIST);
+        listType.elementType = std::make_shared<lingodb::ast::LogicalTypeWithMods>($list);;
+        $$ = listType;
+    }
+    ;
+  
 SimpleType: 
      //GenericType
     Numeric_with_opt_lenghth {$$ = $Numeric_with_opt_lenghth;}

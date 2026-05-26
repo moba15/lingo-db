@@ -862,7 +862,7 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeCreateNode(std::shared
                      error("Column name cannot be empty", columnElement->loc);
                   }
                   std::vector<std::variant<size_t, std::string>> typeModifiers;
-                  NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalTypeWithMods.logicalTypeId, columnElement->logicalTypeWithMods.typeModifiers);
+                  NullableType nullableType = SQLTypeUtils::typemodsToCatalogType(columnElement->logicalTypeWithMods);
                   nullableType.isNullable = true;
                   bool primary = false;
                   for (auto& constraint : columnElement->constraints) {
@@ -969,13 +969,13 @@ std::shared_ptr<ast::CreateNode> SQLQueryAnalyzer::analyzeFunctionCreate(std::sh
    }
 
    if (language == "c" || language == "python") {
-      NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType.logicalTypeId, createFunctionInfo->returnType.typeModifiers);
+      NullableType returnType = SQLTypeUtils::typemodsToCatalogType(createFunctionInfo->returnType);
 
       auto boundCreateFunctionInfo = std::make_shared<ast::BoundCreateFunctionInfo>(createFunctionInfo->functionName, createFunctionInfo->replace, returnType);
       boundCreateFunctionInfo->language = language;
       boundCreateFunctionInfo->code = code;
       for (auto& fArgument : createFunctionInfo->argumentTypes) {
-         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type.logicalTypeId, fArgument.type.typeModifiers).type);
+         boundCreateFunctionInfo->argumentTypes.emplace_back(fArgument.name, SQLTypeUtils::typemodsToCatalogType(fArgument.type).type);
       }
 
       createNode->createInfo = boundCreateFunctionInfo;
@@ -2376,12 +2376,10 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             boundListSelection->range = parsedSelection.range;
             if (!parsedSelection.range) {
                resultType = commonType;
-
             }
-
          }
 
-         return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, boundListSelection, commonType, listType, resultType,  listExpr->alias);
+         return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, boundListSelection, commonType, listType, resultType, listExpr->alias);
       }
       default: error("Expression type not implemented", rootNode->loc);
    }
@@ -2635,7 +2633,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeCastExpression(st
       }
 
       default: {
-         auto castType = SQLTypeUtils::typemodsToCatalogType(castExpr->logicalTypeWithMods.value().logicalTypeId, castExpr->logicalTypeWithMods.value().typeModifiers);
+         auto castType = SQLTypeUtils::typemodsToCatalogType(castExpr->logicalTypeWithMods.value());
          if (castType != boundChild->resultType.value()) {
             castType.isNullable = boundChild->resultType.value().isNullable;
             if (boundChild->type == ast::ExpressionType::VALUE_CONSTANT) {
@@ -3241,7 +3239,9 @@ std::pair<unsigned long, unsigned long> SQLTypeUtils::getAdaptedDecimalPAndSAfte
    return {p, s};
 }
 
-NullableType SQLTypeUtils::typemodsToCatalogType(catalog::LogicalTypeId logicalTypeId, std::vector<std::shared_ptr<ast::Value>>& typeModifiers) {
+NullableType SQLTypeUtils::typemodsToCatalogType(const ast::LogicalTypeWithMods& logicalTypeWithMods) {
+   auto logicalTypeId = logicalTypeWithMods.logicalTypeId;
+   auto& typeModifiers = logicalTypeWithMods.typeModifiers;
    switch (logicalTypeId) {
       case catalog::LogicalTypeId::INT: {
          if (typeModifiers.size() == 1) {
@@ -3307,6 +3307,10 @@ NullableType SQLTypeUtils::typemodsToCatalogType(catalog::LogicalTypeId logicalT
       }
       case catalog::LogicalTypeId::INTERVAL: {
          return catalog::Type::intervalDaytime();
+      }
+      case catalog::LogicalTypeId::LIST: {
+         assert(logicalTypeWithMods.elementType);
+         return catalog::Type::listType(typemodsToCatalogType(*logicalTypeWithMods.elementType).type);
       }
       default: throw std::runtime_error("Typemod not implemented");
    }
