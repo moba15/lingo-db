@@ -16,11 +16,17 @@ class LogicalTypeWithMods {
    public:
    LogicalTypeWithMods() : LogicalTypeWithMods(catalog::LogicalTypeId::INVALID) {}
    LogicalTypeWithMods(catalog::LogicalTypeId logicalTypeId)
-      : logicalTypeId(logicalTypeId), typeModifiers({}) {}
+      : logicalTypeId(logicalTypeId), typeModifiers({}), elementType(nullptr) {}
    LogicalTypeWithMods(catalog::LogicalTypeId logicalTypeId, std::vector<std::shared_ptr<Value>> typeModifiers)
-      : logicalTypeId(logicalTypeId), typeModifiers(std::move(typeModifiers)) {}
+      : logicalTypeId(logicalTypeId), typeModifiers(std::move(typeModifiers)), elementType(nullptr) {}
+   LogicalTypeWithMods(catalog::LogicalTypeId logicalTypeId, std::shared_ptr<LogicalTypeWithMods> elementType)
+      : logicalTypeId(logicalTypeId), typeModifiers({}), elementType(std::move(elementType)) {}
+   LogicalTypeWithMods(catalog::LogicalTypeId logicalTypeId, std::vector<std::shared_ptr<Value>> typeModifiers, std::shared_ptr<LogicalTypeWithMods> elementType)
+      : logicalTypeId(logicalTypeId), typeModifiers(std::move(typeModifiers)), elementType(std::move(elementType)) {}
    catalog::LogicalTypeId logicalTypeId;
    std::vector<std::shared_ptr<Value>> typeModifiers;
+   //Needed for List Types
+   std::shared_ptr<LogicalTypeWithMods> elementType;
 };
 
 class BaseExpression : public AstNode {
