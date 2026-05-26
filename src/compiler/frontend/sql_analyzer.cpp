@@ -2357,8 +2357,29 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          if (commonType.type.getTypeId() == catalog::LogicalTypeId::CHAR) {
             commonType.type = catalog::Type::stringType();
          }
-         catalog::Type resultType = catalog::Type::listType(commonType.type);
-         return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, resultType, listExpr->alias);
+         NullableType listType = catalog::Type::listType(commonType.type);
+         NullableType resultType = catalog::Type::listType(commonType.type);
+
+         //Handle selection
+         std::optional<ast::BoundListExpression::BoundListSelection> boundListSelection = std::nullopt;
+         if (listExpr->selection.has_value()) {
+            auto& parsedSelection = listExpr->selection.value();
+            boundListSelection = ast::BoundListExpression::BoundListSelection{};
+            if (parsedSelection.lowerBound) {
+               boundListSelection->lowerBound = analyzeExpression(parsedSelection.lowerBound.value(), context, resolverScope);
+            }
+            if (parsedSelection.upperBound) {
+               boundListSelection->upperBound = analyzeExpression(parsedSelection.upperBound.value(), context, resolverScope);
+            }
+            boundListSelection->range = parsedSelection.range;
+            if (!parsedSelection.range) {
+               resultType = commonType;
+
+            }
+
+         }
+
+         return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, boundListSelection, commonType, listType, resultType,  listExpr->alias);
       }
       default: error("Expression type not implemented", rootNode->loc);
    }

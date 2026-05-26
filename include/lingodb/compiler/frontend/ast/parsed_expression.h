@@ -558,10 +558,16 @@ class SetColumnExpression : public ParsedExpression {
 
 class ListExpression : public ParsedExpression {
    public:
+   struct ListSelection {
+      public:
+      std::optional<std::shared_ptr<ParsedExpression>> lowerBound;
+      std::optional<std::shared_ptr<ParsedExpression>> upperBound;
+      bool range = false;
+   };
    static constexpr const ExpressionClass cType = ExpressionClass::LIST;
-   ListExpression(std::vector<std::shared_ptr<ParsedExpression>> values) : ParsedExpression(ExpressionType::VALUE_LIST, cType), values(std::move(values)) {}
-
+   ListExpression(std::vector<std::shared_ptr<ParsedExpression>> values, std::optional<ListSelection> selection) : ParsedExpression(ExpressionType::VALUE_LIST, cType), values(std::move(values)), selection(std::move(selection)) {}
    std::vector<std::shared_ptr<ParsedExpression>> values;
+   std::optional<ListSelection> selection;
 };
 
 } // namespace lingodb::ast
