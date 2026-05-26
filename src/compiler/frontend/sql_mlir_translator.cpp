@@ -30,6 +30,24 @@
 namespace lingodb::translator {
 
 using namespace lingodb::compiler::dialect;
+
+namespace {
+mlir::Value normalizeListLowerBound(mlir::OpBuilder& builder, mlir::Location location, mlir::Value index, mlir::Value listLength) {
+   auto zero = builder.create<mlir::arith::ConstantIntOp>(location, 0, 32);
+   auto isNegative = builder.create<mlir::arith::CmpIOp>(location, mlir::arith::CmpIPredicate::slt, index, zero);
+   auto positiveIndex = builder.create<mlir::arith::SubIOp>(location, index, builder.create<mlir::arith::ConstantIntOp>(location, 1, 32));
+   auto negativeIndex = builder.create<mlir::arith::AddIOp>(location, index, listLength);
+   return builder.create<mlir::arith::SelectOp>(location, isNegative, negativeIndex, positiveIndex);
+}
+
+mlir::Value normalizeListUpperBound(mlir::OpBuilder& builder, mlir::Location location, mlir::Value index, mlir::Value listLength) {
+   auto zero = builder.create<mlir::arith::ConstantIntOp>(location, 0, 32);
+   auto isNegative = builder.create<mlir::arith::CmpIOp>(location, mlir::arith::CmpIPredicate::slt, index, zero);
+   auto negativeIndex = builder.create<mlir::arith::AddIOp>(location, index, listLength);
+   return builder.create<mlir::arith::SelectOp>(location, isNegative, negativeIndex, index);
+}
+} // namespace
+
 SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, catalog::Catalog* catalog) : moduleOp(moduleOp), catalog(catalog),
                                                                                            attrManager(moduleOp->getContext()->getLoadedDialect<tuples::TupleStreamDialect>()->getColumnManager()), translationContext(std::make_shared<TranslationContext>()) {
    moduleOp.getContext()->getLoadedDialect<util::UtilDialect>()->getFunctionHelper().setParentModule(moduleOp);
@@ -997,15 +1015,15 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          if (boundList->selection) {
             //TODO remove hardcode
             size_t boundIntBitWidth = 32;
-            auto translatedLowerBound = boundList->selection->lowerBound.has_value() ? translateExpression(builder, boundList->selection->lowerBound.value(), context) : builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);;
-
-            mlir::Value one;
-            one = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
-
-            translatedLowerBound = builder.create<mlir::arith::SubIOp>(builder.getUnknownLoc(), translatedLowerBound, one);
+            auto listLength = builder.create<mlir::arith::IndexCastOp>(exprLocation, builder.getI32Type(), builder.create<db::ListLengthOp>(exprLocation, list));
+            auto translatedLowerBound = boundList->selection->lowerBound.has_value() ? translateExpression(builder, boundList->selection->lowerBound.value(), context) : builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
+            translatedLowerBound = normalizeListLowerBound(builder, exprLocation, translatedLowerBound, listLength);
 
             if (boundList->selection->range) {
-               auto translatedUpperBound = boundList->selection->upperBound.has_value() ? translateExpression(builder, boundList->selection->upperBound.value(), context) : builder.create<mlir::arith::IndexCastOp>(exprLocation, builder.getI32Type(), builder.create<db::ListLengthOp>(exprLocation, list));
+               auto translatedUpperBound = boundList->selection->upperBound.has_value() ? translateExpression(builder, boundList->selection->upperBound.value(), context) : listLength;
+               if (boundList->selection->upperBound.has_value()) {
+                  translatedUpperBound = normalizeListUpperBound(builder, exprLocation, translatedUpperBound, listLength);
+               }
 
 
                auto subSetList = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
