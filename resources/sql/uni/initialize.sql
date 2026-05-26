@@ -13,3 +13,4 @@ insert into voraussetzen(vorgaenger, nachfolger) values (5001,5041), (5001,5043)
 insert into hoeren(matrnr, vorlnr) values (26120,5001), (27550,5001), (27550,4052), (28106,5041), (28106,5052), (28106,5216), (28106,5259), (29120,5001), (29120,5041), (29120,5049), (29555,5022), (25403,5022), (29555,5001);
 insert into assistenten(persnr, name, fachgebiet, boss) values (3002,'Platon','Ideenlehre',2125), (3003,'Aristoteles','Syllogistik',2125), (3004,'Wittgenstein','Sprachtheorie',2126), (3005,'Rhetikus','Planetenbewegung', 2127), (3006,'Newton','Keplersche Gesetze', 2127), (3007,'Spinoza','Gott und Natur',2134);
 insert into pruefen(matrnr, vorlnr, persnr, note) values (28106,5001,2126,1.0), (25403,5041,2125,2.0), (27550, 4630, 2137,2.0);
+CREATE TABLE list_table (int_list INTEGER[] not null, varchar_list VARCHAR[]);
