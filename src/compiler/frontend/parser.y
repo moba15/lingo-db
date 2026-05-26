@@ -85,6 +85,7 @@
 %token          HAT         "^"
 %token 			QUOTE		"'"
 %token          PIPE        "|>"
+%token          COLON       ":"
 
 
 
@@ -350,6 +351,9 @@
 %type<lingodb::ast::LogicalTypeWithMods> func_type func_return
 %type<std::vector<lingodb::ast::FunctionArgument>> func_args_with_defaults func_args_with_defaults_list
 %type<lingodb::ast::FunctionArgument> func_arg_with_default func_arg
+
+%type<std::optional<lingodb::ast::ListExpression::ListSelection>> opt_list_extraction
+%type<lingodb::ast::ListExpression::ListSelection> list_extraction
 
 
 /* Precedence: lowest to highest */
@@ -1620,7 +1624,7 @@ c_expr:
         $$ = subquery;
     }
     //TODO | ARRAY select_with_parens
-    | list_expr 
+    | list_expr
     {
         $$ = $list_expr;
     }
@@ -1899,15 +1903,56 @@ func_arg_expr:
     ;
 
 list_expr: 
-    LB expr_list RB
+    LB expr_list RB opt_list_extraction
     {
-        $$ = mkNode<lingodb::ast::ListExpression>(@$, $expr_list);
+        $$ = mkNode<lingodb::ast::ListExpression>(@$, $expr_list, $opt_list_extraction);
     }
     | LB RB
     {
-        $$ = mkNode<lingodb::ast::ListExpression>(@$, std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>());
+        $$ = mkNode<lingodb::ast::ListExpression>(@$, std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>(), std::nullopt);
     }
-    //TODO | LB list_expr_list RB
+
+opt_list_extraction:
+    %empty 
+    {
+        $$ = std::nullopt;
+    }
+    | list_extraction 
+    {
+        $$ = $list_extraction;
+    }
+    ;
+//TODO decide between a_expr, b_expr and c_expr for the rules in 
+list_extraction:
+    LB b_expr RB
+    {
+        lingodb::ast::ListExpression::ListSelection le{};
+        le.lowerBound = $b_expr;
+        $$ = le;
+    }
+    | LB b_expr[lowerBound] COLON b_expr[upperBound] RB
+    {
+        lingodb::ast::ListExpression::ListSelection le{};
+        le.lowerBound = $lowerBound;
+        le.upperBound = $upperBound;
+        le.range = true;
+        $$ = le;
+    }
+    | LB COLON b_expr[upperBound] RB
+    {
+        lingodb::ast::ListExpression::ListSelection le{};
+        le.upperBound = $upperBound;
+        le.range = true;
+        $$ = le;
+    }
+    | LB b_expr[lowerBound] COLON RB
+    {
+        lingodb::ast::ListExpression::ListSelection le{};
+        le.lowerBound = $lowerBound;
+        le.range = true;
+        $$ = le;
+    }
+     ;
 
 //TODO missing rules
 /*

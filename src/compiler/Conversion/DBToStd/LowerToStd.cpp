@@ -844,6 +844,8 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
       } else if (auto timestampType = mlir::dyn_cast_or_null<db::TimestampType>(type)) {
          typeConstant = ::arrow::Type::type::TIMESTAMP;
          param1 = static_cast<uint32_t>(timestampType.getUnit());
+      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
+         typeConstant = ::arrow::Type::type::LIST;
       }
       assert(typeConstant != ::arrow::Type::type::NA);
       return {typeConstant, param1, param2};
