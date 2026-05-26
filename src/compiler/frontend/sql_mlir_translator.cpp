@@ -986,25 +986,38 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             values.push_back(translateExpression(builder, child, context));
          }
          mlir::Type listType = boundList->listType.toMlirType(builder.getContext());
+         auto elementType = boundList->elementType.toMlirType(builder.getContext());
          auto list = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
          for (auto value : values) {
             builder.create<db::ListAppendOp>(builder.getUnknownLoc(), list, value);
          }
 
          if (boundList->selection) {
-            if (boundList->selection->range) {
-               throw std::runtime_error("Range not implemented");
-            }
-            auto translatedLowerBound = translateExpression(builder, boundList->selection->lowerBound.value(), context);
+            //TODO remove hardcode
+            size_t boundIntBitWidth = 32;
+            auto translatedLowerBound = boundList->selection->lowerBound.has_value() ? translateExpression(builder, boundList->selection->lowerBound.value(), context) : builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);;
 
-            auto elementType = boundList->elementType.toMlirType(builder.getContext());
             mlir::Value one;
-            if (translatedLowerBound.getType().isIndex()) {
-               one = builder.create<mlir::arith::ConstantIndexOp>(builder.getUnknownLoc(), 1);
-            } else {
-               one = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, translatedLowerBound.getType().getIntOrFloatBitWidth());
-            }
+            one = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
+
             translatedLowerBound = builder.create<mlir::arith::SubIOp>(builder.getUnknownLoc(), translatedLowerBound, one);
+
+            if (boundList->selection->range) {
+               auto translatedUpperBound = boundList->selection->upperBound.has_value() ? translateExpression(builder, boundList->selection->upperBound.value(), context) : builder.create<mlir::arith::IndexCastOp>(exprLocation, builder.getI32Type(), builder.create<db::ListLengthOp>(exprLocation, list));
+
+
+               auto subSetList = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
+
+               //Use for-loop to iterate from lower bound to upper bound, then use ListGetOp to extract element and add to new subSetList
+               auto step = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
+               builder.create<mlir::scf::ForOp>(exprLocation, translatedLowerBound, translatedUpperBound, step, mlir::ValueRange{}, [&](mlir::OpBuilder& loopBuilder, mlir::Location loc, mlir::Value idx, mlir::ValueRange) {
+                  auto element = loopBuilder.create<db::ListGetOp>(loc, elementType, list, idx);
+                  loopBuilder.create<db::ListAppendOp>(loc, subSetList, element);
+                  loopBuilder.create<mlir::scf::YieldOp>(loc);
+               });
+               return subSetList;
+            }
+
             return builder.create<db::ListGetOp>(builder.getUnknownLoc(), elementType, list, translatedLowerBound);
          }
 

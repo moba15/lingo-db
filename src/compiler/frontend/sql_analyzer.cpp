@@ -2372,7 +2372,11 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
                boundListSelection->upperBound = analyzeExpression(parsedSelection.upperBound.value(), context, resolverScope);
             }
             boundListSelection->range = parsedSelection.range;
-            resultType = commonType;
+            if (!parsedSelection.range) {
+               resultType = commonType;
+
+            }
+
          }
 
          return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, boundListSelection, commonType, listType, resultType,  listExpr->alias);
