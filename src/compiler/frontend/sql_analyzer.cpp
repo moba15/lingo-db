@@ -19,6 +19,10 @@
 namespace lingodb::analyzer {
 using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::ColumnReference>, StringInfo>::ScopeTy;
 
+namespace {
+NullableType normalizeListCharTypes(NullableType type);
+}
+
 StackGuardNormal::StackGuardNormal() {
 #ifdef ASAN_ACTIVE
    rlimit rlp{};
@@ -2350,13 +2354,11 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
             return child->resultType.value();
          });
          if (types.size() == 0) {
-            //Empty list, set type to int
-            types.push_back(catalog::Type::int8());
+            types.push_back(NullableType(catalog::Type::noneType(), true));
          }
          auto commonType = SQLTypeUtils::getCommonBaseType(types);
-         if (commonType.type.getTypeId() == catalog::LogicalTypeId::CHAR) {
-            commonType.type = catalog::Type::stringType();
-         }
+         commonType = normalizeListCharTypes(commonType);
+
          NullableType listType = catalog::Type::listType(commonType.type);
          NullableType resultType = catalog::Type::listType(commonType.type);
 
@@ -3028,6 +3030,22 @@ std::shared_ptr<ast::BoundColumnRefExpression> SQLQueryAnalyzer::analyzeColumnRe
 /*
     * SQLTypeUtils
     */
+namespace {
+NullableType normalizeListCharTypes(NullableType type) {
+   if (type.type.getTypeId() == catalog::LogicalTypeId::CHAR) {
+      return NullableType(catalog::Type::stringType(), type.isNullable);
+   }
+
+   if (type.type.getTypeId() == catalog::LogicalTypeId::LIST) {
+      auto listInfo = type.type.getInfo<catalog::ListTypeInfo>();
+      auto normalizedElement = normalizeListCharTypes(NullableType(listInfo->getElementType(), false));
+      return NullableType(catalog::Type::listType(normalizedElement.type), type.isNullable);
+   }
+
+   return type;
+}
+} // namespace
+
 NullableType SQLTypeUtils::getCommonType(NullableType nullableType1, NullableType nullableType2) {
    const bool isNullable = nullableType1.isNullable || nullableType2.isNullable;
 
@@ -3035,6 +3053,10 @@ NullableType SQLTypeUtils::getCommonType(NullableType nullableType1, NullableTyp
    if (nullableType1.type.getTypeId() == nullableType2.type.getTypeId()) {
       if (nullableType1.type.getTypeId() == catalog::LogicalTypeId::DECIMAL) {
          return getHigherDecimalType(nullableType1, nullableType2);
+      }
+
+      if (nullableType1.type.getTypeId() == catalog::LogicalTypeId::LIST) {
+         return normalizeListCharTypes(NullableType(nullableType1.type, isNullable));
       }
 
       if (nullableType1.type.getTypeId() == catalog::LogicalTypeId::CHAR) {
@@ -3055,6 +3077,13 @@ NullableType SQLTypeUtils::getCommonType(NullableType nullableType1, NullableTyp
          }
       }
       return NullableType(nullableType1.type, isNullable);
+   }
+
+   if (nullableType1.type.getTypeId() == catalog::LogicalTypeId::LIST && nullableType2.type.getTypeId() == catalog::LogicalTypeId::LIST) {
+      auto listInfo1 = nullableType1.type.getInfo<catalog::ListTypeInfo>();
+      auto listInfo2 = nullableType2.type.getInfo<catalog::ListTypeInfo>();
+      auto commonElementType = getCommonType(NullableType(listInfo1->getElementType(), false), NullableType(listInfo2->getElementType(), false));
+      return normalizeListCharTypes(NullableType(catalog::Type::listType(commonElementType.type), isNullable));
    }
 
    for (size_t i = 0; i < 2; i++) {
