@@ -983,7 +983,9 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto boundList = std::static_pointer_cast<ast::BoundListExpression>(expression);
          std::vector<mlir::Value> values;
          for (auto& child : boundList->values) {
-            values.push_back(translateExpression(builder, child, context));
+            auto expr = translateExpression(builder, child, context);
+            expr = boundList->elementType.castValueToThisType(builder, expr, boundList->elementType.isNullable);
+            values.push_back(expr);
          }
          mlir::Type listType = boundList->listType.toMlirType(builder.getContext());
          auto elementType = boundList->elementType.toMlirType(builder.getContext());
