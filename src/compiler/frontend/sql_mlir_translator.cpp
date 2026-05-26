@@ -985,10 +985,27 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          for (auto& child : boundList->values) {
             values.push_back(translateExpression(builder, child, context));
          }
-         mlir::Type type = boundList->resultType->toMlirType(builder.getContext());
-         auto list = builder.create<db::CreateListOp>(builder.getUnknownLoc(), type);
+         mlir::Type listType = boundList->listType.toMlirType(builder.getContext());
+         auto list = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
          for (auto value : values) {
             builder.create<db::ListAppendOp>(builder.getUnknownLoc(), list, value);
+         }
+
+         if (boundList->selection) {
+            if (boundList->selection->range) {
+               throw std::runtime_error("Range not implemented");
+            }
+            auto translatedLowerBound = translateExpression(builder, boundList->selection->lowerBound.value(), context);
+
+            auto elementType = boundList->elementType.toMlirType(builder.getContext());
+            mlir::Value one;
+            if (translatedLowerBound.getType().isIndex()) {
+               one = builder.create<mlir::arith::ConstantIndexOp>(builder.getUnknownLoc(), 1);
+            } else {
+               one = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, translatedLowerBound.getType().getIntOrFloatBitWidth());
+            }
+            translatedLowerBound = builder.create<mlir::arith::SubIOp>(builder.getUnknownLoc(), translatedLowerBound, one);
+            return builder.create<db::ListGetOp>(builder.getUnknownLoc(), elementType, list, translatedLowerBound);
          }
 
          return list;
