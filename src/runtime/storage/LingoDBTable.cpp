@@ -189,6 +189,10 @@ std::shared_ptr<arrow::DataType> toPhysicalType(lingodb::catalog::Type t) {
       }
       case TypeId::STRING:
          return arrow::utf8();
+      case TypeId::LIST: {
+         auto listInfo = t.getInfo<lingodb::catalog::ListTypeInfo>();
+         return arrow::list(toPhysicalType(listInfo->getElementType()));
+      }
       default:
          throw std::runtime_error("unsupported type");
    }

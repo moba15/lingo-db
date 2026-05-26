@@ -1025,7 +1025,6 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
                   translatedUpperBound = normalizeListUpperBound(builder, exprLocation, translatedUpperBound, listLength);
                }
 
-
                auto subSetList = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
 
                //Use for-loop to iterate from lower bound to upper bound, then use ListGetOp to extract element and add to new subSetList

@@ -192,6 +192,9 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
             mlir::Value msNanos = rewriter.create<arith::MulIOp>(loc, i64Type, msI64, nanosPerMilli);
             loaded = rewriter.create<arith::AddIOp>(loc, i64Type, dayNanos, msNanos);
          }
+      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
+         loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadListOp>(loc, array, offset);
+
       } else {
          return mlir::failure();
       }
