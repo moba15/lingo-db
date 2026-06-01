@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <vector>
+#include <memory>
 namespace lingodb::ast {
 enum class ConstantType : uint8_t {
    INT = 1,
@@ -84,6 +86,22 @@ class NullValue : public Value {
    explicit NullValue() : Value(ConstantType::NULL_P) {}
    std::string toString() override {
       return "NULL";
+   }
+};
+
+class ListValue : public Value {
+   public:
+   explicit ListValue(std::vector<std::shared_ptr<Value>> elements) : Value(ConstantType::LIST), elements(std::move(elements)) {}
+   std::vector<std::shared_ptr<Value>> elements;
+   std::string toString() override {
+      std::string str = "[";
+      for (auto& e : elements) {
+         str += e->toString() + ", ";
+      }
+      str.pop_back();
+      str.pop_back();
+      str += "]";
+      return str;
    }
 };
 
