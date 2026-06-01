@@ -6,6 +6,9 @@ statement ok
 CREATE TABLE list_table (int_list INTEGER[], varchar_list VARCHAR[]);
 
 statement ok
+INSERT INTO list_table VALUES ([1, 2, 3], ['Hello', 'World']);
+
+statement ok
 INSERT INTO integers VALUES (1), (2), (3), (NULL);
 
 query tsv
