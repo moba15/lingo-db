@@ -109,7 +109,7 @@ struct ResultHasher : public execution::ResultProcessor {
                   break;
                }
 
-               // 5. Value Processing
+               // 5. Value Processing (Strict ASCII/Float/Hex for SQLite validation)
                cellHasData = true;
                if (curr == '\n') {
                   // Inner newline (depth > 2), skip leading spaces of next line and replace with space
@@ -137,27 +137,21 @@ struct ResultHasher : public execution::ResultProcessor {
                      digits = 0;
                      out << curr;
                   }
-               } else if (convertHex[column] && std::isxdigit(curr)) {
-                  if (currCharSize % 2 == 0)
-                     currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
-                  else
-                     currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
-               } else if ((curr & (1 << 7)) == (1 << 7)) {
-                  const auto extendedCurr = static_cast<char32_t>(curr) & 0xFF;
-                  currChar |= static_cast<char32_t>(extendedCurr << (currCharSize * 4));
-                  currCharSize += 2;
-               } else {
-                  if (currChar != U'\0') {
-                     assert(currChar <= 0xFF && "Only ASCII characters supported for sqlite testing");
-                     out << static_cast<char>(currChar);
-                     currChar = U'\0';
-                     currCharSize = 0;
+               } else if (convertHex[column]) {
+                  if (std::isxdigit(curr)) {
+                     if (currCharSize % 2 == 0)
+                        currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
+                     else
+                        currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
+                  } else {
+                     out << curr;
                   }
-                  out << curr;
+               } else {
+                  out << curr; // Standard string/int fallthrough
                }
             }
 
-            // Final flush for the cell
+            // Final flush for hex conversions
             if (currChar != U'\0') {
                assert(currChar <= 0xFF && "Only ASCII characters supported for sqlite testing");
                out << static_cast<char>(currChar);
