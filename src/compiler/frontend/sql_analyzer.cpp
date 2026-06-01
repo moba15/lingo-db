@@ -2052,11 +2052,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(s
                assert(element->resultType.has_value());
 
                listElements.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(element)->value);
-
             }
             assert(boundExpr->resultType.has_value());
             types.at(i).push_back(boundExpr->resultType.value());
-            auto boundListConstant= std::make_shared<ast::BoundConstantExpression>(boundExpr->resultType.value(), std::make_shared<ast::ListValue>(listElements), boundExpr->alias );
+            auto boundListConstant = std::make_shared<ast::BoundConstantExpression>(boundExpr->resultType.value(), std::make_shared<ast::ListValue>(listElements), boundExpr->alias);
             boundExprList.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(boundListConstant));
          } else if (boundExpr->exprClass == ast::ExpressionClass::BOUND_CONSTANT) {
             assert(boundExpr->resultType.has_value());
@@ -2065,7 +2064,6 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(s
          } else {
             error("Expression list must only contain constant expressions", exprList.at(i)->loc);
          }
-
       }
       boundValues.emplace_back(boundExprList);
    }
