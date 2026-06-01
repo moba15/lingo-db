@@ -2,10 +2,10 @@
 #define LINGODB_COMPILER_FRONTEND_AST_CONSTANT_VALUE_H
 
 #include <cstdint>
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <vector>
-#include <memory>
 namespace lingodb::ast {
 enum class ConstantType : uint8_t {
    INT = 1,
