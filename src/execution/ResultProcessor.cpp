@@ -76,81 +76,78 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
       bool rowHasData = false;
 
       for (size_t column = 0; column < columnReps.size(); column++) {
-         // Keep the outer loop alive as long as ANY column has characters left
-         if (positions[column] < columnReps[column].size()) {
-            cont = true;
-         }
-
          char32_t currChar = U'\0';
          uint8_t currCharSize = 0;
          std::stringstream out;
+         bool cellHasData = false;
+
+         if (positions[column] < columnReps[column].size()) {
+            cont = true;
+         }
 
          while (positions[column] < columnReps[column].size()) {
             char curr = columnReps[column][positions[column]];
 
             // 1. Bracket tracking
             if (curr == '[') bracketDepth[column]++;
-            bool isStructural = (bracketDepth[column] <= 2) && (curr == '[' || curr == ']');
+            int depth = bracketDepth[column];
             if (curr == ']') bracketDepth[column]--;
             positions[column]++;
 
-            // 2. CRITICAL: Skip leading structural spaces so they don't trigger fake cells
-            if (out.str().empty() && curr == ' ') {
+            // 2. Skip leading structural junk (brackets, separators, spaces at depth 1 or 2)
+            if (!cellHasData && (depth <= 2) && (curr == '[' || curr == ']' || curr == ',' || curr == ' ' || curr == '\n')) {
                continue;
             }
 
-            // 3. Skip structural array wrappers & commas
-            if (isStructural) {
-               continue;
-            }
-            if (curr == ',' && bracketDepth[column] <= 2) {
-               continue;
-            }
-
-            // 4. Handle newlines
-            if (curr == '\n') {
-               // Inside a list/array value
-               if (bracketDepth[column] > 2) {
-                  // Eat indentation spaces following the inner newline
-                  while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
-                     positions[column]++;
-                  }
+            // 3. Handle structural commas (comma followed by newline at depth 1 or 2)
+            if (cellHasData && (depth <= 2) && curr == ',') {
+               char next = (positions[column] < columnReps[column].size()) ? columnReps[column][positions[column]] : '\0';
+               if (next == '\n') {
                   continue;
-               } else {
-                  // If we are at the structural level
-                  if (out.str().empty()) {
-                     continue; // This was just padding, keep looking for data
-                  } else {
-                     break; // Real table cell ended
-                  }
                }
+            }
+
+            // 4. Handle end of cell
+            if (cellHasData && (depth <= 2) && curr == '\n') {
+               break;
+            }
+
+            // 5. Value Processing
+            cellHasData = true;
+            if (curr == '\n') {
+               // Inner newline (depth > 2), skip leading spaces of next line and replace with space
+               while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
+                  positions[column]++;
+               }
+               out << ' ';
+               continue;
+            }
+
+            if (convertHex[column] && isxdigit(curr)) {
+               if (currCharSize % 2 == 0)
+                  currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
+               else
+                  currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
+            } else if ((curr & (1 << 7)) == (1 << 7)) {
+               const auto extendedCurr = static_cast<char32_t>(curr) & 0xFF;
+               currChar |= static_cast<char32_t>(extendedCurr << (currCharSize * 4));
+               currCharSize += 2;
             } else {
-               // 5. Value Processing (Unicode/Hex logic)
-               if (convertHex[column] && isxdigit(curr)) {
-                  if (currCharSize % 2 == 0)
-                     currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
-                  else
-                     currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
-               } else if ((curr & (1 << 7)) == (1 << 7)) {
-                  const auto extendedCurr = static_cast<char32_t>(curr) & 0xFF;
-                  currChar |= static_cast<char32_t>(extendedCurr << (currCharSize * 4));
-                  currCharSize += 2;
-               } else {
-                  if (currChar != U'\0') {
-                     for (size_t i = 0; i < currCharSize / 2; i++) {
-                        const char slice = reinterpret_cast<char*>(&currChar)[i];
-                        if (slice != 0) {
-                           out << slice;
-                        }
+               if (currChar != U'\0') {
+                  for (size_t i = 0; i < currCharSize / 2; i++) {
+                     const char slice = reinterpret_cast<char*>(&currChar)[i];
+                     if (slice != 0) {
+                        out << slice;
                      }
-                     currChar = U'\0';
-                     currCharSize = 0;
                   }
-                  out << curr;
+                  currChar = U'\0';
+                  currCharSize = 0;
                }
+               out << curr;
             }
          }
 
+         // Final flush for the cell
          if (currChar != U'\0') {
             for (size_t i = 0; i < currCharSize / 2; i++) {
                const char slice = reinterpret_cast<char*>(&currChar)[i];
@@ -162,8 +159,8 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
 
          // Store the extracted text into the buffer
          rowCells[column] = out.str();
-         if (!rowCells[column].empty()) {
-            rowHasData = true; // Flag that this row actually contains printable text
+         if (cellHasData) {
+            rowHasData = true;
          }
       }
 
