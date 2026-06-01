@@ -56,7 +56,6 @@ struct ResultHasher : public execution::ResultProcessor {
       options.element_size_limit = 10000;
       std::vector<bool> convertHex;
       std::vector<bool> isFloat;
-      std::vector<int> bracketDepth;
       for (auto c : table->columns()) {
          convertHex.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::FIXED_SIZE_BINARY);
          isFloat.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::DOUBLE);
@@ -64,112 +63,108 @@ struct ResultHasher : public execution::ResultProcessor {
          arrow::PrettyPrint(*c.get(), options, &sstr); //NOLINT (clang-diagnostic-unused-result)
          columnReps.push_back(sstr.str());
          positions.push_back(0);
-         bracketDepth.push_back(0);
       }
 
+      std::vector<int> bracketDepth(columnReps.size(), 0);
       bool cont = true;
       while (cont) {
          cont = false;
-
-         std::vector<std::string> rowCells(columnReps.size());
-         bool rowHasData = false;
-
          for (size_t column = 0; column < columnReps.size(); column++) {
+            char32_t currChar = U'\0';
+            uint8_t currCharSize = 0;
+
+            bool cellHasData = false;
+            bool afterComma = false;
+            size_t digits = 0;
+            std::stringstream out;
+
             if (positions[column] < columnReps[column].size()) {
                cont = true;
             }
 
-            char32_t currChar = U'\0';
-            uint8_t currCharSize = 0;
-
-            bool first = true;
-            bool afterComma = false;
-            size_t digits = 0;
-            std::stringstream out;
             while (positions[column] < columnReps[column].size()) {
                char curr = columnReps[column][positions[column]];
 
-               if (curr == '[') {
-                  bracketDepth[column]++;
-               }
-               bool isStructural = (bracketDepth[column] <= 2) && (curr == '[' || curr == ']');
-               if (curr == ']') {
-                  bracketDepth[column]--;
-               }
+               // 1. Bracket tracking
+               if (curr == '[') bracketDepth[column]++;
+               int depth = bracketDepth[column];
+               if (curr == ']') bracketDepth[column]--;
                positions[column]++;
 
-               if (out.str().empty() && curr == ' ') {
+               // 2. Skip leading structural junk (brackets, separators, spaces at depth 1 or 2)
+               if (!cellHasData && (depth <= 2) && (curr == '[' || curr == ']' || curr == ',' || curr == ' ' || curr == '\n')) {
                   continue;
                }
 
-               if (isStructural) {
-                  continue;
+               // 3. Handle structural commas (comma followed by newline at depth 1 or 2)
+               if (cellHasData && (depth <= 2) && curr == ',') {
+                  char next = (positions[column] < columnReps[column].size()) ? columnReps[column][positions[column]] : '\0';
+                  if (next == '\n') {
+                     continue;
+                  }
                }
-               if (curr == '\n') {
-                  if (bracketDepth[column] > 2) {
-                     while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
-                        positions[column]++;
-                     }
-                     continue;
-                  }
-                  if (out.str().empty()) {
-                     continue;
-                  }
+
+               // 4. Handle end of cell
+               if (cellHasData && (depth <= 2) && curr == '\n') {
                   break;
                }
-               if (curr == ',' && bracketDepth[column] <= 2) {
+
+               // 5. Value Processing
+               cellHasData = true;
+               if (curr == '\n') {
+                  // Inner newline (depth > 2), skip leading spaces of next line and replace with space
+                  while (positions[column] < columnReps[column].size() && columnReps[column][positions[column]] == ' ') {
+                     positions[column]++;
+                  }
+                  out << ' ';
                   continue;
-               } else {
-                  if (isFloat[column]) {
-                     if (std::isdigit(curr)) {
-                        if (afterComma && digits < 3) {
-                           digits++;
-                           out << curr;
-                        } else if (!afterComma) {
-                           out << curr;
-                           first = false;
-                        }
-                     } else if (curr == '.') {
-                        afterComma = true;
+               }
+
+               if (isFloat[column]) {
+                  if (std::isdigit(curr)) {
+                     if (afterComma && digits < 3) {
+                        digits++;
                         out << curr;
-                        digits = 0;
-                     } else {
-                        afterComma = false;
-                        digits = 0;
-                        first = false;
+                     } else if (!afterComma) {
                         out << curr;
                      }
-                  } else if (convertHex[column]) {
-                     first = false;
-                     if (std::isxdigit(curr)) {
-                        if (currCharSize % 2 == 0)
-                           currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
-                        else
-                           currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
-                     } else {
-                        out << curr;
-                     }
+                  } else if (curr == '.') {
+                     afterComma = true;
+                     out << curr;
+                     digits = 0;
                   } else {
-                     first = false;
+                     afterComma = false;
+                     digits = 0;
                      out << curr;
                   }
+               } else if (convertHex[column] && std::isxdigit(curr)) {
+                  if (currCharSize % 2 == 0)
+                     currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
+                  else
+                     currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
+               } else if ((curr & (1 << 7)) == (1 << 7)) {
+                  const auto extendedCurr = static_cast<char32_t>(curr) & 0xFF;
+                  currChar |= static_cast<char32_t>(extendedCurr << (currCharSize * 4));
+                  currCharSize += 2;
+               } else {
+                  if (currChar != U'\0') {
+                     assert(currChar <= 0xFF && "Only ASCII characters supported for sqlite testing");
+                     out << static_cast<char>(currChar);
+                     currChar = U'\0';
+                     currCharSize = 0;
+                  }
+                  out << curr;
                }
             }
+
+            // Final flush for the cell
             if (currChar != U'\0') {
                assert(currChar <= 0xFF && "Only ASCII characters supported for sqlite testing");
                out << static_cast<char>(currChar);
             }
-            rowCells[column] = out.str();
-            if (!rowCells[column].empty()) {
-               rowHasData = true;
-            }
-         }
 
-         if (rowHasData) {
-            for (auto& cell : rowCells) {
-               if (!cell.empty()) {
-                  toHash.push_back(cell);
-               }
+            if (cellHasData) {
+               toHash.push_back(out.str());
             }
          }
       }
@@ -210,10 +205,16 @@ struct ResultHasher : public execution::ResultProcessor {
       numValues = toHash.size();
       std::string linesRes = "";
       if (toHash.size() < 1000 || tsv) {
-         size_t i = 0;
-         for (auto x : toHash) {
-            linesRes += x + ((((i + 1) % numColumns) == 0) ? "\n" : "\t");
-            i++;
+         if (tsv) {
+            size_t i = 0;
+            for (auto x : toHash) {
+               linesRes += x + ((((i + 1) % numColumns) == 0) ? "\n" : "\t");
+               i++;
+            }
+         } else {
+            for (auto x : toHash) {
+               linesRes += x + "\n";
+            }
          }
       }
       lines = linesRes;
