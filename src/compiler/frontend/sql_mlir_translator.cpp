@@ -1400,6 +1400,57 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                      assert(constExpr->resultType.has_value());
                      break;
                   }
+                  case ast::ConstantType::LIST: {
+                     auto listValue = std::static_pointer_cast<ast::ListValue>(constExpr->value);
+                     auto serializeValue = [&](auto&& self, std::shared_ptr<ast::Value> nestedValue) -> mlir::Attribute {
+                        switch (nestedValue->type) {
+                           case ast::ConstantType::INT: {
+                              auto nestedInt = std::static_pointer_cast<ast::IntValue>(nestedValue);
+                              return builder.getI32IntegerAttr(nestedInt->iVal);
+                           }
+                           case ast::ConstantType::UINT: {
+                              auto nestedUInt = std::static_pointer_cast<ast::UnsignedIntValue>(nestedValue);
+                              return builder.getI64IntegerAttr(nestedUInt->iVal);
+                           }
+                           case ast::ConstantType::STRING: {
+                              auto nestedString = std::static_pointer_cast<ast::StringValue>(nestedValue);
+                              return builder.getStringAttr(nestedString->sVal);
+                           }
+                           case ast::ConstantType::FLOAT: {
+                              auto nestedFloat = std::static_pointer_cast<ast::FloatValue>(nestedValue);
+                              return builder.getStringAttr(nestedFloat->fVal);
+                           }
+                           case ast::ConstantType::NULL_P: {
+                              return builder.getUnitAttr();
+                           }
+                           case ast::ConstantType::BOOLEAN: {
+                              auto nestedBool = std::static_pointer_cast<ast::BoolValue>(nestedValue);
+                              return builder.getBoolAttr(nestedBool->bVal);
+                           }
+                           case ast::ConstantType::DATE: {
+                              auto nestedDate = std::static_pointer_cast<ast::DateValue>(nestedValue);
+                              return builder.getStringAttr(nestedDate->date);
+                           }
+                           case ast::ConstantType::INTERVAL: {
+                              auto nestedInterval = std::static_pointer_cast<ast::IntervalValue>(nestedValue);
+                              return builder.getStringAttr(nestedInterval->iVal.stringRepresentation);
+                           }
+                           case ast::ConstantType::LIST: {
+                              auto nestedList = std::static_pointer_cast<ast::ListValue>(nestedValue);
+                              std::vector<mlir::Attribute> nestedValues;
+                              nestedValues.reserve(nestedList->elements.size());
+                              for (auto& element : nestedList->elements) {
+                                 nestedValues.emplace_back(self(self, element));
+                              }
+                              return builder.getArrayAttr(nestedValues);
+                           }
+                           default:
+                              translatorError("Unsupported constant type in list literal", constExpr->loc);
+                        }
+                     };
+                     value = serializeValue(serializeValue, listValue);
+                     break;
+                  }
 
                   default: translatorError("Invalid constant in expression list", constExpr->loc);
                }

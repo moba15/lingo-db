@@ -2041,12 +2041,31 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzeExpressionListRef(s
       std::vector<std::shared_ptr<ast::BoundConstantExpression>> boundExprList{};
       for (size_t i = 0; i < sizePerExprList; i++) {
          std::shared_ptr<ast::BoundExpression> boundExpr = analyzeExpression(exprList.at(i), context, resolverScope);
-         if (boundExpr->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
+         if (boundExpr->exprClass == ast::ExpressionClass::BOUND_LIST) {
+            //Handle List case
+            auto boundList = std::static_pointer_cast<ast::BoundListExpression>(boundExpr);
+            std::vector<std::shared_ptr<ast::Value>> listElements{};
+            for (auto element : boundList->values) {
+               if (element->exprClass != ast::ExpressionClass::BOUND_CONSTANT) {
+                  error("Expression list must only contain constant expressions", element->loc);
+               }
+               assert(element->resultType.has_value());
+
+               listElements.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(element)->value);
+
+            }
+            assert(boundExpr->resultType.has_value());
+            types.at(i).push_back(boundExpr->resultType.value());
+            auto boundListConstant= std::make_shared<ast::BoundConstantExpression>(boundExpr->resultType.value(), std::make_shared<ast::ListValue>(listElements), boundExpr->alias );
+            boundExprList.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(boundListConstant));
+         } else if (boundExpr->exprClass == ast::ExpressionClass::BOUND_CONSTANT) {
+            assert(boundExpr->resultType.has_value());
+            types.at(i).push_back(boundExpr->resultType.value());
+            boundExprList.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(boundExpr));
+         } else {
             error("Expression list must only contain constant expressions", exprList.at(i)->loc);
          }
-         assert(boundExpr->resultType.has_value());
-         types.at(i).push_back(boundExpr->resultType.value());
-         boundExprList.emplace_back(std::static_pointer_cast<ast::BoundConstantExpression>(boundExpr));
+
       }
       boundValues.emplace_back(boundExprList);
    }
