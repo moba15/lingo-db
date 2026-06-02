@@ -638,6 +638,18 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
       }
       case ast::ExpressionClass::LIST: {
          auto listExpression = std::static_pointer_cast<ast::ListExpression>(rootNode);
+         if (listExpression->selection.has_value()) {
+            if (listExpression->selection->lowerBound.has_value()) {
+               auto castExpression = std::make_shared<ast::CastExpression>(ast::LogicalTypeWithMods(catalog::LogicalTypeId::INDEX), listExpression->selection->lowerBound.value());
+               castExpression->child = canonicalizeParsedExpression(castExpression->child, context, false, extendNode);
+               listExpression->selection->lowerBound = castExpression;
+            }
+            if (listExpression->selection->upperBound.has_value()) {
+               auto castExpression = std::make_shared<ast::CastExpression>(ast::LogicalTypeWithMods(catalog::LogicalTypeId::INDEX), listExpression->selection->upperBound.value());
+               castExpression->child = canonicalizeParsedExpression(castExpression->child, context, false, extendNode);
+               listExpression->selection->upperBound = castExpression;
+            }
+         }
          if (extend) {
             return extendExpr(listExpression);
          }
@@ -3328,6 +3340,9 @@ NullableType SQLTypeUtils::typemodsToCatalogType(const ast::LogicalTypeWithMods&
       case catalog::LogicalTypeId::LIST: {
          assert(logicalTypeWithMods.elementType);
          return catalog::Type::listType(typemodsToCatalogType(*logicalTypeWithMods.elementType).type);
+      }
+      case catalog::LogicalTypeId::INDEX: {
+         return catalog::Type::index();
       }
       default: throw std::runtime_error("Typemod not implemented");
    }
