@@ -849,6 +849,8 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
          param1 = static_cast<uint32_t>(timestampType.getUnit());
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
          typeConstant = ::arrow::Type::type::LIST;
+      } else if (mlir::isa<mlir::IndexType>(type)) {
+         typeConstant = ::arrow::Type::type::UINT64;
       }
       assert(typeConstant != ::arrow::Type::type::NA);
       return {typeConstant, param1, param2};
@@ -874,7 +876,7 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
 
          auto parseResult = lingodb::compiler::support::parse(parseArg, arrowType, param1, param2);
          auto loweredType = typeConverter->convertType(scalarType);
-         if (auto intType = mlir::dyn_cast_or_null<IntegerType>(loweredType)) {
+         if (loweredType.isIntOrIndex()) {
             if (auto decimalType = mlir::dyn_cast_or_null<db::DecimalType>(scalarType)) {
                auto [low, high] = lingodb::compiler::support::parseDecimal(std::get<std::string>(parseResult), decimalType.getS());
                std::vector<uint64_t> parts = {low, high};

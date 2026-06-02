@@ -33,15 +33,18 @@ using namespace lingodb::compiler::dialect;
 
 namespace {
 mlir::Value normalizeListLowerBound(mlir::OpBuilder& builder, mlir::Location location, mlir::Value index, mlir::Value listLength) {
-   auto zero = builder.create<mlir::arith::ConstantIntOp>(location, 0, 32);
+   mlir::Type indexType = index.getType();
+   mlir::Value zero = builder.create<mlir::arith::ConstantOp>(location, indexType, builder.getIntegerAttr(indexType, 0));
+   mlir::Value one = builder.create<mlir::arith::ConstantOp>(location, indexType, builder.getIntegerAttr(indexType, 1));
    auto isNegative = builder.create<mlir::arith::CmpIOp>(location, mlir::arith::CmpIPredicate::slt, index, zero);
-   auto positiveIndex = builder.create<mlir::arith::SubIOp>(location, index, builder.create<mlir::arith::ConstantIntOp>(location, 1, 32));
+   auto positiveIndex = builder.create<mlir::arith::SubIOp>(location, index, one);
    auto negativeIndex = builder.create<mlir::arith::AddIOp>(location, index, listLength);
    return builder.create<mlir::arith::SelectOp>(location, isNegative, negativeIndex, positiveIndex);
 }
 
 mlir::Value normalizeListUpperBound(mlir::OpBuilder& builder, mlir::Location location, mlir::Value index, mlir::Value listLength) {
-   auto zero = builder.create<mlir::arith::ConstantIntOp>(location, 0, 32);
+   mlir::Type indexType = index.getType();
+   mlir::Value zero = builder.create<mlir::arith::ConstantOp>(location, indexType, builder.getIntegerAttr(indexType, 0));
    auto isNegative = builder.create<mlir::arith::CmpIOp>(location, mlir::arith::CmpIPredicate::slt, index, zero);
    auto negativeIndex = builder.create<mlir::arith::AddIOp>(location, index, listLength);
    return builder.create<mlir::arith::SelectOp>(location, isNegative, negativeIndex, index);
@@ -1013,22 +1016,28 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          }
 
          if (boundList->selection) {
-            //TODO remove hardcode
-            size_t boundIntBitWidth = 32;
-            auto listLength = builder.create<mlir::arith::IndexCastOp>(exprLocation, builder.getI32Type(), builder.create<db::ListLengthOp>(exprLocation, list));
-            auto translatedLowerBound = boundList->selection->lowerBound.has_value() ? translateExpression(builder, boundList->selection->lowerBound.value(), context) : builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
+            mlir::Value listLength = builder.create<db::ListLengthOp>(exprLocation, list);
+            mlir::Value translatedLowerBound;
+            if (boundList->selection->lowerBound.has_value()) {
+               translatedLowerBound = translateExpression(builder, boundList->selection->lowerBound.value(), context);
+            } else {
+               translatedLowerBound = builder.create<mlir::arith::ConstantOp>(exprLocation, builder.getIndexType(), builder.getIndexAttr(1));
+            }
             translatedLowerBound = normalizeListLowerBound(builder, exprLocation, translatedLowerBound, listLength);
 
             if (boundList->selection->range) {
-               auto translatedUpperBound = boundList->selection->upperBound.has_value() ? translateExpression(builder, boundList->selection->upperBound.value(), context) : listLength;
+               mlir::Value translatedUpperBound;
                if (boundList->selection->upperBound.has_value()) {
+                  translatedUpperBound = translateExpression(builder, boundList->selection->upperBound.value(), context);
                   translatedUpperBound = normalizeListUpperBound(builder, exprLocation, translatedUpperBound, listLength);
+               } else {
+                  translatedUpperBound = listLength;
                }
 
                auto subSetList = builder.create<db::CreateListOp>(builder.getUnknownLoc(), listType);
 
                //Use for-loop to iterate from lower bound to upper bound, then use ListGetOp to extract element and add to new subSetList
-               auto step = builder.create<mlir::arith::ConstantIntOp>(builder.getUnknownLoc(), 1, boundIntBitWidth);
+               auto step = builder.create<mlir::arith::ConstantOp>(exprLocation, builder.getIndexType(), builder.getIndexAttr(1));
                builder.create<mlir::scf::ForOp>(exprLocation, translatedLowerBound, translatedUpperBound, step, mlir::ValueRange{}, [&](mlir::OpBuilder& loopBuilder, mlir::Location loc, mlir::Value idx, mlir::ValueRange) {
                   auto element = loopBuilder.create<db::ListGetOp>(loc, elementType, list, idx);
                   loopBuilder.create<db::ListAppendOp>(loc, subSetList, element);
