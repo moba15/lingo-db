@@ -56,9 +56,9 @@ def Arrow_LoadListOp : Arrow_Op<"array.load_list", [Pure] > {
     let description = [{
         Used for loading list values from an arrow array.
     }];
-    let arguments = (ins Arrow_Array:$array,Index:$offset);
+    let arguments = (ins Arrow_Array:$array,Index:$offset, TypeAttr:$elementType);
     let results = (outs RefType:$value);
-    let assemblyFormat = " $array `,` $offset `->` type($value) attr-dict";
+    let assemblyFormat = " $array `,` $offset `,` $elementType `->` type($value) attr-dict";
 }
 def Arrow_AppendBoolOp : Arrow_Op<"array_builder.append_bool"> {
     let summary = "Appends a boolean value to an Arrow array builder.";
