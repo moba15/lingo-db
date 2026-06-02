@@ -183,7 +183,7 @@ class ArrayLoadListLowering : public OpConversionPattern<arrow::LoadListOp> {
       auto pos1AsIndex = rewriter.create<arith::IndexCastOp>(op.getLoc(), rewriter.getIndexType(), pos1);
       Value ptr = rewriter.create<util::ArrayElementPtrOp>(op.getLoc(), util::RefType::get(rewriter.getI8Type()), binaryBuffer, pos1AsIndex);
 
-      Value elemSizeIdx = rewriter.create<util::SizeOfOp>(op.getLoc(), rewriter.getIndexType(), refType.getElementType());
+      Value elemSizeIdx = rewriter.create<util::SizeOfOp>(op.getLoc(), rewriter.getIndexType(), op.getElementType());
       Value lenAsIndex = rewriter.create<arith::IndexCastOp>(op.getLoc(), rewriter.getIndexType(), len);
       Value byteLen = rewriter.create<arith::MulIOp>(op.getLoc(), rewriter.getIndexType(), lenAsIndex, elemSizeIdx);
       Value buffer = rewriter.create<util::BufferCreateOp>(op.getLoc(), util::BufferType::get(getContext(), rewriter.getI8Type()), ptr, byteLen);

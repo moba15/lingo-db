@@ -27,7 +27,67 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
       if (auto managed = mlir::dyn_cast<db::ManagedType>(t)) {
          return managed.needsManagement();
       }
+      if (auto tupleType = mlir::dyn_cast<mlir::TupleType>(t)) {
+         return llvm::any_of(tupleType.getTypes(), [this](mlir::Type t) { return typeNeedsManagement(t); });
+      }
       return false;
+   }
+
+   mlir::Value promoteToGlobal(mlir::OpBuilder& builder, mlir::Location loc, mlir::Value value, llvm::DenseSet<mlir::Value>& notCounted) {
+      if (notCounted.contains(value)) return value;
+      auto type = value.getType();
+      if (auto tupleType = mlir::dyn_cast<mlir::TupleType>(type)) {
+         llvm::SmallVector<mlir::Value> unpacked;
+         builder.createOrFold<util::UnPackOp>(unpacked, loc, value);
+         llvm::SmallVector<mlir::Value> promoted;
+         for (auto v : unpacked) {
+            promoted.push_back(promoteToGlobal(builder, loc, v, notCounted));
+         }
+         return builder.create<util::PackOp>(loc, tupleType, promoted);
+      }
+      auto managed = mlir::dyn_cast<db::ManagedType>(type);
+      if (!managed || !managed.needsManagement()) return value;
+
+      if (auto listType = mlir::dyn_cast<db::ListType>(type)) {
+         mlir::Value promotedList = managed.emitPromoteToGlobal(builder, loc, value);
+         if (typeNeedsManagement(listType.getElementType())) {
+            auto zero = builder.create<mlir::arith::ConstantIndexOp>(loc, 0);
+            auto len = builder.create<db::ListLengthOp>(loc, promotedList);
+            auto step = builder.create<mlir::arith::ConstantIndexOp>(loc, 1);
+            builder.create<mlir::scf::ForOp>(loc, zero, len, step, std::nullopt, [&](mlir::OpBuilder& b, mlir::Location loc, mlir::Value idx, mlir::ValueRange) {
+               mlir::Value element = b.create<db::ListGetOp>(loc, listType.getElementType(), promotedList, idx);
+               mlir::Value promotedElement = promoteToGlobal(b, loc, element, notCounted);
+               b.create<db::ListSetOp>(loc, promotedList, idx, promotedElement);
+               b.create<mlir::scf::YieldOp>(loc);
+            });
+         }
+         return promotedList;
+      }
+
+      if (auto nullableType = mlir::dyn_cast<db::NullableType>(type)) {
+         mlir::Value promotedNullable = managed.emitPromoteToGlobal(builder, loc, value);
+         if (typeNeedsManagement(nullableType.getType())) {
+            auto isNull = builder.create<db::IsNullOp>(loc, promotedNullable);
+            auto ifOp = builder.create<mlir::scf::IfOp>(loc, type, isNull, true);
+            {
+               mlir::OpBuilder::InsertionGuard guard(builder);
+               builder.setInsertionPointToStart(&ifOp.getThenRegion().front());
+               builder.create<mlir::scf::YieldOp>(loc, promotedNullable);
+            }
+            {
+               builder.setInsertionPointToStart(&ifOp.getElseRegion().front());
+               mlir::Value val = builder.create<db::NullableGetVal>(loc, nullableType.getType(), promotedNullable);
+               mlir::Value promotedVal = promoteToGlobal(builder, loc, val, notCounted);
+               mlir::Value falseVal = builder.create<mlir::arith::ConstantOp>(loc, builder.getI1Type(), builder.getIntegerAttr(builder.getI1Type(), 0));
+               mlir::Value repacked = builder.create<db::AsNullableOp>(loc, type, promotedVal, falseVal);
+               builder.create<mlir::scf::YieldOp>(loc, repacked);
+            }
+            return ifOp.getResult(0);
+         }
+         return promotedNullable;
+      }
+
+      return managed.emitPromoteToGlobal(builder, loc, value);
    }
 
    void addUse(mlir::Value val, mlir::Operation* insertBeforeOp, llvm::DenseSet<mlir::Value>& notCounted) {
@@ -186,11 +246,8 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
          // values returned from the subop.map fn outlive the per-row scope;
          // promote them to a global lifetime instead of bumping the refcount.
          for (auto& operand : terminator->getOpOperands()) {
-            auto managed = mlir::dyn_cast<db::ManagedType>(operand.get().getType());
-            if (!managed || !managed.needsManagement()) continue;
-            if (notCounted.contains(operand.get())) continue;
             mlir::OpBuilder builder(block->getTerminator());
-            mlir::Value newVal = managed.emitPromoteToGlobal(builder, block->getTerminator()->getLoc(), operand.get());
+            mlir::Value newVal = promoteToGlobal(builder, block->getTerminator()->getLoc(), operand.get(), notCounted);
             operand.set(newVal);
          }
       } else {
@@ -243,6 +300,9 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
       module.walk([&](subop::MapOp mapOp) {
          llvm::DenseSet<mlir::Value> notCounted;
          for (auto arg : mapOp.getFn().front().getArguments()) {
+            if (mlir::isa<db::ListType>(arg.getType())) {
+               continue;
+            }
             notCounted.insert(arg);
          }
          seedNotCounted(mapOp.getFn(), notCounted);

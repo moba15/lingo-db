@@ -193,8 +193,8 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
             loaded = rewriter.create<arith::AddIOp>(loc, i64Type, dayNanos, msNanos);
          }
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
-         loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadListOp>(loc, array, offset);
-
+         auto convertedType = typeConverter->convertType(listType.getElementType());
+         loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadListOp>(loc, util::RefType::get(rewriter.getContext()), array, offset, convertedType);
       } else {
          return mlir::failure();
       }
@@ -1557,8 +1557,7 @@ class MemoryPromoteToGlobalLowering : public OpConversionPattern<db::MemoryPromo
          return success();
       }
       if (mlir::isa<db::ListType>(t)) {
-         rt::List::addUse(rewriter, loc)({adaptor.getValue()});
-         rewriter.replaceOp(promoteOp, adaptor.getValue());
+         rewriter.replaceOp(promoteOp, rt::List::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
          return success();
       }
       return failure();
