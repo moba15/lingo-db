@@ -180,9 +180,9 @@ def CreateListOp : DB_Op<"create_list", []> {
 def DB_ListGetOp : DB_Op<"list_get", [DeclareOpInterfaceMethods<DB_RefCountedOp, ["getBorrowedResults"]>]> {
     let summary = "Get element from list";
 
-    let arguments = (ins ListType:$list, AnyTypeOf<[AnyInteger, Index]>:$index);
+    let arguments = (ins ListType:$list, Index:$index);
     let results = (outs AnyType:$element);
-    let assemblyFormat = "$list `:` type($list) `[` $index `:` type($index) `]` `:` type($element) attr-dict";
+    let assemblyFormat = "$list `:` type($list) `[` $index `]` `:` type($element) attr-dict";
     let extraClassDefinition = [{
         void $cppClass::getBorrowedResults(llvm::SmallVectorImpl<mlir::Value>& result) {
             result.push_back(getElement());
@@ -193,8 +193,8 @@ def DB_ListGetOp : DB_Op<"list_get", [DeclareOpInterfaceMethods<DB_RefCountedOp,
 def DB_ListSetOp : DB_Op<"list_set", [DeclareOpInterfaceMethods<DB_RefCountedOp, ["getOwnedOperands"]>]> {
     let summary = "Set element in list";
 
-    let arguments = (ins ListType:$list, AnyTypeOf<[AnyInteger, Index]>:$index, AnyType:$element);
-    let assemblyFormat = "$list `:` type($list) `[` $index `:` type($index) `]` `=` $element `:` type($element) attr-dict";
+    let arguments = (ins ListType:$list, Index:$index, AnyType:$element);
+    let assemblyFormat = "$list `:` type($list) `[` $index `]` `=` $element `:` type($element) attr-dict";
     let extraClassDefinition = [{
         void $cppClass::getOwnedOperands(llvm::SmallVectorImpl<mlir::Value>& result) {
             result.push_back(getElement());
