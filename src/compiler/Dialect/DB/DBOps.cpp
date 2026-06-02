@@ -93,6 +93,8 @@ std::tuple<::arrow::Type::type, uint32_t, uint32_t> convertTypeToArrow(mlir::Typ
       param1 = static_cast<uint32_t>(timestampType.getUnit());
    } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
       typeConstant = ::arrow::Type::type::LIST;
+   } else if (auto indexType = mlir::dyn_cast_or_null<IndexType>(type)) {
+      typeConstant = ::arrow::Type::type::UINT64;
    }
    assert(typeConstant != ::arrow::Type::type::NA);
    return {typeConstant, param1, param2};
@@ -126,8 +128,8 @@ OpFoldResult db::ConstantOp::fold(db::ConstantOp::FoldAdaptor adaptor) {
       auto [low, high] = support::parseDecimal(std::get<std::string>(parseResult), decimalType.getS());
       std::vector<uint64_t> parts = {low, high};
       return IntegerAttr::get(mlir::IntegerType::get(getContext(), 128), mlir::APInt(128, parts));
-   } else if (auto integerType = mlir::dyn_cast_or_null<mlir::IntegerType>(type)) {
-      return IntegerAttr::get(integerType, std::get<int64_t>(parseResult));
+   } else if (type.isIntOrIndex()) {
+      return IntegerAttr::get(type, std::get<int64_t>(parseResult));
    } else if (mlir::isa<mlir::FloatType>(type)) {
       return FloatAttr::get(type, std::get<double>(parseResult));
    } else if (mlir::isa<db::StringType>(type)) {
@@ -138,8 +140,6 @@ OpFoldResult db::ConstantOp::fold(db::ConstantOp::FoldAdaptor adaptor) {
       return mlir::StringAttr::get(getContext(), str);
    } else if (mlir::isa<db::IntervalType, db::DateType, db::TimestampType>(type)) {
       return mlir::IntegerAttr::get(mlir::IntegerType::get(getContext(), 64), std::get<int64_t>(parseResult));
-   } else {
-      type.dump();
    }
    return {};
 }
