@@ -212,46 +212,6 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
 };
 
 class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
-   private:
-   std::string arrowDescrFromType(mlir::Type type) const {
-      if (type.isIndex()) {
-         return "int[64]";
-      } else if (isIntegerType(type, 1)) {
-         return "bool";
-      } else if (auto intWidth = getIntegerWidth(type, false)) {
-         return "int[" + std::to_string(intWidth) + "]";
-      } else if (auto uIntWidth = getIntegerWidth(type, true)) {
-         return "uint[" + std::to_string(uIntWidth) + "]";
-      } else if (auto floatType = mlir::dyn_cast_or_null<mlir::FloatType>(type)) {
-         return "float[" + std::to_string(floatType.getWidth()) + "]";
-      } else if (auto decimalType = mlir::dyn_cast_or_null<db::DecimalType>(type)) {
-         auto prec = std::min(decimalType.getP(), 38);
-         return "decimal[" + std::to_string(prec) + "," + std::to_string(decimalType.getS()) + "]";
-      } else if (auto dateType = mlir::dyn_cast_or_null<db::DateType>(type)) {
-         return dateType.getUnit() == db::DateUnitAttr::day ? "date[32]" : "date[64]";
-      } else if (auto timestampType = mlir::dyn_cast_or_null<db::TimestampType>(type)) {
-         return "timestamp[" + std::to_string(static_cast<uint32_t>(timestampType.getUnit())) + "]";
-      } else if (auto intervalType = mlir::dyn_cast_or_null<db::IntervalType>(type)) {
-         if (intervalType.getUnit() == db::IntervalUnitAttr::months) {
-            return "interval_months";
-         } else {
-            return "interval_daytime";
-         }
-      } else if (mlir::isa<db::StringType>(type)) {
-         return "string";
-      } else if (auto charType = mlir::dyn_cast_or_null<db::CharType>(type)) {
-         if (charType.getLen() <= 1) {
-            return "fixed_sized[4]";
-         } else {
-            return "string";
-         }
-      } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(type)) {
-         return "list[" + arrowDescrFromType(listType.getElementType()) + "]";
-      }
-      assert(false);
-      return "";
-   }
-
    public:
    using OpConversionPattern<db::AppendArrowOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(db::AppendArrowOp appendArrowOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
@@ -333,10 +293,7 @@ class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
             rewriter.create<lingodb::compiler::dialect::arrow::AppendVariableSizeBinaryOp>(loc, builder, value, valid);
          }
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
-         //Get element type
-
          rewriter.create<lingodb::compiler::dialect::arrow::AppendListOp>(loc, builder, value, listType.getElementType(), valid);
-
       } else {
          return failure();
       }
@@ -860,8 +817,7 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
    using OpConversionPattern<db::ConstantOp>::OpConversionPattern;
    LogicalResult matchAndRewrite(db::ConstantOp constantOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
       auto type = constantOp.getType();
-      auto stdType = typeConverter->convertType(type);
-      auto lowerScalarConstant = [&](mlir::Type scalarType, mlir::Attribute scalarValue) -> mlir::Value {
+      auto lowerScalarConstant = [&](mlir::Type scalarType, mlir::Attribute scalarValue) -> std::optional<mlir::Value> {
          auto [arrowType, param1, param2] = convertTypeToArrow(scalarType);
          std::variant<int64_t, double, std::string> parseArg;
          if (auto integerAttr = mlir::dyn_cast_or_null<IntegerAttr>(scalarValue)) {
@@ -871,7 +827,7 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
          } else if (auto stringAttr = mlir::dyn_cast_or_null<StringAttr>(scalarValue)) {
             parseArg = stringAttr.str();
          } else {
-            return mlir::Value();
+            return std::nullopt;
          }
 
          auto parseResult = lingodb::compiler::support::parse(parseArg, arrowType, param1, param2);
@@ -897,28 +853,14 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
             return rewriter.create<util::CreateConstVarLen>(constantOp.getLoc(), util::VarLen32Type::get(rewriter.getContext()), rewriter.getStringAttr(std::get<std::string>(parseResult)));
          }
 
-         return mlir::Value();
+         return std::nullopt;
       };
 
-      auto lowerConstant = [&](auto&& self, mlir::Type currentType, mlir::Attribute currentValue) -> mlir::Value {
-         if (auto nullableType = mlir::dyn_cast<db::NullableType>(currentType)) {
-            if (mlir::isa<UnitAttr>(currentValue)) {
-               auto loweredType = typeConverter->convertType(nullableType.getType());
-               auto undefValue = rewriter.create<util::UndefOp>(constantOp.getLoc(), loweredType);
-               return packNullable(rewriter, constantOp.getLoc(), rewriter.create<arith::ConstantOp>(constantOp.getLoc(), rewriter.getI1Type(), rewriter.getIntegerAttr(rewriter.getI1Type(), 1)), undefValue);
-            }
-
-            auto lowered = self(self, nullableType.getType(), currentValue);
-            if (!lowered) {
-               return mlir::Value();
-            }
-            return packNullable(rewriter, constantOp.getLoc(), mlir::Value(), lowered);
-         }
-
+      auto lowerConstant = [&](auto&& self, mlir::Type currentType, mlir::Attribute currentValue) -> std::optional<mlir::Value> {
          if (auto listType = mlir::dyn_cast<db::ListType>(currentType)) {
             auto arrayAttr = mlir::dyn_cast_or_null<mlir::ArrayAttr>(currentValue);
             if (!arrayAttr) {
-               return mlir::Value();
+               return std::nullopt;
             }
 
             auto elementType = listType.getElementType();
@@ -934,7 +876,7 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
 
                mlir::Value ptr = rt::List::append(rewriter, constantOp.getLoc())({list})[0];
                ptr = rewriter.create<util::GenericMemrefCastOp>(constantOp.getLoc(), util::RefType::get(rewriter.getContext(), elementStdType), ptr).getResult();
-               rewriter.create<util::StoreOp>(constantOp.getLoc(), loweredElement, ptr, mlir::Value());
+               rewriter.create<util::StoreOp>(constantOp.getLoc(), loweredElement.value(), ptr, mlir::Value());
             }
 
             return list;
@@ -944,11 +886,11 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
       };
 
       auto loweredValue = lowerConstant(lowerConstant, type, constantOp.getValue());
-      if (!loweredValue) {
+      if (!loweredValue.has_value()) {
          return failure();
       }
 
-      rewriter.replaceOp(constantOp, loweredValue);
+      rewriter.replaceOp(constantOp, loweredValue.value());
       return success();
    }
 };
@@ -1281,7 +1223,7 @@ class ListAppendLowering : public OpConversionPattern<db::ListAppendOp> {
    LogicalResult matchAndRewrite(db::ListAppendOp listAppendOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
       mlir::Value ptr = rt::List::append(rewriter, listAppendOp.getLoc())({adaptor.getList()})[0];
       ptr = rewriter.create<util::GenericMemrefCastOp>(listAppendOp.getLoc(), util::RefType::get(rewriter.getContext(), typeConverter->convertType(listAppendOp.getElement().getType())), ptr);
-      rewriter.create<util::StoreOp>(listAppendOp.getLoc(), listAppendOp.getElement(), ptr, mlir::Value());
+      rewriter.create<util::StoreOp>(listAppendOp.getLoc(), adaptor.getElement(), ptr, mlir::Value());
       rewriter.eraseOp(listAppendOp);
       return success();
    }
@@ -1555,8 +1497,7 @@ class MemoryPromoteToGlobalLowering : public OpConversionPattern<db::MemoryPromo
       if (mlir::isa<db::StringType>(t) || (charType && charType.getLen() > 1)) {
          rewriter.replaceOp(promoteOp, rt::StringRuntime::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
          return success();
-      }
-      if (mlir::isa<db::ListType>(t)) {
+      } else if (mlir::isa<db::ListType>(t)) {
          rewriter.replaceOp(promoteOp, rt::List::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
          return success();
       }
