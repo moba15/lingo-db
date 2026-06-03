@@ -25,7 +25,7 @@ class LogicalTypeWithMods {
       : logicalTypeId(logicalTypeId), typeModifiers(std::move(typeModifiers)), elementType(std::move(elementType)) {}
    catalog::LogicalTypeId logicalTypeId;
    std::vector<std::shared_ptr<Value>> typeModifiers;
-   //Needed for List Types
+   //Required for List Types
    std::shared_ptr<LogicalTypeWithMods> elementType;
 };
 

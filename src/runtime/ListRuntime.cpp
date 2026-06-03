@@ -62,10 +62,10 @@ List* List::promoteToGlobal(List* list) {
    std::ranges::copy(list->values.begin(), list->values.end(), newList->values.begin());
 
    getCurrentExecutionContext()->registerState({newList, [](void* p) {
-      List* list = static_cast<List*>(p);
+                                                   List* list = static_cast<List*>(p);
 
-      delete static_cast<List*>(p);
-   }});
+                                                   delete static_cast<List*>(p);
+                                                }});
    if (list->storageClass == StorageClass::REFCOUNTED) {
       cleanupUse(list);
    }

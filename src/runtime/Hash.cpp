@@ -33,7 +33,7 @@ uint64_t dbHash64(int64_t v) {
 void dbHashFoldPiece(uint64_t& acc, uint64_t piece) {
    acc = byteSwap64(acc) ^ piece;
 }
-
+//TODO AI generated! Check again
 void hashListArrayBatchRuntime(const arrow::ListArray& array, int64_t numRows, std::vector<uint64_t>& running) {
    for (int64_t i = 0; i < numRows; ++i) {
       if (array.IsNull(i)) {
