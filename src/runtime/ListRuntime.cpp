@@ -19,10 +19,13 @@ Buffer List::getBuffer() {
    return Buffer(len * sizeOfType, values.data());
 }
 List* List::fromBuffer(size_t sizeOfType, Buffer buffer) {
-   auto* res = createRefCounted<List>(sizeOfType);
+   auto* res = new List(sizeOfType);
    res->len = buffer.numElements / sizeOfType;
    res->values.resize(buffer.numElements);
    memcpy(res->values.data(), buffer.ptr, buffer.numElements);
+   getCurrentExecutionContext()->registerState({res, [](void* p) {
+                                                   delete static_cast<List*>(p);
+                                                }});
    return res;
 }
 uint8_t* List::at(size_t pos) {
@@ -62,10 +65,8 @@ List* List::promoteToGlobal(List* list) {
    std::ranges::copy(list->values.begin(), list->values.end(), newList->values.begin());
 
    getCurrentExecutionContext()->registerState({newList, [](void* p) {
-      List* list = static_cast<List*>(p);
-
-      delete static_cast<List*>(p);
-   }});
+                                                   delete static_cast<List*>(p);
+                                                }});
    if (list->storageClass == StorageClass::REFCOUNTED) {
       cleanupUse(list);
    }
