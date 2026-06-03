@@ -1,6 +1,5 @@
 #ifndef LINGODB_CATALOG_MLIRTYPES_H
 #define LINGODB_CATALOG_MLIRTYPES_H
-
 #include <memory>
 namespace mlir {
 class Type;

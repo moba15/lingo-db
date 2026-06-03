@@ -140,6 +140,8 @@ OpFoldResult db::ConstantOp::fold(db::ConstantOp::FoldAdaptor adaptor) {
       return mlir::StringAttr::get(getContext(), str);
    } else if (mlir::isa<db::IntervalType, db::DateType, db::TimestampType>(type)) {
       return mlir::IntegerAttr::get(mlir::IntegerType::get(getContext(), 64), std::get<int64_t>(parseResult));
+   } else {
+      type.dump();
    }
    return {};
 }

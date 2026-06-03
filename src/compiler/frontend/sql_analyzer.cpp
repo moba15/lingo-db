@@ -21,7 +21,7 @@ using ResolverScope = llvm::ScopedHashTable<std::string, std::shared_ptr<ast::Co
 
 namespace {
 NullableType normalizeListCharTypes(NullableType type);
-}
+} //namespace
 
 StackGuardNormal::StackGuardNormal() {
 #ifdef ASAN_ACTIVE
