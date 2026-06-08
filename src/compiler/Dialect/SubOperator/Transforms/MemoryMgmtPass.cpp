@@ -266,6 +266,9 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
       module.walk([&](subop::MapOp mapOp) {
          llvm::DenseSet<mlir::Value> notCounted;
          for (auto arg : mapOp.getFn().front().getArguments()) {
+            if (mlir::isa<db::ListType>(arg.getType())) {
+               continue;
+            }
             notCounted.insert(arg);
          }
          seedNotCounted(mapOp.getFn(), notCounted);
