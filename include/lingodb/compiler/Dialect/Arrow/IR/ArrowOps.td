@@ -52,7 +52,6 @@ def Arrow_LoadVariableSizeBinaryOp : Arrow_Op<"array.load_variable_size_binary",
 }
 def Arrow_LoadListOp : Arrow_Op<"array.load_list", [Pure] > {
     let summary = "Loads a list from an array at a given offset";
-    //TODO better description
     let description = [{
         Used for loading list values from an arrow array.
     }];
