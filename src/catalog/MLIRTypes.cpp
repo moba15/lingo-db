@@ -168,6 +168,9 @@ std::shared_ptr<MLIRTypeCreator> createCharTypeCreator(std::shared_ptr<catalog::
 std::shared_ptr<MLIRTypeCreator> createStringTypeCreator(std::shared_ptr<catalog::StringTypeInfo> info) {
    return {};
 }
+std::shared_ptr<MLIRTypeCreator> createListTypeCreator(std::shared_ptr<catalog::ListTypeInfo> info) {
+   return {};
+}
 std::shared_ptr<MLIRTypeCreator> createNoneTypeCreator() {
    return {};
 }
