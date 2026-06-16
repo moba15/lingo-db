@@ -152,6 +152,8 @@ boolean [fF][aA][lL][sS][eE]
 ")"             { return lingodb::parser::make_RP(loc); }
 "["             { return lingodb::parser::make_LB(loc); }
 "]"             { return lingodb::parser::make_RB(loc); }
+"{"             { return lingodb::parser::make_CBL(loc); }
+"}"             { return lingodb::parser::make_CBR(loc); }
 "."             { return lingodb::parser::make_DOT(loc); }
 ","             { return lingodb::parser::make_COMMA(loc); }
 ";"             { return lingodb::parser::make_SEMICOLON(loc); }

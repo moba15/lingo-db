@@ -25,5 +25,13 @@ bool NullableType::needsManagement() const {
    }
    return false;
 }
+bool StructType::needsManagement() const {
+   for (auto t : getTypes()) {
+      if (auto managed = mlir::dyn_cast<ManagedType>(t)) {
+         if (managed.needsManagement()) return true;
+      }
+   }
+   return false;
+}
 
 } // namespace lingodb::compiler::dialect::db

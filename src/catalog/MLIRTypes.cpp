@@ -87,6 +87,22 @@ class ListTypeCreator : public lingodb::catalog::MLIRTypeCreator {
    private:
    std::shared_ptr<lingodb::catalog::ListTypeInfo> info;
 };
+class StructTypeCreator : public lingodb::catalog::MLIRTypeCreator {
+   public:
+   explicit StructTypeCreator(std::shared_ptr<lingodb::catalog::StructTypeInfo> info) : info(info) {}
+   mlir::Type createType(mlir::MLIRContext* context) override {
+      std::vector<mlir::Type> types;
+      std::vector<mlir::StringAttr> names;
+      for (auto& member : info->getMembers()) {
+         types.push_back(member.second.getMLIRTypeCreator()->createType(context));
+         names.push_back(mlir::StringAttr::get(context, member.first));
+      }
+      return lingodb::compiler::dialect::db::StructType::get(context, types, names);
+   }
+
+   private:
+   std::shared_ptr<lingodb::catalog::StructTypeInfo> info;
+};
 class NoneTypeCreator : public lingodb::catalog::MLIRTypeCreator {
    public:
    mlir::Type createType(mlir::MLIRContext* context) override {
@@ -127,6 +143,9 @@ std::shared_ptr<MLIRTypeCreator> createStringTypeCreator(std::shared_ptr<catalog
 }
 std::shared_ptr<MLIRTypeCreator> createListTypeCreator(std::shared_ptr<catalog::ListTypeInfo> info) {
    return std::make_shared<ListTypeCreator>(info);
+}
+std::shared_ptr<MLIRTypeCreator> createStructTypeCreator(std::shared_ptr<catalog::StructTypeInfo> info) {
+   return std::make_shared<StructTypeCreator>(info);
 }
 std::shared_ptr<MLIRTypeCreator> createNoneTypeCreator() {
    return std::make_shared<NoneTypeCreator>();
@@ -169,6 +188,9 @@ std::shared_ptr<MLIRTypeCreator> createStringTypeCreator(std::shared_ptr<catalog
    return {};
 }
 std::shared_ptr<MLIRTypeCreator> createListTypeCreator(std::shared_ptr<catalog::ListTypeInfo> info) {
+   return {};
+}
+std::shared_ptr<MLIRTypeCreator> createStructTypeCreator(std::shared_ptr<catalog::StructTypeInfo> info) {
    return {};
 }
 std::shared_ptr<MLIRTypeCreator> createNoneTypeCreator() {

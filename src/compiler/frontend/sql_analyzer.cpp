@@ -656,6 +656,16 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
 
          return listExpression;
       }
+      case ast::ExpressionClass::STRUCT: {
+         auto structExpr = std::static_pointer_cast<ast::StructExpression>(rootNode);
+         std::ranges::for_each(structExpr->fields, [&](auto& field) {
+            field.second = canonicalizeParsedExpression(field.second, context, false, extendNode);
+         });
+         if (extend) {
+            return extendExpr(structExpr);
+         }
+         return structExpr;
+      }
       case ast::ExpressionClass::BETWEEN: {
          auto betweenExpr = std::static_pointer_cast<ast::BetweenExpression>(rootNode);
          betweenExpr->input = canonicalizeParsedExpression(betweenExpr->input, context, false, extendNode);
@@ -1170,6 +1180,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                case ast::ExpressionClass::BOUND_COMPARISON:
                case ast::ExpressionClass::BOUND_CONSTANT:
                case ast::ExpressionClass::BOUND_LIST:
+               case ast::ExpressionClass::BOUND_STRUCT:
                case ast::ExpressionClass::BOUND_OPERATOR:
                case ast::ExpressionClass::BOUND_CAST:
                case ast::ExpressionClass::BOUND_SUBQUERY:
@@ -2409,6 +2420,23 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeExpression(std::s
          }
 
          return drv.nf.node<ast::BoundListExpression>(listExpr->loc, boundValues, boundListSelection, commonType, listType, resultType, listExpr->alias);
+      }
+      case ast::ExpressionClass::STRUCT: {
+         auto structExpr = std::static_pointer_cast<ast::StructExpression>(rootNode);
+         std::unordered_map<std::string, std::shared_ptr<ast::BoundExpression>> boundFields;
+         std::vector<std::pair<std::string, catalog::Type>> members;
+
+         for (auto& [key, value] : structExpr->fields) {
+            auto boundExpr = analyzeExpression(value, context, resolverScope);
+            boundFields.emplace(key, boundExpr);
+            if (!boundExpr->resultType.has_value()) {
+               error("Struct field has no valid type", value->loc);
+            }
+            members.emplace_back(key, boundExpr->resultType->type);
+         }
+
+         auto resultType = NullableType(catalog::Type::structType(members), false);
+         return drv.nf.node<ast::BoundStructExpression>(structExpr->loc, boundFields, resultType, structExpr->alias);
       }
       default: error("Expression type not implemented", rootNode->loc);
    }

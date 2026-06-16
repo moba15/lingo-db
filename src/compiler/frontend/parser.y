@@ -68,6 +68,8 @@
 %token 			RP		")"
 %token 			LB		"["
 %token 			RB		"]"
+%token 			CBL		"{"
+%token 			CBR		"}"
 %token 			DOT		"."
 %token          PERCENT "%"
 %token 			COMMA		","
@@ -355,6 +357,9 @@
 
 %type<std::optional<lingodb::ast::ListExpression::ListSelection>> opt_list_extraction
 %type<lingodb::ast::ListExpression::ListSelection> list_extraction
+
+%type<std::shared_ptr<lingodb::ast::StructExpression>> struct_expr
+%type<std::unordered_map<std::string, std::shared_ptr<lingodb::ast::ParsedExpression>>> key_value_list
 
 
 /* Precedence: lowest to highest */
@@ -1629,6 +1634,11 @@ c_expr:
     {
         $$ = $list_expr;
     }
+    | struct_expr
+    {
+        $$ = $struct_expr;
+       
+    }
     //TODO | explicit_row
     //TODO | implicit_row
     //TODO | GROUPING LP expr_list RP
@@ -1912,6 +1922,40 @@ list_expr:
     {
         $$ = mkNode<lingodb::ast::ListExpression>(@$, std::vector<std::shared_ptr<lingodb::ast::ParsedExpression>>(), std::nullopt);
     }
+    ;
+struct_expr:
+    CBL key_value_list CBR
+    {
+        $$ = mkNode<lingodb::ast::StructExpression>(@$, $key_value_list);
+    }
+
+    ;
+key_value_list:
+    ColId COLON a_expr
+    {
+        auto map = std::unordered_map<std::string, std::shared_ptr<lingodb::ast::ParsedExpression>>();
+        map.emplace($ColId, $a_expr);
+        $$ = map;
+    }
+    | STRING_VALUE COLON a_expr
+    {
+        auto map = std::unordered_map<std::string, std::shared_ptr<lingodb::ast::ParsedExpression>>();
+        map.emplace($STRING_VALUE, $a_expr);
+        $$ = map;
+    }
+    | key_value_list[map] COMMA ColId COLON a_expr
+    {
+        $map.emplace($ColId, $a_expr);
+        $$ = $map;
+    }
+    | key_value_list[map] COMMA STRING_VALUE COLON a_expr 
+    {
+        $map.emplace($STRING_VALUE, $a_expr);
+        $$ = $map;
+    }
+
+    ;
+
 
 opt_list_extraction:
     %empty 
@@ -3430,7 +3474,7 @@ AexprConst:
         auto t = mkNode<lingodb::ast::ConstantExpression>(@$); t->value=std::make_shared<lingodb::ast::NullValue>(); $$=t; 
 
     }
-;
+    ;
 //TODO Set Iconst to unsigned long
 //TODO create rule SignedIconst to handle signed integers!
 Iconst:	

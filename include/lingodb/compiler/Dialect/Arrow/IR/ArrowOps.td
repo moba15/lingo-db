@@ -98,6 +98,16 @@ def Arrow_AppendListOp : Arrow_Op<"array_builder.append_list"> {
     let assemblyFormat = " $builder `,` $value `:` type($value) `,` $elementType ( `,` $valid^ )? attr-dict";
 }
 
+def Arrow_AppendStructOp : Arrow_Op<"array_builder.append_struct"> {
+    let summary = "Appends a struct to an Arrow array builder.";
+    let description = [{
+        This operation appends a struct to an Arrow array builder, optionally with a validity flag.
+    }];
+
+    let arguments = (ins Arrow_ArrayBuilder:$builder, AnyType: $value, TypeAttr:$structType,  Optional<I1>: $valid);
+    let assemblyFormat = " $builder `,` $value `:` type($value) `,` $structType ( `,` $valid^ )? attr-dict";
+}
+
 def Arrow_BuilderFromPtr : Arrow_Op<"array_builder.from_ptr", [Pure] > {
     let summary = "Creates a builder value from a pointer to an ArrowColumn builder that is managed in the runtime";
     let arguments = (ins RefType:$ptr);

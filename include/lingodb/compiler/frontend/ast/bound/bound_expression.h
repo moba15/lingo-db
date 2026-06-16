@@ -198,5 +198,13 @@ class BoundListExpression : public BoundExpression {
    NullableType elementType;
    NullableType listType;
 };
+
+class BoundStructExpression : public BoundExpression {
+   public:
+   static constexpr const ExpressionClass cType = ExpressionClass::BOUND_STRUCT;
+   BoundStructExpression(std::unordered_map<std::string, std::shared_ptr<BoundExpression>> fields, NullableType resultType, std::string alias) : BoundExpression(cType, ExpressionType::VALUE_STRUCT, resultType, alias), fields(std::move(fields)) {}
+
+   std::unordered_map<std::string, std::shared_ptr<BoundExpression>> fields;
+};
 } // namespace lingodb::ast
 #endif

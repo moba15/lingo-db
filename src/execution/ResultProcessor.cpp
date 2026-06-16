@@ -1,25 +1,16 @@
 #include <iomanip>
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
-#include <arrow/pretty_print.h>
-#include <arrow/table.h>
+// Replaces <arrow/pretty_print.h> to give us access to arrays and scalars directly
+#include <arrow/api.h>
 
 #include "lingodb/execution/ResultProcessing.h"
 #include "lingodb/runtime/ArrowTable.h"
 #include <functional>
 
 namespace {
-unsigned char hexval(unsigned char c) {
-   if ('0' <= c && c <= '9')
-      return c - '0';
-   else if ('a' <= c && c <= 'f')
-      return c - 'a' + 10;
-   else if ('A' <= c && c <= 'F')
-      return c - 'A' + 10;
-   else
-      abort();
-}
 
 class TableRetriever : public lingodb::execution::ResultProcessor {
    std::shared_ptr<arrow::Table>& result;
@@ -40,95 +31,62 @@ void printTable(const std::shared_ptr<arrow::Table>& table) {
       return;
    }
 
-   std::vector<std::string> columnReps;
-   std::vector<size_t> positions;
-   arrow::PrettyPrintOptions options;
-   options.indent_size = 0;
-   options.window = 100;
-   options.element_size_limit = 10000;
+   // 1. Print Table Header
    std::cout << "|";
    std::string rowSep = "-";
-   std::vector<bool> convertHex;
-   for (auto c : table->columns()) {
-      std::cout << std::setw(30) << table->schema()->field(positions.size())->name() << "  |";
-      convertHex.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::FIXED_SIZE_BINARY);
+   for (int i = 0; i < table->num_columns(); ++i) {
+      std::cout << std::setw(30) << table->schema()->field(i)->name() << "  |";
       rowSep += std::string(33, '-');
-      std::string str;
-      arrow::PrettyPrint(*c.get(), options, &str); //NOLINT (clang-diagnostic-unused-result)
-      columnReps.push_back(str);
-      positions.push_back(0);
    }
-   std::cout << std::endl
-             << rowSep << std::endl;
-   bool cont = true;
-   while (cont) {
-      cont = false;
-      bool skipNL = false;
-      for (size_t column = 0; column < columnReps.size(); column++) {
-         char32_t currChar = U'\0';
-         uint8_t currCharSize = 0;
+   std::cout << "\n" << rowSep << "\n";
 
-         bool first = true;
-         std::stringstream out;
-         while (positions[column] < columnReps[column].size()) {
-            cont = true;
-            char curr = columnReps[column][positions[column]];
-            char next = columnReps[column][positions[column] + 1];
-            positions[column]++;
-            if (first && (curr == '[' || curr == ']' || curr == ',')) {
-               continue;
-            }
-            if (curr == ',' && next == '\n') {
-               continue;
-            }
-            if (curr == '\n') {
-               break;
-            } else {
-               first = false;
-               if (convertHex[column] && isxdigit(curr)) {
-                  if (currCharSize % 2 == 0)
-                     currChar |= hexval(curr) << (currCharSize++ * 4 + 4);
-                  else
-                     currChar |= hexval(curr) << (currCharSize++ * 4 - 4);
-               } else if ((curr & (1 << 7)) == (1 << 7)) {
-                  const auto extendedCurr = static_cast<char32_t>(curr) & 0xFF;
-                  currChar |= static_cast<char32_t>(extendedCurr << (currCharSize * 4));
-                  currCharSize += 2;
+   // 2. Iterate Row-by-Row
+   for (int64_t row = 0; row < table->num_rows(); ++row) {
+      std::cout << "|";
+      for (int col = 0; col < table->num_columns(); ++col) {
+         auto chunked_arr = table->column(col);
+
+         // Arrow Tables are chunked. Find the specific chunk that contains our target row.
+         int64_t chunk_row = row;
+         int chunk_idx = 0;
+         while (chunk_idx < chunked_arr->num_chunks() && chunk_row >= chunked_arr->chunk(chunk_idx)->length()) {
+            chunk_row -= chunked_arr->chunk(chunk_idx)->length();
+            chunk_idx++;
+         }
+
+         std::string outStr = "";
+         if (chunk_idx < chunked_arr->num_chunks()) {
+            auto array = chunked_arr->chunk(chunk_idx);
+            auto result = array->GetScalar(chunk_row);
+
+            if (result.ok() && result.ValueOrDie()->is_valid) {
+               auto scalar = result.ValueOrDie();
+
+               // Bypass Arrow's formatting for binaries to output raw bytes directly
+               // (This replaces your previous manual hex-to-char conversion loop)
+               if (scalar->type->id() == arrow::Type::FIXED_SIZE_BINARY) {
+                  auto bin_scalar = std::static_pointer_cast<arrow::FixedSizeBinaryScalar>(scalar);
+                  outStr = std::string(reinterpret_cast<const char*>(bin_scalar->value->data()), bin_scalar->value->size());
+               } else if (arrow::is_base_binary_like(scalar->type->id())) {
+                  auto bin_scalar = std::static_pointer_cast<arrow::BaseBinaryScalar>(scalar);
+                  outStr = std::string(reinterpret_cast<const char*>(bin_scalar->value->data()), bin_scalar->value->size());
                } else {
-                  if (currChar != U'\0') {
-                     for (size_t i = 0; i < currCharSize / 2; i++) {
-                        const char slice = reinterpret_cast<char*>(&currChar)[i];
-                        if (slice != 0) {
-                           out << slice;
-                        }
-                     }
-                     currChar = U'\0';
-                     currCharSize = 0;
-                  }
-                  out << curr;
+                  // For primitive types, Lists, and Structs, use Arrow's built-in string conversion
+                  // A struct will beautifully format as: {"key1": val1, "key2": val2}
+                  outStr = scalar->ToString();
                }
+            } else {
+               outStr = "NULL";
             }
          }
-         if (currChar != U'\0') {
-            for (size_t i = 0; i < currCharSize / 2; i++) {
-               const char slice = reinterpret_cast<char*>(&currChar)[i];
-               if (slice != 0) {
-                  out << slice;
-               }
-            }
-         }
-         if (first) {
-            skipNL = true;
-         } else {
-            if (column == 0) {
-               std::cout << "|";
-            }
-            std::cout << std::setw(30) << out.str() << "  |";
-         }
+
+         // Prevent any stray newlines (from nested schemas) from breaking table alignment
+         std::replace(outStr.begin(), outStr.end(), '\n', ' ');
+
+         // Print cell with consistent padding
+         std::cout << std::setw(30) << outStr << "  |";
       }
-      if (!skipNL) {
-         std::cout << "\n";
-      }
+      std::cout << "\n";
    }
 }
 
@@ -140,6 +98,7 @@ class TablePrinter : public lingodb::execution::ResultProcessor {
       printTable(table);
    }
 };
+
 class BatchedTablePrinter : public lingodb::execution::ResultProcessor {
    void process(lingodb::runtime::ExecutionContext* executionContext) override {
       for (size_t i = 0;; i++) {
@@ -150,6 +109,7 @@ class BatchedTablePrinter : public lingodb::execution::ResultProcessor {
       }
    }
 };
+
 } // namespace
 
 std::unique_ptr<lingodb::execution::ResultProcessor> lingodb::execution::createTableRetriever(std::shared_ptr<arrow::Table>& result) {
