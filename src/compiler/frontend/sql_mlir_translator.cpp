@@ -49,6 +49,12 @@ mlir::Value normalizeListUpperBound(mlir::OpBuilder& builder, mlir::Location loc
    auto negativeIndex = builder.create<mlir::arith::AddIOp>(location, index, listLength);
    return builder.create<mlir::arith::SelectOp>(location, isNegative, negativeIndex, index);
 }
+mlir::Type getBaseType(mlir::Type t) {
+   if (auto nullableT = mlir::dyn_cast_or_null<db::NullableType>(t)) {
+      return nullableT.getType();
+   }
+   return t;
+}
 } // namespace
 
 SQLMlirTranslator::SQLMlirTranslator(mlir::ModuleOp moduleOp, catalog::Catalog* catalog) : moduleOp(moduleOp), catalog(catalog),
@@ -1050,6 +1056,24 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          }
 
          return list;
+      }
+      case ast::ExpressionClass::BOUND_STRUCT: {
+         auto boundStruct = std::static_pointer_cast<ast::BoundStructExpression>(expression);
+         auto mlirType = boundStruct->resultType->toMlirType(mlirContext);
+         auto structType = mlir::cast<db::StructType>(getBaseType(mlirType));
+
+         std::vector<mlir::Value> values;
+         for (auto nameAttr : structType.getNames()) {
+            std::string name = mlir::cast<mlir::StringAttr>(nameAttr).getValue().str();
+            auto fieldExpr = boundStruct->fields.at(name);
+            auto translated = translateExpression(builder, fieldExpr, context);
+            values.push_back(fieldExpr->resultType->castValue(builder, translated));
+         }
+         mlir::Value res = builder.create<db::StructCreateOp>(exprLocation, structType, values);
+         if (mlir::isa<db::NullableType>(mlirType)) {
+            res = builder.create<db::AsNullableOp>(exprLocation, mlirType, res);
+         }
+         return res;
       }
 
       default: translatorError("Expression not implemented", expression->loc);

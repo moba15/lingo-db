@@ -30,6 +30,7 @@ class ArrowColumnBuilder {
    void addFixedSized(bool isValid, uint8_t* value);
 
    void addList(bool isValid, class List* list, VarLen32 type);
+   void addStruct(bool isValid, class Struct* list, VarLen32 type);
    void addBinary(bool isValid, runtime::VarLen32);
    void merge(ArrowColumnBuilder* other);
    ArrowColumn* finish();

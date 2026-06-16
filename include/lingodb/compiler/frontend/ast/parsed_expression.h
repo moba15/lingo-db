@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include <arrow/vendored/datetime/date.h>
 namespace lingodb::ast {
 class OrderByModifier;
 enum class ExpressionType : uint8_t;
@@ -113,6 +114,7 @@ enum class ExpressionType : uint8_t {
    VALUE_LIST = 80,
    VALUE_SCALAR = 81,
    VALUE_DEFAULT = 82,
+   VALUE_STRUCT = 83,
 
    // -----------------------------
    // Aggregates
@@ -216,6 +218,7 @@ enum class ExpressionClass : uint8_t {
    BETWEEN = 19,
    LAMBDA_REF = 20,
    LIST = 21,
+   STRUCT = 22,
    //===--------------------------------------------------------------------===//
    // Bound Expressions
    //===--------------------------------------------------------------------===//
@@ -239,6 +242,7 @@ enum class ExpressionClass : uint8_t {
    BOUND_LAMBDA_REF = 42,
    BOUND_STAR = 43,
    BOUND_LIST = 44,
+   BOUND_STRUCT = 45,
    //===--------------------------------------------------------------------===//
    // Miscellaneous
    //===--------------------------------------------------------------------===//
@@ -576,5 +580,12 @@ class ListExpression : public ParsedExpression {
    std::optional<ListSelection> selection;
 };
 
+class StructExpression : public ParsedExpression {
+   public:
+   static constexpr const ExpressionClass cType = ExpressionClass::STRUCT;
+   StructExpression(std::unordered_map<std::string, std::shared_ptr<ParsedExpression>> fields) : ParsedExpression(ExpressionType::VALUE_STRUCT, cType), fields(std::move(fields)) {}
+
+   std::unordered_map<std::string, std::shared_ptr<ParsedExpression>> fields;
+};
 } // namespace lingodb::ast
 #endif

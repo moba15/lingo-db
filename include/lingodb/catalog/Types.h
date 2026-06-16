@@ -7,6 +7,8 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility>
+#include <vector>
 namespace lingodb::utility {
 class Serializer;
 class Deserializer;
@@ -30,6 +32,7 @@ enum class LogicalTypeId : uint8_t {
    NONE = 12,
    INDEX = 13,
    LIST = 14,
+   STRUCT = 15,
 };
 class TypeInfo {
    protected:
@@ -42,6 +45,7 @@ class TypeInfo {
       DateInfo = 5,
       IntervalInfo = 6,
       ListInfo = 7,
+      StructInfo = 8,
    };
    TypeInfoType infoType;
    TypeInfo(TypeInfoType infoType) : infoType(infoType) {}
@@ -83,6 +87,7 @@ class Type {
    static Type intervalDaytime();
    static Type intervalMonths();
    static Type listType(Type elementType);
+   static Type structType(std::vector<std::pair<std::string, Type>> members);
    static Type noneType();
    static Type index();
 };
@@ -198,6 +203,17 @@ class ListTypeInfo : public TypeInfo {
 
    private:
    Type elementType;
+};
+class StructTypeInfo : public TypeInfo {
+   public:
+   StructTypeInfo(std::vector<std::pair<std::string, Type>> members) : TypeInfo(TypeInfoType::StructInfo), members(std::move(members)) {}
+   void serializeConcrete(utility::Serializer& serializer) const override;
+   static std::shared_ptr<StructTypeInfo> deserialize(utility::Deserializer& deserializer);
+   std::string toString();
+   auto& getMembers() { return members; }
+
+   private:
+   std::vector<std::pair<std::string, Type>> members;
 };
 } //end namespace lingodb::catalog
 #endif //LINGODB_CATALOG_TYPES_H

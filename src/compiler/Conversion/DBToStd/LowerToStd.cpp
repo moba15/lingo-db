@@ -15,6 +15,7 @@
 #include "lingodb/compiler/runtime/Hashtable.h"
 #include "lingodb/compiler/runtime/ListRuntime.h"
 #include "lingodb/compiler/runtime/StringRuntime.h"
+#include "lingodb/compiler/runtime/StructRuntime.h"
 
 #include "mlir/Conversion/AffineToStandard/AffineToStandard.h"
 #include "mlir/Dialect/Arith/IR/Arith.h"
@@ -294,6 +295,8 @@ class AppendArrowLowering : public OpConversionPattern<db::AppendArrowOp> {
          }
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
          rewriter.create<lingodb::compiler::dialect::arrow::AppendListOp>(loc, builder, value, listType.getElementType(), valid);
+      } else if (auto structType = mlir::dyn_cast_or_null<db::StructType>(baseType)) {
+         rewriter.create<lingodb::compiler::dialect::arrow::AppendStructOp>(loc, builder, value, mlir::TypeAttr::get(structType), valid);
       } else {
          return failure();
       }
@@ -1440,6 +1443,30 @@ class DictIterGetValueLowering : public OpConversionPattern<db::DictIterGetValue
       return success();
    }
 };
+class CreateStructLowering : public OpConversionPattern<db::StructCreateOp> {
+   public:
+   using OpConversionPattern<db::StructCreateOp>::OpConversionPattern;
+   LogicalResult matchAndRewrite(db::StructCreateOp createStructOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
+      auto loc = createStructOp.getLoc();
+      auto structType = createStructOp.getType();
+
+      llvm::SmallVector<mlir::Type> memberTypes;
+      for (auto t : structType.getTypes()) {
+         memberTypes.push_back(typeConverter->convertType(t));
+      }
+      auto tupleType = mlir::TupleType::get(rewriter.getContext(), memberTypes);
+
+      auto typeSize = rewriter.create<util::SizeOfOp>(loc, rewriter.getIndexType(), tupleType);
+      auto strct = rt::Struct::create(rewriter, loc)({typeSize})[0];
+      auto dataPtr = rt::Struct::data(rewriter, loc)({strct})[0];
+      auto tuplePtr = rewriter.create<util::GenericMemrefCastOp>(loc, util::RefType::get(rewriter.getContext(), tupleType), dataPtr);
+      auto packed = rewriter.create<util::PackOp>(loc, tupleType, adaptor.getVals());
+      rewriter.create<util::StoreOp>(loc, packed, tuplePtr, mlir::Value());
+
+      rewriter.replaceOp(createStructOp, strct);
+      return success();
+   }
+};
 class MemoryCleanupUseLowering : public OpConversionPattern<db::MemoryCleanupUse> {
    public:
    using OpConversionPattern<db::MemoryCleanupUse>::OpConversionPattern;
@@ -1459,6 +1486,11 @@ class MemoryCleanupUseLowering : public OpConversionPattern<db::MemoryCleanupUse
          } else {
             rt::List::cleanupUse(rewriter, loc)({adaptor.getValue()});
          }
+         rewriter.eraseOp(cleanupUse);
+         return success();
+      }
+      if (mlir::isa<db::StructType>(t)) {
+         rt::Struct::cleanupUse(rewriter, loc)({adaptor.getValue()});
          rewriter.eraseOp(cleanupUse);
          return success();
       }
@@ -1483,6 +1515,11 @@ class MemoryAddUseLowering : public OpConversionPattern<db::MemoryAddUse> {
          rewriter.eraseOp(addUse);
          return success();
       }
+      if (mlir::isa<db::StructType>(t)) {
+         rt::Struct::addUse(rewriter, loc)({adaptor.getValue()});
+         rewriter.eraseOp(addUse);
+         return success();
+      }
       return failure();
    }
 };
@@ -1499,6 +1536,9 @@ class MemoryPromoteToGlobalLowering : public OpConversionPattern<db::MemoryPromo
          return success();
       } else if (mlir::isa<db::ListType>(t)) {
          rewriter.replaceOp(promoteOp, rt::List::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
+         return success();
+      } else if (mlir::isa<db::StructType>(t)) {
+         rewriter.replaceOp(promoteOp, rt::Struct::promoteToGlobal(rewriter, loc)({adaptor.getValue()})[0]);
          return success();
       }
       return failure();
@@ -1543,6 +1583,9 @@ void DBToStdLoweringPass::runOnOperation() {
       return util::VarLen32Type::get(ctxt);
    });
    typeConverter.addConversion([&](db::ListType) {
+      return util::RefType::get(ctxt, mlir::IntegerType::get(ctxt, 8));
+   });
+   typeConverter.addConversion([&](db::StructType) {
       return util::RefType::get(ctxt, mlir::IntegerType::get(ctxt, 8));
    });
    typeConverter.addConversion([&](db::DictType) {
@@ -1662,6 +1705,7 @@ void DBToStdLoweringPass::runOnOperation() {
 
    patterns.insert<HashLowering>(typeConverter, ctxt);
    patterns.insert<CreateListLowering>(typeConverter, ctxt);
+   patterns.insert<CreateStructLowering>(typeConverter, ctxt);
    patterns.insert<ListLengthLowering>(typeConverter, ctxt);
    patterns.insert<ListAppendLowering>(typeConverter, ctxt);
    patterns.insert<ListGetLowering>(typeConverter, ctxt);
