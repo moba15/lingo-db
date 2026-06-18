@@ -899,6 +899,12 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             case ast::ExpressionType::OPERATOR_NOT: {
                return builder.create<db::NotOp>(exprLocation, translateExpression(builder, operatorExpr->children[0], context));
             }
+            case ast::ExpressionType::STRUCT_EXTRACT: {
+               auto structVal = translateExpression(builder, operatorExpr->children[0], context);
+               auto fieldName = std::static_pointer_cast<ast::BoundConstantExpression>(operatorExpr->children[1])->value;
+               auto fieldNameStr = std::static_pointer_cast<ast::StringValue>(fieldName)->sVal;
+               return builder.create<db::StructGetOp>(exprLocation, operatorExpr->resultType->toMlirType(mlirContext), structVal, builder.getStringAttr(fieldNameStr));
+            }
             default: translatorError("Operator not implemented", expression->loc);
          }
       }

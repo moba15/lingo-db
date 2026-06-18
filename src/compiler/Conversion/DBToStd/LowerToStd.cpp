@@ -1467,6 +1467,39 @@ class CreateStructLowering : public OpConversionPattern<db::StructCreateOp> {
       return success();
    }
 };
+class StructGetLowering : public OpConversionPattern<db::StructGetOp> {
+   public:
+   using OpConversionPattern<db::StructGetOp>::OpConversionPattern;
+   LogicalResult matchAndRewrite(db::StructGetOp structGetOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
+      auto loc = structGetOp.getLoc();
+      auto structType = mlir::cast<db::StructType>(structGetOp.getStrct().getType());
+      auto fieldName = structGetOp.getName().str();
+      size_t fieldIndex = 0;
+      bool found = false;
+      for (auto nameAttr : structType.getNames()) {
+         if (mlir::cast<mlir::StringAttr>(nameAttr).getValue().str() == fieldName) {
+            found = true;
+            break;
+         }
+         fieldIndex++;
+      }
+      if (!found) return failure();
+
+      llvm::SmallVector<mlir::Type> memberTypes;
+      for (auto t : structType.getTypes()) {
+         memberTypes.push_back(typeConverter->convertType(t));
+      }
+      auto tupleType = mlir::TupleType::get(rewriter.getContext(), memberTypes);
+      auto elementType = memberTypes[fieldIndex];
+
+      mlir::Value dataPtr = rt::Struct::data(rewriter, loc)({adaptor.getStrct()})[0];
+      mlir::Value tuplePtr = rewriter.create<util::GenericMemrefCastOp>(loc, util::RefType::get(rewriter.getContext(), tupleType), dataPtr);
+      mlir::Value elementPtr = rewriter.create<util::TupleElementPtrOp>(loc, util::RefType::get(rewriter.getContext(), elementType), tuplePtr, fieldIndex);
+      auto loadOp = rewriter.create<util::LoadOp>(loc, elementPtr);
+      rewriter.replaceOp(structGetOp, loadOp.getVal());
+      return success();
+   }
+};
 class MemoryCleanupUseLowering : public OpConversionPattern<db::MemoryCleanupUse> {
    public:
    using OpConversionPattern<db::MemoryCleanupUse>::OpConversionPattern;
@@ -1706,6 +1739,7 @@ void DBToStdLoweringPass::runOnOperation() {
    patterns.insert<HashLowering>(typeConverter, ctxt);
    patterns.insert<CreateListLowering>(typeConverter, ctxt);
    patterns.insert<CreateStructLowering>(typeConverter, ctxt);
+   patterns.insert<StructGetLowering>(typeConverter, ctxt);
    patterns.insert<ListLengthLowering>(typeConverter, ctxt);
    patterns.insert<ListAppendLowering>(typeConverter, ctxt);
    patterns.insert<ListGetLowering>(typeConverter, ctxt);
