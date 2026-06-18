@@ -195,7 +195,7 @@ class SQLQueryAnalyzer {
    std::shared_ptr<ast::BoundExpression> analyzeWindowExpression(std::shared_ptr<ast::WindowExpression> windowExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundExpression> analyzeCastExpression(std::shared_ptr<ast::CastExpression> castExpr, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
    std::shared_ptr<ast::BoundExpression> analyzeFunctionExpression(std::shared_ptr<ast::FunctionExpression> function, std::shared_ptr<SQLContext> context, ResolverScope& resolverScope);
-   std::shared_ptr<ast::BoundColumnRefExpression> analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context);
+   std::shared_ptr<ast::BoundExpression> analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context);
 
    ast::ExpressionType stringToExpressionType(const std::string& parserStr) {
       std::string str = parserStr;
