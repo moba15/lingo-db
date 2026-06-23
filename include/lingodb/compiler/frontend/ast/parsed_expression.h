@@ -243,6 +243,7 @@ enum class ExpressionClass : uint8_t {
    BOUND_STAR = 43,
    BOUND_LIST = 44,
    BOUND_STRUCT = 45,
+   BOUND_STRUCT_EXTRACT = 46,
    //===--------------------------------------------------------------------===//
    // Miscellaneous
    //===--------------------------------------------------------------------===//

@@ -669,13 +669,6 @@ std::shared_ptr<ast::ParsedExpression> SQLCanonicalizer::canonicalizeParsedExpre
          }
          return structExpr;
       }
-      case ast::ExpressionClass::COLUMN_REF: {
-         auto columnRef = std::static_pointer_cast<ast::ColumnRefExpression>(rootNode);
-         if (extend && columnRef->columnNames.size() > 1) {
-            return extendExpr(columnRef);
-         }
-         return columnRef;
-      }
       case ast::ExpressionClass::BETWEEN: {
          auto betweenExpr = std::static_pointer_cast<ast::BetweenExpression>(rootNode);
          betweenExpr->input = canonicalizeParsedExpression(betweenExpr->input, context, false, extendNode);
@@ -1072,18 +1065,32 @@ std::shared_ptr<ast::SetNode> SQLQueryAnalyzer::analyzeSetNode(std::shared_ptr<a
    }
 }
 
+void SQLQueryAnalyzer::unnestStruct(const std::string& relationName, std::shared_ptr<ast::ColumnReference> structColumn, std::shared_ptr<ast::ExtendNode> extendNode, std::vector<std::shared_ptr<ast::ParsedExpression>>& newTargets, location loc) {
+   static int structExtractId = 0;
+   auto structInfo = structColumn->resultType.type.getInfo<catalog::StructTypeInfo>();
+   for (auto& member : structInfo->getMembers()) {
+      auto extractExpr = drv.nf.node<ast::ColumnRefExpression>(loc, std::vector<std::string>{relationName, member.first});
+      std::string uniqueAlias = "struct_ext_" + std::to_string(structExtractId++);
+      extractExpr->alias = uniqueAlias;
+      extendNode->extensions.push_back(extractExpr);
+
+      auto selectRef = drv.nf.node<ast::ColumnRefExpression>(loc, std::vector<std::string>{uniqueAlias});
+      selectRef->alias = member.first; // The final name should be the member name
+      selectRef->forceToUseAlias = true;
+      newTargets.push_back(selectRef);
+   }
+}
+
 std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::shared_ptr<ast::PipeOperator> pipeOperator, std::shared_ptr<SQLContext>& context, ResolverScope& resolverScope) {
    std::shared_ptr<ast::AstNode> boundAstNode = pipeOperator->node;
    switch (pipeOperator->pipeOpType) {
       case ast::PipeOperatorType::SELECT: {
          assert(pipeOperator->node->nodeType == ast::NodeType::TARGET_LIST);
          auto targetSelection = std::static_pointer_cast<ast::TargetList>(pipeOperator->node);
-         
-         // Pre-check for struct expansions
+
          std::vector<std::shared_ptr<ast::ParsedExpression>> newTargets;
          bool needsExtend = false;
          auto extendNode = drv.nf.node<ast::ExtendNode>(pipeOperator->loc, true);
-         static int structExtractId = 0;
          for (auto& target : targetSelection->targets) {
             if (target->exprClass == ast::ExpressionClass::STAR) {
                auto star = std::static_pointer_cast<ast::StarExpression>(target);
@@ -1094,25 +1101,14 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                   } catch (...) {}
                   if (structColumn && structColumn->resultType.type.getTypeId() == catalog::LogicalTypeId::STRUCT) {
                      needsExtend = true;
-                     auto structInfo = structColumn->resultType.type.getInfo<catalog::StructTypeInfo>();
-                     for (auto& member : structInfo->getMembers()) {
-                        auto extractExpr = drv.nf.node<ast::ColumnRefExpression>(star->loc, std::vector<std::string>{star->relationName, member.first});
-                        std::string uniqueAlias = "struct_ext_" + std::to_string(structExtractId++);
-                        extractExpr->alias = uniqueAlias;
-                        extendNode->extensions.push_back(extractExpr);
-
-                        auto selectRef = drv.nf.node<ast::ColumnRefExpression>(star->loc, std::vector<std::string>{uniqueAlias});
-                        selectRef->alias = member.first; // The final name should be the member name
-                        selectRef->forceToUseAlias = true;
-                        newTargets.push_back(selectRef);
-                     }
+                     unnestStruct(star->relationName, structColumn, extendNode, newTargets, star->loc);
                      continue;
                   }
                }
             }
             newTargets.push_back(target);
          }
-         
+
          if (needsExtend) {
             targetSelection->targets = newTargets;
             auto extendPipeOp = drv.nf.node<ast::PipeOperator>(pipeOperator->loc, ast::PipeOperatorType::EXTEND, extendNode);
@@ -1122,6 +1118,10 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
 
          std::vector<std::weak_ptr<ast::ColumnReference>> targetColumns{};
          context->currentScope->targetInfo.clear();
+
+         bool addedExtend = false;
+         std::string mapName;
+         std::vector<std::shared_ptr<ast::BoundExpression>> boundExtensions;
 
          for (auto& target : targetSelection->targets) {
             auto parsedExpression = analyzeExpression(target, context, resolverScope);
@@ -1152,14 +1152,41 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
 
                   break;
                }
+               case ast::ExpressionClass::BOUND_STRUCT_EXTRACT: {
+                  assert(parsedExpression->columnReference.has_value());
+                  auto structExtract = std::static_pointer_cast<ast::BoundStructExtractExpression>(parsedExpression);
+
+                  if (!addedExtend) {
+                     // We cannot move this extension logic to the canonicalizer step.
+                     // During canonicalization, type information is unavailable, so we
+                     // don't yet know if a column reference requires a struct extraction.
+                     addedExtend = true;
+                     mapName = context->getUniqueScope("map");
+                  }
+                  boundExtensions.push_back(structExtract);
+                  targetColumns.emplace_back(structExtract->columnReference.value());
+                  if (!structExtract->alias.empty()) {
+                     context->mapAttribute(resolverScope, structExtract->alias, structExtract->columnReference.value());
+                  }
+                  context->currentScope->targetInfo.add(structExtract->columnReference.value());
+                  break;
+               }
                case ast::ExpressionClass::BOUND_OPERATOR: {
                   error("Invalid expression inside select clause", target->loc);
                   break;
                }
                //NOTE: All other expressions should be moved into an ExtendNode or AggregationNode by canonicalize
-               default: error("Invalid expression inside select clause", target->loc);
+               default: error("Invalid expression inside select clause2", target->loc);
             }
          }
+         
+         if (addedExtend) {
+            auto boundExtendNode = drv.nf.node<ast::BoundExtendNode>(pipeOperator->loc, mapName, std::move(boundExtensions));
+            auto extendPipeOp = drv.nf.node<ast::PipeOperator>(pipeOperator->loc, ast::PipeOperatorType::EXTEND, boundExtendNode);
+            extendPipeOp->input = pipeOperator->input;
+            pipeOperator->input = extendPipeOp;
+         }
+
          boundAstNode = drv.nf.node<ast::BoundTargetList>(targetSelection->loc, targetSelection->distinct, targetColumns);
          break;
       }
@@ -1237,6 +1264,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                case ast::ExpressionClass::BOUND_CONSTANT:
                case ast::ExpressionClass::BOUND_LIST:
                case ast::ExpressionClass::BOUND_STRUCT:
+               case ast::ExpressionClass::BOUND_STRUCT_EXTRACT:
                case ast::ExpressionClass::BOUND_OPERATOR:
                case ast::ExpressionClass::BOUND_CAST:
                case ast::ExpressionClass::BOUND_SUBQUERY:
@@ -3117,58 +3145,63 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
 
 std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeColumnRefExpression(std::shared_ptr<ast::ColumnRefExpression> columnRef, std::shared_ptr<SQLContext> context) {
    //new implementation which uses the new concept of TableProducers
-   auto columnName = columnRef->columnNames.size() == 1 ? columnRef->columnNames[0] : columnRef->columnNames[1];
-
-   std::string scope;
    std::shared_ptr<ast::ColumnReference> found;
-   if (columnRef->columnNames.size() == 2) {
+   size_t baseLen = 0;
+   std::optional<FrontendError> firstError;
+
+   if (columnRef->columnNames.size() >= 2) {
       try {
          found = context->getColumnReference(columnRef->loc, columnRef->columnNames[0] + "." + columnRef->columnNames[1]);
+         baseLen = 2;
       } catch (FrontendError& e) {
-         try {
-            found = context->getColumnReference(columnRef->loc, columnRef->columnNames[0]);
-            if (found && found->resultType.type.getTypeId() == catalog::LogicalTypeId::STRUCT) {
-               auto structInfo = found->resultType.type.getInfo<catalog::StructTypeInfo>();
-               for (auto& member : structInfo->getMembers()) {
-                  if (member.first == columnRef->columnNames[1]) {
-                     auto boundStruct = drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, "");
-                     auto fieldName = drv.nf.node<ast::BoundConstantExpression>(columnRef->loc, catalog::Type::stringType(), std::make_shared<ast::StringValue>(columnRef->columnNames[1]), "");
-                     return drv.nf.node<ast::BoundOperatorExpression>(columnRef->loc, ast::ExpressionType::STRUCT_EXTRACT, member.second, columnRef->alias, std::vector<std::shared_ptr<ast::BoundExpression>>{boundStruct, fieldName});
-                  }
-               }
-            }
-         } catch (...) {
-         }
-         throw e;
+         firstError = e;
       }
-   } else if (columnRef->columnNames.size() == 1) {
-      found = context->getColumnReference(columnRef->loc, columnRef->columnNames[0]);
-   } else if (columnRef->columnNames.size() == 3) {
-      try {
-         found = context->getColumnReference(columnRef->loc, columnRef->columnNames[0] + "." + columnRef->columnNames[1]);
-         if (found && found->resultType.type.getTypeId() == catalog::LogicalTypeId::STRUCT) {
-            auto structInfo = found->resultType.type.getInfo<catalog::StructTypeInfo>();
-            for (auto& member : structInfo->getMembers()) {
-               if (member.first == columnRef->columnNames[2]) {
-                  auto boundStruct = drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, "");
-                  auto fieldName = drv.nf.node<ast::BoundConstantExpression>(columnRef->loc, catalog::Type::stringType(), std::make_shared<ast::StringValue>(columnRef->columnNames[2]), "");
-                  return drv.nf.node<ast::BoundOperatorExpression>(columnRef->loc, ast::ExpressionType::STRUCT_EXTRACT, member.second, columnRef->alias, std::vector<std::shared_ptr<ast::BoundExpression>>{boundStruct, fieldName});
-               }
-            }
-         }
-      } catch (FrontendError& e) {
-         throw e;
-      }
-   } else {
-      error("Invalid column reference: expected a structured reference (e.g. 'x'' or 'y.x'').", columnRef->loc);
    }
+   if (!found && columnRef->columnNames.size() >= 1) {
+      try {
+         found = context->getColumnReference(columnRef->loc, columnRef->columnNames[0]);
+         baseLen = 1;
+      } catch (FrontendError& e) {
+         if (!firstError) firstError = e;
+      }
+   }
+
    if (!found) {
+      if (firstError) throw *firstError;
       error("Column not found", columnRef->loc);
    }
 
    found->displayName = !columnRef->alias.empty() || columnRef->forceToUseAlias ? columnRef->alias : found->displayName;
 
-   return drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, columnRef->alias);
+   std::shared_ptr<ast::BoundExpression> currentExpr = drv.nf.node<ast::BoundColumnRefExpression>(columnRef->loc, found->resultType, found, baseLen == columnRef->columnNames.size() ? columnRef->alias : "");
+   NullableType currentType = found->resultType;
+
+   for (size_t i = baseLen; i < columnRef->columnNames.size(); i++) {
+       if (currentType.type.getTypeId() != catalog::LogicalTypeId::STRUCT) {
+           error("Cannot extract field '" + columnRef->columnNames[i] + "' from non-struct type", columnRef->loc);
+       }
+       auto structInfo = currentType.type.getInfo<catalog::StructTypeInfo>();
+       bool fieldFound = false;
+       for (auto& member : structInfo->getMembers()) {
+           if (member.first == columnRef->columnNames[i]) {
+               std::string alias = (i == columnRef->columnNames.size() - 1) ? columnRef->alias : "";
+               auto boundExtract = drv.nf.node<ast::BoundStructExtractExpression>(columnRef->loc, currentExpr, member.first, member.second, alias);
+               
+               auto extractedColRef = std::make_shared<ast::ColumnReference>("extract" + std::to_string(i), member.second, member.first);
+               boundExtract->columnReference = extractedColRef;
+               
+               currentExpr = boundExtract;
+               currentType = member.second;
+               fieldFound = true;
+               break;
+           }
+       }
+       if (!fieldFound) {
+           error("Struct field '" + columnRef->columnNames[i] + "' not found", columnRef->loc);
+       }
+   }
+
+   return currentExpr;
 }
 
 /*

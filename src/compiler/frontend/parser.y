@@ -2118,7 +2118,17 @@ window_specification:
 //! TODO For what exactly is this here
 indirection:
     indirection_el { $$=$1;}
-    | indirection indirection_el {$$=$1;}
+    | indirection indirection_el 
+    {
+        if ($1->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF && $2->exprClass == lingodb::ast::ExpressionClass::COLUMN_REF) {
+            auto colRef1 = std::static_pointer_cast<lingodb::ast::ColumnRefExpression>($1);
+            auto colRef2 = std::static_pointer_cast<lingodb::ast::ColumnRefExpression>($2);
+            colRef1->columnNames.insert(colRef1->columnNames.end(), colRef2->columnNames.begin(), colRef2->columnNames.end());
+            $$ = colRef1;
+        } else {
+            $$ = $1;
+        }
+    }
     ;
 indirection_el:
     DOT attr_name {$$=mkNode<lingodb::ast::ColumnRefExpression>(@$, $attr_name);}
