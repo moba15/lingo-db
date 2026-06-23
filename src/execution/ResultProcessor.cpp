@@ -30,9 +30,12 @@ unsigned char hexval(unsigned char c) {
 std::string escapeString(const std::string& str) {
    std::string escaped;
    for (char c : str) {
-      if (c == '\n') escaped += "\\n";
-      else if (c == '"') escaped += "\\\"";
-      else escaped += c;
+      if (c == '\n')
+         escaped += "\\n";
+      else if (c == '"')
+         escaped += "\\\"";
+      else
+         escaped += c;
    }
    return escaped;
 }

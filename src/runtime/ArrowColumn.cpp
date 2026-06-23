@@ -402,7 +402,7 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
                size_t alignment = getPhysicalAlignment(fieldType);
                size_t remainder = nestedOffset % alignment;
                if (remainder != 0) {
-                   nestedOffset += (alignment - remainder);
+                  nestedOffset += (alignment - remainder);
                }
 
                uint8_t* nestedFieldPtr = childStruct ? childStruct->values.data() + nestedOffset : nullptr;
@@ -427,9 +427,6 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
       auto arrowType = std::static_pointer_cast<arrow::StructType>(parseType(type.str()));
       handleStatus(typedBuilder->Append());
 
-
-
-
       size_t currentByteOffset = 0;
       uint8_t* basePointer = structObj->values.data();
 
@@ -442,7 +439,7 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
          size_t alignment = getPhysicalAlignment(fieldType);
          size_t remainder = currentByteOffset % alignment;
          if (remainder != 0) {
-             currentByteOffset += (alignment - remainder);
+            currentByteOffset += (alignment - remainder);
          }
 
          // Calculate pointer for this specific field
@@ -455,8 +452,6 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
       }
    }
 }
-
-
 
 ArrowColumn* ArrowColumnBuilder::finish() {
    auto array = builder->Finish().ValueOrDie();
