@@ -5,7 +5,9 @@
 
 #include <arrow/array.h>
 #include <arrow/pretty_print.h>
+#include <arrow/scalar.h>
 #include <arrow/table.h>
+#include <arrow/type.h>
 
 #include <fstream>
 #include <iostream>
@@ -30,6 +32,89 @@ unsigned char hexval(unsigned char c) {
       return c - 'A' + 10;
    else
       abort();
+}
+// Helper to safely escape strings for JSON
+std::string escapeString(const std::string& str) {
+   std::string escaped;
+   for (char c : str) {
+      if (c == '\n')
+         escaped += "\\n";
+      else if (c == '"')
+         escaped += "\\\"";
+      else
+         escaped += c;
+   }
+   return escaped;
+}
+
+// Recursively convert Arrow Scalars to JSON strings
+std::string scalarToJson(const std::shared_ptr<arrow::Scalar>& scalar) {
+   if (!scalar || !scalar->is_valid) return "null";
+
+   switch (scalar->type->id()) {
+      case arrow::Type::STRUCT: {
+         auto struct_scalar = std::static_pointer_cast<arrow::StructScalar>(scalar);
+         auto struct_type = std::static_pointer_cast<arrow::StructType>(struct_scalar->type);
+         std::stringstream ss;
+         ss << "{";
+         for (size_t i = 0; i < struct_scalar->value.size(); ++i) {
+            if (i > 0) ss << ", ";
+            ss << "\"" << escapeString(struct_type->field(i)->name()) << "\": "
+               << scalarToJson(struct_scalar->value[i]);
+         }
+         ss << "}";
+         return ss.str();
+      }
+      case arrow::Type::LIST:
+      case arrow::Type::LARGE_LIST:
+      case arrow::Type::FIXED_SIZE_LIST: {
+         auto list_scalar = std::static_pointer_cast<arrow::BaseListScalar>(scalar);
+         std::stringstream ss;
+         ss << "[";
+         auto list_arr = list_scalar->value;
+         for (int64_t i = 0; i < list_arr->length(); ++i) {
+            if (i > 0) ss << ", ";
+            auto item_scalar = list_arr->GetScalar(i);
+            if (item_scalar.ok()) {
+               ss << scalarToJson(item_scalar.ValueOrDie());
+            } else {
+               ss << "null";
+            }
+         }
+         ss << "]";
+         return ss.str();
+      }
+      case arrow::Type::STRING:
+      case arrow::Type::LARGE_STRING: {
+         auto str_scalar = std::static_pointer_cast<arrow::StringScalar>(scalar);
+         return "\"" + escapeString(str_scalar->ToString()) + "\"";
+      }
+      default:
+         return scalar->ToString();
+   }
+}
+
+// Generate parser-friendly string mimicking Arrow's exact ChunkedArray formatting
+std::string formatComplexColumn(const std::shared_ptr<arrow::ChunkedArray>& column) {
+   std::stringstream ss;
+   ss << "[\n";
+   for (int i = 0; i < column->num_chunks(); ++i) {
+      if (i > 0) ss << ",\n";
+      ss << "[\n"; // Arrow chunks have inner brackets
+      auto chunk = column->chunk(i);
+      for (int64_t row = 0; row < chunk->length(); ++row) {
+         if (row > 0) ss << ",\n";
+         auto scalar_res = chunk->GetScalar(row);
+         if (scalar_res.ok()) {
+            ss << scalarToJson(scalar_res.ValueOrDie());
+         } else {
+            ss << "null";
+         }
+      }
+      ss << "\n]";
+   }
+   ss << "\n]";
+   return ss.str();
 }
 struct ResultHasher : public execution::ResultProcessor {
    //input
@@ -57,10 +142,19 @@ struct ResultHasher : public execution::ResultProcessor {
       std::vector<bool> convertHex;
       std::vector<bool> isFloat;
       for (auto c : table->columns()) {
+         auto field = table->schema()->field(positions.size());
          convertHex.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::FIXED_SIZE_BINARY);
          isFloat.push_back(table->schema()->field(positions.size())->type()->id() == arrow::Type::DOUBLE);
          std::stringstream sstr;
-         arrow::PrettyPrint(*c.get(), options, &sstr); //NOLINT (clang-diagnostic-unused-result)
+         auto type_id = field->type()->id();
+
+         // Intercept struct and list types to format them into single-line JSON strings
+         if (type_id == arrow::Type::STRUCT || type_id == arrow::Type::LIST ||
+             type_id == arrow::Type::LARGE_LIST || type_id == arrow::Type::FIXED_SIZE_LIST) {
+            sstr << formatComplexColumn(c);
+         } else {
+            arrow::PrettyPrint(*c.get(), options, &sstr); //NOLINT (clang-diagnostic-unused-result)
+         }
          columnReps.push_back(sstr.str());
          positions.push_back(0);
       }
