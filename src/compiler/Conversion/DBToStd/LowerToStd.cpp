@@ -1500,6 +1500,40 @@ class StructGetLowering : public OpConversionPattern<db::StructGetOp> {
       return success();
    }
 };
+class StructUpdateLowering : public OpConversionPattern<db::StructUpdateOp> {
+   public:
+   using OpConversionPattern<db::StructUpdateOp>::OpConversionPattern;
+   LogicalResult matchAndRewrite(db::StructUpdateOp structUpdateOp, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
+      auto loc = structUpdateOp.getLoc();
+      auto structType = mlir::cast<db::StructType>(structUpdateOp.getStrct().getType());
+      auto fieldName = structUpdateOp.getName().str();
+      size_t fieldIndex = 0;
+      bool found = false;
+      for (auto nameAttr : structType.getNames()) {
+         if (mlir::cast<mlir::StringAttr>(nameAttr).getValue().str() == fieldName) {
+            found = true;
+            break;
+         }
+         fieldIndex++;
+      }
+      if (!found) return failure();
+
+      llvm::SmallVector<mlir::Type> memberTypes;
+      for (auto t : structType.getTypes()) {
+         memberTypes.push_back(typeConverter->convertType(t));
+      }
+      auto tupleType = mlir::TupleType::get(rewriter.getContext(), memberTypes);
+      auto elementType = memberTypes[fieldIndex];
+
+      mlir::Value dataPtr = rt::Struct::data(rewriter, loc)({adaptor.getStrct()})[0];
+      mlir::Value tuplePtr = rewriter.create<util::GenericMemrefCastOp>(loc, util::RefType::get(rewriter.getContext(), tupleType), dataPtr);
+      mlir::Value elementPtr = rewriter.create<util::TupleElementPtrOp>(loc, util::RefType::get(rewriter.getContext(), elementType), tuplePtr, fieldIndex);
+      
+      rewriter.create<util::StoreOp>(loc, adaptor.getVal(), elementPtr, mlir::Value());
+      rewriter.replaceOp(structUpdateOp, adaptor.getStrct());
+      return success();
+   }
+};
 class MemoryCleanupUseLowering : public OpConversionPattern<db::MemoryCleanupUse> {
    public:
    using OpConversionPattern<db::MemoryCleanupUse>::OpConversionPattern;
@@ -1740,6 +1774,7 @@ void DBToStdLoweringPass::runOnOperation() {
    patterns.insert<CreateListLowering>(typeConverter, ctxt);
    patterns.insert<CreateStructLowering>(typeConverter, ctxt);
    patterns.insert<StructGetLowering>(typeConverter, ctxt);
+   patterns.insert<StructUpdateLowering>(typeConverter, ctxt);
    patterns.insert<ListLengthLowering>(typeConverter, ctxt);
    patterns.insert<ListAppendLowering>(typeConverter, ctxt);
    patterns.insert<ListGetLowering>(typeConverter, ctxt);

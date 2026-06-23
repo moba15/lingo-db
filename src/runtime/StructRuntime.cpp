@@ -1,5 +1,7 @@
 #include "lingodb/runtime/StructRuntime.h"
 
+#include <iostream>
+
 using namespace lingodb::runtime;
 
 Struct* Struct::create(size_t totalSize) {

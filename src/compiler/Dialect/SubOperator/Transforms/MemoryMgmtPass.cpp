@@ -53,6 +53,20 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
          return promotedList;
       }
 
+      if (auto structType = mlir::dyn_cast<db::StructType>(type)) {
+         mlir::Value promotedStruct = managed.emitPromoteToGlobal(builder, loc, value);
+         for (size_t i = 0; i < structType.getTypes().size(); i++) {
+            auto memberType = structType.getTypes()[i];
+            if (typeNeedsManagement(memberType)) {
+               auto nameAttr = structType.getNames()[i];
+               mlir::Value element = builder.create<db::StructGetOp>(loc, memberType, promotedStruct, nameAttr);
+               mlir::Value promotedElement = promoteToGlobal(builder, loc, element, notCounted);
+               promotedStruct = builder.create<db::StructUpdateOp>(loc, structType, promotedStruct, nameAttr, promotedElement);
+            }
+         }
+         return promotedStruct;
+      }
+
       return managed.emitPromoteToGlobal(builder, loc, value);
    }
 
@@ -156,7 +170,7 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
                builder.create<mlir::func::ReturnOp>(loc);
             }
             elementFn = mlir::SymbolRefAttr::get(builder.getContext(), name);
-         } else {
+         }  else {
             assert(!typeNeedsManagement(listType.getElementType()));
          }
       }
@@ -266,7 +280,7 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
       module.walk([&](subop::MapOp mapOp) {
          llvm::DenseSet<mlir::Value> notCounted;
          for (auto arg : mapOp.getFn().front().getArguments()) {
-            if (mlir::isa<db::ListType>(arg.getType())) {
+            if (mlir::isa<db::ListType>(arg.getType()) || mlir::isa<db::StructType>(arg.getType())) {
                continue;
             }
             notCounted.insert(arg);

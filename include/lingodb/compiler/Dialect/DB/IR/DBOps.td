@@ -150,7 +150,7 @@ def StructType: DB_Type<"Struct", "struct", [DB_ManagedType]>{
   let parameters = (ins ArrayRefParameter<"mlir::Type">:$types, ArrayRefParameter<"mlir::StringAttr">:$names);
   let assemblyFormat = "`<` $names `,` $types `>`";
   let extraClassDeclaration = [{
-      bool needsManagement() const;
+      bool needsManagement() const { return true; };
   }];
 }
 
