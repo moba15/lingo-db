@@ -1179,7 +1179,7 @@ std::shared_ptr<ast::TableProducer> SQLQueryAnalyzer::analyzePipeOperator(std::s
                default: error("Invalid expression inside select clause2", target->loc);
             }
          }
-         
+
          if (addedExtend) {
             auto boundExtendNode = drv.nf.node<ast::BoundExtendNode>(pipeOperator->loc, mapName, std::move(boundExtensions));
             auto extendPipeOp = drv.nf.node<ast::PipeOperator>(pipeOperator->loc, ast::PipeOperatorType::EXTEND, boundExtendNode);
@@ -3167,7 +3167,7 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeColumnRefExpressi
    }
 
    if (!found) {
-      if (firstError) throw *firstError;
+      if (firstError) throw FrontendError(*firstError);
       error("Column not found", columnRef->loc);
    }
 
@@ -3177,28 +3177,28 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeColumnRefExpressi
    NullableType currentType = found->resultType;
 
    for (size_t i = baseLen; i < columnRef->columnNames.size(); i++) {
-       if (currentType.type.getTypeId() != catalog::LogicalTypeId::STRUCT) {
-           error("Cannot extract field '" + columnRef->columnNames[i] + "' from non-struct type", columnRef->loc);
-       }
-       auto structInfo = currentType.type.getInfo<catalog::StructTypeInfo>();
-       bool fieldFound = false;
-       for (auto& member : structInfo->getMembers()) {
-           if (member.first == columnRef->columnNames[i]) {
-               std::string alias = (i == columnRef->columnNames.size() - 1) ? columnRef->alias : "";
-               auto boundExtract = drv.nf.node<ast::BoundStructExtractExpression>(columnRef->loc, currentExpr, member.first, member.second, alias);
-               
-               auto extractedColRef = std::make_shared<ast::ColumnReference>("extract" + std::to_string(i), member.second, member.first);
-               boundExtract->columnReference = extractedColRef;
-               
-               currentExpr = boundExtract;
-               currentType = member.second;
-               fieldFound = true;
-               break;
-           }
-       }
-       if (!fieldFound) {
-           error("Struct field '" + columnRef->columnNames[i] + "' not found", columnRef->loc);
-       }
+      if (currentType.type.getTypeId() != catalog::LogicalTypeId::STRUCT) {
+         error("Cannot extract field '" + columnRef->columnNames[i] + "' from non-struct type", columnRef->loc);
+      }
+      auto structInfo = currentType.type.getInfo<catalog::StructTypeInfo>();
+      bool fieldFound = false;
+      for (auto& member : structInfo->getMembers()) {
+         if (member.first == columnRef->columnNames[i]) {
+            std::string alias = (i == columnRef->columnNames.size() - 1) ? columnRef->alias : "";
+            auto boundExtract = drv.nf.node<ast::BoundStructExtractExpression>(columnRef->loc, currentExpr, member.first, member.second, alias);
+
+            auto extractedColRef = std::make_shared<ast::ColumnReference>("extract" + std::to_string(i), member.second, member.first);
+            boundExtract->columnReference = extractedColRef;
+
+            currentExpr = boundExtract;
+            currentType = member.second;
+            fieldFound = true;
+            break;
+         }
+      }
+      if (!fieldFound) {
+         error("Struct field '" + columnRef->columnNames[i] + "' not found", columnRef->loc);
+      }
    }
 
    return currentExpr;

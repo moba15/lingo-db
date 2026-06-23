@@ -1081,7 +1081,6 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
          auto structVal = translateExpression(builder, boundStructExtract->structColumn, context);
          auto fieldNameStr = builder.getStringAttr(boundStructExtract->fieldName);
          return builder.create<db::StructGetOp>(exprLocation, boundStructExtract->resultType->toMlirType(mlirContext), structVal, fieldNameStr);
-
       }
 
       default: translatorError("Expression not implemented", expression->loc);

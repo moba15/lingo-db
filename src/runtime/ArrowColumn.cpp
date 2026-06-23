@@ -4,7 +4,6 @@
 #include "lingodb/runtime/StructRuntime.h"
 
 #include <iomanip>
-#include <iostream>
 #include <arrow/array.h>
 #include <arrow/array/builder_binary.h>
 #include <arrow/array/builder_decimal.h>
@@ -291,6 +290,8 @@ void ArrowColumnBuilder::addList(bool isValid, List* list, VarLen32 type) {
    }
 }
 
+namespace {
+
 // Helper to determine the physical byte size
 inline size_t getPhysicalByteSize(const std::shared_ptr<arrow::DataType>& type) {
    switch (type->id()) {
@@ -310,8 +311,9 @@ inline size_t getPhysicalByteSize(const std::shared_ptr<arrow::DataType>& type) 
    }
 }
 
-// NEW: Helper to determine C++ memory alignment rules for the compiler
 // Helper to determine C++ memory alignment rules for the compiler
+// Helper to determine C++ memory alignment rules for the compiler
+// TODO Check
 inline size_t getPhysicalAlignment(const std::shared_ptr<arrow::DataType>& type) {
    switch (type->id()) {
       case arrow::Type::INT8: return 1;
@@ -326,6 +328,8 @@ inline size_t getPhysicalAlignment(const std::shared_ptr<arrow::DataType>& type)
       default: return 8;
    }
 }
+
+} // namespace
 
 void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 type) {
    auto appendValue = [](auto&& self, arrow::ArrayBuilder* baseBuilder, std::shared_ptr<arrow::DataType> arrowType, uint8_t* ptr) -> void {
@@ -402,7 +406,7 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
                size_t alignment = getPhysicalAlignment(fieldType);
                size_t remainder = nestedOffset % alignment;
                if (remainder != 0) {
-                   nestedOffset += (alignment - remainder);
+                  nestedOffset += (alignment - remainder);
                }
 
                uint8_t* nestedFieldPtr = childStruct ? childStruct->values.data() + nestedOffset : nullptr;
@@ -427,9 +431,6 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
       auto arrowType = std::static_pointer_cast<arrow::StructType>(parseType(type.str()));
       handleStatus(typedBuilder->Append());
 
-
-
-
       size_t currentByteOffset = 0;
       uint8_t* basePointer = structObj->values.data();
 
@@ -442,7 +443,7 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
          size_t alignment = getPhysicalAlignment(fieldType);
          size_t remainder = currentByteOffset % alignment;
          if (remainder != 0) {
-             currentByteOffset += (alignment - remainder);
+            currentByteOffset += (alignment - remainder);
          }
 
          // Calculate pointer for this specific field
@@ -455,8 +456,6 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
       }
    }
 }
-
-
 
 ArrowColumn* ArrowColumnBuilder::finish() {
    auto array = builder->Finish().ValueOrDie();
