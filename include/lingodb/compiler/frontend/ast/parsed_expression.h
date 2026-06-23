@@ -28,6 +28,8 @@ class LogicalTypeWithMods {
    std::vector<std::shared_ptr<Value>> typeModifiers;
    //Required for List Types
    std::shared_ptr<LogicalTypeWithMods> elementType;
+   //Required for Struct Types
+   std::vector<std::pair<std::string, std::shared_ptr<LogicalTypeWithMods>>> structMembers;
 };
 
 class BaseExpression : public AstNode {

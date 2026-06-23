@@ -229,6 +229,14 @@ std::shared_ptr<arrow::DataType> toPhysicalType(lingodb::catalog::Type t) {
          auto listInfo = t.getInfo<lingodb::catalog::ListTypeInfo>();
          return arrow::list(toPhysicalType(listInfo->getElementType()));
       }
+      case TypeId::STRUCT: {
+         auto structInfo = t.getInfo<lingodb::catalog::StructTypeInfo>();
+         std::vector<std::shared_ptr<arrow::Field>> children;
+         for (auto& field : structInfo->getMembers()) {
+            children.push_back(arrow::field(field.first, toPhysicalType(field.second)));
+         }
+         return arrow::struct_(std::move(children));
+      }
       default:
          throw std::runtime_error("unsupported type");
    }

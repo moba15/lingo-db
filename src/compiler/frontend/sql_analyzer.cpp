@@ -3494,6 +3494,13 @@ NullableType SQLTypeUtils::typemodsToCatalogType(const ast::LogicalTypeWithMods&
       case catalog::LogicalTypeId::INDEX: {
          return catalog::Type::index();
       }
+      case catalog::LogicalTypeId::STRUCT: {
+         std::vector<std::pair<std::string, catalog::Type>> members;
+         for (auto& member : logicalTypeWithMods.structMembers) {
+            members.emplace_back(member.first, typemodsToCatalogType(*member.second).type);
+         }
+         return catalog::Type::structType(members);
+      }
       default: throw std::runtime_error("Typemod not implemented");
    }
 }

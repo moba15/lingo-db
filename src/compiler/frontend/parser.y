@@ -176,7 +176,7 @@
 	SEQUENCE SEQUENCES
 	SERIALIZABLE SERVER SESSION SESSION_USER SET SETS SETOF SHARE SHOW
 	SIMILAR SIMPLE SKIP SMALLINT SNAPSHOT SOME SOURCE SQL_P STABLE STANDALONE_P
-	START STATEMENT STATISTICS STDIN STDOUT STORAGE STORED STRICT_P STRING_P STRIP_P
+	START STATEMENT STATISTICS STDIN STDOUT STORAGE STORED STRICT_P STRING_P STRIP_P STRUCT
 	SUBSCRIPTION SUBSTRING SUPPORT SYMMETRIC SYSID SYSTEM_P SYSTEM_USER
 
 	TABLE TABLES TABLESAMPLE TABLESPACE TARGET TEMP TEMPLATE TEMPORARY TEXT_P THEN
@@ -311,6 +311,8 @@
 %type<std::shared_ptr<lingodb::ast::CreateNode>> CreateStmt CreateFunctionStmt
 %type<bool> OptTemp opt_varying
 %type<lingodb::ast::LogicalTypeWithMods> Numeric SimpleType Type ListType CharacterWithoutLength character Bit ConstCharacter Character CharacterWithLength ConstDatetime Typename ConstTypename Numeric_with_opt_lenghth ConstInterval
+%type<std::vector<std::pair<std::string, std::shared_ptr<lingodb::ast::LogicalTypeWithMods>>>> struct_member_list
+%type<std::pair<std::string, std::shared_ptr<lingodb::ast::LogicalTypeWithMods>>> struct_member
 
 %type<std::shared_ptr<lingodb::ast::TableElement>> TableElement columnElement TableConstraint
 %type<std::vector<std::shared_ptr<lingodb::ast::TableElement>>> TableElementList OptTableElementList
@@ -2339,6 +2341,7 @@ type_function_name:
     | unreserved_keyword {$$=$1;}
     | type_func_name_keyword 
     | DATE_P {$$="date";}
+    | ROW {$$="row";}
 
 type_func_name_keyword:
 			  AUTHORIZATION
@@ -2757,6 +2760,7 @@ unreserved_keyword:
 			| STRICT_P
 			| STRING_P
 			| STRIP_P
+			| STRUCT
 			| SUBSCRIPTION
 			| SUPPORT
 			| SYSID
@@ -3164,8 +3168,34 @@ SimpleType:
     {
         $$ = $1;
     }
+    | STRUCT LP struct_member_list RP
+    {
+        lingodb::ast::LogicalTypeWithMods structType(lingodb::catalog::LogicalTypeId::STRUCT);
+        structType.structMembers = $struct_member_list;
+        $$ = structType;
+    }
     //TODO | JsonType
     ;
+
+struct_member_list:
+    struct_member
+    {
+        $$ = std::vector<std::pair<std::string, std::shared_ptr<lingodb::ast::LogicalTypeWithMods>>>({$struct_member});
+    }
+    | struct_member_list[list] COMMA struct_member
+    {
+        $list.emplace_back($struct_member);
+        $$ = $list;
+    }
+    ;
+
+struct_member:
+    ColId Typename
+    {
+        $$ = std::make_pair($ColId, std::make_shared<lingodb::ast::LogicalTypeWithMods>($Typename));
+    }
+    ;
+
 opt_type_modifiers: 
     LP type_modifiers RP
     {
