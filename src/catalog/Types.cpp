@@ -149,6 +149,8 @@ std::string Type::toString() const {
          return std::dynamic_pointer_cast<IntervalTypeInfo>(info)->toString();
       case LogicalTypeId::CHAR:
          return std::dynamic_pointer_cast<CharTypeInfo>(info)->toString();
+      case LogicalTypeId::STRING:
+         return std::dynamic_pointer_cast<StringTypeInfo>(info)->toString();
       case LogicalTypeId::LIST:
          return std::dynamic_pointer_cast<ListTypeInfo>(info)->toString();
       case LogicalTypeId::STRUCT:
