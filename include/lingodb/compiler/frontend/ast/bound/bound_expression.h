@@ -206,5 +206,13 @@ class BoundStructExpression : public BoundExpression {
 
    std::unordered_map<std::string, std::shared_ptr<BoundExpression>> fields;
 };
+
+class BoundStructExtractExpression : public BoundExpression {
+   public:
+   static constexpr const ExpressionClass cType = ExpressionClass::BOUND_STRUCT_EXTRACT;
+   BoundStructExtractExpression(std::shared_ptr<BoundExpression> structColumn, std::string fieldName, NullableType resultType, std::string alias) : BoundExpression(cType, ExpressionType::STRUCT_EXTRACT, resultType, alias), structColumn(structColumn), fieldName(fieldName) {}
+   std::shared_ptr<BoundExpression> structColumn;
+   std::string fieldName;
+};
 } // namespace lingodb::ast
 #endif
