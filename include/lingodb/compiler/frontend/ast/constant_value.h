@@ -17,6 +17,7 @@ enum class ConstantType : uint8_t {
    BOOLEAN = 7,
    DATE = 8,
    LIST = 9,
+   STRUCT = 10,
 
    INVALID = 99,
 
@@ -101,6 +102,22 @@ class ListValue : public Value {
       str.pop_back();
       str.pop_back();
       str += "]";
+      return str;
+   }
+};
+
+class StructValue : public Value {
+   public:
+   explicit StructValue(std::vector<std::shared_ptr<Value>> elements) : Value(ConstantType::STRUCT), elements(std::move(elements)) {}
+   std::vector<std::shared_ptr<Value>> elements;
+   std::string toString() override {
+      std::string str = "struct(";
+      for (auto& e : elements) {
+         str += e->toString() + ", ";
+      }
+      str.pop_back();
+      str.pop_back();
+      str += ")";
       return str;
    }
 };

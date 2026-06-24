@@ -1507,6 +1507,11 @@ mlir::Value SQLMlirTranslator::translateTableRef(mlir::OpBuilder& builder, std::
                      value = serializeValue(serializeValue, listValue);
                      break;
                   }
+                  case ast::ConstantType::STRUCT: {
+                     auto structValue = std::static_pointer_cast<ast::StructValue>(constExpr->value);
+
+
+                  }
 
                   default: translatorError("Invalid constant in expression list", constExpr->loc);
                }
