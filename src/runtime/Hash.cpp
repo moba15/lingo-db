@@ -52,6 +52,20 @@ void hashListArrayBatchRuntime(const arrow::ListArray& array, int64_t numRows, s
       }
    }
 }
+//TODO AI generated! Check again
+void hashStructArrayBatchRuntime(const arrow::StructArray& array, int64_t numRows, std::vector<uint64_t>& running) {
+   std::vector<uint64_t> structRunning(numRows, 0);
+   for (int i = 0; i < array.num_fields(); i++) {
+      auto childArray = array.field(i);
+      hashColumnPieceBatchRuntime(*childArray, numRows, structRunning);
+   }
+   for (int64_t i = 0; i < numRows; ++i) {
+      if (array.IsNull(i)) {
+         continue;
+      }
+      dbHashFoldPiece(running[i], structRunning[i]);
+   }
+}
 
 template <typename TArrowArray>
 void dbHashCombineIntArrowBatch(std::vector<uint64_t>& running, const arrow::Array& array, int64_t numRows) {
@@ -258,6 +272,11 @@ void hashColumnPieceBatchRuntime(const arrow::Array& array, int64_t numRows, std
       case arrow::Type::type::LIST: {
          const auto& a = static_cast<const arrow::ListArray&>(array);
          hashListArrayBatchRuntime(a, numRows, running);
+         return;
+      }
+      case arrow::Type::type::STRUCT: {
+         const auto& a = static_cast<const arrow::StructArray&>(array);
+         hashStructArrayBatchRuntime(a, numRows, running);
          return;
       }
       default:

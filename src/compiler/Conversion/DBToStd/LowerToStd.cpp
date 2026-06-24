@@ -891,6 +891,34 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
             return list;
          }
 
+         if (auto structType = mlir::dyn_cast<db::StructType>(currentType)) {
+            auto arrayAttr = mlir::dyn_cast_or_null<mlir::ArrayAttr>(currentValue);
+            if (!arrayAttr || arrayAttr.size() != structType.getTypes().size()) {
+               return std::nullopt;
+            }
+
+            llvm::SmallVector<mlir::Type> memberTypes;
+            llvm::SmallVector<mlir::Value> memberValues;
+            for (auto [t, attr] : llvm::zip(structType.getTypes(), arrayAttr)) {
+               auto loweredElement = self(self, t, attr);
+               if (!loweredElement) {
+                  return std::nullopt;
+               }
+               memberTypes.push_back(typeConverter->convertType(t));
+               memberValues.push_back(loweredElement.value());
+            }
+
+            auto tupleType = mlir::TupleType::get(rewriter.getContext(), memberTypes);
+            auto typeSize = rewriter.create<util::SizeOfOp>(constantOp.getLoc(), rewriter.getIndexType(), tupleType);
+            auto strct = rt::Struct::create(rewriter, constantOp.getLoc())({typeSize})[0];
+            auto dataPtr = rt::Struct::data(rewriter, constantOp.getLoc())({strct})[0];
+            auto tuplePtr = rewriter.create<util::GenericMemrefCastOp>(constantOp.getLoc(), util::RefType::get(rewriter.getContext(), tupleType), dataPtr);
+            auto packed = rewriter.create<util::PackOp>(constantOp.getLoc(), tupleType, memberValues);
+            rewriter.create<util::StoreOp>(constantOp.getLoc(), packed, tuplePtr, mlir::Value());
+
+            return strct;
+         }
+
          return lowerScalarConstant(currentType, currentValue);
       };
 
@@ -993,6 +1021,14 @@ class CastOpLowering : public OpConversionPattern<db::CastOp> {
       if (scalarSourceType == scalarTargetType) {
          rewriter.replaceOp(op, value);
          return success();
+      }
+      if (auto structSource = mlir::dyn_cast_or_null<db::StructType>(scalarSourceType)) {
+         if (auto structTarget = mlir::dyn_cast_or_null<db::StructType>(scalarTargetType)) {
+            if (structSource.getTypes() == structTarget.getTypes()) {
+               rewriter.replaceOp(op, value);
+               return success();
+            }
+         }
       }
       if (mlir::isa<db::CharType>(scalarSourceType) || mlir::isa<db::CharType>(scalarTargetType)) {
          mlir::Value castedToString = rewriter.create<db::CastOp>(op.getLoc(), db::StringType::get(getContext()), op.getVal());

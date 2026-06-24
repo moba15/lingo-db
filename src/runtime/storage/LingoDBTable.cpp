@@ -284,6 +284,15 @@ void LingoDBTable::append(const std::shared_ptr<arrow::Table>& table) {
       nextChunk.reset();
    }
    append(batches);
+
+   std::cout << "Table to append:\n" << table->ToString() << "\n";
+   std::vector<std::shared_ptr<arrow::RecordBatch>> currentBatches;
+   for (auto& chunk : tableData) {
+      currentBatches.push_back(chunk.data());
+   }
+   if (auto res = arrow::Table::FromRecordBatches(currentBatches); res.ok()) {
+      std::cout << "Current table after append:\n" << res.ValueOrDie()->ToString() << "\n";
+   }
 }
 void LingoDBTable::append(const std::vector<std::shared_ptr<arrow::RecordBatch>>& toAppend) {
    ensureLoaded();
