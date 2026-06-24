@@ -980,6 +980,22 @@ mlir::Value SQLMlirTranslator::translateExpression(mlir::OpBuilder& builder, std
             }
             return builder.create<db::Hash>(exprLocation, builder.getIndexType(), values);
          }
+         if (upperCaseFName == "ROW") {
+            std::vector<mlir::Value> values;
+            std::vector<mlir::Type> elementTypes{};
+            for (auto arg : function->arguments) {
+               values.push_back(translateExpression(builder, arg, context));
+               elementTypes.push_back(arg->resultType->toMlirType(mlirContext));
+            }
+            mlir::TupleType tupleType = mlir::TupleType::get(builder.getContext(),
+                                                             elementTypes);
+            auto structType = function->resultType->toMlirType(builder.getContext());
+
+            mlir::Value structVal = builder.create<lingodb::compiler::dialect::db::StructCreateOp>(exprLocation, structType, mlir::ValueRange{values});
+
+            return structVal;
+         }
+
          auto func = function->udfFunction;
          if (func.has_value() && func.value()) {
             std::vector<mlir::Value> values;

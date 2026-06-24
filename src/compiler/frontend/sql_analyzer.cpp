@@ -3106,6 +3106,21 @@ std::shared_ptr<ast::BoundExpression> SQLQueryAnalyzer::analyzeFunctionExpressio
       resultType = catalog::Type::index();
       boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
 
+   } else if (upperCaseFName == "ROW") {
+      std::vector<std::shared_ptr<ast::BoundExpression>> boundArgs{};
+      std::ranges::transform(function->arguments, std::back_inserter(boundArgs), [&](auto c) {
+         return analyzeExpression(c, context, resolverScope);
+      });
+      std::vector<std::pair<std::string, catalog::Type>> elementValues{};
+      for (size_t i = 0; i < boundArgs.size(); i++) {
+         auto arg = boundArgs[i];
+         if (!arg->resultType.has_value()) {
+            error("Argument of row function has not a valid return type", arg->loc);
+         }
+         elementValues.emplace_back("", arg->resultType.value().type);
+      }
+      resultType = catalog::Type::structType(elementValues);
+      boundFunctionExpression = drv.nf.node<ast::BoundFunctionExpression>(function->loc, function->type, resultType, function->functionName, scope, fName, function->distinct, boundArgs);
    } else {
       //UDF
       auto entry = catalog->getTypedEntry<lingodb::catalog::FunctionCatalogEntry>(function->functionName);
