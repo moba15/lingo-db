@@ -194,6 +194,20 @@ class ArrayLoadListLowering : public OpConversionPattern<arrow::LoadListOp> {
       return success();
    }
 };
+
+
+class ArrayLoadStructLowering : public OpConversionPattern<arrow::LoadStructOp> {
+   using OpConversionPattern<arrow::LoadStructOp>::OpConversionPattern;
+   LogicalResult matchAndRewrite(arrow::LoadStructOp op, OpAdaptor adaptor, ConversionPatternRewriter& rewriter) const override {
+      auto refType = mlir::dyn_cast_or_null<util::RefType>(op.getType());
+      if (!refType) {
+         return failure();
+      }
+
+
+      return success();
+   }
+};
 class ArrayIsValidLowering : public OpConversionPattern<arrow::IsValidOp> {
    public:
    using OpConversionPattern<arrow::IsValidOp>::OpConversionPattern;
@@ -519,6 +533,7 @@ void ArrowToStdLoweringPass::runOnOperation() {
    patterns.insert<ArrayLoadFixedSizedLowering>(typeConverter, &getContext());
    patterns.insert<ArrayLoadVariableSizeBinaryLowering>(typeConverter, &getContext());
    patterns.insert<ArrayLoadListLowering>(typeConverter, &getContext());
+   patterns.insert<ArrayLoadStructLowering>(typeConverter, &getContext());
    patterns.insert<ArrayLoadBoolLowering>(typeConverter, &getContext());
    patterns.insert<BuilderFromPtrLowering>(typeConverter, &getContext());
    patterns.insert<BuilderAppendFixedSizedLowering>(typeConverter, &getContext());

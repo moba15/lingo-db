@@ -59,6 +59,15 @@ def Arrow_LoadListOp : Arrow_Op<"array.load_list", [Pure] > {
     let results = (outs RefType:$value);
     let assemblyFormat = " $array `,` $offset `,` $elementType `->` type($value) attr-dict";
 }
+def Arrow_LoadStructOp : Arrow_Op<"array.load_struct", [Pure] > {
+    let summary = "Loads a struct from an array at a given offset";
+    let description = [{
+        Used for loading struct values from an arrow array.
+    }];
+    let arguments = (ins Arrow_Array:$array,Index:$offset, TypeAttr:$structType);
+    let results = (outs RefType:$value);
+    let assemblyFormat = " $array `,` $offset `,` $structType `->` type($value) attr-dict";
+}
 def Arrow_AppendBoolOp : Arrow_Op<"array_builder.append_bool"> {
     let summary = "Appends a boolean value to an Arrow array builder.";
     let description = [{

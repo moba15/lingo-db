@@ -196,7 +196,10 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
       } else if (auto listType = mlir::dyn_cast_or_null<db::ListType>(baseType)) {
          auto convertedType = typeConverter->convertType(listType.getElementType());
          loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadListOp>(loc, util::RefType::get(rewriter.getContext()), array, offset, convertedType);
-      } else {
+      } else if (auto structType = mlir::dyn_cast_or_null<db::StructType>(baseType)) {
+         loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadStructOp>(loc, util::RefType::get(rewriter.getContext()), array, offset, structType);
+      }
+      else {
          return mlir::failure();
       }
 
