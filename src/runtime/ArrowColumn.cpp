@@ -421,6 +421,8 @@ void ArrowColumnBuilder::addStruct(bool isValid, Struct* structObj, VarLen32 typ
    next();
    auto* typedBuilder = reinterpret_cast<arrow::StructBuilder*>(builder);
 
+   std::cout << "addStruct called with isValid=" << isValid << " structObj=" << structObj << " empty=" << (structObj ? structObj->values.empty() : true) << std::endl;
+
    if (!isValid || !structObj || structObj->values.empty()) {
       handleStatus(typedBuilder->AppendNull());
    } else {
