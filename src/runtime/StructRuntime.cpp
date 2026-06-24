@@ -1,6 +1,7 @@
 #include "lingodb/runtime/StructRuntime.h"
 
 #include <iostream>
+#include <cstring>
 
 using namespace lingodb::runtime;
 
@@ -10,6 +11,12 @@ Struct* Struct::create(size_t totalSize) {
 
 uint8_t* Struct::data() {
    return values.data();
+}
+
+Struct* Struct::fromBuffer(Buffer buffer) {
+   auto* s = Struct::create(buffer.numElements);
+   std::memcpy(s->values.data(), buffer.ptr, buffer.numElements);
+   return s;
 }
 
 void Struct::cleanupUse(Struct* s) {

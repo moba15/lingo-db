@@ -29,6 +29,7 @@
 #include "lingodb/compiler/runtime/ExecutionContext.h"
 #include <lingodb/compiler/runtime/ArrowColumn.h>
 #include <lingodb/compiler/runtime/ListRuntime.h>
+#include <lingodb/compiler/runtime/StructRuntime.h>
 using namespace mlir;
 namespace arrow = lingodb::compiler::dialect::arrow;
 namespace db = lingodb::compiler::dialect::db;
@@ -188,7 +189,7 @@ class ArrayLoadListLowering : public OpConversionPattern<arrow::LoadListOp> {
       Value byteLen = rewriter.create<arith::MulIOp>(op.getLoc(), rewriter.getIndexType(), lenAsIndex, elemSizeIdx);
       Value buffer = rewriter.create<util::BufferCreateOp>(op.getLoc(), util::BufferType::get(getContext(), rewriter.getI8Type()), ptr, byteLen);
       Value elemSizeI64 = rewriter.create<arith::IndexCastOp>(op.getLoc(), rewriter.getI64Type(), elemSizeIdx);
-      Value list = rt::List::fromBuffer(rewriter, op.getLoc())({elemSizeI64, buffer})[0];
+            Value list = rt::List::fromBuffer(rewriter, op.getLoc())({elemSizeI64, buffer})[0];
       rewriter.replaceOp(op, list);
 
       return success();
@@ -204,6 +205,23 @@ class ArrayLoadStructLowering : public OpConversionPattern<arrow::LoadStructOp> 
          return failure();
       }
 
+      mlir::Value valueBuffer;
+      createAtArrayCreation(rewriter, adaptor.getArray(), [&](mlir::ConversionPatternRewriter& rewriter) {
+         Value elemSizeIdx2 = rewriter.create<util::SizeOfOp>(op.getLoc(), rewriter.getIndexType(), op.getStructType());
+         auto arrayOffset = rewriter.create<util::LoadElementOp>(op.getLoc(), rewriter.getIndexType(), adaptor.getArray(), 2);
+         auto bufferArray = rewriter.create<util::LoadElementOp>(op.getLoc(), util::RefType::get(util::RefType::get(rewriter.getI8Type())), adaptor.getArray(), 5);
+         //load buffer with main values (offset 1)
+         auto c1 = rewriter.create<arith::ConstantIndexOp>(op.getLoc(), 1);
+         valueBuffer = rewriter.create<util::LoadOp>(op.getLoc(), bufferArray, c1);
+         Value byteOffset = rewriter.create<arith::MulIOp>(op.getLoc(), rewriter.getIndexType(), arrayOffset, elemSizeIdx2);
+         valueBuffer = rewriter.create<util::ArrayElementPtrOp>(op.getLoc(), util::RefType::get(rewriter.getI8Type()), valueBuffer, byteOffset);
+      });
+      Value elemSizeIdx = rewriter.create<util::SizeOfOp>(op.getLoc(), rewriter.getIndexType(), op.getStructType());
+      Value byteOffset = rewriter.create<arith::MulIOp>(op.getLoc(), rewriter.getIndexType(), adaptor.getOffset(), elemSizeIdx);
+      Value ptr = rewriter.create<util::ArrayElementPtrOp>(op.getLoc(), util::RefType::get(rewriter.getI8Type()), valueBuffer, byteOffset);
+      Value buffer = rewriter.create<util::BufferCreateOp>(op.getLoc(), util::BufferType::get(getContext(), rewriter.getI8Type()), ptr, elemSizeIdx);
+      Value structObj = rt::Struct::fromBuffer(rewriter, op.getLoc())({buffer})[0];
+      rewriter.replaceOp(op, structObj);
 
       return success();
    }
@@ -514,8 +532,7 @@ void ArrowToStdLoweringPass::runOnOperation() {
       auto idxType = IndexType::get(ctxt);
       auto bufferType = util::RefType::get(ctxt, mlir::IntegerType::get(ctxt, 8));
       auto bufferArrayType = util::RefType::get(ctxt, bufferType);
-      //todo: childArrayType
-      return util::RefType::get(&getContext(), mlir::TupleType::get(ctxt, {idxType, idxType, idxType, idxType, idxType, bufferArrayType}));
+      return util::RefType::get(&getContext(), mlir::TupleType::get(ctxt, {idxType, idxType, idxType, idxType, idxType, bufferArrayType, bufferArrayType}));
    });
    typeConverter.addConversion([&](arrow::ArrayBuilderType builderType) {
       return util::RefType::get(&getContext(), IntegerType::get(&getContext(), 8));

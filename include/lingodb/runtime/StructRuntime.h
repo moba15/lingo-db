@@ -11,6 +11,7 @@ class Struct {
    std::vector<uint8_t> values;
    Struct(size_t totalSize, StorageClass storageClass = StorageClass::REFCOUNTED) : values(totalSize), storageClass(storageClass) {}
    static Struct* create(size_t totalSize);
+   static Struct* fromBuffer(Buffer buffer);
    uint8_t* data();
    static void cleanupUse(Struct* s);
    static void addUse(Struct* s);
