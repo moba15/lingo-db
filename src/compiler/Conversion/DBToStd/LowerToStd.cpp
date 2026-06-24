@@ -34,6 +34,8 @@
 #include "mlir/Transforms/DialectConversion.h"
 #include "mlir/Transforms/Passes.h"
 
+#include <mlir/Dialect/SPIRV/IR/SPIRVTypes.h>
+
 using namespace mlir;
 
 namespace {
@@ -198,8 +200,7 @@ class LoadArrowOpLowering : public OpConversionPattern<db::LoadArrowOp> {
          loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadListOp>(loc, util::RefType::get(rewriter.getContext()), array, offset, convertedType);
       } else if (auto structType = mlir::dyn_cast_or_null<db::StructType>(baseType)) {
          loaded = rewriter.create<lingodb::compiler::dialect::arrow::LoadStructOp>(loc, util::RefType::get(rewriter.getContext()), array, offset, structType);
-      }
-      else {
+      } else {
          return mlir::failure();
       }
 
@@ -814,6 +815,8 @@ class ConstantLowering : public OpConversionPattern<db::ConstantOp> {
          typeConstant = ::arrow::Type::type::LIST;
       } else if (mlir::isa<mlir::IndexType>(type)) {
          typeConstant = ::arrow::Type::type::UINT64;
+      } else if (mlir::isa<db::StructType>(type)) {
+         typeConstant = ::arrow::Type::type::STRUCT;
       }
       assert(typeConstant != ::arrow::Type::type::NA);
       return {typeConstant, param1, param2};
@@ -1531,7 +1534,7 @@ class StructUpdateLowering : public OpConversionPattern<db::StructUpdateOp> {
       mlir::Value dataPtr = rt::Struct::data(rewriter, loc)({adaptor.getStrct()})[0];
       mlir::Value tuplePtr = rewriter.create<util::GenericMemrefCastOp>(loc, util::RefType::get(rewriter.getContext(), tupleType), dataPtr);
       mlir::Value elementPtr = rewriter.create<util::TupleElementPtrOp>(loc, util::RefType::get(rewriter.getContext(), elementType), tuplePtr, fieldIndex);
-      
+
       rewriter.create<util::StoreOp>(loc, adaptor.getVal(), elementPtr, mlir::Value());
       rewriter.replaceOp(structUpdateOp, adaptor.getStrct());
       return success();

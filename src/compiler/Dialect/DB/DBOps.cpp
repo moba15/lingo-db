@@ -95,6 +95,8 @@ std::tuple<::arrow::Type::type, uint32_t, uint32_t> convertTypeToArrow(mlir::Typ
       typeConstant = ::arrow::Type::type::LIST;
    } else if (auto indexType = mlir::dyn_cast_or_null<IndexType>(type)) {
       typeConstant = ::arrow::Type::type::UINT64;
+   } else if (auto structType = mlir::dyn_cast_or_null<db::StructType>(type)) {
+      typeConstant = ::arrow::Type::type::STRUCT;
    }
    assert(typeConstant != ::arrow::Type::type::NA);
    return {typeConstant, param1, param2};
