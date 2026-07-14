@@ -1524,7 +1524,7 @@ class OuterJoinLowering : public OpConversionPattern<relalg::OuterJoinOp> {
       auto nullsEqual = outerJoinOp->getAttrOfType<mlir::ArrayAttr>("nullsEqual");
 
       if (!reverse) {
-         rewriter.replaceOp(outerJoinOp, translateNL(semiJoinOp, adaptor.getLeft(), adaptor.getRight(), semiJoinOp.getLeft(), semiJoinOp.getRight(), useHash, useIndexNestedLoop, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(outerJoinOp.getRight().getDefiningOp())), rewriter, outerJoinOp, [loc, &outerJoinOp](mlir::Value v, mlir::ConversionPatternRewriter& rewriter) -> mlir::Value {
+         rewriter.replaceOp(outerJoinOp, translateNL(outerJoinOp, adaptor.getLeft(), adaptor.getRight(), outerJoinOp.getLeft(), outerJoinOp.getRight(), useHash, useIndexNestedLoop, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(outerJoinOp.getRight().getDefiningOp())), rewriter, outerJoinOp, [loc, outerJoinOp](mlir::Value v, mlir::ConversionPatternRewriter& rewriter) mutable -> mlir::Value {
                                auto filtered = translateSelection(v, outerJoinOp.getPredicate(), rewriter, loc);
                                auto [markerDefAttr, markerRefAttr] = createColumn(rewriter.getI1Type(), "marker", "marker");
                                Value filteredNoMatch = rewriter.create<subop::FilterOp>(loc, anyTuple(filtered, markerDefAttr, rewriter, loc), subop::FilterSemantic::none_true, rewriter.getArrayAttr({markerRefAttr}));
@@ -1534,7 +1534,7 @@ class OuterJoinLowering : public OpConversionPattern<relalg::OuterJoinOp> {
                             }));
       } else {
          auto [flagAttrDef, flagAttrRef] = createColumn(rewriter.getI1Type(), "materialized", "marker");
-         auto [stream, scan] = translateNLWithMarker(adaptor.getLeft(), adaptor.getRight(), useHash, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(outerJoinOp.getLeft().getDefiningOp())), rewriter, loc, flagAttrDef, [loc, &outerJoinOp](mlir::Value v, mlir::Value, mlir::ConversionPatternRewriter& rewriter, tuples::ColumnRefAttr ref, Member flagMember) -> mlir::Value {
+         auto [stream, scan] = translateNLWithMarker(adaptor.getLeft(), adaptor.getRight(), useHash, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(outerJoinOp.getLeft().getDefiningOp())), rewriter, loc, flagAttrDef, [loc, outerJoinOp](mlir::Value v, mlir::Value, mlir::ConversionPatternRewriter& rewriter, tuples::ColumnRefAttr ref, Member flagMember) mutable -> mlir::Value {
             auto filtered = translateSelection(v, outerJoinOp.getPredicate(), rewriter, loc);
             auto [markerDefAttr, markerRefAttr] = createColumn(rewriter.getI1Type(), "marker", "marker");
             auto afterBool = mapBool(filtered, rewriter, loc, true, &markerDefAttr.getColumn());
@@ -1583,7 +1583,7 @@ class SingleJoinLowering : public OpConversionPattern<relalg::SingleJoinOp> {
          auto mappedNullable = mapColsToNullable(gathered.getRes(), rewriter, loc, singleJoinOp.getMapping());
          rewriter.replaceOp(singleJoinOp, mappedNullable);
       } else if (!reverse) {
-         rewriter.replaceOp(singleJoinOp, translateNL(semiJoinOp, adaptor.getLeft(), adaptor.getRight(), semiJoinOp.getLeft(), semiJoinOp.getRight(), useHash, useIndexNestedLoop, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(singleJoinOp.getRight().getDefiningOp())), rewriter, singleJoinOp, [loc, &singleJoinOp](mlir::Value v, mlir::ConversionPatternRewriter& rewriter) -> mlir::Value {
+         rewriter.replaceOp(singleJoinOp, translateNL(singleJoinOp, adaptor.getLeft(), adaptor.getRight(), singleJoinOp.getLeft(), singleJoinOp.getRight(), useHash, useIndexNestedLoop, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(singleJoinOp.getRight().getDefiningOp())), rewriter, singleJoinOp, [loc, singleJoinOp](mlir::Value v, mlir::ConversionPatternRewriter& rewriter) mutable -> mlir::Value {
                                auto filtered = translateSelection(v, singleJoinOp.getPredicate(), rewriter, loc);
                                auto [markerDefAttr, markerRefAttr] = createColumn(rewriter.getI1Type(), "marker", "marker");
                                Value filteredNoMatch = rewriter.create<subop::FilterOp>(loc, anyTuple(filtered, markerDefAttr, rewriter, loc), subop::FilterSemantic::none_true, rewriter.getArrayAttr({markerRefAttr}));
@@ -1593,7 +1593,7 @@ class SingleJoinLowering : public OpConversionPattern<relalg::SingleJoinOp> {
                             }));
       } else {
          auto [flagAttrDef, flagAttrRef] = createColumn(rewriter.getI1Type(), "materialized", "marker");
-         auto [stream, scan] = translateNLWithMarker(adaptor.getLeft(), adaptor.getRight(), useHash, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(singleJoinOp.getLeft().getDefiningOp())), rewriter, loc, flagAttrDef, [loc, &singleJoinOp](mlir::Value v, mlir::Value, mlir::ConversionPatternRewriter& rewriter, tuples::ColumnRefAttr ref, Member flagMember) -> mlir::Value {
+         auto [stream, scan] = translateNLWithMarker(adaptor.getLeft(), adaptor.getRight(), useHash, nullsEqual, leftHash, rightHash, requiredColumns.lookup(mlir::cast<Operator>(singleJoinOp.getLeft().getDefiningOp())), rewriter, loc, flagAttrDef, [loc, singleJoinOp](mlir::Value v, mlir::Value, mlir::ConversionPatternRewriter& rewriter, tuples::ColumnRefAttr ref, Member flagMember) mutable -> mlir::Value {
             auto filtered = translateSelection(v, singleJoinOp.getPredicate(), rewriter, loc);
             auto [markerDefAttr, markerRefAttr] = createColumn(rewriter.getI1Type(), "marker", "marker");
             auto afterBool = mapBool(filtered, rewriter, loc, true, &markerDefAttr.getColumn());

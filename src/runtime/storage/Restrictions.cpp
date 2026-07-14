@@ -169,7 +169,7 @@ class NotNullFilter : public lingodb::runtime::Filter {
 class IsNullFilter : public lingodb::runtime::Filter {
    public:
    IsNullFilter() {}
-   size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+   size_t filter(size_t len, const uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
       auto* writer = nextSelVec;
       if (arrayView->nullCount == 0) {
          //fast path: no nulls
@@ -378,7 +378,7 @@ class BitMapFilter : public lingodb::runtime::Filter {
 
    public:
    BitMapFilter(size_t* bitMap) {}
-   size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+   size_t filter(size_t len, const uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
       const T* data = reinterpret_cast<const T*>(arrayView->buffers[1]) + offset + arrayView->offset;
       auto* writer = nextSelVec;
       for (size_t i = 0; i < len; i++) {
@@ -444,7 +444,7 @@ class HashViewFilter : public lingodb::runtime::Filter {
    HashViewFilter(lingodb::runtime::SIP::SIPNode* sip) : sip(sip), view(sip->hashView) {
       assert(view);
    }
-   size_t filter(size_t len, uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
+   size_t filter(size_t len, const uint16_t* currSelVec, uint16_t* nextSelVec, const lingodb::runtime::ArrayView* arrayView, size_t offset) override {
       auto* writer = nextSelVec;
       size_t filteredCount = 0;
 
