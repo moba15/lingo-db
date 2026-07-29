@@ -9,7 +9,7 @@ class Struct {
 
    public:
    std::vector<uint8_t> values;
-   Struct(size_t totalSize, StorageClass storageClass = StorageClass::REFCOUNTED) : values(totalSize), storageClass(storageClass) {}
+   Struct(size_t totalSize, StorageClass storageClass = StorageClass::REFCOUNTED) : storageClass(storageClass), values(totalSize) {}
    static Struct* create(size_t totalSize);
    uint8_t* data();
    static void cleanupUse(Struct* s);

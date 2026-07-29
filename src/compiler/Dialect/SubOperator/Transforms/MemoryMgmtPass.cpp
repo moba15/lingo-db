@@ -159,6 +159,38 @@ class MemoryMgmtPass : public mlir::PassWrapper<MemoryMgmtPass, mlir::OperationP
          } else {
             assert(!typeNeedsManagement(listType.getElementType()));
          }
+      } else if (auto structType = mlir::dyn_cast<db::StructType>(val.getType())) {
+         bool needsFieldMgmt = false;
+         for (auto fieldType : structType.getTypes()) {
+            if (typeNeedsManagement(fieldType)) {
+               needsFieldMgmt = true;
+               break;
+            }
+         }
+         if (needsFieldMgmt) {
+            auto loc = insertBeforeOp->getLoc();
+            std::string name = "_cleanup_struct_" + std::to_string(reinterpret_cast<uintptr_t>(structType.getAsOpaquePointer()));
+            auto moduleOp = insertBeforeOp->getParentOfType<mlir::ModuleOp>();
+            mlir::func::FuncOp cleanupFn = moduleOp.lookupSymbol<mlir::func::FuncOp>(name);
+            if (!cleanupFn) {
+               auto fnType = builder.getFunctionType({structType}, {});
+               mlir::OpBuilder::InsertionGuard guard(builder);
+               builder.setInsertionPointToStart(moduleOp.getBody());
+               cleanupFn = builder.create<mlir::func::FuncOp>(loc, name, fnType);
+               builder.setInsertionPointToStart(cleanupFn.addEntryBlock());
+               mlir::Value strct = cleanupFn.getArgument(0);
+               for (size_t i = 0; i < structType.getTypes().size(); ++i) {
+                  auto fieldType = structType.getTypes()[i];
+                  if (typeNeedsManagement(fieldType)) {
+                     auto fieldNameAttr = mlir::cast<mlir::StringAttr>(structType.getNames()[i]);
+                     mlir::Value element = builder.create<db::StructGetOp>(loc, fieldType, strct, fieldNameAttr);
+                     builder.create<db::MemoryCleanupUse>(loc, element, mlir::SymbolRefAttr());
+                  }
+               }
+               builder.create<mlir::func::ReturnOp>(loc);
+            }
+            elementFn = mlir::SymbolRefAttr::get(builder.getContext(), name);
+         }
       }
       mlir::cast<db::ManagedType>(val.getType()).emitCleanupUse(builder, insertBeforeOp->getLoc(), val, elementFn);
    }
